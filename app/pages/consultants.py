@@ -13,6 +13,26 @@ import os
 sys.path.append(os.path.dirname(__file__))
 from app.services.consultant_service import ConsultantService
 
+def clear_cache_and_refresh(keep_edit_id=False):
+    """Nettoie le cache et force le rafraîchissement des données"""
+    # Nettoyer le cache Streamlit
+    st.cache_data.clear()
+    
+    # Nettoyer les états de session liés aux sélections
+    keys_to_clear = [
+        'selected_consultant_id', 
+        'selected_consultant_name', 
+        'show_delete_dialog'
+    ]
+    
+    # Ajouter edit_consultant_id à la liste seulement si on ne veut pas le garder
+    if not keep_edit_id:
+        keys_to_clear.append('edit_consultant_id')
+    
+    for key in keys_to_clear:
+        if key in st.session_state:
+            del st.session_state[key]
+
 def show():
     """Affiche la page de gestion des consultants"""
     
@@ -20,7 +40,7 @@ def show():
     st.markdown("### Gérez les profils de vos consultants")
     
     # Onglets pour organiser les fonctionnalités
-    tab1, tab2, tab3, tab4 = st.tabs(["📋 Liste des consultants", "➕ Ajouter un consultant", "✏️ Modifier un consultant", "📄 Import CV"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📋 Liste des consultants", "➕ Ajouter un consultant", "✏️ Modifier un consultant", "�️ Supprimer un consultant", "�📄 Import CV"])
     
     with tab1:
         show_consultants_list()
@@ -32,6 +52,9 @@ def show():
         show_edit_consultant_form()
     
     with tab4:
+        show_delete_consultant_form()
+    
+    with tab5:
         show_cv_import()
 
 def show_consultants_list():
@@ -39,8 +62,14 @@ def show_consultants_list():
     
     st.subheader("📋 Liste des consultants")
     
-    # Filtres
-    col1, col2, col3 = st.columns(3)
+    # Vérifier si un consultant vient d'être ajouté
+    if 'newly_added_consultant' in st.session_state:
+        consultant_name = st.session_state.newly_added_consultant
+        st.success(f"🎉 **Nouveau consultant ajouté** : {consultant_name}")
+        del st.session_state.newly_added_consultant
+    
+    # Filtres et bouton de rafraîchissement
+    col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
     
     with col1:
         search_name = st.text_input("🔍 Rechercher par nom", placeholder="Nom ou prénom...")
@@ -56,6 +85,12 @@ def show_consultants_list():
             "📈 Trier par",
             ["Nom", "Date d'ajout", "Dernière mise à jour"]
         )
+    
+    with col4:
+        st.write("")  # Espacement
+        if st.button("🔄", help="Actualiser la liste", key="refresh_consultants"):
+            clear_cache_and_refresh(keep_edit_id=True)
+            st.rerun()
     
     # Récupérer les consultants depuis la base de données
     try:
@@ -86,9 +121,9 @@ def show_consultants_list():
                 status = "✅ Disponible" if filter_availability == "Disponible" else "🔴 En mission"
                 df = df[df['Disponibilité'] == status]
             
-            # Afficher le tableau
+            # Afficher le tableau avec sélection
             if not df.empty:
-                st.dataframe(
+                event = st.dataframe(
                     df,
                     use_container_width=True,
                     hide_index=True,
@@ -101,8 +136,28 @@ def show_consultants_list():
                             "Email",
                             width="medium"
                         )
-                    }
+                    },
+                    on_select="rerun",
+                    selection_mode="single-row",
+                    key="consultants_table"
                 )
+                
+                # Vérifier si une ligne est sélectionnée
+                if event.selection.rows:
+                    selected_row_index = event.selection.rows[0]
+                    selected_consultant = df.iloc[selected_row_index]
+                    
+                    # Stocker les données du consultant sélectionné
+                    st.session_state.selected_consultant_id = int(selected_consultant['ID'])
+                    st.session_state.selected_consultant_name = f"{selected_consultant['Prénom']} {selected_consultant['Nom']}"
+                    
+                    # NOUVEAU : Définir automatiquement l'ID pour la modification
+                    st.session_state.edit_consultant_id = int(selected_consultant['ID'])
+                    
+                    st.info(f"👤 Consultant sélectionné: **{selected_consultant['Prénom']} {selected_consultant['Nom']}**")
+                    st.success(f"✏️ Prêt pour modification - Allez dans l'onglet 'Modifier un consultant'")
+                else:
+                    st.info("👆 Cliquez sur une ligne du tableau pour sélectionner un consultant")
                 
                 # Actions en lot
                 st.markdown("---")
@@ -125,90 +180,12 @@ def show_consultants_list():
                 with col3:
                     if st.button("✉️ Email groupé"):
                         st.info("✉️ Email groupé - Fonctionnalité à venir !")
-                
-                # Actions rapides par consultant
-                st.markdown("---")
-                st.subheader("⚡ Actions rapides")
-                
-                selected_consultant = st.selectbox(
-                    "Sélectionner un consultant pour les actions",
-                    options=df['Prénom'] + " " + df['Nom'],  # Changé: Prénom + Nom au lieu de Nom + Prénom
-                    index=0
-                )
-                
-                col1, col2, col3, col4 = st.columns(4)
-                
-                with col1:
-                    if st.button("✏️ Modifier"):
-                        consultant_id = df[df['Prénom'] + " " + df['Nom'] == selected_consultant]['ID'].iloc[0]
-                        st.session_state.edit_consultant_id = consultant_id
-                        st.success(f"✏️ Consultant sélectionné pour modification. Allez dans l'onglet 'Modifier un consultant'")
-                
-                with col2:
-                    if st.button("🎯 Voir compétences"):
-                        st.info(f"🎯 Compétences de {selected_consultant} - Redirection vers page compétences !")
-                
-                with col3:
-                    if st.button("💼 Voir missions"):
-                        st.info(f"💼 Missions de {selected_consultant} - Redirection vers page missions !")
-                
-                with col4:
-                    if st.button("🗑️ Supprimer", type="secondary"):
-                        try:
-                            # Recherche plus robuste de l'ID
-                            matching_rows = df[df['Prénom'] + " " + df['Nom'] == selected_consultant]
-                            
-                            if matching_rows.empty:
-                                st.error(f"❌ Consultant '{selected_consultant}' non trouvé dans la liste")
-                                st.write("Debug - Consultants disponibles:")
-                                st.write(df[['ID', 'Prénom', 'Nom']])
-                                return
-                            
-                            consultant_id = int(matching_rows['ID'].iloc[0])
-                            st.info(f"🔍 Debug: ID trouvé = {consultant_id} pour '{selected_consultant}'")
-                            
-                            # Clé unique pour la confirmation de suppression
-                            confirm_key = f"confirm_delete_{consultant_id}"
-                            
-                            if not st.session_state.get(confirm_key, False):
-                                st.session_state[confirm_key] = True
-                                st.warning(f"⚠️ Confirmez-vous la suppression de {selected_consultant} (ID: {consultant_id}) ? Cliquez à nouveau pour confirmer.")
-                            else:
-                                try:
-                                    st.info(f"🔄 Tentative de suppression du consultant ID {consultant_id}...")
-                                    result = ConsultantService.delete_consultant(consultant_id)
-                                    
-                                    if result:
-                                        st.success(f"✅ {selected_consultant} supprimé avec succès !")
-                                        # Nettoyer toutes les confirmations
-                                        keys_to_remove = [key for key in st.session_state.keys() if key.startswith('confirm_delete_')]
-                                        for key in keys_to_remove:
-                                            del st.session_state[key]
-                                        if 'edit_consultant_id' in st.session_state:
-                                            del st.session_state['edit_consultant_id']
-                                        st.rerun()
-                                    else:
-                                        st.error(f"❌ Échec de la suppression de {selected_consultant} (ID: {consultant_id})")
-                                        st.session_state[confirm_key] = False
-                                        
-                                except Exception as delete_error:
-                                    st.error(f"❌ Erreur lors de la suppression: {str(delete_error)}")
-                                    st.session_state[confirm_key] = False
-                                    
-                        except Exception as e:
-                            st.error(f"❌ Erreur dans la logique de suppression: {str(e)}")
-                            st.write(f"Debug - Exception type: {type(e).__name__}")
-                            st.write(f"Debug - Selected consultant: '{selected_consultant}'")
-                            import traceback
-                            st.code(traceback.format_exc())
             
             else:
                 st.info("Aucun consultant ne correspond aux critères de recherche.")
         
         else:
-            st.info("📝 Aucun consultant enregistré. Commencez par ajouter votre premier consultant !")
-            if st.button("➕ Ajouter le premier consultant"):
-                st.switch_page("Consultants")
+            st.info("📝 Aucun consultant enregistré. Utilisez l'onglet 'Ajouter un consultant' pour commencer !")
     
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement des consultants: {e}")
@@ -219,7 +196,10 @@ def show_add_consultant_form():
     
     st.subheader("➕ Ajouter un nouveau consultant")
     
-    with st.form("add_consultant_form"):
+    # Générer une clé unique pour le formulaire pour forcer la réinitialisation
+    form_key = f"add_consultant_form_{st.session_state.get('form_reset_counter', 0)}"
+    
+    with st.form(form_key):
         col1, col2 = st.columns(2)
         
         with col1:
@@ -267,8 +247,11 @@ def show_add_consultant_form():
                     st.success(f"✅ Consultant {prenom} {nom} ajouté avec succès !")
                     st.balloons()
                     
+                    # Nettoyer le cache pour rafraîchir les données
+                    clear_cache_and_refresh()
+                    
                     # Afficher un aperçu des données saisies
-                    with st.expander("👁️ Aperçu des données"):
+                    with st.expander("👁️ Aperçu des données ajoutées"):
                         st.json({
                             "prenom": prenom,
                             "nom": nom,
@@ -280,8 +263,22 @@ def show_add_consultant_form():
                             "date_creation": datetime.now().isoformat()
                         })
                     
-                    # Suggérer de voir la liste
-                    st.info("💡 Consultez l'onglet 'Liste des consultants' pour voir votre nouveau consultant !")
+                    # Redirection automatique vers la liste des consultants
+                    st.info("� Redirection automatique vers la liste des consultants...")
+                    
+                    # Stocker le consultant ajouté pour le mettre en évidence
+                    st.session_state.newly_added_consultant = f"{prenom} {nom}"
+                    
+                    # Incrémenter le compteur pour forcer la réinitialisation du formulaire
+                    st.session_state.form_reset_counter = st.session_state.get('form_reset_counter', 0) + 1
+                    
+                    st.info("🔄 Consultant ajouté ! Allez voir la liste des consultants pour le retrouver.")
+                    st.success("📝 Le formulaire est maintenant réinitialisé pour un nouvel ajout.")
+                    
+                    # Réinitialiser le formulaire en rechargeant la page
+                    import time
+                    time.sleep(1.5)
+                    st.rerun()
                 else:
                     st.error("❌ Erreur lors de l'ajout du consultant. Vérifiez la base de données.")
         
@@ -306,34 +303,52 @@ def show_edit_consultant_form():
     
     st.subheader("✏️ Modifier un consultant")
     
-    # Sélection du consultant à modifier
-    consultants = ConsultantService.get_all_consultants()
+    # Debug: Afficher l'état de la session
+    if st.checkbox("🔍 Debug: Voir l'état de la session", key="debug_session"):
+        st.write("Session state:", dict(st.session_state))
     
-    if not consultants:
-        st.info("📝 Aucun consultant à modifier. Ajoutez d'abord des consultants.")
-        return
-    
-    # Options pour le selectbox
-    consultant_options = {}
-    for consultant in consultants:
-        key = f"{consultant.prenom} {consultant.nom} ({consultant.email})"
-        consultant_options[key] = consultant
-    
-    # Pré-sélection si un consultant a été choisi depuis la liste
-    selected_key = None
+    # Vérifier si un consultant a été sélectionné depuis la liste
     if 'edit_consultant_id' in st.session_state:
-        for key, consultant in consultant_options.items():
-            if consultant.id == st.session_state.edit_consultant_id:
-                selected_key = key
-                break
-    
-    selected_consultant_key = st.selectbox(
-        "👤 Sélectionner le consultant à modifier",
-        options=list(consultant_options.keys()),
-        index=list(consultant_options.keys()).index(selected_key) if selected_key else 0
-    )
-    
-    consultant = consultant_options[selected_consultant_key]
+        # Récupérer le consultant sélectionné
+        try:
+            consultant_id = st.session_state.edit_consultant_id
+            st.success(f"🎯 **ID consultant détecté**: {consultant_id}")
+            
+            consultant = ConsultantService.get_consultant_by_id(consultant_id)
+            if not consultant:
+                st.error("❌ Consultant introuvable")
+                del st.session_state.edit_consultant_id
+                return
+                
+            st.success(f"✏️ **Consultant sélectionné depuis la liste**: {consultant.prenom} {consultant.nom}")
+            
+        except Exception as e:
+            st.error(f"❌ Erreur lors du chargement: {e}")
+            del st.session_state.edit_consultant_id
+            return
+    else:
+        st.warning("⚠️ Aucun consultant pré-sélectionné")
+        # Sélection manuelle du consultant
+        consultants = ConsultantService.get_all_consultants()
+        
+        if not consultants:
+            st.info("📝 Aucun consultant à modifier. Ajoutez d'abord des consultants.")
+            return
+        
+        # Options pour le selectbox
+        consultant_options = {}
+        for cons in consultants:
+            key = f"{cons.prenom} {cons.nom} ({cons.email})"
+            consultant_options[key] = cons
+        
+        selected_consultant_key = st.selectbox(
+            "👤 Sélectionner le consultant à modifier",
+            options=list(consultant_options.keys()),
+            index=0
+        )
+        
+        consultant = consultant_options[selected_consultant_key]
+        st.info("💡 **Conseil**: Vous pouvez aussi sélectionner un consultant dans la 'Liste des consultants' puis cliquer sur 'Modifier'")
     
     st.info(f"📝 Modification de: **{consultant.prenom} {consultant.nom}**")
     
@@ -389,7 +404,12 @@ def show_edit_consultant_form():
                     if 'edit_consultant_id' in st.session_state:
                         del st.session_state.edit_consultant_id
                     
-                    st.info("💡 Les modifications ont été sauvegardées. Consultez la liste pour voir les changements.")
+                    st.info("� Retour automatique à la liste des consultants...")
+                    
+                    # Forcer le rafraîchissement et retourner à la liste
+                    import time
+                    time.sleep(1)
+                    st.rerun()
                 else:
                     st.error("❌ Erreur lors de la mise à jour du consultant.")
         
@@ -490,6 +510,235 @@ def show_cv_import():
                 height=200,
                 disabled=True
             )
+
+def show_delete_consultant_form():
+    """Affiche le formulaire de suppression d'un consultant"""
+    
+    st.subheader("🗑️ Supprimer un consultant")
+    
+    # Vérifier si un consultant a été sélectionné depuis la liste
+    if 'selected_consultant_id' in st.session_state and 'selected_consultant_name' in st.session_state:
+        # Récupérer le consultant sélectionné
+        try:
+            consultant_id = st.session_state.selected_consultant_id
+            consultant_name = st.session_state.selected_consultant_name
+            
+            consultant = ConsultantService.get_consultant_by_id(consultant_id)
+            if not consultant:
+                st.error("❌ Consultant introuvable")
+                del st.session_state.selected_consultant_id
+                del st.session_state.selected_consultant_name
+                return
+                
+            st.success(f"🎯 **Consultant sélectionné depuis la liste**: {consultant_name}")
+            
+            # Dialog de confirmation immédiat - Workflow simplifié
+            st.error(f"### ⚠️ CONFIRMER LA SUPPRESSION")
+            st.error(f"**Voulez-vous vraiment supprimer {consultant.prenom} {consultant.nom} ?**")
+            
+            # Informations résumées du consultant
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write(f"📧 **Email**: {consultant.email}")
+                st.write(f"💰 **Salaire**: {consultant.salaire_actuel or 0}€")
+            with col2:
+                st.write(f"📞 **Téléphone**: {consultant.telephone or 'Non renseigné'}")
+                st.write(f"✅ **Disponible**: {'Oui' if consultant.disponibilite else 'Non'}")
+            
+            st.warning("⚠️ Cette action est **IRRÉVERSIBLE** et supprimera toutes les données associées.")
+            
+            # Boutons de confirmation - Workflow direct
+            col1, col2, col3 = st.columns([1, 1, 2])
+            
+            with col1:
+                if st.button("✅ OUI, SUPPRIMER", type="primary", key="confirm_delete"):
+                    try:
+                        result = ConsultantService.delete_consultant(consultant_id)
+                        
+                        if result:
+                            st.success(f"✅ {consultant.prenom} {consultant.nom} a été supprimé avec succès !")
+                            st.balloons()
+                            
+                            # Nettoyer tous les états
+                            keys_to_clean = ['selected_consultant_id', 'selected_consultant_name', 'edit_consultant_id']
+                            for key in keys_to_clean:
+                                if key in st.session_state:
+                                    del st.session_state[key]
+                            
+                            # Nettoyer le cache et rafraîchir
+                            clear_cache_and_refresh()
+                            
+                            # Attendre un peu puis recharger
+                            import time
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.error("❌ Erreur lors de la suppression du consultant.")
+                    except Exception as e:
+                        st.error(f"❌ Erreur technique: {str(e)}")
+            
+            with col2:
+                if st.button("❌ NON, ANNULER", key="cancel_delete"):
+                    # Nettoyer les sélections
+                    if 'selected_consultant_id' in st.session_state:
+                        del st.session_state.selected_consultant_id
+                    if 'selected_consultant_name' in st.session_state:
+                        del st.session_state.selected_consultant_name
+                    st.info("❌ Suppression annulée")
+                    st.rerun()
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.write(f"**👤 Prénom**: {consultant.prenom}")
+                st.write(f"**👤 Nom**: {consultant.nom}")
+                st.write(f"**📧 Email**: {consultant.email}")
+                st.write(f"**� Téléphone**: {consultant.telephone or 'Non renseigné'}")
+            
+            with col2:
+                st.write(f"**💰 Salaire**: {consultant.salaire_actuel or 0}€")
+                st.write(f"**✅ Disponible**: {'Oui' if consultant.disponibilite else 'Non'}")
+                st.write(f"**📅 Créé le**: {consultant.date_creation.strftime('%d/%m/%Y') if consultant.date_creation else 'N/A'}")
+                st.write(f"**� Modifié le**: {consultant.derniere_maj.strftime('%d/%m/%Y') if consultant.derniere_maj else 'N/A'}")
+            
+            if consultant.notes:
+                st.write(f"**📝 Notes**: {consultant.notes}")
+            
+            # Bouton de suppression principal
+            st.markdown("---")
+            st.warning("⚠️ **Attention**: Cette action supprimera définitivement le consultant et toutes ses données associées (compétences, missions, CV).")
+            
+            col1, col2, col3 = st.columns([1, 1, 2])
+            
+            with col1:
+                if st.button("🗑️ SUPPRIMER CE CONSULTANT", type="primary"):
+                    st.session_state.show_delete_confirmation = True
+            
+            with col2:
+                if st.button("❌ Annuler"):
+                    # Nettoyer les sélections
+                    if 'selected_consultant_id' in st.session_state:
+                        del st.session_state.selected_consultant_id
+                    if 'selected_consultant_name' in st.session_state:
+                        del st.session_state.selected_consultant_name
+                    st.info("❌ Suppression annulée")
+                    st.rerun()
+            
+            # Dialog de confirmation
+            if st.session_state.get("show_delete_confirmation", False):
+                st.markdown("---")
+                st.error(f"### ⚠️ CONFIRMATION DE SUPPRESSION")
+                st.error(f"**Êtes-vous absolument sûr de vouloir supprimer {consultant.prenom} {consultant.nom} ?**")
+                st.warning("Cette action est **IRRÉVERSIBLE** et supprimera :")
+                st.markdown("""
+                - ✖️ Le profil du consultant
+                - ✖️ Toutes ses compétences
+                - ✖️ Toutes ses missions
+                - ✖️ Tous ses CVs uploadés
+                """)
+                
+                # Debug: Afficher l'état
+                st.write("🔍 Debug:", {
+                    "consultant_id": consultant_id,
+                    "consultant_name": consultant_name,
+                    "session_state_keys": list(st.session_state.keys())
+                })
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    confirm_clicked = st.button("✅ OUI, SUPPRIMER DÉFINITIVEMENT", type="primary", key="final_delete_confirm")
+                    if confirm_clicked:
+                        st.write("🔍 Bouton de confirmation cliqué !")
+                        try:
+                            st.write(f"🔍 Tentative de suppression du consultant ID: {consultant_id}")
+                            result = ConsultantService.delete_consultant(consultant_id)
+                            st.write(f"🔍 Résultat de la suppression: {result}")
+                            
+                            if result:
+                                st.success(f"✅ {consultant.prenom} {consultant.nom} a été supprimé avec succès !")
+                                st.balloons()
+                                
+                                # Nettoyer tous les états
+                                keys_to_clean = ['selected_consultant_id', 'selected_consultant_name', 'show_delete_confirmation', 'edit_consultant_id']
+                                for key in keys_to_clean:
+                                    if key in st.session_state:
+                                        del st.session_state[key]
+                                
+                                # Nettoyer le cache
+                                st.cache_data.clear()
+                                
+                                st.info("🔄 Retour automatique à la liste des consultants...")
+                                
+                                # Attendre un peu puis recharger
+                                import time
+                                time.sleep(1.5)
+                                st.rerun()
+                            else:
+                                st.error("❌ Erreur lors de la suppression du consultant.")
+                                st.session_state.show_delete_confirmation = False
+                        except Exception as e:
+                            st.error(f"❌ Erreur technique: {str(e)}")
+                            st.session_state.show_delete_confirmation = False
+                
+                with col2:
+                    cancel_clicked = st.button("❌ NON, ANNULER", key="cancel_final_delete")
+                    if cancel_clicked:
+                        st.write("🔍 Bouton d'annulation cliqué !")
+                        st.session_state.show_delete_confirmation = False
+                        st.info("❌ Suppression annulée")
+                        st.rerun()
+            
+        except Exception as e:
+            st.error(f"❌ Erreur lors du chargement: {e}")
+            # Nettoyer les états en cas d'erreur
+            if 'selected_consultant_id' in st.session_state:
+                del st.session_state.selected_consultant_id
+            if 'selected_consultant_name' in st.session_state:
+                del st.session_state.selected_consultant_name
+            return
+    
+    else:
+        # Aucun consultant sélectionné
+        st.warning("⚠️ Aucun consultant sélectionné")
+        
+        st.info("""
+        **Workflow de suppression simplifié :**
+        
+        1. 📋 Allez dans l'onglet **'Liste des consultants'**
+        2. 👆 **Cliquez sur une ligne** du tableau pour sélectionner un consultant
+        3. 🗑️ **Revenez dans cet onglet** → Confirmation immédiate
+        4. ✅ **Cliquez sur "OUI, SUPPRIMER"** → Suppression terminée !
+        
+        ➡️ Sélectionnez d'abord un consultant dans la liste !
+        """)
+        
+        st.markdown("---")
+        
+        # Afficher un aperçu des consultants disponibles
+        consultants = ConsultantService.get_all_consultants()
+        
+        if consultants:
+            st.subheader("📊 Consultants disponibles pour suppression")
+            
+            consultant_info = []
+            for consultant in consultants:
+                consultant_info.append({
+                    "Prénom": consultant.prenom,
+                    "Nom": consultant.nom,
+                    "Email": consultant.email,
+                    "Disponible": "✅" if consultant.disponibilite else "❌"
+                })
+            
+            df_info = pd.DataFrame(consultant_info)
+            st.dataframe(df_info, use_container_width=True, hide_index=True)
+            
+            st.info(f"📈 **Total**: {len(consultants)} consultant(s) dans la base de données")
+        else:
+            st.warning("📝 Aucun consultant dans la base de données.")
+        
+        st.markdown("---")
+        st.success("💡 **Conseil**: Sélectionnez un consultant dans la 'Liste des consultants' puis revenez ici")
 
 if __name__ == "__main__":
     show()

@@ -6,6 +6,23 @@ Démarre l'application Streamlit
 import subprocess
 import sys
 import os
+import socket
+
+def is_port_available(port):
+    """Vérifie si un port est disponible"""
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(('localhost', port))
+            return True
+    except OSError:
+        return False
+
+def find_available_port(start_port=8501, max_attempts=10):
+    """Trouve un port disponible"""
+    for port in range(start_port, start_port + max_attempts):
+        if is_port_available(port):
+            return port
+    return None
 
 def run_consultator():
     """Lance l'application Consultator"""
@@ -15,14 +32,21 @@ def run_consultator():
     
     print("🚀 Lancement de Consultator...")
     print(f"📁 Répertoire: {app_dir}")
-    print("🌐 URL: http://localhost:8501")
+    
+    # Trouver un port disponible
+    port = find_available_port()
+    if port is None:
+        print("❌ Aucun port disponible trouvé")
+        return
+    
+    print(f"🌐 URL: http://localhost:{port}")
     print("⏱️  Démarrage en cours...")
     
     # Lancer Streamlit
     cmd = [
         sys.executable, "-m", "streamlit", "run", 
         os.path.join(app_dir, "main.py"),
-        "--server.port=8501",
+        f"--server.port={port}",
         "--server.address=localhost",
         "--browser.gatherUsageStats=false"
     ]
