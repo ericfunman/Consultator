@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.env
+
+# VS Code
+.vscode/settings.json
+.vscode/launch.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Database
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Uploads (optional - décommentez si vous ne voulez pas versionner les fichiers uploadés)
+# data/uploads/*
+# !data/uploads/.gitkeep
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
