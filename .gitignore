@@ -53,8 +53,29 @@ Thumbs.db
 .streamlit/secrets.toml
 
 # Uploads (optional - décommentez si vous ne voulez pas versionner les fichiers uploadés)
-# data/uploads/*
-# !data/uploads/.gitkeep
+data/uploads/*
+!data/uploads/.gitkeep
+
+# Fichiers de backup
+backup_*/
+
+# Fichiers de test et développement
+test_*.py
+debug_*.py
+analyze_*.py
+algorithm_summary.py
+create_test_*.py
+delete_function_simplified.py
+final_algorithm.py
+improved_date_detection.py
+patch_document_analyzer.py
+show_analysis_results.py
+validation_missions_detaillees.py
+
+# Documents de travail
+AMELIORATIONS_ANALYSE.md
+STATUS_FINAL.md
+Eric_L_Quanteam.pptx
 
 # IDE
 .idea/

@@ -22,6 +22,9 @@ def get_database_session():
     """Retourne une session de base de données"""
     return SessionLocal()
 
+# Alias pour compatibilité (certains fichiers peuvent avoir l'ancien nom)
+get_session = get_database_session
+
 def init_database():
     """Initialise la base de données et crée les tables"""
     try:

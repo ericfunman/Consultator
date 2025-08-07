@@ -82,6 +82,7 @@ class Mission(Base):
     consultant_id = Column(Integer, ForeignKey('consultants.id'), nullable=False)
     nom_mission = Column(String(200), nullable=False)
     client = Column(String(200), nullable=False)
+    role = Column(String(300))  # Nouveau champ pour le rôle/poste
     date_debut = Column(Date, nullable=False)
     date_fin = Column(Date)
     statut = Column(String(20), default='en_cours')  # en_cours, terminee, suspendue

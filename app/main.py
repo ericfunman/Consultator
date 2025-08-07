@@ -9,10 +9,10 @@ import sys
 import os
 
 # Ajouter le dossier app au path Python
-sys.path.append(os.path.join(os.path.dirname(__file__), 'app'))
+sys.path.append(os.path.dirname(__file__))
 
 # Import des pages
-from pages import home, consultants, skills, missions
+from pages_modules import consultants, home, skills, missions
 from database.database import init_database
 
 # Configuration de la page
@@ -58,15 +58,12 @@ def main():
     
     # Menu de navigation dans la sidebar
     with st.sidebar:
-        st.image("https://via.placeholder.com/200x80/1f77b4/ffffff?text=CONSULTATOR", width=200)
-        st.markdown("---")
-        
         selected = option_menu(
-            menu_title="Navigation",
+            menu_title=None,  # Pas de titre
             options=["🏠 Accueil", "👥 Consultants", "🎯 Compétences", "💼 Missions"],
             icons=["house", "people", "target", "briefcase"],
             menu_icon="list",
-            default_index=0,
+            default_index=1,  # Démarre sur Consultants par défaut
             styles={
                 "container": {"padding": "0!important", "background-color": "#fafafa"},
                 "icon": {"color": "#1f77b4", "font-size": "18px"},
