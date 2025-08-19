@@ -1,5 +1,5 @@
 """
-Page de gestion des consultants - Version propre
+Page de gestion des consultants
 CRUD complet pour les consultants avec formulaires, tableaux et gestion de documents
 """
 
@@ -8,6 +8,8 @@ import pandas as pd
 from datetime import datetime
 import sys
 import os
+import platform
+import subprocess
 
 # Import des modèles et services
 sys.path.append(os.path.dirname(__file__))
@@ -22,8 +24,15 @@ from database.models import Mission, ConsultantCompetence, Competence
 def show():
     """Affiche la page de gestion des consultants"""
     
-    st.title("👥 Gestion des consultants")
-    st.markdown("### Gérez les profils de vos consultants")
+    print("🚨 TERMINAL LOG: La fonction show() de consultants.py a été appelée!")
+    
+    st.title("🚨 NOUVEAU TITRE UNIQUE 19/08/2025 - Gestion des consultants 🚨")
+    st.markdown("### ✅ CETTE PAGE A ÉTÉ MISE À JOUR - Gérez les profils de vos consultants")
+    
+    # TEST FORCÉ POUR VÉRIFIER QUE CE FICHIER EST UTILISÉ - VERSION 19/08/2025 15:45
+    st.error("🚨 DEBUG ACTIF - CONSULTANTS.PY PAGES_MODULES - 19/08/2025 15:45 🚨")
+    st.success("✅ Ce message confirme que le bon fichier consultants.py est utilisé")
+    st.balloons()
     
     # Vérifier si on doit afficher le profil d'un consultant spécifique
     if 'view_consultant_profile' in st.session_state:
@@ -103,6 +112,10 @@ def show_consultant_skills(consultant):
     
     st.subheader("💼 Compétences technologiques")
     
+    # Debug forcé pour vérifier que cette fonction est appelée
+    st.error("🔥 DEBUG: Cette fonction est bien appelée !")
+    st.write(f"🔍 Consultant ID: {consultant.id}, Nom: {consultant.nom} {consultant.prenom}")
+    
     # Récupérer les technologies des missions du consultant
     technologies_missions = get_consultant_technologies_from_missions(consultant.id)
     
@@ -125,57 +138,11 @@ def show_consultant_skills(consultant):
     
     with tab1:
         if all_technologies:
-            # Récupérer le référentiel de technologies pour vérifier si elles sont connues
-            try:
-                referentiel_technologies = TechnologyService.get_all_technologies()
-                known_tech_names = {tech.nom.lower() for tech in referentiel_technologies}
-            except:
-                known_tech_names = set()
-            
-            # Affichage des compétences sous forme de badges
             st.write("**🏷️ Technologies maîtrisées**")
             
-            # Légende des couleurs
-            col_leg1, col_leg2 = st.columns(2)
-            with col_leg1:
-                st.markdown("✅ **Vert** : Technologie du référentiel")
-            with col_leg2:
-                st.markdown("❓ **Jaune** : Technologie non référencée")
-            
-            st.markdown("---")
-            
-            # Organiser en colonnes
-            cols = st.columns(4)
-            technologies_list = sorted(list(all_technologies))
-            
-            for i, tech in enumerate(technologies_list):
-                with cols[i % 4]:
-                    # Vérifier si la technologie vient des missions
-                    source = "🚀 Mission" if tech in technologies_missions else "✋ Manuel"
-                    
-                    # Vérifier si la technologie est dans le référentiel
-                    is_known = tech.lower() in known_tech_names
-                    
-                    # Couleur selon si la technologie est connue ou non
-                    if is_known:
-                        bg_color = "#e8f5e8"  # Vert clair pour les technologies connues
-                        border_color = "#28a745"
-                        text_color = "#155724"
-                    else:
-                        bg_color = "#fff3cd"  # Jaune clair pour les technologies inconnues
-                        border_color = "#ffc107"
-                        text_color = "#856404"
-                    
-                    status_icon = "✅" if is_known else "❓"
-                    
-                    st.markdown(f"""
-                    <div style="padding: 8px; margin: 3px; border: 2px solid {border_color}; border-radius: 5px; text-align: center; background-color: {bg_color}; color: {text_color};">
-                        {status_icon} <strong>{tech}</strong><br>
-                        <small style="color: {text_color};">{source}</small>
-                    </div>
-                    """, unsafe_allow_html=True)
-            
-            st.markdown("---")
+            for tech in sorted(all_technologies):
+                source = "🚀 Mission" if tech in technologies_missions else "✋ Manuel"
+                st.write(f"• {tech} ({source})")
             
             # Métriques des compétences
             col1, col2, col3 = st.columns(3)
@@ -191,44 +158,10 @@ def show_consultant_skills(consultant):
         
         else:
             st.info("🔍 Aucune compétence technologique trouvée")
-            st.markdown("💡 Les compétences peuvent provenir de:")
-            st.markdown("- 🚀 **Missions** : Technologies utilisées dans les missions")
-            st.markdown("- ✋ **Ajout manuel** : Utilisez l'onglet 'Ajouter des compétences'")
     
     with tab2:
         st.markdown("### ➕ Ajouter des compétences manuellement")
-        
-        # Widget de sélection des technologies avec le référentiel
-        try:
-            nouvelles_technologies = technology_multiselect(
-                label="🛠️ Sélectionnez des technologies",
-                key=f"add_skills_{consultant.id}",
-                current_technologies="",
-                help_text="Choisissez les technologies que maîtrise ce consultant"
-            )
-            
-            if st.button("➕ Ajouter les compétences sélectionnées", type="primary"):
-                if nouvelles_technologies:
-                    # Convertir la chaîne en liste
-                    techs_to_add = [tech.strip() for tech in nouvelles_technologies.split(',') if tech.strip()]
-                    
-                    # Ajouter chaque technologie
-                    added_count = 0
-                    for tech in techs_to_add:
-                        if tech not in all_technologies:  # Éviter les doublons
-                            add_manual_skill(consultant.id, tech)
-                            added_count += 1
-                    
-                    if added_count > 0:
-                        st.success(f"✅ {added_count} compétence(s) ajoutée(s) avec succès !")
-                        st.rerun()
-                    else:
-                        st.warning("⚠️ Toutes les technologies sélectionnées sont déjà présentes")
-                else:
-                    st.error("❌ Veuillez sélectionner au moins une technologie")
-        except Exception as e:
-            st.error(f"Erreur avec le widget de technologies: {e}")
-            st.info("Fonctionnalité d'ajout de compétences temporairement indisponible")
+        st.info("Fonctionnalité d'ajout de compétences à venir")
 
 def get_consultant_technologies_from_missions(consultant_id):
     """Récupère toutes les technologies utilisées dans les missions du consultant"""
@@ -238,39 +171,28 @@ def get_consultant_technologies_from_missions(consultant_id):
         with get_database_session() as session:
             missions = session.query(Mission).filter(Mission.consultant_id == consultant_id).all()
             
+            # Debug temporaire
+            st.write(f"🔍 Debug: {len(missions)} missions trouvées pour consultant ID {consultant_id}")
+            
             for mission in missions:
                 if mission.technologies_utilisees and mission.technologies_utilisees.strip():
                     # Diviser les technologies et les nettoyer
                     mission_techs = [tech.strip() for tech in mission.technologies_utilisees.split(',') if tech.strip()]
                     technologies.update(mission_techs)
+                    st.write(f"✅ Mission {mission.client}: {mission_techs}")
+                else:
+                    st.write(f"❌ Mission {mission.client}: pas de technologies")
                     
     except Exception as e:
-        pass  # Pas d'affichage d'erreur pour garder l'interface propre
+        st.error(f"❌ Erreur lors de la récupération des technologies: {e}")
     
+    st.write(f"🎯 Technologies finales: {list(technologies)}")
     return list(technologies)
 
 def get_consultant_manual_skills(consultant_id):
     """Récupère les compétences ajoutées manuellement pour le consultant"""
     key = f"manual_skills_{consultant_id}"
     return st.session_state.get(key, [])
-
-def add_manual_skill(consultant_id, technology):
-    """Ajoute une compétence manuelle pour le consultant"""
-    key = f"manual_skills_{consultant_id}"
-    current_skills = st.session_state.get(key, [])
-    
-    if technology not in current_skills:
-        current_skills.append(technology)
-        st.session_state[key] = current_skills
-
-def remove_manual_skill(consultant_id, technology):
-    """Supprime une compétence manuelle pour le consultant"""
-    key = f"manual_skills_{consultant_id}"
-    current_skills = st.session_state.get(key, [])
-    
-    if technology in current_skills:
-        current_skills.remove(technology)
-        st.session_state[key] = current_skills
 
 def show_consultant_info(consultant):
     """Affiche les informations de base du consultant"""
@@ -340,21 +262,13 @@ def show_consultants_list():
             # Préparer les données pour le tableau
             consultants_data = []
             for consultant in consultants:
-                # Compter les missions
-                try:
-                    with get_database_session() as session:
-                        nb_missions = session.query(Mission).filter(Mission.consultant_id == consultant.id).count()
-                except:
-                    nb_missions = 0
-                
                 consultants_data.append({
                     "ID": consultant.id,
                     "Prénom": consultant.prenom,
                     "Nom": consultant.nom,
                     "Email": consultant.email,
                     "Salaire": f"{consultant.salaire_actuel or 0:,}€",
-                    "Statut": "✅ Disponible" if consultant.disponibilite else "🔴 Occupé",
-                    "Missions": nb_missions
+                    "Statut": "✅ Disponible" if consultant.disponibilite else "🔴 Occupé"
                 })
             
             # Afficher le tableau
@@ -386,21 +300,6 @@ def show_consultants_list():
                     if st.button("✏️ Modifier", use_container_width=True):
                         st.session_state.view_consultant_profile = selected_consultant_id
                         st.rerun()
-            
-            # Métriques générales
-            st.markdown("---")
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                st.metric("👥 Total consultants", len(consultants))
-            
-            with col2:
-                disponibles = len([c for c in consultants if c.disponibilite])
-                st.metric("✅ Disponibles", disponibles)
-            
-            with col3:
-                salaire_moyen = sum(c.salaire_actuel or 0 for c in consultants) / len(consultants) if consultants else 0
-                st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
         else:
             st.info("📝 Aucun consultant enregistré")
     

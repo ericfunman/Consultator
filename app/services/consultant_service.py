@@ -6,8 +6,8 @@ CRUD operations pour les consultants avec la base de données
 from datetime import datetime, date
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session, joinedload
-from app.database.database import get_database_session
-from app.database.models import Consultant, Mission, Competence, ConsultantCompetence
+from database.database import get_database_session
+from database.models import Consultant, Mission, Competence, ConsultantCompetence
 import streamlit as st
 
 
@@ -56,7 +56,7 @@ class ConsultantService:
             with get_database_session() as session:
                 consultant = session.query(Consultant)\
                     .options(
-                        joinedload(Consultant.competences),
+                        joinedload(Consultant.competences).joinedload(ConsultantCompetence.competence),
                         joinedload(Consultant.missions)
                     )\
                     .filter(Consultant.id == consultant_id)\
@@ -85,21 +85,22 @@ class ConsultantService:
                     'missions_count': missions_count,
                     'competences': [
                         {
-                            'id': comp.id,
-                            'nom': comp.nom,
-                            'niveau': comp.niveau,
+                            'id': comp.competence.id if comp.competence else comp.id,
+                            'nom': comp.competence.nom if comp.competence else 'N/A',
+                            'niveau': comp.niveau_maitrise,
                             'annees_experience': comp.annees_experience
                         } for comp in (consultant.competences or [])
                     ],
                     'missions': [
                         {
                             'id': mission.id,
-                            'titre': mission.titre,
+                            'nom_mission': mission.nom_mission,
+                            'client': mission.client,
                             'description': mission.description,
                             'date_debut': mission.date_debut,
                             'date_fin': mission.date_fin,
-                            'entreprise': mission.entreprise,
-                            'revenus': mission.revenus
+                            'statut': mission.statut,
+                            'revenus_generes': mission.revenus_generes
                         } for mission in (consultant.missions or [])
                     ]
                 }

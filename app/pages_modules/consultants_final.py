@@ -1,5 +1,5 @@
 """
-Page de gestion des consultants - Version propre
+Page de gestion des consultants
 CRUD complet pour les consultants avec formulaires, tableaux et gestion de documents
 """
 
@@ -8,6 +8,8 @@ import pandas as pd
 from datetime import datetime
 import sys
 import os
+import platform
+import subprocess
 
 # Import des modèles et services
 sys.path.append(os.path.dirname(__file__))
@@ -245,7 +247,7 @@ def get_consultant_technologies_from_missions(consultant_id):
                     technologies.update(mission_techs)
                     
     except Exception as e:
-        pass  # Pas d'affichage d'erreur pour garder l'interface propre
+        st.error(f"❌ Erreur lors de la récupération des technologies: {e}")
     
     return list(technologies)
 

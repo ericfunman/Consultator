@@ -20,8 +20,8 @@ try:
 except ImportError as e:
     st.error(f"❌ Dépendance manquante pour le parsing de documents: {e}")
 
-from app.database.database import get_database_session
-from app.database.models import Consultant
+from database.database import get_database_session
+from database.models import Consultant
 
 class DocumentService:
     """Service pour la gestion des documents"""
