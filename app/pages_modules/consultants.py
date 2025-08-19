@@ -942,7 +942,7 @@ def show_consultant_missions(consultant):
                 # Description de la mission
                 if mission['Description'] and mission['Description'] != "Aucune description":
                     st.write("**📝 Description**:")
-                    st.text_area("", value=mission['Description'], height=100, key=f"desc_{i}", disabled=True)
+                    st.text_area("Description", value=mission['Description'], height=100, key=f"desc_{i}", disabled=True, label_visibility="collapsed")
         
         # Actions
         col1, col2, col3 = st.columns(3)
