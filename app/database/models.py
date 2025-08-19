@@ -121,3 +121,16 @@ class CV(Base):
     
     def __repr__(self):
         return f"<CV(id={self.id}, consultant_id={self.consultant_id}, fichier='{self.fichier_nom}')>"
+
+class CustomTechnology(Base):
+    """Modèle pour les technologies personnalisées"""
+    __tablename__ = 'custom_technologies'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nom = Column(String(100), nullable=False, unique=True)
+    categorie = Column(String(100), nullable=False, default="Personnalisées")
+    description = Column(Text)
+    date_creation = Column(DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f"<CustomTechnology(id={self.id}, nom='{self.nom}', categorie='{self.categorie}')>"

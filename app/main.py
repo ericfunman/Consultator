@@ -12,7 +12,7 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 # Import des pages
-from pages_modules import consultants, home, skills, missions
+from pages_modules import consultants, home, skills, missions, technologies
 from database.database import init_database
 
 # Configuration de la page
@@ -60,10 +60,10 @@ def main():
     with st.sidebar:
         selected = option_menu(
             menu_title=None,  # Pas de titre
-            options=["🏠 Accueil", "👥 Consultants", "🎯 Compétences", "💼 Missions"],
-            icons=["house", "people", "target", "briefcase"],
+            options=["🏠 Accueil", "👥 Consultants", "🎯 Compétences", "�️ Technologies", "�💼 Missions"],
+            icons=["house", "people", "target", "tools", "briefcase"],
             menu_icon="list",
-            default_index=1,  # Démarre sur Consultants par défaut
+            default_index=0,  # Démarre sur Accueil au lieu de Consultants
             styles={
                 "container": {"padding": "0!important", "background-color": "#fafafa"},
                 "icon": {"color": "#1f77b4", "font-size": "18px"},
@@ -76,9 +76,6 @@ def main():
                 "nav-link-selected": {"background-color": "#1f77b4"},
             }
         )
-        
-        st.markdown("---")
-        st.info("💡 **Conseil du jour**\n\nUtilisez les filtres pour trouver rapidement vos consultants par compétence !")
     
     # Navigation vers les pages
     if selected == "🏠 Accueil":
@@ -87,7 +84,9 @@ def main():
         consultants.show()
     elif selected == "🎯 Compétences":
         skills.show()
-    elif selected == "💼 Missions":
+    elif selected == "�️ Technologies":
+        technologies.show()
+    elif selected == "�💼 Missions":
         missions.show()
 
 if __name__ == "__main__":
