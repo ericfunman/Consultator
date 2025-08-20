@@ -12,7 +12,8 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 # Import des pages
-from pages_modules import consultants, home, skills, missions, technologies
+import importlib
+from pages_modules import home, skills, missions, technologies, consultants
 from database.database import init_database
 
 # Configuration de la page
@@ -60,7 +61,7 @@ def main():
     with st.sidebar:
         selected = option_menu(
             menu_title=None,  # Pas de titre
-            options=["🏠 Accueil", "👥 Consultants", "🎯 Compétences", "�️ Technologies", "�💼 Missions"],
+            options=["🏠 Accueil", "👥 Consultants", "🎯 Compétences", "🛠️ Technologies", "💼 Missions"],
             icons=["house", "people", "target", "tools", "briefcase"],
             menu_icon="list",
             default_index=0,  # Démarre sur Accueil au lieu de Consultants
@@ -84,9 +85,9 @@ def main():
         consultants.show()
     elif selected == "🎯 Compétences":
         skills.show()
-    elif selected == "�️ Technologies":
+    elif selected == "🛠️ Technologies":
         technologies.show()
-    elif selected == "�💼 Missions":
+    elif selected == "💼 Missions":
         missions.show()
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 """
-Page de gestion des consultants - Version propre
-CRUD complet pour les consultants avec formulaires, tableaux et gestion de documents
+Page de gestion des consultants - Version fonctionnelle
+CRUD complet pour les consultants avec formulaires, tableaux et gestion des missions
 """
 
 import streamlit as st
@@ -9,21 +9,37 @@ from datetime import datetime
 import sys
 import os
 
-# Import des modèles et services
-sys.path.append(os.path.dirname(__file__))
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from services.consultant_service import ConsultantService
-from services.document_analyzer import DocumentAnalyzer
-from services.technology_service import TechnologyService
-from components.technology_widget import technology_multiselect
-from database.database import get_database_session
-from database.models import Mission, ConsultantCompetence, Competence
+# Ajouter les chemins nécessaires
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+# Variables pour les imports
+ConsultantService = None
+get_database_session = None
+Mission = None
+imports_ok = False
+
+try:
+    from services.consultant_service import ConsultantService
+    from database.database import get_database_session
+    from database.models import Mission
+    imports_ok = True
+except ImportError as e:
+    # Imports échoués, on continue quand même
+    pass
 
 def show():
     """Affiche la page de gestion des consultants"""
     
     st.title("👥 Gestion des consultants")
     st.markdown("### Gérez les profils de vos consultants")
+    
+    if not imports_ok:
+        st.error("❌ Les services de base ne sont pas disponibles")
+        st.info("Vérifiez que tous les modules sont correctement installés")
+        return
     
     # Vérifier si on doit afficher le profil d'un consultant spécifique
     if 'view_consultant_profile' in st.session_state:
@@ -64,24 +80,24 @@ def show_consultant_profile():
     
     st.markdown("---")
     
-    # Informations principales
+    # Métriques principales
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric("💰 Salaire annuel", f"{consultant.salaire_actuel or 0:,}€", delta=None)
-        
+        st.metric("💰 Salaire annuel", f"{consultant.salaire_actuel or 0:,}€")
+    
     with col2:
-        status = "Disponible" if consultant.disponibilite else "En mission"
+        status = "✅ Disponible" if consultant.disponibilite else "🔴 En mission"
         st.metric("📊 Statut", status)
-        
+    
     with col3:
         creation_date = consultant.date_creation.strftime("%d/%m/%Y") if consultant.date_creation else "N/A"
         st.metric("📅 Membre depuis", creation_date)
     
     st.markdown("---")
     
-    # Détails du profil
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📋 Informations", "💼 Compétences", "🚀 Missions", "📄 Documents", "⚙️ Actions"])
+    # Onglets de détail
+    tab1, tab2, tab3 = st.tabs(["📋 Informations", "💼 Compétences", "🚀 Missions"])
     
     with tab1:
         show_consultant_info(consultant)
@@ -91,245 +107,307 @@ def show_consultant_profile():
     
     with tab3:
         show_consultant_missions(consultant)
+
+def show_consultant_info(consultant):
+    """Affiche et permet la modification des informations du consultant"""
     
-    with tab4:
-        show_consultant_documents(consultant)
+    st.subheader("📋 Informations personnelles")
     
-    with tab5:
-        show_consultant_actions(consultant)
+    with st.form(f"edit_consultant_{consultant.id}"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            prenom = st.text_input("👤 Prénom *", value=consultant.prenom, placeholder="Ex: Jean")
+            email = st.text_input("📧 Email *", value=consultant.email, placeholder="jean.dupont@example.com")
+            salaire = st.number_input("💰 Salaire annuel (€)", 
+                                    min_value=0, 
+                                    value=int(consultant.salaire_actuel or 0), 
+                                    step=1000)
+        
+        with col2:
+            nom = st.text_input("👤 Nom *", value=consultant.nom, placeholder="Ex: Dupont")
+            telephone = st.text_input("📞 Téléphone", 
+                                    value=consultant.telephone or "", 
+                                    placeholder="01.23.45.67.89")
+            disponibilite = st.checkbox("✅ Disponible", value=consultant.disponibilite)
+        
+        # Notes
+        notes = st.text_area("📝 Notes", 
+                            value=consultant.notes or "",
+                            height=100,
+                            placeholder="Notes sur le consultant...")
+        
+        # Bouton de sauvegarde
+        col1, col2, col3 = st.columns([2, 1, 2])
+        with col2:
+            submitted = st.form_submit_button("💾 Sauvegarder", 
+                                            type="primary",
+                                            use_container_width=True)
+        
+        if submitted:
+            if not prenom or not nom or not email:
+                st.error("❌ Veuillez remplir tous les champs obligatoires (*)")
+            else:
+                # Vérifier l'unicité de l'email
+                existing = ConsultantService.get_consultant_by_email(email)
+                if existing and existing.id != consultant.id:
+                    st.error(f"❌ Un consultant avec l'email {email} existe déjà !")
+                else:
+                    try:
+                        update_data = {
+                            'prenom': prenom.strip(),
+                            'nom': nom.strip(),
+                            'email': email.strip().lower(),
+                            'telephone': telephone.strip() if telephone else None,
+                            'salaire_actuel': salaire,
+                            'disponibilite': disponibilite,
+                            'notes': notes.strip() if notes else None
+                        }
+                        
+                        if ConsultantService.update_consultant(consultant.id, update_data):
+                            st.success(f"✅ {prenom} {nom} modifié avec succès !")
+                            st.rerun()
+                        else:
+                            st.error("❌ Erreur lors de la modification")
+                    
+                    except Exception as e:
+                        st.error(f"❌ Erreur: {e}")
 
 def show_consultant_skills(consultant):
-    """Affiche les compétences technologiques du consultant"""
+    """Affiche les compétences du consultant basées sur ses missions"""
     
     st.subheader("💼 Compétences technologiques")
     
-    # Récupérer les technologies des missions du consultant
-    technologies_missions = get_consultant_technologies_from_missions(consultant.id)
-    
-    # Récupérer les compétences manuelles (si elles existent)
-    competences_manuelles = get_consultant_manual_skills(consultant.id)
-    
-    # Combiner toutes les technologies
-    all_technologies = set()
-    
-    # Technologies des missions
-    for tech in technologies_missions:
-        all_technologies.add(tech)
-    
-    # Compétences ajoutées manuellement
-    for comp in competences_manuelles:
-        all_technologies.add(comp)
-    
-    # Onglets pour organiser les fonctionnalités
-    tab1, tab2 = st.tabs(["📋 Compétences actuelles", "➕ Ajouter des compétences"])
-    
-    with tab1:
-        if all_technologies:
-            # Récupérer le référentiel de technologies pour vérifier si elles sont connues
-            try:
-                referentiel_technologies = TechnologyService.get_all_technologies()
-                known_tech_names = {tech.nom.lower() for tech in referentiel_technologies}
-            except:
-                known_tech_names = set()
+    try:
+        # Récupérer les technologies des missions
+        with get_database_session() as session:
+            missions = session.query(Mission).filter(Mission.consultant_id == consultant.id).all()
             
-            # Affichage des compétences sous forme de badges
-            st.write("**🏷️ Technologies maîtrisées**")
+        technologies = set()
+        for mission in missions:
+            if mission.technologies_utilisees:
+                mission_techs = [tech.strip() for tech in mission.technologies_utilisees.split(',') if tech.strip()]
+                technologies.update(mission_techs)
+        
+        if technologies:
+            st.write("**🏷️ Technologies maîtrisées** (extraites des missions)")
             
-            # Légende des couleurs
-            col_leg1, col_leg2 = st.columns(2)
-            with col_leg1:
-                st.markdown("✅ **Vert** : Technologie du référentiel")
-            with col_leg2:
-                st.markdown("❓ **Jaune** : Technologie non référencée")
-            
-            st.markdown("---")
-            
-            # Organiser en colonnes
+            # Affichage en colonnes
             cols = st.columns(4)
-            technologies_list = sorted(list(all_technologies))
+            tech_list = sorted(list(technologies))
             
-            for i, tech in enumerate(technologies_list):
+            for i, tech in enumerate(tech_list):
                 with cols[i % 4]:
-                    # Vérifier si la technologie vient des missions
-                    source = "🚀 Mission" if tech in technologies_missions else "✋ Manuel"
-                    
-                    # Vérifier si la technologie est dans le référentiel
-                    is_known = tech.lower() in known_tech_names
-                    
-                    # Couleur selon si la technologie est connue ou non
-                    if is_known:
-                        bg_color = "#e8f5e8"  # Vert clair pour les technologies connues
-                        border_color = "#28a745"
-                        text_color = "#155724"
-                    else:
-                        bg_color = "#fff3cd"  # Jaune clair pour les technologies inconnues
-                        border_color = "#ffc107"
-                        text_color = "#856404"
-                    
-                    status_icon = "✅" if is_known else "❓"
-                    
                     st.markdown(f"""
-                    <div style="padding: 8px; margin: 3px; border: 2px solid {border_color}; border-radius: 5px; text-align: center; background-color: {bg_color}; color: {text_color};">
-                        {status_icon} <strong>{tech}</strong><br>
-                        <small style="color: {text_color};">{source}</small>
+                    <div style="padding: 8px; margin: 3px; border: 2px solid #1f77b4; 
+                                border-radius: 5px; text-align: center; background-color: #e8f4fd;">
+                        <strong>{tech}</strong>
                     </div>
                     """, unsafe_allow_html=True)
             
             st.markdown("---")
-            
-            # Métriques des compétences
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                st.metric("🛠️ Total technologies", len(all_technologies))
-            
-            with col2:
-                st.metric("🚀 Depuis missions", len(technologies_missions))
-            
-            with col3:
-                st.metric("✋ Ajoutées manuellement", len(competences_manuelles))
-        
+            st.metric("🛠️ Total technologies", len(technologies))
         else:
-            st.info("🔍 Aucune compétence technologique trouvée")
-            st.markdown("💡 Les compétences peuvent provenir de:")
-            st.markdown("- 🚀 **Missions** : Technologies utilisées dans les missions")
-            st.markdown("- ✋ **Ajout manuel** : Utilisez l'onglet 'Ajouter des compétences'")
+            st.info("🔍 Aucune technologie trouvée dans les missions")
     
-    with tab2:
-        st.markdown("### ➕ Ajouter des compétences manuellement")
-        
-        # Widget de sélection des technologies avec le référentiel
-        try:
-            nouvelles_technologies = technology_multiselect(
-                label="🛠️ Sélectionnez des technologies",
-                key=f"add_skills_{consultant.id}",
-                current_technologies="",
-                help_text="Choisissez les technologies que maîtrise ce consultant"
-            )
-            
-            if st.button("➕ Ajouter les compétences sélectionnées", type="primary"):
-                if nouvelles_technologies:
-                    # Convertir la chaîne en liste
-                    techs_to_add = [tech.strip() for tech in nouvelles_technologies.split(',') if tech.strip()]
-                    
-                    # Ajouter chaque technologie
-                    added_count = 0
-                    for tech in techs_to_add:
-                        if tech not in all_technologies:  # Éviter les doublons
-                            add_manual_skill(consultant.id, tech)
-                            added_count += 1
-                    
-                    if added_count > 0:
-                        st.success(f"✅ {added_count} compétence(s) ajoutée(s) avec succès !")
-                        st.rerun()
-                    else:
-                        st.warning("⚠️ Toutes les technologies sélectionnées sont déjà présentes")
-                else:
-                    st.error("❌ Veuillez sélectionner au moins une technologie")
-        except Exception as e:
-            st.error(f"Erreur avec le widget de technologies: {e}")
-            st.info("Fonctionnalité d'ajout de compétences temporairement indisponible")
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement des compétences: {e}")
 
-def get_consultant_technologies_from_missions(consultant_id):
-    """Récupère toutes les technologies utilisées dans les missions du consultant"""
-    technologies = set()
+def show_consultant_missions(consultant):
+    """Affiche l'historique des missions du consultant avec édition"""
+    
+    st.subheader("🚀 Historique des missions")
     
     try:
         with get_database_session() as session:
-            missions = session.query(Mission).filter(Mission.consultant_id == consultant_id).all()
+            missions = session.query(Mission).filter(
+                Mission.consultant_id == consultant.id
+            ).order_by(Mission.date_debut.desc()).all()
+        
+        if missions:
+            # Métriques des missions
+            col1, col2, col3, col4 = st.columns(4)
             
-            for mission in missions:
-                if mission.technologies_utilisees and mission.technologies_utilisees.strip():
-                    # Diviser les technologies et les nettoyer
-                    mission_techs = [tech.strip() for tech in mission.technologies_utilisees.split(',') if tech.strip()]
-                    technologies.update(mission_techs)
+            total_revenus = sum(m.revenus_generes or 0 for m in missions)
+            missions_terminees = len([m for m in missions if m.statut == "terminee"])
+            missions_en_cours = len([m for m in missions if m.statut == "en_cours"])
+            
+            with col1:
+                st.metric("💰 Revenus totaux", f"{total_revenus:,}€")
+            with col2:
+                st.metric("✅ Terminées", missions_terminees)
+            with col3:
+                st.metric("🔄 En cours", missions_en_cours)
+            with col4:
+                st.metric("📊 Total", len(missions))
+            
+            st.markdown("---")
+            
+            # Onglets pour organiser les fonctionnalités
+            tab1, tab2 = st.tabs(["📋 Missions existantes", "➕ Ajouter une mission"])
+            
+            with tab1:
+                # Mode édition
+                edit_mode = st.checkbox("✏️ Mode édition", key="edit_mode_missions")
+                
+                if edit_mode:
+                    st.info("📝 Mode édition activé - Cliquez sur une mission pour la modifier")
                     
+                    for i, mission in enumerate(missions):
+                        with st.expander(f"✏️ Éditer: {mission.client} - {mission.role or 'Rôle non défini'}", expanded=False):
+                            show_mission_edit_form(mission)
+                else:
+                    # Affichage normal (lecture seule)
+                    for i, mission in enumerate(missions):
+                        with st.expander(f"🚀 {mission.client} - {mission.role or 'Rôle non défini'}", expanded=(i == 0)):
+                            show_mission_readonly(mission)
+            
+            with tab2:
+                show_add_mission_form(consultant)
+        else:
+            st.info("📝 Aucune mission enregistrée pour ce consultant")
+            show_add_mission_form(consultant)
+    
     except Exception as e:
-        pass  # Pas d'affichage d'erreur pour garder l'interface propre
-    
-    return list(technologies)
+        st.error(f"❌ Erreur lors du chargement des missions: {e}")
 
-def get_consultant_manual_skills(consultant_id):
-    """Récupère les compétences ajoutées manuellement pour le consultant"""
-    key = f"manual_skills_{consultant_id}"
-    return st.session_state.get(key, [])
-
-def add_manual_skill(consultant_id, technology):
-    """Ajoute une compétence manuelle pour le consultant"""
-    key = f"manual_skills_{consultant_id}"
-    current_skills = st.session_state.get(key, [])
-    
-    if technology not in current_skills:
-        current_skills.append(technology)
-        st.session_state[key] = current_skills
-
-def remove_manual_skill(consultant_id, technology):
-    """Supprime une compétence manuelle pour le consultant"""
-    key = f"manual_skills_{consultant_id}"
-    current_skills = st.session_state.get(key, [])
-    
-    if technology in current_skills:
-        current_skills.remove(technology)
-        st.session_state[key] = current_skills
-
-def show_consultant_info(consultant):
-    """Affiche les informations de base du consultant"""
-    st.subheader("📋 Informations personnelles")
-    
+def show_mission_readonly(mission):
+    """Affiche les détails d'une mission en lecture seule"""
     col1, col2 = st.columns(2)
     
     with col1:
-        st.write(f"**👤 Prénom**: {consultant.prenom}")
-        st.write(f"**📧 Email**: {consultant.email}")
-        st.write(f"**💰 Salaire**: {consultant.salaire_actuel or 0:,}€")
+        st.write(f"**🏢 Client**: {mission.client}")
+        st.write(f"**👤 Rôle**: {mission.role or 'Non spécifié'}")
+        st.write(f"**📅 Début**: {mission.date_debut.strftime('%Y-%m-%d') if mission.date_debut else 'N/A'}")
+        st.write(f"**💰 Revenus**: {mission.revenus_generes or 0:,}€")
     
     with col2:
-        st.write(f"**👤 Nom**: {consultant.nom}")
-        st.write(f"**📞 Téléphone**: {consultant.telephone or 'N/A'}")
-        st.write(f"**✅ Disponible**: {'Oui' if consultant.disponibilite else 'Non'}")
-
-def show_consultant_missions(consultant):
-    """Affiche les missions du consultant"""
-    st.subheader("🚀 Missions")
-    
-    try:
-        with get_database_session() as session:
-            missions = session.query(Mission).filter(Mission.consultant_id == consultant.id).all()
-            
-        if missions:
-            for mission in missions:
-                with st.expander(f"🚀 {mission.client} - {mission.role or 'Rôle non défini'}"):
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        st.write(f"**🏢 Client**: {mission.client}")
-                        st.write(f"**👤 Rôle**: {mission.role or 'Non spécifié'}")
-                        st.write(f"**💰 Revenus**: {mission.revenus_generes or 0:,}€")
-                    
-                    with col2:
-                        st.write(f"**📅 Début**: {mission.date_debut.strftime('%Y-%m-%d') if mission.date_debut else 'N/A'}")
-                        st.write(f"**📅 Fin**: {mission.date_fin.strftime('%Y-%m-%d') if mission.date_fin else 'En cours'}")
-                        st.write(f"**📊 Statut**: {mission.statut}")
-                    
-                    st.write(f"**🛠️ Technologies**: {mission.technologies_utilisees or 'Non spécifiées'}")
+        st.write(f"**📅 Fin**: {mission.date_fin.strftime('%Y-%m-%d') if mission.date_fin else 'En cours'}")
+        
+        # Statut avec couleur
+        if mission.statut == 'terminee':
+            st.success("✅ Terminée")
+        elif mission.statut == 'en_cours':
+            st.info("🔄 En cours")
         else:
-            st.info("📝 Aucune mission enregistrée")
-            
-    except Exception as e:
-        st.error(f"❌ Erreur: {e}")
+            st.warning("⏸️ En pause")
+    
+    st.write(f"**🛠️ Technologies**: {mission.technologies_utilisees or 'Non spécifiées'}")
+    
+    # Description de la mission
+    if mission.description and mission.description != "Aucune description":
+        st.write("**📝 Description**:")
+        st.text_area(
+            label="Description de la mission", 
+            value=mission.description, 
+            height=100, 
+            key=f"desc_readonly_{mission.id}", 
+            disabled=True, 
+            label_visibility="collapsed"
+        )
 
-def show_consultant_documents(consultant):
-    """Affiche les documents du consultant"""
-    st.subheader("📄 Documents")
-    st.info("Fonctionnalité de gestion des documents à venir")
+def show_mission_edit_form(mission):
+    """Formulaire d'édition d'une mission"""
+    
+    with st.form(f"edit_mission_{mission.id}"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            nom_mission = st.text_input("📋 Nom de la mission", 
+                                      value=mission.nom_mission or "", 
+                                      key=f"edit_nom_{mission.id}")
+            client = st.text_input("🏢 Client", 
+                                 value=mission.client or "", 
+                                 key=f"edit_client_{mission.id}")
+            role = st.text_input("👤 Rôle", 
+                               value=mission.role or "", 
+                               key=f"edit_role_{mission.id}")
+            revenus = st.number_input("💰 Revenus (€)", 
+                                    value=float(mission.revenus_generes or 0), 
+                                    min_value=0.0, 
+                                    key=f"edit_revenus_{mission.id}")
+        
+        with col2:
+            date_debut = st.date_input("📅 Date début", 
+                                     value=mission.date_debut if mission.date_debut else None, 
+                                     key=f"edit_debut_{mission.id}")
+            date_fin = st.date_input("📅 Date fin", 
+                                   value=mission.date_fin if mission.date_fin else None, 
+                                   key=f"edit_fin_{mission.id}")
+            statut = st.selectbox("📊 Statut", 
+                                ["en_cours", "terminee", "en_pause"], 
+                                index=["en_cours", "terminee", "en_pause"].index(mission.statut) if mission.statut in ["en_cours", "terminee", "en_pause"] else 0,
+                                key=f"edit_statut_{mission.id}")
+        
+        technologies = st.text_input("🛠️ Technologies", 
+                                   value=mission.technologies_utilisees or "", 
+                                   key=f"edit_tech_{mission.id}")
+        description = st.text_area("📝 Description", 
+                                 value=mission.description or "", 
+                                 height=100, 
+                                 key=f"edit_desc_{mission.id}")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.form_submit_button("💾 Sauvegarder", type="primary"):
+                save_mission_changes(mission.id, {
+                    'nom_mission': nom_mission,
+                    'client': client,
+                    'role': role,
+                    'date_debut': date_debut,
+                    'date_fin': date_fin,
+                    'statut': statut,
+                    'revenus_generes': revenus,
+                    'technologies_utilisees': technologies,
+                    'description': description
+                })
+        
+        with col2:
+            if st.form_submit_button("🗑️ Supprimer", type="secondary"):
+                delete_mission(mission.id)
+        
+        with col3:
+            if st.form_submit_button("❌ Annuler"):
+                st.rerun()
 
-def show_consultant_actions(consultant):
-    """Affiche les actions possibles"""
-    st.subheader("⚙️ Actions")
-    st.info("Actions supplémentaires à venir")
+def show_add_mission_form(consultant):
+    """Formulaire d'ajout d'une nouvelle mission"""
+    
+    st.markdown("### ➕ Ajouter une nouvelle mission")
+    
+    with st.form("add_mission_form"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            nom_mission = st.text_input("📋 Nom de la mission", placeholder="Ex: Développement application mobile")
+            client = st.text_input("🏢 Client", placeholder="Ex: Société Générale")
+            role = st.text_input("👤 Rôle", placeholder="Ex: Lead Developer")
+            revenus = st.number_input("💰 Revenus (€)", min_value=0.0, value=0.0)
+        
+        with col2:
+            date_debut = st.date_input("📅 Date début")
+            date_fin = st.date_input("📅 Date fin (optionnel)", value=None)
+            statut = st.selectbox("📊 Statut", ["en_cours", "terminee", "en_pause"])
+        
+        technologies_str = st.text_input("🛠️ Technologies", placeholder="Ex: Python, Django, PostgreSQL")
+        description = st.text_area("📝 Description", height=100, placeholder="Décrivez les activités réalisées durant cette mission...")
+        
+        if st.form_submit_button("➕ Ajouter la mission", type="primary"):
+            add_new_mission(consultant.id, {
+                'nom_mission': nom_mission,
+                'client': client,
+                'role': role,
+                'date_debut': date_debut,
+                'date_fin': date_fin,
+                'statut': statut,
+                'revenus_generes': revenus,
+                'technologies_utilisees': technologies_str,
+                'description': description
+            })
 
 def show_consultants_list():
-    """Affiche la liste des consultants"""
+    """Affiche la liste des consultants avec interactions"""
     
     st.subheader("📋 Liste des consultants")
     
@@ -357,10 +435,9 @@ def show_consultants_list():
                     "Missions": nb_missions
                 })
             
-            # Afficher le tableau
+            # Afficher le tableau avec sélection
             df = pd.DataFrame(consultants_data)
             
-            # Configuration du tableau avec sélection
             event = st.dataframe(
                 df,
                 use_container_width=True,
@@ -369,27 +446,44 @@ def show_consultants_list():
                 selection_mode="single-row"
             )
             
-            # Gestion de la sélection
+            # Actions sur sélection
             if event.selection.rows:
                 selected_row = event.selection.rows[0]
-                selected_consultant_id = consultants_data[selected_row]["ID"]
+                selected_id = consultants_data[selected_row]["ID"]
+                selected_name = f"{consultants_data[selected_row]['Prénom']} {consultants_data[selected_row]['Nom']}"
                 
-                # Boutons d'action pour le consultant sélectionné
-                col1, col2 = st.columns(2)
+                st.success(f"✅ Consultant sélectionné : **{selected_name}**")
+                
+                col1, col2, col3 = st.columns(3)
                 
                 with col1:
-                    if st.button("👁️ Voir le profil", type="primary", use_container_width=True):
-                        st.session_state.view_consultant_profile = selected_consultant_id
+                    if st.button("👁️ Voir le profil", 
+                               type="primary", 
+                               use_container_width=True,
+                               key=f"view_{selected_id}"):
+                        st.session_state.view_consultant_profile = selected_id
                         st.rerun()
                 
                 with col2:
-                    if st.button("✏️ Modifier", use_container_width=True):
-                        st.session_state.view_consultant_profile = selected_consultant_id
+                    if st.button("✏️ Modifier", 
+                               use_container_width=True,
+                               key=f"edit_{selected_id}"):
+                        st.session_state.view_consultant_profile = selected_id
                         st.rerun()
+                
+                with col3:
+                    if st.button("🗑️ Supprimer", 
+                               use_container_width=True,
+                               key=f"delete_{selected_id}"):
+                        if ConsultantService.delete_consultant(selected_id):
+                            st.success("✅ Consultant supprimé !")
+                            st.rerun()
+                        else:
+                            st.error("❌ Erreur lors de la suppression")
             
             # Métriques générales
             st.markdown("---")
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             
             with col1:
                 st.metric("👥 Total consultants", len(consultants))
@@ -399,16 +493,22 @@ def show_consultants_list():
                 st.metric("✅ Disponibles", disponibles)
             
             with col3:
+                occupes = len(consultants) - disponibles
+                st.metric("🔴 Occupés", occupes)
+            
+            with col4:
                 salaire_moyen = sum(c.salaire_actuel or 0 for c in consultants) / len(consultants) if consultants else 0
                 st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
+        
         else:
             st.info("📝 Aucun consultant enregistré")
+            st.markdown("💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil")
     
     except Exception as e:
-        st.error(f"❌ Erreur lors du chargement: {e}")
+        st.error(f"❌ Erreur lors du chargement de la liste: {e}")
 
 def show_add_consultant_form():
-    """Affiche le formulaire d'ajout d'un nouveau consultant"""
+    """Formulaire d'ajout d'un nouveau consultant"""
     
     st.subheader("➕ Ajouter un nouveau consultant")
     
@@ -418,32 +518,128 @@ def show_add_consultant_form():
         with col1:
             prenom = st.text_input("👤 Prénom *", placeholder="Ex: Jean")
             email = st.text_input("📧 Email *", placeholder="jean.dupont@example.com")
-            salaire = st.number_input("💰 Salaire annuel (€)", min_value=0, value=45000, step=1000)
+            salaire = st.number_input("💰 Salaire annuel (€)", 
+                                    min_value=0, 
+                                    value=45000, 
+                                    step=1000)
         
         with col2:
             nom = st.text_input("👤 Nom *", placeholder="Ex: Dupont")
             telephone = st.text_input("📞 Téléphone", placeholder="01.23.45.67.89")
             disponibilite = st.checkbox("✅ Disponible", value=True)
         
-        submitted = st.form_submit_button("➕ Créer le consultant", type="primary")
+        # Notes optionnelles
+        notes = st.text_area("📝 Notes (optionnel)", 
+                           height=100,
+                           placeholder="Notes sur le consultant...")
+        
+        # Bouton de création
+        submitted = st.form_submit_button("➕ Créer le consultant", 
+                                        type="primary",
+                                        use_container_width=True)
         
         if submitted:
             if not prenom or not nom or not email:
                 st.error("❌ Veuillez remplir tous les champs obligatoires (*)")
             else:
-                try:
-                    consultant_data = {
-                        'prenom': prenom.strip(),
-                        'nom': nom.strip(),
-                        'email': email.strip().lower(),
-                        'telephone': telephone.strip() if telephone else None,
-                        'salaire_actuel': salaire,
-                        'disponibilite': disponibilite
-                    }
+                # Vérifier l'unicité de l'email
+                existing = ConsultantService.get_consultant_by_email(email)
+                if existing:
+                    st.error(f"❌ Un consultant avec l'email {email} existe déjà !")
+                else:
+                    try:
+                        consultant_data = {
+                            'prenom': prenom.strip(),
+                            'nom': nom.strip(),
+                            'email': email.strip().lower(),
+                            'telephone': telephone.strip() if telephone else None,
+                            'salaire': salaire,
+                            'disponible': disponibilite,
+                            'notes': notes.strip() if notes else None
+                        }
+                        
+                        if ConsultantService.create_consultant(consultant_data):
+                            st.success(f"✅ {prenom} {nom} créé avec succès !")
+                            st.balloons()  # Animation de succès
+                            st.rerun()
+                        else:
+                            st.error("❌ Erreur lors de la création")
                     
-                    nouveau_consultant = ConsultantService.create_consultant(consultant_data)
-                    st.success(f"✅ {prenom} {nom} a été créé avec succès !")
-                    st.rerun()
-                    
-                except Exception as e:
-                    st.error(f"❌ Erreur lors de la création: {e}")
+                    except Exception as e:
+                        st.error(f"❌ Erreur lors de la création: {e}")
+
+# Fonctions utilitaires pour les missions
+
+def save_mission_changes(mission_id, mission_data):
+    """Sauvegarde les modifications d'une mission"""
+    try:
+        with get_database_session() as session:
+            mission = session.query(Mission).filter(Mission.id == mission_id).first()
+            
+            if mission:
+                # Mettre à jour les champs
+                mission.nom_mission = mission_data['nom_mission']
+                mission.client = mission_data['client']
+                mission.role = mission_data['role']
+                mission.date_debut = mission_data['date_debut']
+                mission.date_fin = mission_data['date_fin']
+                mission.statut = mission_data['statut']
+                mission.revenus_generes = mission_data['revenus_generes']
+                mission.technologies_utilisees = mission_data['technologies_utilisees']
+                mission.description = mission_data['description']
+                
+                session.commit()
+                st.success("✅ Mission mise à jour avec succès !")
+                st.rerun()
+            else:
+                st.error("❌ Mission non trouvée")
+                
+    except Exception as e:
+        st.error(f"❌ Erreur lors de la sauvegarde: {e}")
+
+def delete_mission(mission_id):
+    """Supprime une mission"""
+    try:
+        with get_database_session() as session:
+            mission = session.query(Mission).filter(Mission.id == mission_id).first()
+            
+            if mission:
+                session.delete(mission)
+                session.commit()
+                st.success("✅ Mission supprimée avec succès !")
+                st.rerun()
+            else:
+                st.error("❌ Mission non trouvée")
+                
+    except Exception as e:
+        st.error(f"❌ Erreur lors de la suppression: {e}")
+
+def add_new_mission(consultant_id, mission_data):
+    """Ajoute une nouvelle mission"""
+    
+    if not mission_data['nom_mission'] or not mission_data['client']:
+        st.error("❌ Le nom de la mission et le client sont obligatoires")
+        return
+    
+    try:
+        with get_database_session() as session:
+            nouvelle_mission = Mission(
+                consultant_id=consultant_id,
+                nom_mission=mission_data['nom_mission'],
+                client=mission_data['client'],
+                role=mission_data['role'],
+                date_debut=mission_data['date_debut'],
+                date_fin=mission_data['date_fin'],
+                statut=mission_data['statut'],
+                revenus_generes=mission_data['revenus_generes'],
+                technologies_utilisees=mission_data['technologies_utilisees'],
+                description=mission_data['description']
+            )
+            
+            session.add(nouvelle_mission)
+            session.commit()
+            st.success("✅ Nouvelle mission ajoutée avec succès !")
+            st.rerun()
+            
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'ajout: {e}")
