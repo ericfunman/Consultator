@@ -104,7 +104,7 @@ def show_dashboard_charts():
         st.subheader("💰 Évolution des revenus")
 
         # Données de démonstration
-        dates = pd.date_range(start="2024-01-01", end="2024-12-31", freq="M")
+        dates = pd.date_range(start="2024-01-01", end="2024-12-31", freq="ME")
         revenus = [
             50000 + i * 5000 + (i % 3) * 2000 for i in range(len(dates))
         ]

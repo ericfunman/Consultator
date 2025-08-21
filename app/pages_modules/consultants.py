@@ -26,7 +26,7 @@ try:
     from database.database import get_database_session
     from database.models import Mission
     from services.consultant_service import ConsultantService
-    from services.document_analyzer_clean import DocumentAnalyzer
+    from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
     from services.document_service import DocumentService
 
     imports_ok = True
@@ -902,9 +902,12 @@ def save_consultant_document(
         st.info(f"📁 Fichier: {safe_name}")
 
         # Si c'est un CV, proposer l'analyse automatique
-        if document_type == "CV":
-            if st.button("🔍 Analyser ce CV", key=f"analyze_{consultant.id}"):
-                st.info("🚧 Analyse de CV en cours de développement...")
+        # Proposer l'analyse CV pour TOUS les types de documents
+        if st.button("🔍 Analyser comme CV", key=f"analyze_{consultant.id}"):
+            # st.write(f"🎯 **BOUTON UPLOAD CLIQUÉ** pour consultant {consultant.id}")  # Debug
+            # Analyser le document qui vient d'être uploadé
+            analyze_cv_document(file_path, consultant)
+            return  # Ne pas recharger après l'analyse
 
         # Recharger la page pour afficher le nouveau document
         st.rerun()
@@ -1031,6 +1034,9 @@ def show_existing_documents(consultant):
             display_name = extract_original_filename(file_path.name)
             doc_type = detect_document_type(display_name)
 
+            # DEBUG: Afficher le type détecté
+            # st.write(f"🔍 DEBUG: {file_path.name} → Type: '{doc_type}'")
+
             # Interface simplifiée avec colonnes
             col1, col2, col3, col4, col5, col6 = st.columns([3, 1, 1, 1, 1, 1])
 
@@ -1051,15 +1057,14 @@ def show_existing_documents(consultant):
                     preview_document(file_path, consultant)
 
             with col4:
-                if doc_type == "CV":
-                    if st.button(
-                        "🔍",
-                        key=f"analyze_{file_path.name}",
-                        help="Analyser CV",
+                # Bouton d'analyse CV pour TOUS les documents
+                if st.button(
+                    "🔍",
+                    key=f"analyze_{file_path.name}",
+                    help="Analyser comme CV",
                     ):
+                        # st.write(f"🎯 **BOUTON CLIQUÉ** pour {file_path.name}")  # Debug
                         analyze_cv_document(file_path, consultant)
-                else:
-                    st.write("")
 
             with col5:
                 if st.button(
@@ -1369,9 +1374,9 @@ def preview_powerpoint(file_path):
 
 def analyze_cv_document(file_path, consultant):
     """Analyse un CV et affiche les résultats avec mise à jour automatique"""
-
+    
     try:
-        st.info(f"🔍 Démarrage de l'analyse du fichier: {file_path}")
+        st.info(f"🔍 Analyse du fichier: {file_path.name}")
 
         # Vérifier que le fichier existe
         if not file_path.exists():
@@ -1380,7 +1385,6 @@ def analyze_cv_document(file_path, consultant):
 
         with st.spinner("🔍 Analyse du CV en cours..."):
             # Extraction du texte
-            st.info("📄 Extraction du texte...")
             text = DocumentAnalyzer.extract_text_from_file(str(file_path))
 
             if not text:
@@ -1390,19 +1394,13 @@ def analyze_cv_document(file_path, consultant):
                 st.warning(
                     f"⚠️ Le document semble trop court ({len(text.strip())} caractères)"
                 )
-                st.write("Texte extrait:", text[:200] + "...")
                 return
 
-            st.success(
-                f"✅ Texte extrait avec succès ({len(text)} caractères)"
-            )
+            st.success(f"✅ Texte extrait avec succès ({len(text)} caractères)")
 
             # Analyse du contenu
-            st.info("🧠 Analyse du contenu...")
             consultant_name = f"{consultant.prenom} {consultant.nom}"
-            analysis = DocumentAnalyzer.analyze_cv_content(
-                text, consultant_name
-            )
+            analysis = DocumentAnalyzer.analyze_cv_content(text, consultant_name)
 
             if not analysis:
                 st.error("❌ L'analyse n'a retourné aucun résultat")
@@ -1410,19 +1408,14 @@ def analyze_cv_document(file_path, consultant):
 
             # Affichage des résultats
             st.success("✅ Analyse terminée !")
-            st.write(
-                f"🔍 Résultats de l'analyse: {len(analysis)} éléments détectés"
-            )
 
             # Onglets pour organiser les résultats
             tab1, tab2, tab3, tab4 = st.tabs(
-                ["📋 Missions", "🛠️ Compétences", "📊 Résumé", "💾 Actions"]
+                ["📋 Missions", "�️ Compétences", "📊 Résumé", "💾 Actions"]
             )
 
             with tab1:
-                missions = analysis.get("missions", [])
-                st.write(f"🚀 {len(missions)} mission(s) détectée(s)")
-                show_cv_missions(missions)
+                show_cv_missions(analysis.get("missions", []), consultant)
 
             with tab2:
                 show_cv_skills(analysis)
@@ -1435,17 +1428,220 @@ def analyze_cv_document(file_path, consultant):
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'analyse : {e}")
-        st.write(f"Type d'erreur: {type(e).__name__}")
-        st.write(f"Détails: {str(e)}")
         st.info("💡 Vérifiez que le fichier est bien un CV valide")
 
 
-def show_cv_missions(missions):
-    """Affiche les missions extraites du CV"""
+def show_cv_missions(missions, consultant):
+    """Affiche les missions extraites du CV avec possibilité d'édition et sauvegarde"""
 
     if not missions:
         st.info("📋 Aucune mission détectée dans le CV")
         return
+
+    st.write(f"**{len(missions)} mission(s) détectée(s) :**")
+    
+    # Trier les missions par ordre antéchronologique si possible
+    # Pour le moment, on les affiche dans l'ordre détecté
+    
+    for i, mission in enumerate(missions, 1):
+        with st.expander(f"🏢 Mission {i}: {mission.get('client', 'Client inconnu')}", expanded=True):
+            
+            # Créer des champs éditables pour chaque mission
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                client = st.text_input(
+                    "Client", 
+                    value=mission.get('client', ''),
+                    key=f"mission_{i}_client"
+                )
+                
+                titre = st.text_input(
+                    "Rôle/Titre", 
+                    value=mission.get('titre', ''),
+                    key=f"mission_{i}_titre"
+                )
+                
+                # Dates de début et fin
+                date_debut = st.date_input(
+                    "Date de début",
+                    value=None,
+                    key=f"mission_{i}_debut"
+                )
+                
+                date_fin = st.date_input(
+                    "Date de fin",
+                    value=None,
+                    key=f"mission_{i}_fin"
+                )
+            
+            with col2:
+                description = st.text_area(
+                    "Description",
+                    value=mission.get('description', ''),
+                    height=100,
+                    key=f"mission_{i}_description"
+                )
+                
+                # Technologies sous forme de tags
+                technologies_text = ", ".join(mission.get('langages_techniques', []))
+                technologies = st.text_area(
+                    "Technologies (séparées par des virgules)",
+                    value=technologies_text,
+                    height=60,
+                    key=f"mission_{i}_technologies"
+                )
+            
+            # Bouton de sauvegarde pour cette mission
+            col1, col2, col3 = st.columns([1, 1, 2])
+            with col1:
+                if st.button(f"💾 Sauvegarder Mission {i}", key=f"save_mission_{i}"):
+                    save_mission_to_consultant(
+                        consultant, client, titre, date_debut, date_fin, 
+                        description, technologies, i
+                    )
+            
+            with col2:
+                if st.button(f"🗑️ Ignorer", key=f"ignore_mission_{i}"):
+                    st.info(f"Mission {i} ignorée")
+            
+            st.markdown("---")
+
+
+def save_mission_to_consultant(consultant, client, titre, date_debut, date_fin, description, technologies, mission_num):
+    """Sauvegarde une mission dans la base de données"""
+    
+    try:
+        # Convertir les technologies en liste
+        tech_list = [tech.strip() for tech in technologies.split(',') if tech.strip()]
+        
+        # Préparer les données de la mission
+        mission_data = {
+            'consultant_id': consultant.id,
+            'client': client,
+            'titre': titre,
+            'date_debut': date_debut,
+            'date_fin': date_fin,
+            'description': description,
+            'technologies': ', '.join(tech_list)
+        }
+        
+        # TODO: Implémenter la sauvegarde en base de données
+        # Pour le moment, on affiche juste un message de succès
+        st.success(f"✅ Mission {mission_num} '{titre}' chez {client} sauvegardée !")
+        st.info("💡 La sauvegarde en base de données sera implémentée prochainement")
+        
+        # Afficher un résumé de la mission
+        with st.expander("📋 Résumé de la mission sauvegardée", expanded=False):
+            st.write(f"**Client:** {client}")
+            st.write(f"**Rôle:** {titre}")
+            if date_debut:
+                st.write(f"**Début:** {date_debut}")
+            if date_fin:
+                st.write(f"**Fin:** {date_fin}")
+            st.write(f"**Description:** {description}")
+            if tech_list:
+                st.write(f"**Technologies:** {', '.join(tech_list)}")
+        
+    except Exception as e:
+        st.error(f"❌ Erreur lors de la sauvegarde de la mission {mission_num}: {e}")
+
+
+def show_cv_skills(analysis):
+    """Affiche les compétences extraites du CV"""
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("🛠️ Technologies")
+        technologies = analysis.get("langages_techniques", [])
+        if technologies:
+            for tech in technologies:
+                st.write(f"• {tech}")
+        else:
+            st.info("Aucune technologie détectée")
+    
+    with col2:
+        st.subheader("💼 Compétences Fonctionnelles")
+        competences = analysis.get("competences_fonctionnelles", [])
+        if competences:
+            for comp in competences:
+                st.write(f"• {comp}")
+        else:
+            st.info("Aucune compétence fonctionnelle détectée")
+
+def show_cv_summary(analysis, consultant):
+    """Affiche un résumé de l'analyse"""
+    
+    st.subheader("📊 Résumé de l'analyse")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        missions_count = len(analysis.get("missions", []))
+        st.metric("🏢 Missions", missions_count)
+    
+    with col2:
+        tech_count = len(analysis.get("langages_techniques", []))
+        st.metric("🛠️ Technologies", tech_count)
+    
+    with col3:
+        comp_count = len(analysis.get("competences_fonctionnelles", []))
+        st.metric("💼 Compétences", comp_count)
+    
+    with col4:
+        info_general = analysis.get("informations_generales", {})
+        word_count = info_general.get("nombre_mots", 0)
+        st.metric("📝 Mots", word_count)
+    
+    # Affichage du texte brut (aperçu)
+    if st.checkbox("🔍 Voir l'aperçu du texte analysé"):
+        texte_brut = analysis.get("texte_brut", "")
+        if texte_brut:
+            st.text_area("Aperçu du contenu analysé", texte_brut, height=200, disabled=True)
+
+def show_cv_actions(analysis, consultant):
+    """Affiche les actions possibles après analyse"""
+    
+    st.subheader("💾 Actions de sauvegarde")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("📋 Ajouter toutes les missions au profil", type="primary"):
+            missions = analysis.get("missions", [])
+            if missions:
+                st.success(f"✅ {len(missions)} mission(s) prête(s) à être ajoutée(s)")
+                st.info("🚧 Fonctionnalité de sauvegarde en cours de développement")
+            else:
+                st.warning("⚠️ Aucune mission à ajouter")
+    
+    with col2:
+        if st.button("🛠️ Ajouter toutes les compétences au profil"):
+            technologies = analysis.get("langages_techniques", [])
+            if technologies:
+                st.success(f"✅ {len(technologies)} technologie(s) prête(s) à être ajoutée(s)")
+                st.info("🚧 Fonctionnalité de sauvegarde en cours de développement")
+            else:
+                st.warning("⚠️ Aucune technologie à ajouter")
+    
+    # Export options
+    st.markdown("---")
+    st.subheader("📤 Export des résultats")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("📄 Export JSON"):
+            st.info("🚧 Export JSON en cours de développement")
+    
+    with col2:
+        if st.button("📊 Export Excel"):
+            st.info("🚧 Export Excel en cours de développement")
+    
+    with col3:
+        if st.button("📋 Copier résumé"):
+            st.info("🚧 Copie en cours de développement")
 
     st.subheader(f"🚀 Missions détectées ({len(missions)})")
 
