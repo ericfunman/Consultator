@@ -1,0 +1,49 @@
+# Configuration Pylint pour Consultator
+[MASTER]
+load-plugins=pylint.extensions.docparams
+
+[MESSAGES CONTROL]
+# Désactiver certains messages moins critiques pour commencer
+disable=
+    too-few-public-methods,
+    fixme,
+    missing-module-docstring,
+    duplicate-code
+
+[FORMAT]
+# Longueur de ligne maximum
+max-line-length=79
+
+# Nombre d'espaces pour l'indentation
+indent-string='    '
+
+[DESIGN]
+# Nombre maximum de paramètres pour une fonction
+max-args=10
+
+# Nombre maximum de variables locales
+max-locals=20
+
+# Nombre maximum de branches
+max-branches=15
+
+# Nombre maximum d'instructions
+max-statements=60
+
+[SIMILARITIES]
+# Longueur minimum des lignes similaires
+min-similarity-lines=8
+
+# Ignore les commentaires lors de la vérification des similarités
+ignore-comments=yes
+
+# Ignore les docstrings lors de la vérification des similarités
+ignore-docstrings=yes
+
+[VARIABLES]
+# Liste des noms de variables autorisés
+good-names=i,j,k,ex,Run,_,id,df,st
+
+[IMPORTS]
+# Liste des modules externes autorisés
+known-third-party=streamlit,pandas,sqlalchemy,pdfplumber,docx,pptx
