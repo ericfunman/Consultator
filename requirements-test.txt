@@ -1,0 +1,22 @@
+# Tests Configuration
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+pytest-asyncio>=0.21.0
+pytest-html>=3.1.0
+pytest-xdist>=3.2.0
+coverage>=7.0.0
+factory-boy>=3.2.0
+faker>=18.0.0
+
+# Test utilities
+requests-mock>=1.10.0
+freezegun>=1.2.0
+parameterized>=0.9.0
+
+# Database testing
+pytest-postgresql>=5.0.0
+sqlalchemy-utils>=0.40.0
+
+# Streamlit testing (unofficial)
+streamlit-testing>=0.1.0
