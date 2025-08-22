@@ -39,6 +39,7 @@ ENV/
 *.db-journal
 *.db-wal
 *.db-shm
+data/consultator.db
 
 # Logs
 *.log
@@ -82,3 +83,11 @@ Eric_L_Quanteam.pptx
 *.swp
 *.swo
 *~
+
+# Tests et rapports temporaires
+.coverage
+test_consultator.db
+reports/coverage.xml
+reports/test-report.html
+reports/test-results.xml
+reports/~$*.docx
