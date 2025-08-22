@@ -20,6 +20,7 @@ from pages_modules import home
 from pages_modules import missions
 from pages_modules import skills
 from pages_modules import technologies
+from pages_modules import chatbot
 
 # Configuration de la page
 st.set_page_config(
@@ -78,8 +79,9 @@ def main():
                 " Compétences",
                 " Technologies",
                 " Missions",
+                "🤖 Assistant IA",
             ],
-            icons=["house", "people", "target", "tools", "briefcase"],
+            icons=["house", "people", "target", "tools", "briefcase", "robot"],
             menu_icon="list",
             default_index=0,  # Démarre sur Accueil au lieu de Consultants
             styles={
@@ -109,6 +111,8 @@ def main():
         technologies.show()
     elif selected == " Missions":
         missions.show()
+    elif selected == "🤖 Assistant IA":
+        chatbot.show()
 
 
 if __name__ == "__main__":
