@@ -9,6 +9,27 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 
 Base = declarative_base()
+class Practice(Base):
+    """Modèle pour les practices (Data, Quant, etc.)"""
+    __tablename__ = 'practices'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nom = Column(String(100), unique=True, nullable=False)
+    description = Column(Text)
+    responsable = Column(String(200))  # Nom du responsable de practice
+    date_creation = Column(DateTime, default=datetime.now)
+    actif = Column(Boolean, default=True)
+
+    # Relations
+    consultants = relationship("Consultant", back_populates="practice")
+
+    def __repr__(self):
+        return f"<Practice(id={self.id}, nom='{self.nom}')>"
+
+    @property
+    def nombre_consultants(self):
+        """Retourne le nombre de consultants dans cette practice"""
+        return len([c for c in self.consultants if c.disponibilite])
 
 class Consultant(Base):
     """Modèle pour les consultants"""
@@ -26,6 +47,8 @@ class Consultant(Base):
     notes = Column(Text)
     
     # Relations
+    practice_id = Column(Integer, ForeignKey('practices.id'))
+    practice = relationship("Practice", back_populates="consultants")
     competences = relationship("ConsultantCompetence", back_populates="consultant", cascade="all, delete-orphan")
     missions = relationship("Mission", back_populates="consultant", cascade="all, delete-orphan")
     cvs = relationship("CV", back_populates="consultant", cascade="all, delete-orphan")
