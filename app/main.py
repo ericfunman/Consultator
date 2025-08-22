@@ -1,31 +1,38 @@
-"""
+﻿"""
 Consultator - Plateforme de gestion de consultants
 Point d'entrée principal de l'application Streamlit
 """
 
+import os
+import sys
+
 import streamlit as st
 from streamlit_option_menu import option_menu
-import sys
-import os
 
 # Ajouter le dossier app au path Python
 sys.path.append(os.path.dirname(__file__))
 
-# Import des pages
-import importlib
-from pages_modules import home, skills, missions, technologies, consultants
 from database.database import init_database
+
+# Import des pages
+from pages_modules import consultants
+from pages_modules import home
+from pages_modules import missions
+from pages_modules import skills
+from pages_modules import technologies
+from pages_modules import chatbot
 
 # Configuration de la page
 st.set_page_config(
     page_title="Consultator",
-    page_icon="👥",
+    page_icon="",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # CSS personnalisé
-st.markdown("""
+st.markdown(
+    """
 <style>
     .main-header {
         font-size: 2.5rem;
@@ -45,28 +52,43 @@ st.markdown("""
         margin: 0.5rem 0;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
+
 
 def main():
     """Fonction principale de l'application"""
-    
+
     # Initialiser la base de données
     init_database()
-    
+
     # Header principal
-    st.markdown('<div class="main-header">👥 Consultator</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="main-header"> Consultator</div>', unsafe_allow_html=True
+    )
     st.markdown("### Plateforme de gestion de practice data")
-    
+
     # Menu de navigation dans la sidebar
     with st.sidebar:
         selected = option_menu(
             menu_title=None,  # Pas de titre
-            options=["🏠 Accueil", "👥 Consultants", "🎯 Compétences", "🛠️ Technologies", "💼 Missions"],
-            icons=["house", "people", "target", "tools", "briefcase"],
+            options=[
+                " Accueil",
+                " Consultants",
+                " Compétences",
+                " Technologies",
+                " Missions",
+                "🤖 Assistant IA",
+            ],
+            icons=["house", "people", "target", "tools", "briefcase", "robot"],
             menu_icon="list",
             default_index=0,  # Démarre sur Accueil au lieu de Consultants
             styles={
-                "container": {"padding": "0!important", "background-color": "#fafafa"},
+                "container": {
+                    "padding": "0!important",
+                    "background-color": "#fafafa",
+                },
                 "icon": {"color": "#1f77b4", "font-size": "18px"},
                 "nav-link": {
                     "font-size": "16px",
@@ -75,20 +97,23 @@ def main():
                     "--hover-color": "#eee",
                 },
                 "nav-link-selected": {"background-color": "#1f77b4"},
-            }
+            },
         )
-    
+
     # Navigation vers les pages
-    if selected == "🏠 Accueil":
+    if selected == " Accueil":
         home.show()
-    elif selected == "👥 Consultants":
+    elif selected == " Consultants":
         consultants.show()
-    elif selected == "🎯 Compétences":
+    elif selected == " Compétences":
         skills.show()
-    elif selected == "🛠️ Technologies":
+    elif selected == " Technologies":
         technologies.show()
-    elif selected == "💼 Missions":
+    elif selected == " Missions":
         missions.show()
+    elif selected == "🤖 Assistant IA":
+        chatbot.show()
+
 
 if __name__ == "__main__":
     main()
