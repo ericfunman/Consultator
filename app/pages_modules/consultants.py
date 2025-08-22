@@ -150,6 +150,7 @@ def show_consultant_info(consultant):
     practice_options = {p.nom: p.id for p in practices}
     current_practice_id = consultant_db.practice_id if hasattr(consultant_db, 'practice_id') else None
 
+    from database.models import ConsultantSalaire
     with st.form(f"edit_consultant_{consultant.id}"):
         col1, col2 = st.columns(2)
 
@@ -196,6 +197,40 @@ def show_consultant_info(consultant):
             height=100,
             placeholder="Notes sur le consultant...",
         )
+
+        # Historique des salaires
+        st.markdown("---")
+        st.subheader("📈 Historique des salaires")
+        with get_database_session() as session:
+            salaires = session.query(ConsultantSalaire).filter(ConsultantSalaire.consultant_id == consultant.id).order_by(ConsultantSalaire.date_debut.desc()).all()
+        if salaires:
+            for salaire in salaires:
+                st.write(f"- **{salaire.salaire:,.0f} €** du {salaire.date_debut.strftime('%d/%m/%Y')} " + (f"au {salaire.date_fin.strftime('%d/%m/%Y')}" if salaire.date_fin else "(en cours)") + (f" — {salaire.commentaire}" if salaire.commentaire else ""))
+        else:
+            st.info("Aucune évolution de salaire enregistrée.")
+
+        # Ajout d'une évolution de salaire
+        with st.expander("➕ Ajouter une évolution de salaire"):
+            with st.form(f"add_salary_form_{consultant.id}"):
+                new_salaire = st.number_input("Nouveau salaire (€)", min_value=0, step=1000, key=f"salaire_{consultant.id}")
+                new_date_debut = st.date_input("Date de début", value=datetime.today(), key=f"date_debut_{consultant.id}")
+                new_commentaire = st.text_input("Commentaire", value="", key=f"commentaire_{consultant.id}")
+                add_salary_submitted = st.form_submit_button("Ajouter l'évolution de salaire")
+                if add_salary_submitted:
+                    try:
+                        with get_database_session() as session:
+                            salaire_obj = ConsultantSalaire(
+                                consultant_id=consultant.id,
+                                salaire=new_salaire,
+                                date_debut=new_date_debut,
+                                commentaire=new_commentaire.strip() or None
+                            )
+                            session.add(salaire_obj)
+                            session.commit()
+                        st.success("✅ Évolution de salaire ajoutée !")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Erreur lors de l'ajout : {e}")
 
         # Bouton de sauvegarde
         col1, col2, col3 = st.columns([2, 1, 2])
