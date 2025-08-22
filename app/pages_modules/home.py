@@ -5,10 +5,14 @@ Dashboard principal avec statistiques et vue d'ensemble
 
 import os
 import sys
+import warnings
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+
+# Supprimer les FutureWarnings de pandas 
+warnings.filterwarnings('ignore', category=FutureWarning, message=".*deprecated.*")
 
 # Import des services
 sys.path.append(os.path.dirname(__file__))
@@ -103,8 +107,26 @@ def show_dashboard_charts():
     with col2:
         st.subheader("💰 Évolution des revenus")
 
-        # Données de démonstration
-        dates = pd.date_range(start="2024-01-01", end="2024-12-31", freq="ME")
+        # Données de démonstration - éviter pandas.date_range
+        from datetime import datetime, timedelta
+        import calendar
+        
+        # Créer les dates manuellement pour éviter le warning pandas
+        start_date = datetime(2024, 1, 1)
+        dates = []
+        current = start_date
+        
+        for i in range(12):
+            # Dernier jour du mois
+            if current.month == 12:
+                next_month = current.replace(year=current.year + 1, month=1)
+            else:
+                next_month = current.replace(month=current.month + 1)
+            
+            last_day = next_month - timedelta(days=1)
+            dates.append(last_day)
+            current = next_month
+        
         revenus = [
             50000 + i * 5000 + (i % 3) * 2000 for i in range(len(dates))
         ]

@@ -7,6 +7,10 @@ import subprocess
 import sys
 import os
 import socket
+import warnings
+
+# Supprimer tous les FutureWarnings liés à pandas
+warnings.filterwarnings('ignore', category=FutureWarning, message=".*deprecated.*")
 
 def is_port_available(port):
     """Vérifie si un port est disponible"""
