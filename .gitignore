@@ -35,11 +35,14 @@ ENV/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# Database
+# Database files - Ne pas versionner les bases de données SQLite
+*.db
 *.db-journal
 *.db-wal
 *.db-shm
 data/consultator.db
+data/*.db
+!data/.gitkeep
 
 # Logs
 *.log

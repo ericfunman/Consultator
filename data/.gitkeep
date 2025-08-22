@@ -1,0 +1,2 @@
+# Ce fichier garantit que le répertoire data/ est créé dans Git
+# Le fichier consultator.db sera généré automatiquement au premier lancement
