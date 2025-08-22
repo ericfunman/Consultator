@@ -67,7 +67,11 @@ def show_consultant_profile():
     """Affiche le profil détaillé d'un consultant"""
 
     consultant_id = st.session_state.view_consultant_profile
-    consultant = ConsultantService.get_consultant_by_id(consultant_id)
+    # Charger le consultant avec la relation practice pour éviter DetachedInstanceError
+    from sqlalchemy.orm import joinedload
+    from database.models import Consultant
+    with get_database_session() as session:
+        consultant = session.query(Consultant).options(joinedload(Consultant.practice)).filter(Consultant.id == consultant_id).first()
 
     if not consultant:
         st.error("❌ Consultant introuvable")
@@ -89,7 +93,7 @@ def show_consultant_profile():
     st.markdown("---")
 
     # Métriques principales
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
     with col1:
         st.metric("💰 Salaire annuel", f"{consultant.salaire_actuel or 0:,}€")
@@ -107,6 +111,10 @@ def show_consultant_profile():
             else "N/A"
         )
         st.metric("📅 Membre depuis", creation_date)
+
+    with col4:
+        practice_name = consultant.practice.nom if hasattr(consultant, 'practice') and consultant.practice else "Non affecté"
+        st.metric("🏢 Practice", practice_name)
 
     st.markdown("---")
 
@@ -133,42 +141,58 @@ def show_consultant_info(consultant):
 
     st.subheader("📋 Informations personnelles")
 
+    from database.models import Practice, Consultant
+    from sqlalchemy.orm import joinedload
+    # Recharger le consultant avec la relation practice pour éviter DetachedInstanceError
+    with get_database_session() as session:
+        consultant_db = session.query(Consultant).options(joinedload(Consultant.practice)).filter(Consultant.id == consultant.id).first()
+        practices = session.query(Practice).filter(Practice.actif == True).all()
+    practice_options = {p.nom: p.id for p in practices}
+    current_practice_id = consultant_db.practice_id if hasattr(consultant_db, 'practice_id') else None
+
     with st.form(f"edit_consultant_{consultant.id}"):
         col1, col2 = st.columns(2)
 
         with col1:
             prenom = st.text_input(
-                "👤 Prénom *", value=consultant.prenom, placeholder="Ex: Jean"
+                "👤 Prénom *", value=consultant_db.prenom, placeholder="Ex: Jean"
             )
             email = st.text_input(
                 "📧 Email *",
-                value=consultant.email,
+                value=consultant_db.email,
                 placeholder="jean.dupont@example.com",
             )
             salaire = st.number_input(
                 "💰 Salaire annuel (€)",
                 min_value=0,
-                value=int(consultant.salaire_actuel or 0),
+                value=int(consultant_db.salaire_actuel or 0),
                 step=1000,
             )
+            # Sélection de la practice
+            practice_label = st.selectbox(
+                "🏢 Practice",
+                options=["Non affecté"] + list(practice_options.keys()),
+                index=(list(practice_options.values()).index(current_practice_id) + 1) if current_practice_id in practice_options.values() else 0
+            )
+            selected_practice_id = practice_options.get(practice_label)
 
         with col2:
             nom = st.text_input(
-                "👤 Nom *", value=consultant.nom, placeholder="Ex: Dupont"
+                "👤 Nom *", value=consultant_db.nom, placeholder="Ex: Dupont"
             )
             telephone = st.text_input(
                 "📞 Téléphone",
-                value=consultant.telephone or "",
+                value=consultant_db.telephone or "",
                 placeholder="01.23.45.67.89",
             )
             disponibilite = st.checkbox(
-                "✅ Disponible", value=consultant.disponibilite
+                "✅ Disponible", value=consultant_db.disponibilite
             )
 
         # Notes
         notes = st.text_area(
             "📝 Notes",
-            value=consultant.notes or "",
+            value=consultant_db.notes or "",
             height=100,
             placeholder="Notes sur le consultant...",
         )
@@ -204,6 +228,7 @@ def show_consultant_info(consultant):
                             "salaire_actuel": salaire,
                             "disponibilite": disponibilite,
                             "notes": notes.strip() if notes else None,
+                            "practice_id": selected_practice_id,
                         }
 
                         if ConsultantService.update_consultant(
@@ -667,6 +692,11 @@ def show_add_consultant_form():
 
     st.subheader("➕ Ajouter un nouveau consultant")
 
+    from database.models import Practice
+    with get_database_session() as session:
+        practices = session.query(Practice).filter(Practice.actif == True).all()
+    practice_options = {p.nom: p.id for p in practices}
+
     with st.form("add_consultant_form"):
         col1, col2 = st.columns(2)
 
@@ -678,6 +708,13 @@ def show_add_consultant_form():
             salaire = st.number_input(
                 "💰 Salaire annuel (€)", min_value=0, value=45000, step=1000
             )
+            # Sélection de la practice
+            practice_label = st.selectbox(
+                "🏢 Practice",
+                options=["Non affecté"] + list(practice_options.keys()),
+                index=0
+            )
+            selected_practice_id = practice_options.get(practice_label)
 
         with col2:
             nom = st.text_input("👤 Nom *", placeholder="Ex: Dupont")
@@ -722,6 +759,7 @@ def show_add_consultant_form():
                             "salaire": salaire,
                             "disponible": disponibilite,
                             "notes": notes.strip() if notes else None,
+                            "practice_id": selected_practice_id,
                         }
 
                         if ConsultantService.create_consultant(
