@@ -51,6 +51,10 @@ class ChatbotService:
                 return self._handle_contact_question(entities)
             elif intent == "liste_consultants":
                 return self._handle_list_consultants_question(entities)
+            elif intent == "practices":
+                return self._handle_practices_question(entities)
+            elif intent == "cvs":
+                return self._handle_cvs_question(entities)
             elif intent == "statistiques":
                 return self._handle_stats_question(entities)
             elif intent == "recherche_consultant":
@@ -93,7 +97,7 @@ class ChatbotService:
         intent_patterns = {
             "salaire": [
                 r"salaire", r"rémunération", r"paie", r"combien gagne", 
-                r"revenus", r"euros", r"€", r"salaire de", r"gagne"
+                r"revenus", r"euros", r"€", r"salaire de", r"gagne", r"cjm", r"coût journalier"
             ],
             "competences": [
                 r"compétences", r"competences", r"maîtrise", r"maitrise", r"sait faire", r"technologies",
@@ -113,6 +117,13 @@ class ChatbotService:
                 r"quels sont les consultants", r"liste des consultants", r"consultants disponibles",
                 r"consultants actifs", r"tous les consultants", r"lister les consultants",
                 r"qui sont les consultants", r"montrer les consultants"
+            ],
+            "practices": [
+                r"practice", r"practices", r"qui est dans la practice", r"consultants de la practice",
+                r"practice data", r"practice quant", r"équipe", r"dans quelle practice"
+            ],
+            "cvs": [
+                r"cv", r"curriculum", r"document", r"fichier", r"upload", r"téléchargé"
             ],
             "statistiques": [
                 r"combien.+consultants", r"nombre.+consultants", r"combien.+dans.+base", 
@@ -174,7 +185,8 @@ class ChatbotService:
             "noms": [],
             "entreprises": [],
             "competences": [],
-            "montants": []
+            "montants": [],
+            "practices": []
         }
         
         # Patterns pour extraire les entités
@@ -205,24 +217,45 @@ class ChatbotService:
             if entreprise in question:
                 entities["entreprises"].append(entreprise)
         
-        # Compétences techniques
+        # Compétences techniques - chercher dans la liste prédéfinie ET dans la base
         competences_connues = [
             "python", "java", "javascript", "sql", "react", "angular",
-            "node.js", "docker", "kubernetes", "aws", "azure", "power bi"
+            "node.js", "docker", "kubernetes", "aws", "azure", "power bi",
+            "agile", "scrum", "finance", "devops"
         ]
         for competence in competences_connues:
             if competence in question:
                 entities["competences"].append(competence)
+        
+        # Chercher aussi dans la base de données des compétences
+        from database.models import Competence
+        all_competences = self.session.query(Competence).all()
+        for competence in all_competences:
+            if re.search(rf'\b{re.escape(competence.nom.lower())}\b', question):
+                entities["competences"].append(competence.nom)
+        
+        # Supprimer les doublons
+        entities["competences"] = list(dict.fromkeys(entities["competences"]))
         
         # Montants
         montants_pattern = r'(\d+(?:\s*\d{3})*)\s*(?:euros?|€)'
         montants_matches = re.findall(montants_pattern, question)
         entities["montants"] = [montant.replace(' ', '') for montant in montants_matches]
         
+        # Practices - chercher dans la base de données
+        from database.models import Practice
+        all_practices = self.session.query(Practice).filter(Practice.actif == True).all()
+        for practice in all_practices:
+            if re.search(rf'\b{re.escape(practice.nom.lower())}\b', question):
+                entities["practices"].append(practice.nom)
+        
         return entities
     
     def _handle_salary_question(self, entities: Dict) -> Dict[str, Any]:
-        """Gère les questions sur les salaires"""
+        """Gère les questions sur les salaires et le CJM"""
+        
+        # Détecter si c'est une question sur le CJM
+        is_cjm_question = "cjm" in self.last_question.lower() or "coût journalier" in self.last_question.lower()
         
         # Si un nom est mentionné, chercher ce consultant spécifique
         if entities["noms"]:
@@ -231,11 +264,21 @@ class ChatbotService:
             
             if consultant:
                 if consultant.salaire_actuel and consultant.salaire_actuel > 0:
-                    response = f"💰 Le salaire de **{consultant.prenom} {consultant.nom}** est de **{consultant.salaire_actuel:,.0f} €** par an."
+                    if is_cjm_question:
+                        # Calculer le CJM
+                        cjm = consultant.salaire_actuel * 1.8 / 216
+                        response = f"📈 Le CJM (Coût Journalier Moyen) de **{consultant.prenom} {consultant.nom}** est de **{cjm:,.0f} €**."
+                        response += f"\n💡 Calcul : {consultant.salaire_actuel:,.0f} € × 1.8 ÷ 216 = {cjm:,.0f} €"
+                    else:
+                        response = f"💰 Le salaire de **{consultant.prenom} {consultant.nom}** est de **{consultant.salaire_actuel:,.0f} €** par an."
+                    
                     if not consultant.disponibilite:
                         response += "\n⚠️ Attention : ce consultant est actuellement indisponible."
                 else:
-                    response = f"❓ Désolé, le salaire de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+                    if is_cjm_question:
+                        response = f"❓ Désolé, le CJM de **{consultant.prenom} {consultant.nom}** ne peut pas être calculé car le salaire n'est pas renseigné."
+                    else:
+                        response = f"❓ Désolé, le salaire de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
                 
                 return {
                     "response": response,
@@ -244,6 +287,7 @@ class ChatbotService:
                             "nom": consultant.nom,
                             "prenom": consultant.prenom,
                             "salaire": consultant.salaire_actuel,
+                            "cjm": (consultant.salaire_actuel * 1.8 / 216) if consultant.salaire_actuel else None,
                             "disponibilite": consultant.disponibilite
                         }
                     },
@@ -279,6 +323,7 @@ class ChatbotService:
     def _handle_skills_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les compétences"""
         
+        # Si une compétence spécifique est mentionnée
         if entities["competences"]:
             competence = entities["competences"][0]
             consultants = self._find_consultants_by_skill(competence)
@@ -287,6 +332,9 @@ class ChatbotService:
                 noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
                 response = f"🎯 Consultants maîtrisant **{competence.title()}** :\n\n"
                 response += "\n".join([f"• {nom}" for nom in noms])
+                
+                # Ajouter les détails des compétences
+                response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
             else:
                 response = f"❌ Aucun consultant ne maîtrise **{competence}** dans notre base."
             
@@ -297,7 +345,45 @@ class ChatbotService:
                 "confidence": 0.9
             }
         
-        # Question générale sur les compétences
+        # Recherche dynamique de compétence dans la question
+        elif any(word in self.last_question.lower() for word in ["qui maîtrise", "qui sait", "qui connaît", "qui connait"]):
+            # Extraire le nom de la compétence après le verbe
+            question_lower = self.last_question.lower()
+            
+            # Chercher tous les mots après "maîtrise", "sait", "connaît"
+            patterns = [
+                r"qui\s+maîtrise\s+(\w+)",
+                r"qui\s+sait\s+(\w+)",
+                r"qui\s+connaît\s+(\w+)",
+                r"qui\s+connait\s+(\w+)"
+            ]
+            
+            competence_found = None
+            for pattern in patterns:
+                match = re.search(pattern, question_lower)
+                if match:
+                    competence_found = match.group(1)
+                    break
+            
+            if competence_found:
+                consultants = self._find_consultants_by_skill(competence_found)
+                
+                if consultants:
+                    noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
+                    response = f"🎯 Consultants maîtrisant **{competence_found.title()}** :\n\n"
+                    response += "\n".join([f"• {nom}" for nom in noms])
+                    response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+                else:
+                    response = f"❌ Aucun consultant ne maîtrise **{competence_found}** dans notre base."
+                
+                return {
+                    "response": response,
+                    "data": {"consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]},
+                    "intent": "competences",
+                    "confidence": 0.8
+                }
+        
+        # Question générale sur les compétences d'un consultant
         elif entities["noms"]:
             nom = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom)
@@ -463,14 +549,22 @@ class ChatbotService:
 • Actifs : **{stats['consultants_actifs']}** 
 • Inactifs : **{stats['consultants_inactifs']}**
 
+🏢 **Practices :**
+• Total : **{stats['practices_total']}**
+
 💼 **Missions :**
 • Total : **{stats['missions_total']}**
 • En cours : **{stats['missions_en_cours']}**
 • Terminées : **{stats['missions_terminees']}**
 
-💰 **Financier :**
+� **Documents :**
+• Total CVs : **{stats['cvs_total']}**
+• Consultants avec CV : **{stats['consultants_avec_cv']}**
+
+�💰 **Financier :**
 • TJM moyen : **{stats['tjm_moyen']:,.0f} €**
-• Salaire moyen : **{stats['salaire_moyen']:,.0f} €**"""
+• Salaire moyen : **{stats['salaire_moyen']:,.0f} €**
+• CJM moyen : **{stats['cjm_moyen']:,.0f} €**"""
         
         return {
             "response": response,
@@ -572,7 +666,8 @@ class ChatbotService:
                 response += f" - {consultant.email}"
             
             if consultant.salaire_actuel:
-                response += f" - {consultant.salaire_actuel:,.0f} €/an"
+                cjm = consultant.salaire_actuel * 1.8 / 216
+                response += f" - {consultant.salaire_actuel:,.0f} €/an - CJM: {cjm:,.0f} €"
             
             response += "\n"
         
@@ -587,7 +682,8 @@ class ChatbotService:
                         "prenom": c.prenom,
                         "email": c.email,
                         "disponibilite": c.disponibilite,
-                        "salaire": c.salaire_actuel
+                        "salaire": c.salaire_actuel,
+                        "cjm": (c.salaire_actuel * 1.8 / 216) if c.salaire_actuel else None
                     } for c in consultants
                 ],
                 "count": len(consultants)
@@ -612,7 +708,9 @@ class ChatbotService:
 📅 Date création : {consultant.date_creation.strftime('%d/%m/%Y') if consultant.date_creation else 'Non renseignée'}"""
 
                 if consultant.salaire_actuel:
+                    cjm = consultant.salaire_actuel * 1.8 / 216
                     response += f"\n💰 Salaire : **{consultant.salaire_actuel:,.0f} €**"
+                    response += f"\n📈 CJM : **{cjm:,.0f} €**"
                 
                 # Ajouter info sur les missions
                 missions_count = len(consultant.missions)
@@ -661,6 +759,198 @@ class ChatbotService:
             "confidence": 1.0
         }
     
+    def _handle_practices_question(self, entities: Dict) -> Dict[str, Any]:
+        """Gère les questions sur les practices"""
+        
+        from database.models import Practice
+        
+        # Si une practice spécifique est mentionnée
+        if entities["practices"]:
+            practice_name = entities["practices"][0]
+            practice = self.session.query(Practice).filter(
+                func.lower(Practice.nom) == practice_name.lower()
+            ).first()
+            
+            if practice:
+                # Récupérer les consultants de cette practice
+                consultants = [c for c in practice.consultants]
+                
+                if consultants:
+                    response = f"👥 **Practice {practice.nom}** :\n\n"
+                    response += f"📋 **{len(consultants)} consultant(s)** :\n"
+                    
+                    for i, consultant in enumerate(consultants, 1):
+                        status_icon = "🟢" if consultant.disponibilite else "🔴"
+                        cjm = (consultant.salaire_actuel * 1.8 / 216) if consultant.salaire_actuel else 0
+                        response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
+                        if consultant.salaire_actuel:
+                            response += f" - CJM: {cjm:,.0f} €"
+                        response += "\n"
+                    
+                    if practice.responsable:
+                        response += f"\n👨‍💼 **Responsable** : {practice.responsable}"
+                else:
+                    response = f"📋 **Practice {practice.nom}** : Aucun consultant assigné"
+                
+                return {
+                    "response": response,
+                    "data": {
+                        "practice": practice.nom,
+                        "consultants": [
+                            {
+                                "nom": c.nom,
+                                "prenom": c.prenom,
+                                "disponibilite": c.disponibilite,
+                                "cjm": (c.salaire_actuel * 1.8 / 216) if c.salaire_actuel else None
+                            } for c in consultants
+                        ]
+                    },
+                    "intent": "practices",
+                    "confidence": 0.9
+                }
+            else:
+                return {
+                    "response": f"❌ Practice **{practice_name}** introuvable dans la base.",
+                    "data": None,
+                    "intent": "practices",
+                    "confidence": 0.7
+                }
+        
+        # Question générale sur les practices
+        else:
+            practices = self.session.query(Practice).filter(Practice.actif == True).all()
+            
+            if practices:
+                response = "🏢 **Practices disponibles** :\n\n"
+                
+                for practice in practices:
+                    nb_consultants = len([c for c in practice.consultants])
+                    nb_disponibles = len([c for c in practice.consultants if c.disponibilite])
+                    
+                    response += f"• **{practice.nom}** : {nb_consultants} consultant(s) ({nb_disponibles} disponible(s))\n"
+                    if practice.responsable:
+                        response += f"  👨‍💼 Responsable : {practice.responsable}\n"
+                
+                return {
+                    "response": response,
+                    "data": {
+                        "practices": [
+                            {
+                                "nom": p.nom,
+                                "consultants_total": len([c for c in p.consultants]),
+                                "consultants_disponibles": len([c for c in p.consultants if c.disponibilite]),
+                                "responsable": p.responsable
+                            } for p in practices
+                        ]
+                    },
+                    "intent": "practices",
+                    "confidence": 0.8
+                }
+            else:
+                return {
+                    "response": "❓ Aucune practice active trouvée dans la base.",
+                    "data": None,
+                    "intent": "practices",
+                    "confidence": 0.6
+                }
+    
+    def _handle_cvs_question(self, entities: Dict) -> Dict[str, Any]:
+        """Gère les questions sur les CVs"""
+        
+        from database.models import CV
+        
+        # Si un consultant spécifique est mentionné
+        if entities["noms"]:
+            nom_recherche = entities["noms"][0]
+            consultant = self._find_consultant_by_name(nom_recherche)
+            
+            if consultant:
+                cvs = consultant.cvs
+                
+                if cvs:
+                    response = f"📁 **CVs de {consultant.prenom} {consultant.nom}** :\n\n"
+                    
+                    for i, cv in enumerate(cvs, 1):
+                        taille_mb = (cv.taille_fichier / 1024 / 1024) if cv.taille_fichier else 0
+                        date_upload = cv.date_upload.strftime('%d/%m/%Y') if cv.date_upload else 'N/A'
+                        
+                        response += f"{i}. **{cv.fichier_nom}**\n"
+                        response += f"   📅 Uploadé le : {date_upload}\n"
+                        response += f"   📏 Taille : {taille_mb:.1f} MB\n"
+                        if cv.contenu_extrait:
+                            response += f"   ✅ Contenu analysé\n"
+                        response += "\n"
+                    
+                    response += f"📊 **Total : {len(cvs)} document(s)**"
+                else:
+                    response = f"📁 **{consultant.prenom} {consultant.nom}** : Aucun CV uploadé"
+                
+                return {
+                    "response": response,
+                    "data": {
+                        "consultant": f"{consultant.prenom} {consultant.nom}",
+                        "cvs": [
+                            {
+                                "nom": cv.fichier_nom,
+                                "date_upload": cv.date_upload.isoformat() if cv.date_upload else None,
+                                "taille": cv.taille_fichier,
+                                "contenu_analyse": bool(cv.contenu_extrait)
+                            } for cv in cvs
+                        ]
+                    },
+                    "intent": "cvs",
+                    "confidence": 0.9
+                }
+            else:
+                return {
+                    "response": f"❌ Consultant **{nom_recherche}** introuvable.",
+                    "data": None,
+                    "intent": "cvs",
+                    "confidence": 0.7
+                }
+        
+        # Question générale sur les CVs
+        else:
+            cvs_total = self.session.query(CV).count()
+            consultants_avec_cv = self.session.query(Consultant).join(CV).distinct().count()
+            
+            response = f"📁 **Statistiques des CVs** :\n\n"
+            response += f"• Total de documents : **{cvs_total}**\n"
+            response += f"• Consultants avec CV : **{consultants_avec_cv}**\n"
+            
+            # Top 3 consultants avec le plus de CVs
+            from sqlalchemy import func
+            top_consultants = (
+                self.session.query(Consultant, func.count(CV.id).label('nb_cvs'))
+                .join(CV)
+                .group_by(Consultant.id)
+                .order_by(func.count(CV.id).desc())
+                .limit(3)
+                .all()
+            )
+            
+            if top_consultants:
+                response += f"\n🏆 **Top consultants (nombre de CVs)** :\n"
+                for consultant, nb_cvs in top_consultants:
+                    response += f"• **{consultant.prenom} {consultant.nom}** : {nb_cvs} CV(s)\n"
+            
+            return {
+                "response": response,
+                "data": {
+                    "cvs_total": cvs_total,
+                    "consultants_avec_cv": consultants_avec_cv,
+                    "top_consultants": [
+                        {
+                            "nom": c.nom,
+                            "prenom": c.prenom,
+                            "nb_cvs": nb
+                        } for c, nb in top_consultants
+                    ]
+                },
+                "intent": "cvs",
+                "confidence": 0.8
+            }
+
     # Méthodes utilitaires pour les requêtes DB
     
     def _find_consultant_by_name(self, nom_recherche: str) -> Optional[Consultant]:
@@ -690,10 +980,19 @@ class ChatbotService:
         return consultant
     
     def _find_consultants_by_skill(self, competence: str) -> List[Consultant]:
-        """Trouve les consultants ayant une compétence (simulation)"""
-        # Pour l'instant, retourner une liste vide
-        # TODO: Implémenter la recherche par compétences quand la relation sera créée
-        return []
+        """Trouve les consultants ayant une compétence"""
+        from database.models import Competence, ConsultantCompetence
+        
+        # Recherche les consultants qui ont cette compétence
+        consultants = self.session.query(Consultant).join(
+            ConsultantCompetence, Consultant.id == ConsultantCompetence.consultant_id
+        ).join(
+            Competence, ConsultantCompetence.competence_id == Competence.id
+        ).filter(
+            func.lower(Competence.nom).like(f'%{competence.lower()}%')
+        ).distinct().all()
+        
+        return consultants
     
     def _get_missions_by_company(self, entreprise: str) -> List[Mission]:
         """Récupère les missions pour une entreprise"""
@@ -751,6 +1050,8 @@ class ChatbotService:
     def _get_general_stats(self) -> Dict[str, Any]:
         """Calcule les statistiques générales"""
         
+        from database.models import Practice, CV
+        
         # Consultants
         consultants_total = self.session.query(Consultant).count()
         consultants_actifs = self.session.query(Consultant).filter(Consultant.disponibilite == True).count()
@@ -761,13 +1062,21 @@ class ChatbotService:
         missions_en_cours = self.session.query(Mission).filter(Mission.statut == "en_cours").count()
         missions_terminees = missions_total - missions_en_cours
         
+        # Practices
+        practices_total = self.session.query(Practice).filter(Practice.actif == True).count()
+        
+        # CVs
+        cvs_total = self.session.query(CV).count()
+        consultants_avec_cv = self.session.query(Consultant).join(CV).distinct().count()
+        
         # TJM moyen
         tjm_moyen = self.session.query(func.avg(Mission.taux_journalier)).filter(Mission.taux_journalier.isnot(None)).scalar() or 0
         
-        # Salaire moyen
+        # Salaire moyen et CJM moyen
         salaire_moyen = self.session.query(func.avg(Consultant.salaire_actuel)).filter(
             Consultant.salaire_actuel.isnot(None)
         ).scalar() or 0
+        cjm_moyen = (salaire_moyen * 1.8 / 216) if salaire_moyen > 0 else 0
         
         return {
             "consultants_total": consultants_total,
@@ -776,8 +1085,12 @@ class ChatbotService:
             "missions_total": missions_total,
             "missions_en_cours": missions_en_cours,
             "missions_terminees": missions_terminees,
+            "practices_total": practices_total,
+            "cvs_total": cvs_total,
+            "consultants_avec_cv": consultants_avec_cv,
             "tjm_moyen": tjm_moyen,
-            "salaire_moyen": salaire_moyen
+            "salaire_moyen": salaire_moyen,
+            "cjm_moyen": cjm_moyen
         }
     
     def __del__(self):
