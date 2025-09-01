@@ -3,6 +3,7 @@ import pandas as pd
 from sqlalchemy import and_
 from database.models import BusinessManager, Consultant, ConsultantBusinessManager
 from database.database import get_session
+from services.business_manager_service import BusinessManagerService
 from datetime import datetime, date
 
 def show():
@@ -575,42 +576,54 @@ def show_business_managers_list():
     """Affiche la liste des Business Managers avec interactions"""
     st.subheader("📋 Liste des Business Managers")
     
+    # Champ de recherche
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        search_term = st.text_input(
+            "🔍 Rechercher un Business Manager", 
+            placeholder="Tapez un prénom, nom ou email...",
+            help="Recherche dans les prénoms, noms et emails des Business Managers"
+        )
+    with col2:
+        search_button = st.button("🔍 Rechercher", use_container_width=True)
+    
     try:
-        with get_session() as session:
-            # Récupération des BMs
-            bms = session.query(BusinessManager).all()
-            
-            if not bms:
-                st.info("📝 Aucun Business Manager enregistré")
-                st.markdown("💡 Utilisez l'onglet **Nouveau BM** pour créer votre premier Business Manager")
+        # Utiliser la recherche si un terme est saisi, sinon afficher tous les BMs
+        if search_term and search_term.strip():
+            bms_data_from_service = BusinessManagerService.search_business_managers(search_term.strip())
+            if bms_data_from_service:
+                st.info(f"🔍 {len(bms_data_from_service)} Business Manager(s) trouvé(s) pour '{search_term}'")
+            else:
+                st.warning(f"❌ Aucun Business Manager trouvé pour '{search_term}'")
                 return
-            
-            # Préparer les données pour le tableau
-            bms_data = []
-            for bm in bms:
-                # Compter les consultants assignés (actifs)
-                consultants_count = session.query(ConsultantBusinessManager)\
-                    .filter(and_(
-                        ConsultantBusinessManager.business_manager_id == bm.id,
-                        ConsultantBusinessManager.date_fin.is_(None)
-                    )).count()
-                
-                # Total assignations (historique)
+        else:
+            bms_data_from_service = BusinessManagerService.get_all_business_managers()
+        
+        if not bms_data_from_service:
+            st.info("📝 Aucun Business Manager enregistré")
+            st.markdown("💡 Utilisez l'onglet **Nouveau BM** pour créer votre premier Business Manager")
+            return
+        
+        # Préparer les données pour le tableau à partir du service
+        bms_data = []
+        for bm_dict in bms_data_from_service:
+            # Calculer le total des assignations avec une nouvelle session
+            with get_session() as session:
                 total_assignments = session.query(ConsultantBusinessManager)\
-                    .filter(ConsultantBusinessManager.business_manager_id == bm.id)\
+                    .filter(ConsultantBusinessManager.business_manager_id == bm_dict['id'])\
                     .count()
-                
-                bms_data.append({
-                    "ID": bm.id,
-                    "Prénom": bm.prenom,
-                    "Nom": bm.nom,
-                    "Email": bm.email,
-                    "Téléphone": bm.telephone or "N/A",
-                    "Consultants actuels": consultants_count,
-                    "Total assignations": total_assignments,
-                    "Statut": "🟢 Actif" if bm.actif else "🔴 Inactif",
-                    "Créé le": bm.date_creation.strftime("%d/%m/%Y") if bm.date_creation else "N/A"
-                })
+            
+            bms_data.append({
+                "ID": bm_dict['id'],
+                "Prénom": bm_dict['prenom'],
+                "Nom": bm_dict['nom'],
+                "Email": bm_dict['email'],
+                "Téléphone": bm_dict['telephone'] or "N/A",
+                "Consultants actuels": bm_dict['consultants_count'],
+                "Total assignations": total_assignments,
+                "Statut": "🟢 Actif" if bm_dict['actif'] else "🔴 Inactif",
+                "Créé le": bm_dict['date_creation'].strftime("%d/%m/%Y") if bm_dict['date_creation'] else "N/A"
+            })
             
             # Afficher le tableau avec sélection
             df = pd.DataFrame(bms_data)
@@ -679,10 +692,10 @@ def show_business_managers_list():
             col1, col2, col3, col4 = st.columns(4)
             
             with col1:
-                st.metric("👔 Total BMs", len(bms))
+                st.metric("👔 Total BMs", len(bms_data_from_service))
             
             with col2:
-                actifs = len([bm for bm in bms if bm.actif])
+                actifs = len([bm for bm in bms_data_from_service if bm['actif']])
                 st.metric("🟢 Actifs", actifs)
             
             with col3:
@@ -690,7 +703,7 @@ def show_business_managers_list():
                 st.metric("👥 Total consultants gérés", total_consultants)
             
             with col4:
-                avg_consultants = total_consultants / len(bms) if len(bms) > 0 else 0
+                avg_consultants = total_consultants / len(bms_data_from_service) if len(bms_data_from_service) > 0 else 0
                 st.metric("📊 Moyenne consultants/BM", f"{avg_consultants:.1f}")
                     
     except Exception as e:

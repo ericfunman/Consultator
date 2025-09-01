@@ -1213,9 +1213,28 @@ def show_consultants_list():
     """Affiche la liste des consultants avec interactions optimisée"""
 
     st.subheader("📋 Liste des consultants")
+    
+    # Champ de recherche
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        search_term = st.text_input(
+            "🔍 Rechercher un consultant", 
+            placeholder="Tapez un prénom, nom ou email...",
+            help="Recherche dans les prénoms, noms et emails des consultants"
+        )
+    with col2:
+        search_button = st.button("🔍 Rechercher", use_container_width=True)
 
     try:
-        consultants = ConsultantService.get_all_consultants()
+        # Utiliser la recherche si un terme est saisi, sinon afficher tous les consultants
+        if search_term and search_term.strip():
+            consultants = ConsultantService.search_consultants_optimized(search_term.strip())
+            if consultants:
+                st.info(f"🔍 {len(consultants)} consultant(s) trouvé(s) pour '{search_term}'")
+            else:
+                st.warning(f"❌ Aucun consultant trouvé pour '{search_term}'")
+        else:
+            consultants = ConsultantService.get_all_consultants()
 
         if consultants:
             # Préparer les données pour le tableau
