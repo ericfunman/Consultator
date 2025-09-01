@@ -19,6 +19,7 @@ from pages_modules import consultants
 from pages_modules import home
 from pages_modules import technologies
 from pages_modules import practices
+# Import business_managers fait dynamiquement pour éviter les erreurs de chargement
 from pages_modules import chatbot
 
 # Configuration de la page
@@ -75,11 +76,12 @@ def main():
             options=[
                 "🏠 Accueil",
                 "👥 Consultants",
+                "👨‍💼 Business Managers",
                 "🏢 Practices",
                 "🔧 Référentiel Technologies",
                 "🤖 Assistant IA",
             ],
-            icons=["house", "people", "building", "tools", "robot"],
+            icons=["house", "people", "briefcase", "building", "tools", "robot"],
             menu_icon="list",
             default_index=0,  # Démarre sur Accueil au lieu de Consultants
             styles={
@@ -103,6 +105,15 @@ def main():
         home.show()
     elif selected == "👥 Consultants":
         consultants.show()
+    elif selected == "👨‍💼 Business Managers":
+        try:
+            from pages_modules import business_managers
+            business_managers.show()
+        except Exception as e:
+            st.error("🚫 Erreur lors du chargement du module Business Managers")
+            st.error(f"Détails: {e}")
+            import traceback
+            st.code(traceback.format_exc())
     elif selected == "🏢 Practices":
         practices.show()
     elif selected == "🔧 Référentiel Technologies":
