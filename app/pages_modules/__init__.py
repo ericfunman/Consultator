@@ -7,5 +7,8 @@ Contient toutes les pages de l'application Streamlit
 from . import home
 from . import consultants
 from . import technologies
+from . import practices
+from . import business_managers
+from . import chatbot
 
-__all__ = ['home', 'consultants', 'technologies']
+__all__ = ['home', 'consultants', 'technologies', 'practices', 'business_managers', 'chatbot']

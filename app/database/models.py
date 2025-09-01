@@ -54,6 +54,7 @@ class Consultant(Base):
     cvs = relationship("CV", back_populates="consultant", cascade="all, delete-orphan")
     salaires = relationship("ConsultantSalaire", back_populates="consultant", cascade="all, delete-orphan")
     langues = relationship("ConsultantLangue", back_populates="consultant", cascade="all, delete-orphan")
+    business_manager_gestions = relationship("ConsultantBusinessManager", back_populates="consultant", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Consultant(id={self.id}, nom='{self.nom}', prenom='{self.prenom}')>"
@@ -61,6 +62,14 @@ class Consultant(Base):
     @property
     def nom_complet(self):
         return f"{self.prenom} {self.nom}"
+    
+    @property
+    def business_manager_actuel(self):
+        """Retourne le Business Manager actuel du consultant"""
+        for cbm in self.business_manager_gestions:
+            if cbm.date_fin is None:
+                return cbm.business_manager
+        return None
 
 class Competence(Base):
     """Modèle pour les compétences techniques et fonctionnelles"""
@@ -217,3 +226,68 @@ class ConsultantLangue(Base):
             5: "Natif (C2)"
         }
         return labels.get(self.niveau, "Inconnu")
+
+class BusinessManager(Base):
+    """Modèle pour les Business Managers"""
+    __tablename__ = 'business_managers'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nom = Column(String(100), nullable=False)
+    prenom = Column(String(100), nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    telephone = Column(String(20))
+    date_creation = Column(DateTime, default=datetime.now)
+    derniere_maj = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    actif = Column(Boolean, default=True)
+    notes = Column(Text)
+    
+    # Relations
+    consultant_gestions = relationship("ConsultantBusinessManager", back_populates="business_manager", cascade="all, delete-orphan")
+    
+    def __repr__(self):
+        return f"<BusinessManager(id={self.id}, nom='{self.nom}', prenom='{self.prenom}')>"
+    
+    @property
+    def nom_complet(self):
+        """Retourne le nom complet du BM"""
+        return f"{self.prenom} {self.nom}"
+    
+    @property
+    def consultants_actuels(self):
+        """Retourne les consultants actuellement gérés par ce BM"""
+        return [cbm.consultant for cbm in self.consultant_gestions if cbm.date_fin is None]
+    
+    @property
+    def nombre_consultants_actuels(self):
+        """Retourne le nombre de consultants actuellement gérés"""
+        return len(self.consultants_actuels)
+
+class ConsultantBusinessManager(Base):
+    """Table de liaison entre consultants et business managers avec historique"""
+    __tablename__ = 'consultant_business_managers'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    consultant_id = Column(Integer, ForeignKey('consultants.id'), nullable=False)
+    business_manager_id = Column(Integer, ForeignKey('business_managers.id'), nullable=False)
+    date_debut = Column(Date, nullable=False, default=datetime.now)
+    date_fin = Column(Date)  # NULL si la gestion est active
+    commentaire = Column(Text)  # ex: "Changement d'équipe", "Promotion", etc.
+    date_creation = Column(DateTime, default=datetime.now)
+    
+    # Relations
+    consultant = relationship("Consultant", back_populates="business_manager_gestions")
+    business_manager = relationship("BusinessManager", back_populates="consultant_gestions")
+    
+    def __repr__(self):
+        return f"<ConsultantBusinessManager(consultant_id={self.consultant_id}, bm_id={self.business_manager_id}, debut={self.date_debut})>"
+    
+    @property
+    def est_actuel(self):
+        """Retourne True si cette gestion est actuellement active"""
+        return self.date_fin is None
+    
+    @property
+    def duree_jours(self):
+        """Calcule la durée de la gestion en jours"""
+        date_fin_effective = self.date_fin or datetime.now().date()
+        return (date_fin_effective - self.date_debut).days
