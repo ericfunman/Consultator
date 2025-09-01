@@ -1,6 +1,7 @@
 """
 Service de gestion des consultants
 CRUD operations pour les consultants avec la base de données
+Optimisé pour gérer 1000+ consultants avec cache et pagination efficace
 """
 
 from datetime import datetime, date
@@ -12,11 +13,11 @@ import streamlit as st
 
 
 class ConsultantService:
-    """Service pour la gestion des consultants"""
+    """Service pour la gestion des consultants optimisé pour de gros volumes"""
     
     @staticmethod
-    def get_all_consultants(page: int = 1, per_page: int = 20) -> List[Consultant]:
-        """Récupère tous les consultants avec pagination"""
+    def get_all_consultants_objects(page: int = 1, per_page: int = 50) -> List[Consultant]:
+        """Récupère tous les consultants comme objets (ancienne interface)"""
         try:
             with get_database_session() as session:
                 consultants = session.query(Consultant)\
@@ -33,6 +34,117 @@ class ConsultantService:
         except Exception as e:
             print(f"Erreur lors de la récupération des consultants: {e}")
             return []
+    
+    @staticmethod
+    @st.cache_data(ttl=300)  # Cache pendant 5 minutes
+    def get_all_consultants(page: int = 1, per_page: int = 50) -> List[Dict]:
+        """Récupère tous les consultants avec pagination optimisée"""
+        try:
+            with get_database_session() as session:
+                consultants = session.query(Consultant)\
+                    .options(joinedload(Consultant.practice))\
+                    .offset((page - 1) * per_page)\
+                    .limit(per_page)\
+                    .all()
+                
+                # Convertir en dictionnaires pour éviter les erreurs de session
+                consultant_list = []
+                for consultant in consultants:
+                    consultant_dict = {
+                        'id': consultant.id,
+                        'prenom': consultant.prenom,
+                        'nom': consultant.nom,
+                        'email': consultant.email,
+                        'telephone': consultant.telephone,
+                        'salaire_actuel': consultant.salaire_actuel,
+                        'disponibilite': consultant.disponibilite,
+                        'practice_name': consultant.practice.nom if consultant.practice else 'N/A',
+                        'date_creation': consultant.date_creation,
+                        'derniere_maj': consultant.derniere_maj
+                    }
+                    consultant_list.append(consultant_dict)
+                
+                return consultant_list
+        except Exception as e:
+            print(f"Erreur lors de la récupération des consultants: {e}")
+            return []
+    
+    @staticmethod
+    @st.cache_data(ttl=300)  # Cache pendant 5 minutes
+    def search_consultants_optimized(search_term: str, page: int = 1, per_page: int = 50) -> List[Dict]:
+        """Recherche optimisée avec cache pour de gros volumes"""
+        try:
+            with get_database_session() as session:
+                query = session.query(Consultant)\
+                    .options(joinedload(Consultant.practice))
+                
+                if search_term:
+                    search_filter = f"%{search_term}%"
+                    query = query.filter(
+                        (Consultant.nom.ilike(search_filter)) |
+                        (Consultant.prenom.ilike(search_filter)) |
+                        (Consultant.email.ilike(search_filter))
+                    )
+                
+                consultants = query.offset((page - 1) * per_page).limit(per_page).all()
+                
+                # Convertir en dictionnaires
+                return [
+                    {
+                        'id': c.id,
+                        'prenom': c.prenom,
+                        'nom': c.nom,
+                        'email': c.email,
+                        'telephone': c.telephone,
+                        'salaire_actuel': c.salaire_actuel,
+                        'disponibilite': c.disponibilite,
+                        'practice_name': c.practice.nom if c.practice else 'N/A'
+                    } for c in consultants
+                ]
+        except Exception as e:
+            print(f"Erreur lors de la recherche: {e}")
+            return []
+    
+    @staticmethod
+    @st.cache_data(ttl=600)  # Cache pendant 10 minutes
+    def get_consultants_count() -> int:
+        """Retourne le nombre total de consultants avec cache"""
+        try:
+            with get_database_session() as session:
+                return session.query(Consultant).count()
+        except Exception as e:
+            print(f"Erreur lors du comptage des consultants: {e}")
+            return 0
+    
+    @staticmethod
+    @st.cache_data(ttl=300)  # Cache pendant 5 minutes  
+    def get_consultant_summary_stats() -> Dict[str, int]:
+        """Récupère les statistiques générales avec cache pour tableau de bord"""
+        try:
+            with get_database_session() as session:
+                total_consultants = session.query(Consultant).count()
+                available_consultants = session.query(Consultant)\
+                    .filter(Consultant.disponibilite == True).count()
+                total_missions = session.query(Mission).count()
+                active_missions = session.query(Mission)\
+                    .filter(Mission.statut == 'en_cours').count()
+                
+                return {
+                    'total_consultants': total_consultants,
+                    'available_consultants': available_consultants,
+                    'total_missions': total_missions,
+                    'active_missions': active_missions,
+                    'busy_consultants': total_consultants - available_consultants
+                }
+        except Exception as e:
+            print(f"Erreur lors de la récupération des stats: {e}")
+            return {
+                'total_consultants': 0,
+                'available_consultants': 0,
+                'total_missions': 0,
+                'active_missions': 0,
+                'busy_consultants': 0
+            }
     
     @staticmethod
     def get_consultant_by_id(consultant_id: int) -> Optional[Consultant]:

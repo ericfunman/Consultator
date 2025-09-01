@@ -1,0 +1,35 @@
+[server]
+# Optimisations pour gros volumes de données
+maxUploadSize = 100
+maxMessageSize = 100
+enableCORS = false
+enableXsrfProtection = false
+
+[global]
+# Cache et performances
+dataFrameSerialization = "arrow"
+showWarningOnDirectExecution = false
+
+[browser]
+# Réduction du polling pour éviter la surcharge
+gatherUsageStats = false
+
+[theme]
+# Performance UI
+base = "light"
+primaryColor = "#1f77b4"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+
+[runner]
+# Optimisations d'exécution
+magicEnabled = false
+installTracer = false
+fixMatplotlib = false
+postScriptGC = true
+
+[client]
+# Optimisations client
+showErrorDetails = true
+toolbarMode = "minimal"

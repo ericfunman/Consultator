@@ -1,9 +1,10 @@
 """
 Modèles de base de données pour Consultator
 Définit la structure des tables avec SQLAlchemy
+Optimisé pour gérer 1000+ consultants avec index de performance
 """
 
-from sqlalchemy import Column, Integer, String, Float, Date, Text, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Float, Date, Text, ForeignKey, DateTime, Boolean, Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -32,7 +33,7 @@ class Practice(Base):
         return len([c for c in self.consultants if c.disponibilite])
 
 class Consultant(Base):
-    """Modèle pour les consultants"""
+    """Modèle pour les consultants avec optimisations de performance"""
     __tablename__ = 'consultants'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -55,6 +56,15 @@ class Consultant(Base):
     salaires = relationship("ConsultantSalaire", back_populates="consultant", cascade="all, delete-orphan")
     langues = relationship("ConsultantLangue", back_populates="consultant", cascade="all, delete-orphan")
     business_manager_gestions = relationship("ConsultantBusinessManager", back_populates="consultant", cascade="all, delete-orphan")
+    
+    # Index de performance pour recherches rapides
+    __table_args__ = (
+        Index('idx_consultant_nom_prenom', 'nom', 'prenom'),
+        Index('idx_consultant_email', 'email'),
+        Index('idx_consultant_disponibilite', 'disponibilite'),
+        Index('idx_consultant_practice', 'practice_id'),
+        Index('idx_consultant_date_maj', 'derniere_maj'),
+    )
     
     def __repr__(self):
         return f"<Consultant(id={self.id}, nom='{self.nom}', prenom='{self.prenom}')>"
@@ -109,7 +119,7 @@ class ConsultantCompetence(Base):
         return f"<ConsultantCompetence(consultant_id={self.consultant_id}, competence_id={self.competence_id}, experience={self.annees_experience})>"
 
 class Mission(Base):
-    """Modèle pour les missions des consultants"""
+    """Modèle pour les missions des consultants avec optimisations"""
     __tablename__ = 'missions'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -127,6 +137,15 @@ class Mission(Base):
     
     # Relations
     consultant = relationship("Consultant", back_populates="missions")
+    
+    # Index de performance pour requêtes fréquentes
+    __table_args__ = (
+        Index('idx_mission_consultant', 'consultant_id'),
+        Index('idx_mission_client', 'client'),
+        Index('idx_mission_statut', 'statut'),
+        Index('idx_mission_dates', 'date_debut', 'date_fin'),
+        Index('idx_mission_consultant_dates', 'consultant_id', 'date_debut'),
+    )
     
     def __repr__(self):
         return f"<Mission(id={self.id}, nom='{self.nom_mission}', client='{self.client}')>"

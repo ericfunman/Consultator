@@ -1,6 +1,7 @@
 ﻿"""
 Consultator - Plateforme de gestion de consultants
 Point d'entrée principal de l'application Streamlit
+Optimisé pour gérer 1000+ consultants avec initialisation efficace
 """
 
 import os
@@ -14,23 +15,15 @@ sys.path.append(os.path.dirname(__file__))
 
 from database.database import init_database
 
-# Import des pages
-from pages_modules import consultants
-from pages_modules import home
-from pages_modules import technologies
-from pages_modules import practices
-# Import business_managers fait dynamiquement pour éviter les erreurs de chargement
-from pages_modules import chatbot
-
 # Configuration de la page
 st.set_page_config(
     page_title="Consultator",
-    page_icon="",
+    page_icon="🏢",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# CSS personnalisé
+# CSS personnalisé optimisé
 st.markdown(
     """
 <style>
@@ -51,39 +44,104 @@ st.markdown(
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin: 0.5rem 0;
     }
+    .stApp > header {
+        background-color: transparent;
+    }
+    .stApp {
+        background: linear-gradient(45deg, #f0f4f8, #e8f4fd);
+    }
 </style>
 """,
     unsafe_allow_html=True,
 )
 
+@st.cache_resource
+def get_navigation_modules():
+    """Cache les imports des modules de navigation pour éviter les rechargements"""
+    modules = {}
+    try:
+        from pages_modules import home
+        modules['home'] = home
+    except Exception as e:
+        print(f"Erreur import home: {e}")
+    
+    try:
+        from pages_modules import consultants
+        modules['consultants'] = consultants
+    except Exception as e:
+        print(f"Erreur import consultants: {e}")
+    
+    try:
+        from pages_modules import technologies
+        modules['technologies'] = technologies
+    except Exception as e:
+        print(f"Erreur import technologies: {e}")
+    
+    try:
+        from pages_modules import practices
+        modules['practices'] = practices
+    except Exception as e:
+        print(f"Erreur import practices: {e}")
+    
+    try:
+        from pages_modules import business_managers
+        modules['business_managers'] = business_managers
+    except Exception as e:
+        print(f"Erreur import business_managers: {e}")
+    
+    try:
+        from pages_modules import chatbot
+        modules['chatbot'] = chatbot
+    except Exception as e:
+        print(f"Erreur import chatbot: {e}")
+    
+    return modules
+
 
 def main():
-    """Fonction principale de l'application"""
+    """Fonction principale de l'application optimisée"""
 
-    # Initialiser la base de données
-    init_database()
+    # Initialiser la base de données UNE SEULE FOIS
+    if 'database_initialized' not in st.session_state:
+        with st.spinner('🔄 Initialisation de la base de données...'):
+            init_database()
+            st.session_state.database_initialized = True
 
     # Header principal
     st.markdown(
-        '<div class="main-header"> Consultator</div>', unsafe_allow_html=True
+        '<div class="main-header">🏢 Consultator</div>', unsafe_allow_html=True
     )
-    st.markdown("### Plateforme de gestion de practice data")
+    st.markdown("### 📊 Plateforme de gestion de practice data (1000+ consultants)")
+
+    # Charger les modules avec cache
+    modules = get_navigation_modules()
 
     # Menu de navigation dans la sidebar
     with st.sidebar:
+        # Affichage rapide des statistiques si possible
+        if 'consultants' in modules:
+            try:
+                from services.consultant_service import ConsultantService
+                stats = ConsultantService.get_consultant_summary_stats()
+                st.metric("👥 Total Consultants", stats.get('total_consultants', 0))
+                st.metric("✅ Disponibles", stats.get('available_consultants', 0))
+                st.divider()
+            except:
+                pass  # Ignore si erreur stats
+        
         selected = option_menu(
-            menu_title=None,  # Pas de titre
+            menu_title="🧭 Navigation",
             options=[
                 "🏠 Accueil",
                 "👥 Consultants",
                 "👨‍💼 Business Managers",
                 "🏢 Practices",
-                "🔧 Référentiel Technologies",
+                "🔧 Technologies",
                 "🤖 Assistant IA",
             ],
             icons=["house", "people", "briefcase", "building", "tools", "robot"],
             menu_icon="list",
-            default_index=0,  # Démarre sur Accueil au lieu de Consultants
+            default_index=0,
             styles={
                 "container": {
                     "padding": "0!important",
@@ -100,26 +158,50 @@ def main():
             },
         )
 
-    # Navigation vers les pages
-    if selected == "🏠 Accueil":
-        home.show()
-    elif selected == "👥 Consultants":
-        consultants.show()
-    elif selected == "👨‍💼 Business Managers":
-        try:
-            from pages_modules import business_managers
-            business_managers.show()
-        except Exception as e:
-            st.error("🚫 Erreur lors du chargement du module Business Managers")
-            st.error(f"Détails: {e}")
-            import traceback
+    # Navigation vers les pages avec gestion d'erreurs optimisée
+    try:
+        if selected == "🏠 Accueil":
+            if 'home' in modules:
+                modules['home'].show()
+            else:
+                st.error("❌ Module Accueil non disponible")
+                
+        elif selected == "👥 Consultants":
+            if 'consultants' in modules:
+                modules['consultants'].show()
+            else:
+                st.error("❌ Module Consultants non disponible")
+                
+        elif selected == "👨‍💼 Business Managers":
+            if 'business_managers' in modules:
+                modules['business_managers'].show()
+            else:
+                st.error("❌ Module Business Managers non disponible")
+                st.info("💡 Vérifiez que le fichier `business_managers.py` existe dans `pages_modules/`")
+                
+        elif selected == "🏢 Practices":
+            if 'practices' in modules:
+                modules['practices'].show()
+            else:
+                st.error("❌ Module Practices non disponible")
+                
+        elif selected == "🔧 Technologies":
+            if 'technologies' in modules:
+                modules['technologies'].show()
+            else:
+                st.error("❌ Module Technologies non disponible")
+                
+        elif selected == "🤖 Assistant IA":
+            if 'chatbot' in modules:
+                modules['chatbot'].show()
+            else:
+                st.error("❌ Module Assistant IA non disponible")
+                
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement de la page: {e}")
+        import traceback
+        with st.expander("🔍 Détails de l'erreur"):
             st.code(traceback.format_exc())
-    elif selected == "🏢 Practices":
-        practices.show()
-    elif selected == "🔧 Référentiel Technologies":
-        technologies.show()
-    elif selected == "🤖 Assistant IA":
-        chatbot.show()
 
 
 if __name__ == "__main__":

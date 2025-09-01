@@ -138,89 +138,100 @@ def show_cv_analysis_fullwidth():
 
 
 def show_consultant_profile():
-    """Affiche le profil détaillé d'un consultant"""
+    """Affiche le profil détaillé d'un consultant avec gestion d'erreurs améliorée"""
 
     consultant_id = st.session_state.view_consultant_profile
-    # Charger le consultant avec la relation practice pour éviter DetachedInstanceError
-    from sqlalchemy.orm import joinedload
-    from database.models import Consultant
-    with get_database_session() as session:
-        consultant = session.query(Consultant).options(joinedload(Consultant.practice)).filter(Consultant.id == consultant_id).first()
-
-    if not consultant:
-        st.error("❌ Consultant introuvable")
-        del st.session_state.view_consultant_profile
-        st.rerun()
-        return
-
-    # En-tête avec bouton retour
-    col1, col2 = st.columns([6, 1])
-
-    with col1:
-        st.title(f"👤 Profil de {consultant.prenom} {consultant.nom}")
-
-    with col2:
-        if st.button("← Retour", key="back_to_list"):
+    
+    try:
+        # Utiliser la méthode optimisée du service
+        consultant_data = ConsultantService.get_consultant_with_stats(consultant_id)
+        
+        if not consultant_data:
+            st.error("❌ Consultant introuvable")
             del st.session_state.view_consultant_profile
             st.rerun()
+            return
 
-    st.markdown("---")
+        # Pour compatibilité avec les fonctions existantes, on charge aussi l'objet complet
+        consultant = ConsultantService.get_consultant_by_id(consultant_id)
+        
+        # En-tête avec bouton retour
+        col1, col2 = st.columns([6, 1])
 
-    # Métriques principales
-    col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            st.title(f"👤 Profil de {consultant_data['prenom']} {consultant_data['nom']}")
 
-    with col1:
-        st.metric("💰 Salaire annuel", f"{consultant.salaire_actuel or 0:,}€")
+        with col2:
+            if st.button("← Retour", key="back_to_list"):
+                del st.session_state.view_consultant_profile
+                st.rerun()
 
-    with col2:
-        # Calcul du CJM (Coût Journalier Moyen)
-        cjm = (consultant.salaire_actuel * 1.8 / 216) if consultant.salaire_actuel else 0
-        st.metric("📈 CJM", f"{cjm:,.0f}€")
-
-    with col3:
-        status = (
-            "✅ Disponible" if consultant.disponibilite else "🔴 En mission"
-        )
-        st.metric("📊 Statut", status)
-
-    with col4:
-        creation_date = (
-            consultant.date_creation.strftime("%d/%m/%Y")
-            if consultant.date_creation
-            else "N/A"
-        )
-        st.metric("📅 Membre depuis", creation_date)
-
-    with col5:
-        practice_name = consultant.practice.nom if hasattr(consultant, 'practice') and consultant.practice else "Non affecté"
-        st.metric("🏢 Practice", practice_name)
-
-    st.markdown("---")
-
-    # Affichage de l'analyse CV en PLEINE LARGEUR (si disponible)
-    if 'cv_analysis' in st.session_state:
-        show_cv_analysis_fullwidth()
         st.markdown("---")
 
-    # Onglets de détail
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(
-        ["📋 Informations", "💼 Compétences", "🌍 Langues", "🚀 Missions", "📁 Documents"]
-    )
+        # Métriques principales
+        col1, col2, col3, col4, col5 = st.columns(5)
 
-    with tab1:
-        show_consultant_info(consultant)
+        with col1:
+            salaire = consultant_data.get('salaire_actuel', 0) or 0
+            st.metric("💰 Salaire annuel", f"{salaire:,}€")
 
-    with tab2:
-        show_consultant_skills(consultant)
+        with col2:
+            # Calcul du CJM (Coût Journalier Moyen)
+            cjm = (salaire * 1.8 / 216) if salaire else 0
+            st.metric("📈 CJM", f"{cjm:,.0f}€")
 
-    with tab3:
-        show_consultant_languages(consultant)
+        with col3:
+            status = (
+                "✅ Disponible" if consultant_data.get('disponibilite', False) else "🔴 En mission"
+            )
+            st.metric("📊 Statut", status)
 
-    with tab4:
-        show_consultant_missions(consultant)
+        with col4:
+            creation_date = (
+                consultant_data['date_creation'].strftime("%d/%m/%Y")
+                if consultant_data.get('date_creation')
+                else "N/A"
+            )
+            st.metric("📅 Membre depuis", creation_date)
 
-    with tab5:
-        show_consultant_documents(consultant)
+        with col5:
+            practice_name = "Non affecté"  # Valeur par défaut
+            if consultant and hasattr(consultant, 'practice') and consultant.practice:
+                practice_name = consultant.practice.nom
+            st.metric("🏢 Practice", practice_name)
+
+        st.markdown("---")
+
+        # Affichage de l'analyse CV en PLEINE LARGEUR (si disponible)
+        if 'cv_analysis' in st.session_state:
+            show_cv_analysis_fullwidth()
+            st.markdown("---")
+
+        # Onglets de détail
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(
+            ["📋 Informations", "💼 Compétences", "🌍 Langues", "🚀 Missions", "📁 Documents"]
+        )
+
+        with tab1:
+            show_consultant_info(consultant)
+
+        with tab2:
+            show_consultant_skills(consultant)
+
+        with tab3:
+            show_consultant_languages(consultant)
+
+        with tab4:
+            show_consultant_missions(consultant)
+
+        with tab5:
+            show_consultant_documents(consultant)
+    
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement du profil consultant: {e}")
+        st.error("Retour à la liste des consultants...")
+        del st.session_state.view_consultant_profile
+        st.rerun()
 
 
 def show_consultant_info(consultant):
@@ -1199,7 +1210,7 @@ def show_add_mission_form(consultant):
 
 
 def show_consultants_list():
-    """Affiche la liste des consultants avec interactions"""
+    """Affiche la liste des consultants avec interactions optimisée"""
 
     st.subheader("📋 Liste des consultants")
 
@@ -1215,26 +1226,27 @@ def show_consultants_list():
                     with get_database_session() as session:
                         nb_missions = (
                             session.query(Mission)
-                            .filter(Mission.consultant_id == consultant.id)
+                            .filter(Mission.consultant_id == consultant['id'])
                             .count()
                         )
                 except:
                     nb_missions = 0
 
                 # Calcul du CJM (Coût Journalier Moyen)
-                cjm = (consultant.salaire_actuel * 1.8 / 216) if consultant.salaire_actuel else 0
+                salaire = consultant['salaire_actuel'] or 0
+                cjm = (salaire * 1.8 / 216) if salaire else 0
 
                 consultants_data.append(
                     {
-                        "ID": consultant.id,
-                        "Prénom": consultant.prenom,
-                        "Nom": consultant.nom,
-                        "Email": consultant.email,
-                        "Salaire": f"{consultant.salaire_actuel or 0:,}€",
+                        "ID": consultant['id'],
+                        "Prénom": consultant['prenom'],
+                        "Nom": consultant['nom'],
+                        "Email": consultant['email'],
+                        "Salaire": f"{salaire:,}€",
                         "CJM": f"{cjm:,.0f}€",
                         "Statut": (
                             "✅ Disponible"
-                            if consultant.disponibilite
+                            if consultant['disponibilite']
                             else "🔴 Occupé"
                         ),
                         "Missions": nb_missions,
