@@ -64,60 +64,83 @@ COMPETENCES_TECHNIQUES = {
     ]
 }
 
-# Compétences fonctionnelles par secteur
+# Compétences fonctionnelles spécialisées Bancaire & Assurance
 COMPETENCES_FONCTIONNELLES = {
-    "Finance & Banking": [
-        "Banque d'investissement", "Trading", "Risk Management", "Compliance",
-        "Réglementation bancaire", "Basel III", "IFRS", "Solvency II",
-        "Anti-Money Laundering", "KYC", "Payment Systems", "Blockchain Finance"
+    "Banque de Détail": [
+        "Conseil clientèle particuliers", "Conseil clientèle professionnels", 
+        "Conseil patrimoine", "Crédit immobilier", "Crédit à la consommation",
+        "Comptes et dépôts", "Épargne et placement", "Assurance-vie bancaire",
+        "Moyens de paiement", "Services bancaires digitaux", "Monétique"
     ],
     
-    "Assurance": [
-        "Actuariat", "Souscription", "Gestion des sinistres", "Réassurance",
-        "Solvency II", "Tarification", "Modélisation des risques",
-        "Distribution d'assurance", "InsurTech"
+    "Banque d'Affaires & Corporate": [
+        "Crédit corporate", "Financement structuré", "Financement de projets",
+        "Syndication bancaire", "Trade finance", "Cash management",
+        "Introduction en bourse (IPO)", "Émissions obligataires", 
+        "Fusions & acquisitions (M&A)", "Leveraged buy-out (LBO)",
+        "Restructuration financière", "Capital markets"
     ],
     
-    "Retail & E-commerce": [
-        "Customer Experience", "Supply Chain", "Inventory Management",
-        "Pricing Strategy", "Merchandising", "Omnichannel", "CRM",
-        "Marketing Digital", "SEO/SEM", "Analytics E-commerce"
+    "Marchés Financiers": [
+        "Trading actions (equity)", "Trading obligataire (fixed income)",
+        "Trading dérivés", "Market making", "Sales trading", 
+        "Structuration de produits", "Analyse fondamentale", "Analyse technique",
+        "Recherche actions (equity research)", "Valorisation d'entreprises",
+        "Gestion de portefeuille", "Asset management", "Gestion quantitative"
     ],
     
-    "Santé & Pharma": [
-        "Réglementation FDA", "Clinical Trials", "Pharmacovigilance",
-        "Medical Devices", "Healthcare IT", "HIPAA", "HL7", "FHIR",
-        "Télémédecine", "Biotechnologies"
+    "Crédit & Risques": [
+        "Scoring crédit", "Notation interne", "Analyse sectorielle",
+        "Due diligence crédit", "Restructuration de créances", "Recouvrement",
+        "Risque de crédit", "Risque de marché", "Risque opérationnel",
+        "Risque de liquidité", "Stress testing", "Modélisation des risques",
+        "Modèles VaR", "Backtesting", "Monte Carlo"
     ],
     
-    "Industrie & Manufacturing": [
-        "Lean Manufacturing", "Six Sigma", "Supply Chain", "PLM",
-        "ERP Manufacturing", "IoT Industriel", "Industrie 4.0", "MES",
-        "Quality Management", "Maintenance prédictive"
+    "Assurance Vie": [
+        "Épargne retraite", "Assurance décès", "Contrats en unités de compte",
+        "Gestion sous mandat", "Prévoyance collective", "Actuariat vie",
+        "Modélisation ALM", "Réserves techniques vie", "Distribution assurance vie"
     ],
     
-    "Energie & Utilities": [
-        "Smart Grid", "Renewable Energy", "Energy Trading", "Grid Management",
-        "SCADA", "Asset Management", "Regulatory Compliance",
-        "Carbon Management", "Energy Analytics"
+    "Assurance Non-Vie": [
+        "Assurance automobile", "Assurance habitation", "Assurance santé",
+        "Assurance responsabilité civile", "Assurance entreprise",
+        "Actuariat non-vie", "Gestion des sinistres", "Expertise sinistres",
+        "Tarification IARD", "Modélisation catastrophes"
     ],
     
-    "Télécom & Media": [
-        "Network Management", "5G", "OSS/BSS", "Broadcasting", "Streaming",
-        "Content Management", "Digital Rights", "Subscriber Management",
-        "Network Optimization"
+    "Réassurance": [
+        "Souscription réassurance", "Traités de réassurance", 
+        "Réassurance facultative", "Réassurance obligatoire",
+        "Gestion des sinistres réassurance", "Modélisation cat bonds",
+        "Cession en réassurance", "Rétrocession"
     ],
     
-    "Transport & Logistique": [
-        "Supply Chain Optimization", "Fleet Management", "Route Optimization",
-        "Warehouse Management", "TMS", "WMS", "Last Mile Delivery",
-        "Autonomous Vehicles", "Smart Mobility"
+    "Produits Financiers": [
+        "Actions", "Obligations", "Dérivés (options, futures)", "Swaps",
+        "Produits structurés", "OPCVM/SICAV", "ETF", "Private equity",
+        "Hedge funds", "Commodities", "Devises (FX)", "Cryptomonnaies",
+        "Green bonds", "Sukuk (finance islamique)", "Warrants", "Certificats"
     ],
     
-    "Secteur Public": [
-        "E-Government", "Digital Identity", "Citizen Services", "Smart Cities",
-        "Public Safety", "Tax Systems", "Social Services", "Regulatory Compliance",
-        "Open Data", "Digital Transformation"
+    "Réglementation Bancaire": [
+        "Bâle III", "CRD IV/CRR", "IFRS 9", "MiFID II", "PSD2",
+        "EMIR", "SFTR", "Benchmark Regulation", "CSDR", "AIFMD",
+        "UCITS", "MAR (Market Abuse)", "BRRD", "SRM", "EBA Guidelines"
+    ],
+    
+    "Réglementation Assurance": [
+        "Solvabilité II", "IFRS 17", "Code des assurances", "ACPR",
+        "EIOPA Guidelines", "IDD", "PRIIPS", "Loi Sapin II",
+        "ORSA", "Pilier 1-2-3 Solvency", "QRT", "SFCR", "RSR"
+    ],
+    
+    "Compliance & AML": [
+        "Anti-blanchiment (AML)", "KYC (Know Your Customer)", "LCB-FT",
+        "FATCA", "CRS", "Sanctions internationales", "PEP screening",
+        "Transaction monitoring", "SAR/STR", "TRACFIN", "Embargos",
+        "Lutte contre financement terrorisme", "Due diligence renforcée"
     ]
 }
 

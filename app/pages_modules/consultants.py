@@ -24,7 +24,7 @@ imports_ok = False
 
 try:
     from database.database import get_database_session
-    from database.models import Mission
+    from database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire
     from services.consultant_service import ConsultantService
     from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
     from services.document_service import DocumentService
@@ -327,20 +327,52 @@ def show_consultant_info(consultant):
 
 
 def show_consultant_skills(consultant):
-    """Affiche les compétences du consultant basées sur ses missions"""
+    """Affiche et gère les compétences techniques et fonctionnelles du consultant"""
 
-    st.subheader("💼 Compétences technologiques")
+    # Onglets pour organiser les types de compétences
+    tab1, tab2, tab3 = st.tabs([
+        "🛠️ Compétences Techniques", 
+        "🏦 Compétences Fonctionnelles", 
+        "➕ Ajouter Compétences"
+    ])
 
+    with tab1:
+        st.subheader("🛠️ Compétences techniques")
+        _show_technical_skills(consultant)
+
+    with tab2:
+        st.subheader("🏦 Compétences fonctionnelles")
+        _show_functional_skills(consultant)
+
+    with tab3:
+        st.subheader("➕ Ajouter des compétences")
+        _add_skills_form(consultant)
+
+
+def _show_technical_skills(consultant):
+    """Affiche les compétences techniques du consultant"""
     try:
-        # Récupérer les technologies des missions
+        # Récupérer les compétences techniques enregistrées
         with get_database_session() as session:
+            competences_tech = (
+                session.query(ConsultantCompetence, Competence)
+                .join(Competence)
+                .filter(
+                    ConsultantCompetence.consultant_id == consultant.id,
+                    Competence.type_competence == 'technique'
+                )
+                .all()
+            )
+
+            # Récupérer aussi les technologies des missions
             missions = (
                 session.query(Mission)
                 .filter(Mission.consultant_id == consultant.id)
                 .all()
             )
 
-        technologies = set()
+        # Technologies des missions
+        technologies_missions = set()
         for mission in missions:
             if mission.technologies_utilisees:
                 mission_techs = [
@@ -348,34 +380,283 @@ def show_consultant_skills(consultant):
                     for tech in mission.technologies_utilisees.split(",")
                     if tech.strip()
                 ]
-                technologies.update(mission_techs)
+                technologies_missions.update(mission_techs)
 
-        if technologies:
-            st.write("**🏷️ Technologies maîtrisées** (extraites des missions)")
+        # Affichage des compétences enregistrées
+        if competences_tech:
+            st.write("**📋 Compétences techniques enregistrées**")
+            
+            for consultant_comp, competence in competences_tech:
+                col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
+                
+                with col1:
+                    st.write(f"**{competence.nom}**")
+                    st.caption(f"Catégorie: {competence.categorie}")
+                
+                with col2:
+                    st.write(f"📊 {consultant_comp.niveau_maitrise}")
+                
+                with col3:
+                    st.write(f"⏱️ {consultant_comp.annees_experience} ans")
+                
+                with col4:
+                    if st.button("🗑️", key=f"del_tech_{consultant_comp.id}"):
+                        _delete_consultant_competence(consultant_comp.id)
+                        st.rerun()
 
-            # Affichage en colonnes
+            st.markdown("---")
+        else:
+            st.info("📝 Aucune compétence technique enregistrée")
+
+        # Technologies extraites des missions
+        if technologies_missions:
+            st.write("**🏷️ Technologies des missions**")
+            
             cols = st.columns(4)
-            tech_list = sorted(list(technologies))
+            tech_list = sorted(list(technologies_missions))
 
             for i, tech in enumerate(tech_list):
                 with cols[i % 4]:
                     st.markdown(
                         f"""
-                    <div style="padding: 8px; margin: 3px; border: 2px solid #1f77b4; 
-                                border-radius: 5px; text-align: center; background-color: #e8f4fd;">
+                    <div style="padding: 8px; margin: 3px; border: 2px solid #28a745; 
+                                border-radius: 5px; text-align: center; background-color: #d4edda;">
                         <strong>{tech}</strong>
                     </div>
                     """,
                         unsafe_allow_html=True,
                     )
 
-            st.markdown("---")
-            st.metric("🛠️ Total technologies", len(technologies))
-        else:
-            st.info("🔍 Aucune technologie trouvée dans les missions")
+            st.metric("🛠️ Technologies utilisées", len(technologies_missions))
 
     except Exception as e:
-        st.error(f"❌ Erreur lors du chargement des compétences: {e}")
+        st.error(f"❌ Erreur lors du chargement des compétences techniques: {e}")
+
+
+def _show_functional_skills(consultant):
+    """Affiche les compétences fonctionnelles du consultant"""
+    try:
+        with get_database_session() as session:
+            competences_func = (
+                session.query(ConsultantCompetence, Competence)
+                .join(Competence)
+                .filter(
+                    ConsultantCompetence.consultant_id == consultant.id,
+                    Competence.type_competence == 'fonctionnelle'
+                )
+                .order_by(Competence.categorie, Competence.nom)
+                .all()
+            )
+
+        if competences_func:
+            st.write("**🏦 Compétences fonctionnelles enregistrées**")
+            
+            # Grouper par catégorie
+            categories = {}
+            for consultant_comp, competence in competences_func:
+                if competence.categorie not in categories:
+                    categories[competence.categorie] = []
+                categories[competence.categorie].append((consultant_comp, competence))
+
+            for categorie, comps in categories.items():
+                with st.expander(f"📂 {categorie} ({len(comps)} compétences)"):
+                    for consultant_comp, competence in comps:
+                        col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
+                        
+                        with col1:
+                            st.write(f"**{competence.nom}**")
+                        
+                        with col2:
+                            st.write(f"📊 {consultant_comp.niveau_maitrise}")
+                        
+                        with col3:
+                            st.write(f"⏱️ {consultant_comp.annees_experience} ans")
+                        
+                        with col4:
+                            if st.button("🗑️", key=f"del_func_{consultant_comp.id}"):
+                                _delete_consultant_competence(consultant_comp.id)
+                                st.rerun()
+
+            # Métriques
+            total_competences = len(competences_func)
+            st.metric("🏦 Total compétences fonctionnelles", total_competences)
+        else:
+            st.info("📝 Aucune compétence fonctionnelle enregistrée")
+            st.write("Utilisez l'onglet **'Ajouter Compétences'** pour ajouter des compétences bancaires/assurance.")
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement des compétences fonctionnelles: {e}")
+
+
+def _add_skills_form(consultant):
+    """Formulaire d'ajout de compétences"""
+    
+    # Choix du type de compétence
+    type_competence = st.radio(
+        "Type de compétence à ajouter:",
+        options=["🛠️ Technique", "🏦 Fonctionnelle"],
+        horizontal=True
+    )
+
+    with st.form("add_competence_form"):
+        if type_competence == "🛠️ Technique":
+            _add_technical_skill_form(consultant)
+        else:
+            _add_functional_skill_form(consultant)
+
+
+def _add_technical_skill_form(consultant):
+    """Formulaire pour ajouter une compétence technique"""
+    from app.utils.skill_categories import COMPETENCES_TECHNIQUES
+    
+    # Sélection de la catégorie
+    categories_tech = list(COMPETENCES_TECHNIQUES.keys())
+    categorie = st.selectbox("📂 Catégorie technique", categories_tech)
+    
+    # Sélection de la compétence
+    competences_list = COMPETENCES_TECHNIQUES[categorie]
+    competence_nom = st.selectbox("🛠️ Compétence", competences_list)
+    
+    # Niveau et expérience
+    col1, col2 = st.columns(2)
+    with col1:
+        niveau = st.selectbox(
+            "📊 Niveau de maîtrise",
+            ["Débutant", "Intermédiaire", "Avancé", "Expert"]
+        )
+    
+    with col2:
+        experience = st.number_input(
+            "⏱️ Années d'expérience", 
+            min_value=0.0, 
+            max_value=50.0, 
+            value=1.0, 
+            step=0.5
+        )
+    
+    # Champs optionnels
+    certifications = st.text_input("🏆 Certifications (optionnel)")
+    projets = st.text_area("💼 Projets réalisés (optionnel)")
+    
+    submitted = st.form_submit_button("➕ Ajouter la compétence technique")
+    
+    if submitted:
+        _save_consultant_competence(
+            consultant.id, competence_nom, categorie, 'technique',
+            niveau, experience, certifications, projets
+        )
+
+
+def _add_functional_skill_form(consultant):
+    """Formulaire pour ajouter une compétence fonctionnelle"""
+    from app.utils.skill_categories import COMPETENCES_FONCTIONNELLES
+    
+    # Sélection de la catégorie
+    categories_func = list(COMPETENCES_FONCTIONNELLES.keys())
+    categorie = st.selectbox("📂 Catégorie fonctionnelle", categories_func)
+    
+    # Sélection de la compétence
+    competences_list = COMPETENCES_FONCTIONNELLES[categorie]
+    competence_nom = st.selectbox("🏦 Compétence", competences_list)
+    
+    # Niveau et expérience
+    col1, col2 = st.columns(2)
+    with col1:
+        niveau = st.selectbox(
+            "📊 Niveau de maîtrise",
+            ["Débutant", "Intermédiaire", "Avancé", "Expert"]
+        )
+    
+    with col2:
+        experience = st.number_input(
+            "⏱️ Années d'expérience", 
+            min_value=0.0, 
+            max_value=50.0, 
+            value=1.0, 
+            step=0.5
+        )
+    
+    # Champs optionnels
+    certifications = st.text_input("🏆 Certifications (optionnel)")
+    projets = st.text_area("� Projets/missions réalisés (optionnel)")
+    
+    submitted = st.form_submit_button("➕ Ajouter la compétence fonctionnelle")
+    
+    if submitted:
+        _save_consultant_competence(
+            consultant.id, competence_nom, categorie, 'fonctionnelle',
+            niveau, experience, certifications, projets
+        )
+
+
+def _save_consultant_competence(consultant_id, competence_nom, categorie, type_comp, 
+                               niveau, experience, certifications, projets):
+    """Sauvegarde une compétence pour un consultant"""
+    try:
+        with get_database_session() as session:
+            # Vérifier/créer la compétence
+            competence = session.query(Competence).filter(
+                Competence.nom == competence_nom,
+                Competence.type_competence == type_comp
+            ).first()
+            
+            if not competence:
+                competence = Competence(
+                    nom=competence_nom,
+                    categorie=categorie,
+                    type_competence=type_comp,
+                    description=f"Compétence {type_comp} en {competence_nom.lower()}"
+                )
+                session.add(competence)
+                session.flush()  # Pour obtenir l'ID
+
+            # Vérifier si le consultant a déjà cette compétence
+            existing = session.query(ConsultantCompetence).filter(
+                ConsultantCompetence.consultant_id == consultant_id,
+                ConsultantCompetence.competence_id == competence.id
+            ).first()
+
+            if existing:
+                st.warning(f"⚠️ {competence_nom} est déjà dans le profil du consultant")
+                return
+
+            # Créer l'association consultant-compétence
+            consultant_comp = ConsultantCompetence(
+                consultant_id=consultant_id,
+                competence_id=competence.id,
+                niveau_maitrise=niveau.lower(),
+                annees_experience=experience,
+                certifications=certifications if certifications else None,
+                projets_realises=projets if projets else None
+            )
+
+            session.add(consultant_comp)
+            session.commit()
+
+            st.success(f"✅ Compétence '{competence_nom}' ajoutée avec succès!")
+            st.rerun()
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'ajout: {e}")
+
+
+def _delete_consultant_competence(consultant_competence_id):
+    """Supprime une compétence d'un consultant"""
+    try:
+        with get_database_session() as session:
+            consultant_comp = session.query(ConsultantCompetence).filter(
+                ConsultantCompetence.id == consultant_competence_id
+            ).first()
+            
+            if consultant_comp:
+                session.delete(consultant_comp)
+                session.commit()
+                st.success("✅ Compétence supprimée!")
+            else:
+                st.error("❌ Compétence non trouvée")
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors de la suppression: {e}")
 
 
 def show_consultant_missions(consultant):

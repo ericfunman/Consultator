@@ -323,10 +323,19 @@ class ChatbotService:
     def _handle_skills_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les compétences"""
         
+        # Détecter le type de compétences demandé
+        question_lower = self.last_question.lower()
+        type_competence = None
+        
+        if any(word in question_lower for word in ["compétences techniques", "technique", "technologie", "programmation"]):
+            type_competence = "technique"
+        elif any(word in question_lower for word in ["compétences fonctionnelles", "fonctionnelle", "métier", "bancaire", "finance"]):
+            type_competence = "fonctionnelle"
+        
         # Si une compétence spécifique est mentionnée
         if entities["competences"]:
             competence = entities["competences"][0]
-            consultants = self._find_consultants_by_skill(competence)
+            consultants = self._find_consultants_by_skill(competence, type_competence)
             
             if consultants:
                 noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
@@ -346,27 +355,31 @@ class ChatbotService:
             }
         
         # Recherche dynamique de compétence dans la question
-        elif any(word in self.last_question.lower() for word in ["qui maîtrise", "qui sait", "qui connaît", "qui connait"]):
+        elif any(word in question_lower for word in ["qui maîtrise", "qui sait", "qui connaît", "qui connait"]):
             # Extraire le nom de la compétence après le verbe
-            question_lower = self.last_question.lower()
             
             # Chercher tous les mots après "maîtrise", "sait", "connaît"
             patterns = [
-                r"qui\s+maîtrise\s+(\w+)",
-                r"qui\s+sait\s+(\w+)",
-                r"qui\s+connaît\s+(\w+)",
-                r"qui\s+connait\s+(\w+)"
+                r"qui\s+maîtrise\s+(.+?)(?:\?|$)",
+                r"qui\s+sait\s+(.+?)(?:\?|$)",
+                r"qui\s+connaît\s+(.+?)(?:\?|$)",
+                r"qui\s+connait\s+(.+?)(?:\?|$)",
+                r"qui\s+a\s+(.+?)(?:\?|$)",
+                r"qui\s+possède\s+(.+?)(?:\?|$)"
             ]
             
             competence_found = None
             for pattern in patterns:
                 match = re.search(pattern, question_lower)
                 if match:
-                    competence_found = match.group(1)
+                    competence_found = match.group(1).strip()
+                    # Nettoyer les articles et prépositions
+                    competence_found = re.sub(r'^(le|la|les|du|de|des|en|une?)\s+', '', competence_found)
+                    competence_found = re.sub(r'\s+(compétence|skill)s?$', '', competence_found)
                     break
             
             if competence_found:
-                consultants = self._find_consultants_by_skill(competence_found)
+                consultants = self._find_consultants_by_skill(competence_found, type_competence)
                 
                 if consultants:
                     noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
@@ -389,7 +402,7 @@ class ChatbotService:
             consultant = self._find_consultant_by_name(nom)
             
             if consultant:
-                skills = self._get_consultant_skills(consultant.id)
+                skills = self._get_consultant_skills(consultant.id, type_competence)
                 
                 if skills:
                     response = f"🎯 **Compétences de {consultant.prenom} {consultant.nom} :**\n\n"
@@ -979,18 +992,24 @@ class ChatbotService:
         
         return consultant
     
-    def _find_consultants_by_skill(self, competence: str) -> List[Consultant]:
-        """Trouve les consultants ayant une compétence"""
+    def _find_consultants_by_skill(self, competence: str, type_competence: str = None) -> List[Consultant]:
+        """Trouve les consultants ayant une compétence avec filtre par type"""
         from database.models import Competence, ConsultantCompetence
         
-        # Recherche les consultants qui ont cette compétence
-        consultants = self.session.query(Consultant).join(
+        # Construction de la requête de base
+        query = self.session.query(Consultant).join(
             ConsultantCompetence, Consultant.id == ConsultantCompetence.consultant_id
         ).join(
             Competence, ConsultantCompetence.competence_id == Competence.id
         ).filter(
             func.lower(Competence.nom).like(f'%{competence.lower()}%')
-        ).distinct().all()
+        )
+        
+        # Ajouter le filtre par type si spécifié
+        if type_competence:
+            query = query.filter(Competence.type_competence == type_competence)
+        
+        consultants = query.distinct().all()
         
         return consultants
     
@@ -1006,13 +1025,19 @@ class ChatbotService:
             Mission.consultant_id == consultant_id
         ).order_by(Mission.date_debut.desc()).all()
     
-    def _get_consultant_skills(self, consultant_id: int) -> List[Dict[str, Any]]:
+    def _get_consultant_skills(self, consultant_id: int, type_competence: str = None) -> List[Dict[str, Any]]:
         """Récupère les compétences d'un consultant avec leurs détails"""
-        consultant_competences = self.session.query(ConsultantCompetence).join(
+        query = self.session.query(ConsultantCompetence).join(
             Competence
         ).filter(
             ConsultantCompetence.consultant_id == consultant_id
-        ).all()
+        )
+        
+        # Ajouter le filtre par type si spécifié
+        if type_competence:
+            query = query.filter(Competence.type_competence == type_competence)
+        
+        consultant_competences = query.all()
         
         skills = []
         for cc in consultant_competences:
