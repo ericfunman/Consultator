@@ -6,7 +6,7 @@ Gère la connexion SQLite et la création des tables
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .models import Base, Consultant, Competence, ConsultantCompetence, Mission, CV
+from .models import Base, Practice, Consultant, Competence, ConsultantCompetence, Mission, CV
 
 # Configuration de la base de données
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'consultator.db')
@@ -71,13 +71,15 @@ def get_database_info():
             consultant_count = session.query(Consultant).count()
             competence_count = session.query(Competence).count()
             mission_count = session.query(Mission).count()
+            practice_count = session.query(Practice).count()
             
             return {
                 "exists": True,
                 "path": DATABASE_PATH,
                 "consultants": consultant_count,
                 "competences": competence_count,
-                "missions": mission_count
+                "missions": mission_count,
+                "practices": practice_count
             }
     except Exception as e:
         return {"exists": True, "error": str(e)}

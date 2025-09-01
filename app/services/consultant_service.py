@@ -7,7 +7,7 @@ from datetime import datetime, date
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session, joinedload
 from database.database import get_database_session
-from database.models import Consultant, Mission, Competence, ConsultantCompetence
+from database.models import Consultant, Mission, Competence, ConsultantCompetence, Practice
 import streamlit as st
 
 
@@ -19,10 +19,17 @@ class ConsultantService:
         """Récupère tous les consultants avec pagination"""
         try:
             with get_database_session() as session:
-                return session.query(Consultant)\
+                consultants = session.query(Consultant)\
+                    .options(joinedload(Consultant.practice))\
                     .offset((page - 1) * per_page)\
                     .limit(per_page)\
                     .all()
+                
+                # Détacher les instances de la session pour éviter les erreurs DetachedInstance
+                for consultant in consultants:
+                    session.expunge(consultant)
+                
+                return consultants
         except Exception as e:
             print(f"Erreur lors de la récupération des consultants: {e}")
             return []
@@ -134,6 +141,7 @@ class ConsultantService:
                     email=data.get('email'),
                     telephone=data.get('telephone'),
                     salaire_actuel=data.get('salaire'),  # Corrigé: salaire_actuel au lieu de salaire
+                    practice_id=data.get('practice_id'),  # Nouveau champ pour la practice
                     disponibilite=data.get('disponible', True),  # Corrigé: disponibilite au lieu de disponible
                     notes=data.get('notes'),
                     date_creation=datetime.now(),

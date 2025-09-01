@@ -1,8 +1,0 @@
-[general]
-email = ""
-
-[browser]
-gatherUsageStats = false
-
-[server]
-port = 8502

@@ -17,9 +17,8 @@ from database.database import init_database
 # Import des pages
 from pages_modules import consultants
 from pages_modules import home
-from pages_modules import missions
-from pages_modules import skills
 from pages_modules import technologies
+from pages_modules import practices
 from pages_modules import chatbot
 
 # Configuration de la page
@@ -74,14 +73,13 @@ def main():
         selected = option_menu(
             menu_title=None,  # Pas de titre
             options=[
-                " Accueil",
-                " Consultants",
-                " Compétences",
-                " Technologies",
-                " Missions",
+                "🏠 Accueil",
+                "👥 Consultants",
+                "🏢 Practices",
+                "🔧 Référentiel Technologies",
                 "🤖 Assistant IA",
             ],
-            icons=["house", "people", "target", "tools", "briefcase", "robot"],
+            icons=["house", "people", "building", "tools", "robot"],
             menu_icon="list",
             default_index=0,  # Démarre sur Accueil au lieu de Consultants
             styles={
@@ -101,16 +99,14 @@ def main():
         )
 
     # Navigation vers les pages
-    if selected == " Accueil":
+    if selected == "🏠 Accueil":
         home.show()
-    elif selected == " Consultants":
+    elif selected == "👥 Consultants":
         consultants.show()
-    elif selected == " Compétences":
-        skills.show()
-    elif selected == " Technologies":
+    elif selected == "🏢 Practices":
+        practices.show()
+    elif selected == "🔧 Référentiel Technologies":
         technologies.show()
-    elif selected == " Missions":
-        missions.show()
     elif selected == "🤖 Assistant IA":
         chatbot.show()
 

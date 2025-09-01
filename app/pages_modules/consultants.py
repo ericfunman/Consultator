@@ -93,18 +93,23 @@ def show_consultant_profile():
     st.markdown("---")
 
     # Métriques principales
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.metric("💰 Salaire annuel", f"{consultant.salaire_actuel or 0:,}€")
 
     with col2:
+        # Calcul du CJM (Coût Journalier Moyen)
+        cjm = (consultant.salaire_actuel * 1.8 / 216) if consultant.salaire_actuel else 0
+        st.metric("📈 CJM", f"{cjm:,.0f}€")
+
+    with col3:
         status = (
             "✅ Disponible" if consultant.disponibilite else "🔴 En mission"
         )
         st.metric("📊 Statut", status)
 
-    with col3:
+    with col4:
         creation_date = (
             consultant.date_creation.strftime("%d/%m/%Y")
             if consultant.date_creation
@@ -112,7 +117,7 @@ def show_consultant_profile():
         )
         st.metric("📅 Membre depuis", creation_date)
 
-    with col4:
+    with col5:
         practice_name = consultant.practice.nom if hasattr(consultant, 'practice') and consultant.practice else "Non affecté"
         st.metric("🏢 Practice", practice_name)
 
@@ -170,6 +175,11 @@ def show_consultant_info(consultant):
                 value=int(consultant_db.salaire_actuel or 0),
                 step=1000,
             )
+            
+            # Affichage du CJM calculé en temps réel
+            cjm_calcule = (salaire * 1.8 / 216) if salaire > 0 else 0
+            st.info(f"📈 CJM calculé : **{cjm_calcule:,.0f} €** (salaire×1.8÷216)")
+            
             # Sélection de la practice
             practice_label = st.selectbox(
                 "🏢 Practice",
@@ -656,6 +666,9 @@ def show_consultants_list():
                 except:
                     nb_missions = 0
 
+                # Calcul du CJM (Coût Journalier Moyen)
+                cjm = (consultant.salaire_actuel * 1.8 / 216) if consultant.salaire_actuel else 0
+
                 consultants_data.append(
                     {
                         "ID": consultant.id,
@@ -663,6 +676,7 @@ def show_consultants_list():
                         "Nom": consultant.nom,
                         "Email": consultant.email,
                         "Salaire": f"{consultant.salaire_actuel or 0:,}€",
+                        "CJM": f"{cjm:,.0f}€",
                         "Statut": (
                             "✅ Disponible"
                             if consultant.disponibilite

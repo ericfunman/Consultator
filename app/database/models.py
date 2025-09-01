@@ -52,6 +52,7 @@ class Consultant(Base):
     competences = relationship("ConsultantCompetence", back_populates="consultant", cascade="all, delete-orphan")
     missions = relationship("Mission", back_populates="consultant", cascade="all, delete-orphan")
     cvs = relationship("CV", back_populates="consultant", cascade="all, delete-orphan")
+    salaires = relationship("ConsultantSalaire", back_populates="consultant", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Consultant(id={self.id}, nom='{self.nom}', prenom='{self.prenom}')>"
@@ -157,3 +158,16 @@ class CustomTechnology(Base):
     
     def __repr__(self):
         return f"<CustomTechnology(id={self.id}, nom='{self.nom}', categorie='{self.categorie}')>"
+
+class ConsultantSalaire(Base):
+    """Historique des salaires d'un consultant"""
+    __tablename__ = 'consultant_salaires'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    consultant_id = Column(Integer, ForeignKey('consultants.id'), nullable=False)
+    salaire = Column(Float, nullable=False)
+    date_debut = Column(Date, nullable=False, default=datetime.now)
+    date_fin = Column(Date)
+    commentaire = Column(Text)
+    consultant = relationship("Consultant", back_populates="salaires")
+    def __repr__(self):
+        return f"<ConsultantSalaire(id={self.id}, consultant_id={self.consultant_id}, salaire={self.salaire}, date_debut={self.date_debut})>"

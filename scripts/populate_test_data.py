@@ -19,33 +19,39 @@ import random
 def create_test_consultants():
     """Crée des consultants de test"""
     
-    consultants_data = [
-        {
-            "nom": "Dupont", "prenom": "Jean", "email": "jean.dupont@email.com",
-            "telephone": "01.23.45.67.89", "salaire_actuel": 45000.0,
-            "disponibilite": True, "notes": "Consultant senior avec expertise en développement web"
-        },
-        {
-            "nom": "Martin", "prenom": "Marie", "email": "marie.martin@email.com", 
-            "telephone": "01.98.76.54.32", "salaire_actuel": 52000.0,
-            "disponibilite": False, "notes": "Spécialiste en data science et machine learning"
-        },
-        {
-            "nom": "Bernard", "prenom": "Pierre", "email": "pierre.bernard@email.com",
-            "telephone": "01.11.22.33.44", "salaire_actuel": 48000.0,
-            "disponibilite": True, "notes": "Expert en cybersécurité et infrastructure cloud"
-        },
-        {
-            "nom": "Durand", "prenom": "Sophie", "email": "sophie.durand@email.com",
-            "telephone": "01.55.66.77.88", "salaire_actuel": 50000.0,
-            "disponibilite": False, "notes": "Consultante fonctionnelle spécialisée en finance"
-        },
-        {
-            "nom": "Moreau", "prenom": "Paul", "email": "paul.moreau@email.com",
-            "telephone": "01.99.88.77.66", "salaire_actuel": 46000.0,
-            "disponibilite": True, "notes": "Développeur full-stack avec expertise mobile"
-        }
+    base_consultants = [
+        {"nom": "Dupont", "prenom": "Jean", "notes": "Consultant senior avec expertise en développement web"},
+        {"nom": "Martin", "prenom": "Marie", "notes": "Spécialiste en data science et machine learning"},
+        {"nom": "Bernard", "prenom": "Pierre", "notes": "Expert en cybersécurité et infrastructure cloud"},
+        {"nom": "Durand", "prenom": "Sophie", "notes": "Consultante fonctionnelle spécialisée en finance"},
+        {"nom": "Moreau", "prenom": "Paul", "notes": "Développeur full-stack avec expertise mobile"},
+        {"nom": "Petit", "prenom": "Luc", "notes": "Consultant BI junior"},
+        {"nom": "Roux", "prenom": "Julie", "notes": "Experte Power BI et SQL"},
+        {"nom": "Lefevre", "prenom": "Nicolas", "notes": "Data engineer Python/Cloud"},
+        {"nom": "Garnier", "prenom": "Claire", "notes": "Chef de projet digital"},
+        {"nom": "Faure", "prenom": "Hugo", "notes": "Consultant DevOps"},
+        {"nom": "Chevalier", "prenom": "Emma", "notes": "Analyste fonctionnelle"},
+        {"nom": "Lambert", "prenom": "Lucas", "notes": "Développeur backend Java"},
+        {"nom": "Bonnet", "prenom": "Camille", "notes": "Consultante cloud AWS"},
+        {"nom": "Francois", "prenom": "Alice", "notes": "Data scientist IA"},
+        {"nom": "Legrand", "prenom": "Antoine", "notes": "Expert sécurité SI"}
     ]
+
+    consultants_data = []
+    for i, base in enumerate(base_consultants):
+        email = f"{base['prenom'].lower()}.{base['nom'].lower()}@email.com"
+        telephone = f"01.{random.randint(10,99)}.{random.randint(10,99)}.{random.randint(10,99)}.{random.randint(10,99)}"
+        salaire = float(random.randint(42000, 60000))
+        disponibilite = random.choice([True, False])
+        consultants_data.append({
+            "nom": base["nom"],
+            "prenom": base["prenom"],
+            "email": email,
+            "telephone": telephone,
+            "salaire_actuel": salaire,
+            "disponibilite": disponibilite,
+            "notes": base["notes"]
+        })
     
     session = get_session()
     consultants = []
