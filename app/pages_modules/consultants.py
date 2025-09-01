@@ -1214,16 +1214,13 @@ def show_consultants_list():
 
     st.subheader("📋 Liste des consultants")
     
-    # Champ de recherche
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        search_term = st.text_input(
-            "🔍 Rechercher un consultant", 
-            placeholder="Tapez un prénom, nom ou email...",
-            help="Recherche dans les prénoms, noms et emails des consultants"
-        )
-    with col2:
-        search_button = st.button("🔍 Rechercher", use_container_width=True)
+    # Champ de recherche en temps réel
+    search_term = st.text_input(
+        "🔍 Rechercher un consultant", 
+        placeholder="Tapez un prénom, nom ou email pour filtrer...",
+        help="La liste se filtre automatiquement pendant que vous tapez",
+        key="consultant_search"
+    )
 
     try:
         # Utiliser la recherche si un terme est saisi, sinon afficher tous les consultants
@@ -1252,7 +1249,7 @@ def show_consultants_list():
                     nb_missions = 0
 
                 # Calcul du CJM (Coût Journalier Moyen)
-                salaire = consultant['salaire_actuel'] or 0
+                salaire = consultant.get('salaire_actuel', 0) or 0
                 cjm = (salaire * 1.8 / 216) if salaire else 0
 
                 consultants_data.append(
@@ -1265,7 +1262,7 @@ def show_consultants_list():
                         "CJM": f"{cjm:,.0f}€",
                         "Statut": (
                             "✅ Disponible"
-                            if consultant['disponibilite']
+                            if consultant.get('disponibilite', False)
                             else "🔴 Occupé"
                         ),
                         "Missions": nb_missions,
@@ -1332,7 +1329,7 @@ def show_consultants_list():
                 st.metric("👥 Total consultants", len(consultants))
 
             with col2:
-                disponibles = len([c for c in consultants if c.disponibilite])
+                disponibles = len([c for c in consultants if c.get('disponibilite', False)])
                 st.metric("✅ Disponibles", disponibles)
 
             with col3:
@@ -1341,7 +1338,7 @@ def show_consultants_list():
 
             with col4:
                 salaire_moyen = (
-                    sum(c.salaire_actuel or 0 for c in consultants)
+                    sum(c.get('salaire_actuel', 0) or 0 for c in consultants)
                     / len(consultants)
                     if consultants
                     else 0

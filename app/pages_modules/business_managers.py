@@ -576,16 +576,13 @@ def show_business_managers_list():
     """Affiche la liste des Business Managers avec interactions"""
     st.subheader("📋 Liste des Business Managers")
     
-    # Champ de recherche
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        search_term = st.text_input(
-            "🔍 Rechercher un Business Manager", 
-            placeholder="Tapez un prénom, nom ou email...",
-            help="Recherche dans les prénoms, noms et emails des Business Managers"
-        )
-    with col2:
-        search_button = st.button("🔍 Rechercher", use_container_width=True)
+    # Champ de recherche en temps réel
+    search_term = st.text_input(
+        "🔍 Rechercher un Business Manager", 
+        placeholder="Tapez un prénom, nom ou email pour filtrer...",
+        help="La liste se filtre automatiquement pendant que vous tapez",
+        key="bm_search"
+    )
     
     try:
         # Utiliser la recherche si un terme est saisi, sinon afficher tous les BMs
@@ -624,79 +621,79 @@ def show_business_managers_list():
                 "Statut": "🟢 Actif" if bm_dict['actif'] else "🔴 Inactif",
                 "Créé le": bm_dict['date_creation'].strftime("%d/%m/%Y") if bm_dict['date_creation'] else "N/A"
             })
+        
+        # Afficher le tableau avec sélection (EN DEHORS de la boucle)
+        df = pd.DataFrame(bms_data)
+        
+        event = st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="single-row",
+            column_config={
+                "ID": st.column_config.NumberColumn("ID", width="small"),
+                "Prénom": st.column_config.TextColumn("Prénom", width="medium"),
+                "Nom": st.column_config.TextColumn("Nom", width="medium"),
+                "Email": st.column_config.TextColumn("Email", width="large"),
+                "Téléphone": st.column_config.TextColumn("Téléphone", width="medium"),
+                "Consultants actuels": st.column_config.NumberColumn("Consultants", width="small"),
+                "Total assignations": st.column_config.NumberColumn("Total", width="small"),
+                "Statut": st.column_config.TextColumn("Statut", width="small"),
+                "Créé le": st.column_config.TextColumn("Créé le", width="medium")
+            }
+        )
+        
+        # Actions sur sélection
+        if event.selection.rows:
+            selected_row = event.selection.rows[0]
+            selected_id = bms_data[selected_row]["ID"]
+            selected_name = f"{bms_data[selected_row]['Prénom']} {bms_data[selected_row]['Nom']}"
             
-            # Afficher le tableau avec sélection
-            df = pd.DataFrame(bms_data)
+            st.success(f"✅ Business Manager sélectionné : **{selected_name}**")
             
-            event = st.dataframe(
-                df,
-                use_container_width=True,
-                hide_index=True,
-                on_select="rerun",
-                selection_mode="single-row",
-                column_config={
-                    "ID": st.column_config.NumberColumn("ID", width="small"),
-                    "Prénom": st.column_config.TextColumn("Prénom", width="medium"),
-                    "Nom": st.column_config.TextColumn("Nom", width="medium"),
-                    "Email": st.column_config.TextColumn("Email", width="large"),
-                    "Téléphone": st.column_config.TextColumn("Téléphone", width="medium"),
-                    "Consultants actuels": st.column_config.NumberColumn("Consultants", width="small"),
-                    "Total assignations": st.column_config.NumberColumn("Total", width="small"),
-                    "Statut": st.column_config.TextColumn("Statut", width="small"),
-                    "Créé le": st.column_config.TextColumn("Créé le", width="medium")
-                }
-            )
-            
-            # Actions sur sélection
-            if event.selection.rows:
-                selected_row = event.selection.rows[0]
-                selected_id = bms_data[selected_row]["ID"]
-                selected_name = f"{bms_data[selected_row]['Prénom']} {bms_data[selected_row]['Nom']}"
-                
-                st.success(f"✅ Business Manager sélectionné : **{selected_name}**")
-                
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    if st.button(
-                        "👁️ Voir le profil",
-                        type="primary",
-                        use_container_width=True,
-                        key=f"view_bm_{selected_id}",
-                    ):
-                        st.session_state.view_bm_profile = selected_id
-                        st.rerun()
-                
-                with col2:
-                    if st.button(
-                        "✏️ Modifier",
-                        use_container_width=True,
-                        key=f"edit_bm_{selected_id}",
-                    ):
-                        st.session_state.view_bm_profile = selected_id
-                        st.session_state.edit_bm_mode = True
-                        st.rerun()
-                
-                with col3:
-                    if st.button(
-                        "🗑️ Supprimer",
-                        use_container_width=True,
-                        key=f"delete_bm_{selected_id}",
-                    ):
-                        st.session_state.view_bm_profile = selected_id
-                        st.session_state.delete_bm_mode = True
-                        st.rerun()
-            
-            # Métriques générales
-            st.markdown("---")
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3 = st.columns(3)
             
             with col1:
-                st.metric("👔 Total BMs", len(bms_data_from_service))
+                if st.button(
+                    "👁️ Voir le profil",
+                    type="primary",
+                    use_container_width=True,
+                    key=f"view_bm_{selected_id}",
+                ):
+                    st.session_state.view_bm_profile = selected_id
+                    st.rerun()
             
             with col2:
-                actifs = len([bm for bm in bms_data_from_service if bm['actif']])
-                st.metric("🟢 Actifs", actifs)
+                if st.button(
+                    "✏️ Modifier",
+                    use_container_width=True,
+                    key=f"edit_bm_{selected_id}",
+                ):
+                    st.session_state.view_bm_profile = selected_id
+                    st.session_state.edit_bm_mode = True
+                    st.rerun()
+            
+            with col3:
+                if st.button(
+                    "🗑️ Supprimer",
+                    use_container_width=True,
+                    key=f"delete_bm_{selected_id}",
+                ):
+                    st.session_state.view_bm_profile = selected_id
+                    st.session_state.delete_bm_mode = True
+                    st.rerun()
+        
+        # Métriques générales
+        st.markdown("---")
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("👔 Total BMs", len(bms_data_from_service))
+        
+        with col2:
+            actifs = len([bm for bm in bms_data_from_service if bm['actif']])
+            st.metric("🟢 Actifs", actifs)
             
             with col3:
                 total_consultants = sum(bm_data["Consultants actuels"] for bm_data in bms_data)
