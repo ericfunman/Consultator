@@ -11,7 +11,7 @@ import streamlit as st
 
 # Imports des services existants
 from database.database import get_database_session
-from database.models import Consultant, Mission, Competence, ConsultantCompetence
+from database.models import Consultant, Mission, Competence, ConsultantCompetence, Langue, ConsultantLangue
 from sqlalchemy import func, and_, or_
 
 
@@ -45,6 +45,8 @@ class ChatbotService:
                 return self._handle_salary_question(entities)
             elif intent == "competences":
                 return self._handle_skills_question(entities)
+            elif intent == "langues":
+                return self._handle_languages_question(entities)
             elif intent == "missions":
                 return self._handle_missions_question(entities)
             elif intent == "contact":
@@ -103,6 +105,11 @@ class ChatbotService:
                 r"compétences", r"competences", r"maîtrise", r"maitrise", r"sait faire", r"technologies",
                 r"langages", r"outils", r"expertise", r"python", r"sql", r"java",
                 r"quelles.+compétences", r"quelles.+competences", r"skills", r"techno", r"connaît", r"connait"
+            ],
+            "langues": [
+                r"langues?", r"langue", r"parle", r"parlent", r"anglais", r"français", r"espagnol",
+                r"allemand", r"italien", r"bilingue", r"niveau.+langue", r"parle.+anglais",
+                r"qui.+parle", r"quelles.+langues", r"polyglotte", r"linguistique"
             ],
             "missions": [
                 r"missions", r"mission", r"travaille", r"chez", r"entreprise", r"client",
@@ -185,6 +192,7 @@ class ChatbotService:
             "noms": [],
             "entreprises": [],
             "competences": [],
+            "langues": [],
             "montants": [],
             "practices": []
         }
@@ -236,6 +244,24 @@ class ChatbotService:
         
         # Supprimer les doublons
         entities["competences"] = list(dict.fromkeys(entities["competences"]))
+        
+        # Langues - chercher dans la base de données des langues
+        from database.models import Langue
+        all_langues = self.session.query(Langue).all()
+        langues_connues = ["français", "anglais", "espagnol", "allemand", "italien", "portugais", "chinois", "japonais", "arabe", "russe"]
+        
+        # Chercher d'abord dans les langues prédéfinies
+        for langue in langues_connues:
+            if langue in question:
+                entities["langues"].append(langue)
+        
+        # Chercher dans la base de données
+        for langue in all_langues:
+            if re.search(rf'\b{re.escape(langue.nom.lower())}\b', question):
+                entities["langues"].append(langue.nom)
+        
+        # Supprimer les doublons
+        entities["langues"] = list(dict.fromkeys(entities["langues"]))
         
         # Montants
         montants_pattern = r'(\d+(?:\s*\d{3})*)\s*(?:euros?|€)'
@@ -453,6 +479,156 @@ class ChatbotService:
             "data": None,
             "intent": "competences",
             "confidence": 0.5
+        }
+    
+    def _handle_languages_question(self, entities: Dict) -> Dict[str, Any]:
+        """Gère les questions sur les langues parlées par les consultants"""
+        
+        # Si une langue spécifique est mentionnée
+        if entities["langues"]:
+            langue_recherchee = entities["langues"][0]
+            consultants = self._find_consultants_by_language(langue_recherchee)
+            
+            if consultants:
+                noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
+                response = f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
+                response += "\n".join([f"• {nom}" for nom in noms])
+                
+                # Ajouter les détails des niveaux
+                response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+                
+                # Détails des niveaux si moins de 5 consultants
+                if len(consultants) <= 5:
+                    response += "\n\n🎯 **Niveaux détaillés :**"
+                    for consultant in consultants:
+                        for cl in consultant.langues:
+                            if cl.langue.nom.lower() == langue_recherchee.lower():
+                                response += f"\n  • **{consultant.prenom} {consultant.nom}** : {cl.niveau_label}"
+                                if cl.commentaire:
+                                    response += f" - {cl.commentaire}"
+                                break
+                
+                return {
+                    "response": response,
+                    "data": {"consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]},
+                    "intent": "langues",
+                    "confidence": 0.9
+                }
+            else:
+                response = f"❌ Aucun consultant ne parle **{langue_recherchee}** dans notre base."
+                return {
+                    "response": response,
+                    "data": {"consultants": []},
+                    "intent": "langues",
+                    "confidence": 0.8
+                }
+        
+        # Question générale sur les langues d'un consultant (vérifier en premier)
+        elif entities["noms"] or any(word in self.last_question.lower() for word in ["quelles langues", "langues de", "langues parlées"]):
+            # Si pas de nom détecté dans entities, essayer d'extraire manuellement
+            nom = None
+            if entities["noms"]:
+                nom = entities["noms"][0]
+            else:
+                # Extraire le nom après "langues parle" ou "langues de"
+                patterns = [
+                    r"quelles?\s+langues?\s+parle\s+(\w+)",
+                    r"langues?\s+parle\s+(\w+)",
+                    r"langues?\s+de\s+(\w+)",
+                    r"(\w+)\s+parle\s+quelles?\s+langues?",
+                    r"quelles?\s+sont\s+les\s+langues?\s+de\s+(\w+)"
+                ]
+                
+                for pattern in patterns:
+                    match = re.search(pattern, self.last_question.lower())
+                    if match:
+                        nom = match.group(1)
+                        break
+            
+            if nom:
+                consultant = self._find_consultant_by_name(nom)
+                
+                if consultant:
+                    if consultant.langues:
+                        response = f"🌍 **Langues parlées par {consultant.prenom} {consultant.nom} :**\n\n"
+                        
+                        for cl in consultant.langues:
+                            flag_emoji = {
+                                'FR': '🇫🇷', 'EN': '🇬🇧', 'ES': '🇪🇸', 'DE': '🇩🇪', 'IT': '🇮🇹',
+                                'PT': '🇵🇹', 'NL': '🇳🇱', 'RU': '🇷🇺', 'ZH': '🇨🇳', 'JA': '🇯🇵',
+                                'AR': '🇸🇦', 'HI': '🇮🇳'
+                            }
+                            emoji = flag_emoji.get(cl.langue.code_iso, '🌍')
+                            response += f"  {emoji} **{cl.langue.nom}** - {cl.niveau_label}"
+                            if cl.commentaire:
+                                response += f" - {cl.commentaire}"
+                            response += "\n"
+                        
+                        response += f"\n📊 **Total : {len(consultant.langues)} langue(s)**"
+                    else:
+                        response = f"❌ Aucune langue enregistrée pour **{consultant.prenom} {consultant.nom}**."
+                else:
+                    response = f"❌ Consultant **{nom}** introuvable."
+                
+                return {
+                    "response": response,
+                    "data": {"consultant": consultant.nom if consultant else None, "languages_count": len(consultant.langues) if consultant else 0},
+                    "intent": "langues",
+                    "confidence": 0.8
+                }
+            else:
+                # Question générale sur les langues sans nom spécifique
+                return {
+                    "response": "🌍 Pour connaître les langues d'un consultant, demandez : \"Quelles langues parle [nom] ?\"\n\nOu pour trouver qui parle une langue : \"Qui parle anglais ?\"",
+                    "data": {},
+                    "intent": "langues",
+                    "confidence": 0.6
+                }
+        
+        # Recherche dynamique de langue dans la question
+        elif any(word in self.last_question.lower() for word in ["qui parle", "parle", "parlent", "bilingue"]):
+            # Extraire le nom de la langue après "parle"
+            question_lower = self.last_question.lower()
+            
+            patterns = [
+                r"qui\s+parle\s+(.+?)(?:\?|$)",
+                r"parlent\s+(.+?)(?:\?|$)",
+                r"qui.+parle.+(.+?)(?:\?|$)"
+            ]
+            
+            langue_found = None
+            for pattern in patterns:
+                match = re.search(pattern, question_lower)
+                if match:
+                    langue_found = match.group(1).strip()
+                    # Nettoyer les articles
+                    langue_found = re.sub(r'^(le|la|les|du|de|des|en|une?)\s+', '', langue_found)
+                    break
+            
+            if langue_found:
+                consultants = self._find_consultants_by_language(langue_found)
+                
+                if consultants:
+                    noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
+                    response = f"🌍 Consultants parlant **{langue_found.title()}** :\n\n"
+                    response += "\n".join([f"• {nom}" for nom in noms])
+                    response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+                else:
+                    response = f"❌ Aucun consultant ne parle **{langue_found}** dans notre base."
+                
+                return {
+                    "response": response,
+                    "data": {"consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants] if consultants else []},
+                    "intent": "langues",
+                    "confidence": 0.8
+                }
+        
+        # Question générale sur les langues
+        return {
+            "response": "🌍 Pour connaître les langues d'un consultant, demandez : \"Quelles langues parle [nom] ?\"\n\nOu pour trouver qui parle une langue : \"Qui parle anglais ?\"",
+            "data": {},
+            "intent": "langues",
+            "confidence": 0.6
         }
     
     def _handle_missions_question(self, entities: Dict) -> Dict[str, Any]:
@@ -1010,6 +1186,21 @@ class ChatbotService:
             query = query.filter(Competence.type_competence == type_competence)
         
         consultants = query.distinct().all()
+        
+        return consultants
+    
+    def _find_consultants_by_language(self, langue: str) -> List[Consultant]:
+        """Trouve les consultants parlant une langue"""
+        from database.models import Langue, ConsultantLangue
+        
+        # Construction de la requête de base
+        consultants = self.session.query(Consultant).join(
+            ConsultantLangue, Consultant.id == ConsultantLangue.consultant_id
+        ).join(
+            Langue, ConsultantLangue.langue_id == Langue.id
+        ).filter(
+            func.lower(Langue.nom).like(f'%{langue.lower()}%')
+        ).distinct().all()
         
         return consultants
     

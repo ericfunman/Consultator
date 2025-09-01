@@ -53,6 +53,7 @@ class Consultant(Base):
     missions = relationship("Mission", back_populates="consultant", cascade="all, delete-orphan")
     cvs = relationship("CV", back_populates="consultant", cascade="all, delete-orphan")
     salaires = relationship("ConsultantSalaire", back_populates="consultant", cascade="all, delete-orphan")
+    langues = relationship("ConsultantLangue", back_populates="consultant", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Consultant(id={self.id}, nom='{self.nom}', prenom='{self.prenom}')>"
@@ -171,3 +172,48 @@ class ConsultantSalaire(Base):
     consultant = relationship("Consultant", back_populates="salaires")
     def __repr__(self):
         return f"<ConsultantSalaire(id={self.id}, consultant_id={self.consultant_id}, salaire={self.salaire}, date_debut={self.date_debut})>"
+
+class Langue(Base):
+    """Modèle pour les langues"""
+    __tablename__ = 'langues'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nom = Column(String(100), nullable=False, unique=True)
+    code_iso = Column(String(5))  # ex: FR, EN, ES, DE, IT
+    description = Column(Text)
+    
+    # Relations
+    consultant_langues = relationship("ConsultantLangue", back_populates="langue")
+    
+    def __repr__(self):
+        return f"<Langue(id={self.id}, nom='{self.nom}', code_iso='{self.code_iso}')>"
+
+class ConsultantLangue(Base):
+    """Table de liaison entre consultants et langues avec niveau"""
+    __tablename__ = 'consultant_langues'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    consultant_id = Column(Integer, ForeignKey('consultants.id'), nullable=False)
+    langue_id = Column(Integer, ForeignKey('langues.id'), nullable=False)
+    niveau = Column(Integer, nullable=False)  # 1=Débutant, 2=Élémentaire, 3=Intermédiaire, 4=Avancé, 5=Natif
+    commentaire = Column(Text)  # ex: "Lu, écrit, parlé", "Certification TOEIC 850", etc.
+    date_ajout = Column(DateTime, default=datetime.now)
+    
+    # Relations
+    consultant = relationship("Consultant", back_populates="langues")
+    langue = relationship("Langue", back_populates="consultant_langues")
+    
+    def __repr__(self):
+        return f"<ConsultantLangue(consultant_id={self.consultant_id}, langue_id={self.langue_id}, niveau={self.niveau})>"
+    
+    @property
+    def niveau_label(self):
+        """Retourne le label du niveau"""
+        labels = {
+            1: "Débutant (A1)",
+            2: "Élémentaire (A2)", 
+            3: "Intermédiaire (B1-B2)",
+            4: "Avancé (C1)",
+            5: "Natif (C2)"
+        }
+        return labels.get(self.niveau, "Inconnu")

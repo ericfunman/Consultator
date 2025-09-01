@@ -24,7 +24,7 @@ imports_ok = False
 
 try:
     from database.database import get_database_session
-    from database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire
+    from database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire, Langue, ConsultantLangue
     from services.consultant_service import ConsultantService
     from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
     from services.document_service import DocumentService
@@ -124,8 +124,8 @@ def show_consultant_profile():
     st.markdown("---")
 
     # Onglets de détail
-    tab1, tab2, tab3, tab4 = st.tabs(
-        ["📋 Informations", "💼 Compétences", "🚀 Missions", "📁 Documents"]
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        ["📋 Informations", "💼 Compétences", "🌍 Langues", "🚀 Missions", "📁 Documents"]
     )
 
     with tab1:
@@ -135,9 +135,12 @@ def show_consultant_profile():
         show_consultant_skills(consultant)
 
     with tab3:
-        show_consultant_missions(consultant)
+        show_consultant_languages(consultant)
 
     with tab4:
+        show_consultant_missions(consultant)
+
+    with tab5:
         show_consultant_documents(consultant)
 
 
@@ -654,6 +657,174 @@ def _delete_consultant_competence(consultant_competence_id):
                 st.success("✅ Compétence supprimée!")
             else:
                 st.error("❌ Compétence non trouvée")
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors de la suppression: {e}")
+
+
+def show_consultant_languages(consultant):
+    """Affiche et gère les langues du consultant"""
+    st.subheader("🌍 Langues parlées")
+    
+    try:
+        with get_database_session() as session:
+            # Récupérer les langues du consultant
+            consultant_langues = (
+                session.query(ConsultantLangue)
+                .join(Langue)
+                .filter(ConsultantLangue.consultant_id == consultant.id)
+                .all()
+            )
+            
+            if consultant_langues:
+                # Affichage des langues existantes
+                for cl in consultant_langues:
+                    col1, col2, col3, col4 = st.columns([3, 2, 3, 1])
+                    
+                    with col1:
+                        flag_emoji = {
+                            'FR': '🇫🇷', 'EN': '🇬🇧', 'ES': '🇪🇸', 'DE': '🇩🇪', 'IT': '🇮🇹',
+                            'PT': '🇵🇹', 'NL': '🇳🇱', 'RU': '🇷🇺', 'ZH': '🇨🇳', 'JA': '🇯🇵',
+                            'AR': '🇸🇦', 'HI': '🇮🇳'
+                        }
+                        emoji = flag_emoji.get(cl.langue.code_iso, '🌍')
+                        st.write(f"{emoji} **{cl.langue.nom}**")
+                    
+                    with col2:
+                        niveau_colors = {1: "🔴", 2: "🟠", 3: "🟡", 4: "🟢", 5: "🔵"}
+                        st.write(f"{niveau_colors.get(cl.niveau, '⚪')} {cl.niveau_label}")
+                    
+                    with col3:
+                        if cl.commentaire:
+                            st.caption(cl.commentaire[:50] + "..." if len(cl.commentaire) > 50 else cl.commentaire)
+                    
+                    with col4:
+                        if st.button("🗑️", key=f"del_lang_{cl.id}", help="Supprimer"):
+                            _delete_consultant_language(cl.id)
+                            st.rerun()
+                
+                st.write("---")
+            else:
+                st.info("🔍 Aucune langue enregistrée")
+            
+            # Formulaire d'ajout de langue
+            with st.expander("➕ Ajouter une langue"):
+                _add_language_form(consultant)
+                
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'affichage des langues: {e}")
+
+
+def _add_language_form(consultant):
+    """Formulaire pour ajouter une langue"""
+    with st.form(f"add_language_{consultant.id}"):
+        # Récupérer toutes les langues disponibles
+        try:
+            with get_database_session() as session:
+                langues_disponibles = session.query(Langue).order_by(Langue.nom).all()
+                
+                if not langues_disponibles:
+                    st.warning("⚠️ Aucune langue disponible. Veuillez d'abord initialiser les langues.")
+                    return
+                
+                # Récupérer les langues déjà assignées
+                langues_consultant = (
+                    session.query(ConsultantLangue.langue_id)
+                    .filter(ConsultantLangue.consultant_id == consultant.id)
+                    .all()
+                )
+                langues_assignees = [l[0] for l in langues_consultant]
+                
+                # Filtrer les langues non assignées
+                langues_libres = [l for l in langues_disponibles if l.id not in langues_assignees]
+                
+                if not langues_libres:
+                    st.info("✅ Toutes les langues disponibles sont déjà assignées")
+                    return
+                
+                # Formulaire
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    langue_selectionnee = st.selectbox(
+                        "🌍 Langue",
+                        langues_libres,
+                        format_func=lambda x: f"{x.nom} ({x.code_iso})"
+                    )
+                
+                with col2:
+                    niveau = st.selectbox(
+                        "📊 Niveau",
+                        [1, 2, 3, 4, 5],
+                        format_func=lambda x: {
+                            1: "1 - Débutant (A1)",
+                            2: "2 - Élémentaire (A2)",
+                            3: "3 - Intermédiaire (B1-B2)",
+                            4: "4 - Avancé (C1)",
+                            5: "5 - Natif (C2)"
+                        }[x]
+                    )
+                
+                commentaire = st.text_area(
+                    "💬 Commentaire (optionnel)",
+                    placeholder="Ex: TOEIC 850, Certification, Langue maternelle...",
+                    max_chars=200
+                )
+                
+                submitted = st.form_submit_button("➕ Ajouter la langue")
+                
+                if submitted and langue_selectionnee:
+                    _save_consultant_language(consultant.id, langue_selectionnee.id, niveau, commentaire)
+                    st.rerun()
+                    
+        except Exception as e:
+            st.error(f"❌ Erreur lors de la préparation du formulaire: {e}")
+
+
+def _save_consultant_language(consultant_id, langue_id, niveau, commentaire):
+    """Enregistre une langue pour un consultant"""
+    try:
+        with get_database_session() as session:
+            # Vérifier si la langue n'est pas déjà assignée
+            existing = session.query(ConsultantLangue).filter(
+                ConsultantLangue.consultant_id == consultant_id,
+                ConsultantLangue.langue_id == langue_id
+            ).first()
+            
+            if existing:
+                st.warning("⚠️ Cette langue est déjà assignée à ce consultant")
+                return
+            
+            # Créer la nouvelle langue
+            nouvelle_langue = ConsultantLangue(
+                consultant_id=consultant_id,
+                langue_id=langue_id,
+                niveau=niveau,
+                commentaire=commentaire.strip() if commentaire else None
+            )
+            
+            session.add(nouvelle_langue)
+            session.commit()
+            st.success("✅ Langue ajoutée avec succès!")
+            
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'ajout de la langue: {e}")
+
+
+def _delete_consultant_language(consultant_langue_id):
+    """Supprime une langue d'un consultant"""
+    try:
+        with get_database_session() as session:
+            consultant_langue = session.query(ConsultantLangue).filter(
+                ConsultantLangue.id == consultant_langue_id
+            ).first()
+            
+            if consultant_langue:
+                session.delete(consultant_langue)
+                session.commit()
+                st.success("✅ Langue supprimée!")
+            else:
+                st.error("❌ Langue non trouvée")
 
     except Exception as e:
         st.error(f"❌ Erreur lors de la suppression: {e}")
