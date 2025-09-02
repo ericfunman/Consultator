@@ -16,7 +16,7 @@ warnings.filterwarnings('ignore', category=FutureWarning, message=".*deprecated.
 
 # Import des services
 sys.path.append(os.path.dirname(__file__))
-from database.database import get_database_info
+from app.database.database import get_database_info
 
 
 def show():
@@ -31,7 +31,7 @@ def show():
     if not db_info.get("exists", False):
         st.error("❌ Base de données non initialisée")
         if st.button("Initialiser la base de données"):
-            from database.database import init_database
+            from app.database.database import init_database
 
             if init_database():
                 st.success("✅ Base de données initialisée avec succès !")

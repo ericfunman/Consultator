@@ -24,11 +24,11 @@ def show():
     
     try:
         st.write("🔍 **Test 1: Import des modèles...**")
-        from database.models import BusinessManager, Consultant, ConsultantBusinessManager
+        from app.database.models import BusinessManager, Consultant, ConsultantBusinessManager
         st.success("✅ Modèles importés avec succès")
         
         st.write("🔍 **Test 2: Import get_database_session...**")
-        from database.database import get_database_session
+        from app.database.database import get_database_session
         st.success("✅ get_database_session importé avec succès")
         
         st.write("🔍 **Test 3: Test de connexion...**")

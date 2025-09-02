@@ -23,11 +23,11 @@ Mission = None
 imports_ok = False
 
 try:
-    from database.database import get_database_session
-    from database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire, Langue, ConsultantLangue, BusinessManager
-    from services.consultant_service import ConsultantService
-    from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
-    from services.document_service import DocumentService
+    from app.database.database import get_database_session
+    from app.database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire, Langue, ConsultantLangue, BusinessManager
+    from app.services.consultant_service import ConsultantService
+    from app.services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
+    from app.services.document_service import DocumentService
     from sqlalchemy.orm import joinedload
 
     imports_ok = True
@@ -263,7 +263,7 @@ def show_consultant_info(consultant):
 
     st.subheader("📋 Informations personnelles")
 
-    from database.models import Practice, Consultant
+    from app.database.models import Practice, Consultant
     from sqlalchemy.orm import joinedload
     # Recharger le consultant avec la relation practice pour éviter DetachedInstanceError
     with get_database_session() as session:
@@ -280,7 +280,7 @@ def show_consultant_info(consultant):
     practice_options = {p.nom: p.id for p in practices}
     current_practice_id = consultant_db.practice_id if hasattr(consultant_db, 'practice_id') else None
 
-    from database.models import ConsultantSalaire
+    from app.database.models import ConsultantSalaire
     # Formulaire principal infos consultant
     with st.form(f"edit_consultant_{consultant.id}"):
         col1, col2 = st.columns(2)
@@ -1366,7 +1366,7 @@ def show_add_consultant_form():
 
     st.subheader("➕ Ajouter un nouveau consultant")
 
-    from database.models import Practice
+    from app.database.models import Practice
     with get_database_session() as session:
         practices = session.query(Practice).filter(Practice.actif == True).all()
     practice_options = {p.nom: p.id for p in practices}
