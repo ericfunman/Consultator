@@ -7,6 +7,7 @@ Optimisé pour gérer 1000+ consultants avec cache et pagination efficace
 from datetime import datetime, date
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import func
 from database.database import get_database_session
 from database.models import Consultant, Mission, Competence, ConsultantCompetence, Practice
 import streamlit as st
@@ -72,11 +73,23 @@ class ConsultantService:
     @staticmethod
     @st.cache_data(ttl=300)  # Cache pendant 5 minutes
     def search_consultants_optimized(search_term: str, page: int = 1, per_page: int = 50) -> List[Dict]:
-        """Recherche optimisée avec cache pour de gros volumes"""
+        """Recherche optimisée avec cache pour de gros volumes - avec statistiques intégrées"""
         try:
             with get_database_session() as session:
-                query = session.query(Consultant)\
-                    .options(joinedload(Consultant.practice))
+                # Requête optimisée avec JOIN pour éviter les requêtes N+1
+                query = session.query(
+                    Consultant.id,
+                    Consultant.prenom,
+                    Consultant.nom,
+                    Consultant.email,
+                    Consultant.telephone,
+                    Consultant.salaire_actuel,
+                    Consultant.disponibilite,
+                    Consultant.date_creation,
+                    Practice.nom.label('practice_name'),
+                    func.count(Mission.id).label('nb_missions')
+                ).outerjoin(Practice, Consultant.practice_id == Practice.id)\
+                 .outerjoin(Mission, Consultant.id == Mission.consultant_id)
                 
                 if search_term:
                     search_filter = f"%{search_term}%"
@@ -86,23 +99,47 @@ class ConsultantService:
                         (Consultant.email.ilike(search_filter))
                     )
                 
-                consultants = query.offset((page - 1) * per_page).limit(per_page).all()
+                query = query.group_by(
+                    Consultant.id,
+                    Consultant.prenom,
+                    Consultant.nom,
+                    Consultant.email,
+                    Consultant.telephone,
+                    Consultant.salaire_actuel,
+                    Consultant.disponibilite,
+                    Consultant.date_creation,
+                    Practice.nom
+                ).offset((page - 1) * per_page).limit(per_page)
+
+                results = query.all()
                 
-                # Convertir en dictionnaires
-                return [
-                    {
-                        'id': c.id,
-                        'prenom': c.prenom,
-                        'nom': c.nom,
-                        'email': c.email,
-                        'telephone': c.telephone,
-                        'salaire_actuel': c.salaire_actuel,
-                        'disponibilite': c.disponibilite,
-                        'practice_name': c.practice.nom if c.practice else 'N/A'
-                    } for c in consultants
-                ]
+                # Convertir en dictionnaires avec calculs optimisés
+                consultant_list = []
+                for row in results:
+                    salaire = row.salaire_actuel or 0
+                    cjm = (salaire * 1.8 / 216) if salaire else 0
+                    
+                    consultant_dict = {
+                        'id': row.id,
+                        'prenom': row.prenom,
+                        'nom': row.nom,
+                        'email': row.email,
+                        'telephone': row.telephone,
+                        'salaire_actuel': salaire,
+                        'disponibilite': row.disponibilite,
+                        'practice_name': row.practice_name or 'Non affecté',
+                        'date_creation': row.date_creation,
+                        'nb_missions': row.nb_missions,
+                        'cjm': cjm,
+                        'salaire_formatted': f"{salaire:,}€",
+                        'cjm_formatted': f"{cjm:,.0f}€",
+                        'statut': "✅ Disponible" if row.disponibilite else "🔴 Occupé"
+                    }
+                    consultant_list.append(consultant_dict)
+                
+                return consultant_list
         except Exception as e:
-            print(f"Erreur lors de la recherche: {e}")
+            print(f"Erreur lors de la recherche optimisée: {e}")
             return []
     
     @staticmethod
@@ -115,6 +152,77 @@ class ConsultantService:
         except Exception as e:
             print(f"Erreur lors du comptage des consultants: {e}")
             return 0
+    
+    @staticmethod
+    @st.cache_data(ttl=300)  # Cache pendant 5 minutes
+    def get_all_consultants_with_stats(page: int = 1, per_page: int = 50) -> List[Dict]:
+        """
+        Récupère tous les consultants avec leurs statistiques en une seule requête optimisée
+        Résout le problème N+1 des requêtes pour compter les missions
+        """
+        try:
+            with get_database_session() as session:
+                # Une seule requête avec LEFT JOIN pour récupérer consultants + nombre de missions
+                query = session.query(
+                    Consultant.id,
+                    Consultant.prenom,
+                    Consultant.nom,
+                    Consultant.email,
+                    Consultant.telephone,
+                    Consultant.salaire_actuel,
+                    Consultant.disponibilite,
+                    Consultant.date_creation,
+                    Consultant.derniere_maj,
+                    Practice.nom.label('practice_name'),
+                    func.count(Mission.id).label('nb_missions')
+                ).outerjoin(Practice, Consultant.practice_id == Practice.id)\
+                 .outerjoin(Mission, Consultant.id == Mission.consultant_id)\
+                 .group_by(
+                     Consultant.id,
+                     Consultant.prenom,
+                     Consultant.nom,
+                     Consultant.email,
+                     Consultant.telephone,
+                     Consultant.salaire_actuel,
+                     Consultant.disponibilite,
+                     Consultant.date_creation,
+                     Consultant.derniere_maj,
+                     Practice.nom
+                 )\
+                 .offset((page - 1) * per_page)\
+                 .limit(per_page)
+
+                results = query.all()
+                
+                # Convertir en dictionnaires avec calculs optimisés
+                consultant_list = []
+                for row in results:
+                    salaire = row.salaire_actuel or 0
+                    cjm = (salaire * 1.8 / 216) if salaire else 0
+                    
+                    consultant_dict = {
+                        'id': row.id,
+                        'prenom': row.prenom,
+                        'nom': row.nom,
+                        'email': row.email,
+                        'telephone': row.telephone,
+                        'salaire_actuel': salaire,
+                        'disponibilite': row.disponibilite,
+                        'practice_name': row.practice_name or 'Non affecté',
+                        'date_creation': row.date_creation,
+                        'derniere_maj': row.derniere_maj,
+                        'nb_missions': row.nb_missions,
+                        'cjm': cjm,
+                        'salaire_formatted': f"{salaire:,}€",
+                        'cjm_formatted': f"{cjm:,.0f}€",
+                        'statut': "✅ Disponible" if row.disponibilite else "🔴 Occupé"
+                    }
+                    consultant_list.append(consultant_dict)
+                
+                return consultant_list
+        except Exception as e:
+            print(f"Erreur lors de la récupération optimisée des consultants: {e}")
+            return []
     
     @staticmethod
     @st.cache_data(ttl=300)  # Cache pendant 5 minutes  

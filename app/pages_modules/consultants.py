@@ -42,12 +42,6 @@ def show():
     st.title("👥 Gestion des consultants")
     st.markdown("### Gérez les profils de vos consultants")
 
-    # DEBUG: Afficher l'état du session state
-    if "view_consultant_profile" in st.session_state:
-        st.info(f"🔍 DEBUG: Session state détecté - ID consultant = {st.session_state.view_consultant_profile}")
-    else:
-        st.info("🔍 DEBUG: Aucun session state 'view_consultant_profile' détecté")
-
     if not imports_ok:
         st.error("❌ Les services de base ne sont pas disponibles")
         st.info("Vérifiez que tous les modules sont correctement installés")
@@ -55,6 +49,7 @@ def show():
 
     # Vérifier si on doit afficher le profil d'un consultant spécifique
     if "view_consultant_profile" in st.session_state:
+        st.info(f"🔍 DEBUG: Session state détecté - ID consultant = {st.session_state.view_consultant_profile}")
         st.info("🔍 DEBUG: Appel de show_consultant_profile() en cours...")
         show_consultant_profile()
         return
@@ -1261,7 +1256,7 @@ def show_consultants_list():
     )
 
     try:
-        # Utiliser la recherche si un terme est saisi, sinon afficher tous les consultants
+        # Utiliser les nouvelles méthodes optimisées
         if search_term and search_term.strip():
             consultants = ConsultantService.search_consultants_optimized(search_term.strip())
             if consultants:
@@ -1269,41 +1264,23 @@ def show_consultants_list():
             else:
                 st.warning(f"❌ Aucun consultant trouvé pour '{search_term}'")
         else:
-            consultants = ConsultantService.get_all_consultants()
+            # Utiliser la méthode optimisée qui récupère tout en une requête
+            consultants = ConsultantService.get_all_consultants_with_stats()
 
         if consultants:
-            # Préparer les données pour le tableau
+            # Les données sont déjà préparées par le service optimisé
             consultants_data = []
             for consultant in consultants:
-                # Compter les missions
-                try:
-                    with get_database_session() as session:
-                        nb_missions = (
-                            session.query(Mission)
-                            .filter(Mission.consultant_id == consultant['id'])
-                            .count()
-                        )
-                except:
-                    nb_missions = 0
-
-                # Calcul du CJM (Coût Journalier Moyen)
-                salaire = consultant.get('salaire_actuel', 0) or 0
-                cjm = (salaire * 1.8 / 216) if salaire else 0
-
                 consultants_data.append(
                     {
                         "ID": consultant['id'],
                         "Prénom": consultant['prenom'],
                         "Nom": consultant['nom'],
                         "Email": consultant['email'],
-                        "Salaire": f"{salaire:,}€",
-                        "CJM": f"{cjm:,.0f}€",
-                        "Statut": (
-                            "✅ Disponible"
-                            if consultant.get('disponibilite', False)
-                            else "🔴 Occupé"
-                        ),
-                        "Missions": nb_missions,
+                        "Salaire": consultant['salaire_formatted'],
+                        "CJM": consultant['cjm_formatted'],
+                        "Statut": consultant['statut'],
+                        "Missions": consultant['nb_missions'],
                     }
                 )
 
