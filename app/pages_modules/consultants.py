@@ -49,8 +49,6 @@ def show():
 
     # Vérifier si on doit afficher le profil d'un consultant spécifique
     if "view_consultant_profile" in st.session_state:
-        st.info(f"🔍 DEBUG: Session state détecté - ID consultant = {st.session_state.view_consultant_profile}")
-        st.info("🔍 DEBUG: Appel de show_consultant_profile() en cours...")
         show_consultant_profile()
         return
 
@@ -145,9 +143,6 @@ def show_consultant_profile():
 
     consultant_id = st.session_state.view_consultant_profile
     
-    # DEBUG: Confirmation d'entrée dans la fonction
-    st.success(f"✅ DEBUG: Fonction show_consultant_profile() appelée avec ID = {consultant_id}")
-    
     try:
         # Charger le consultant avec toutes les relations nécessaires dans la même session
         with get_database_session() as session:
@@ -158,7 +153,6 @@ def show_consultant_profile():
             
             if not consultant:
                 st.error("❌ Consultant introuvable")
-                st.error(f"🔍 DEBUG: Aucun consultant trouvé avec l'ID {consultant_id}")
                 if st.button("← Retour à la liste", key="back_to_list_error"):
                     del st.session_state.view_consultant_profile
                     st.rerun()
@@ -180,8 +174,6 @@ def show_consultant_profile():
                 'date_creation': consultant.date_creation,
                 'practice_name': practice_name
             }
-
-        st.success(f"✅ DEBUG: Consultant trouvé = {consultant_data['prenom']} {consultant_data['nom']}")
         
         # En-tête avec bouton retour
         col1, col2 = st.columns([6, 1])
@@ -258,7 +250,6 @@ def show_consultant_profile():
     
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du profil consultant: {e}")
-        st.error(f"🔍 DEBUG: Détails de l'erreur pour consultant ID {consultant_id}")
         st.code(str(e))
         
         # Bouton manuel pour retourner à la liste
@@ -1312,9 +1303,7 @@ def show_consultants_list():
                         use_container_width=True,
                         key=f"view_{selected_id}",
                     ):
-                        st.success(f"🔍 DEBUG: Bouton cliqué pour consultant ID = {selected_id}")
                         st.session_state.view_consultant_profile = selected_id
-                        st.success(f"✅ DEBUG: Session state défini = {st.session_state.view_consultant_profile}")
                         st.rerun()
 
                 with col2:
