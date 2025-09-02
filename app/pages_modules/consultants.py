@@ -2952,3 +2952,60 @@ def import_single_mission(mission_data, consultant):
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'import : {e}")
+
+
+# Fonctions wrapper pour la compatibilité avec consultant_profile.py
+
+def show_consultants_list_tab():
+    """Wrapper pour afficher la liste des consultants"""
+    show_consultants_list()
+
+
+def show_add_consultant_form_tab():
+    """Wrapper pour afficher le formulaire d'ajout"""
+    show_add_consultant_form()
+
+
+def show_consultant_info_tab(consultant):
+    """Wrapper pour afficher les informations du consultant"""
+    show_consultant_info(consultant)
+
+
+def show_consultant_skills_tab(consultant):
+    """Wrapper pour afficher les compétences du consultant"""
+    show_consultant_skills(consultant)
+
+
+def show_consultant_languages_tab(consultant):
+    """Wrapper pour afficher les langues du consultant"""
+    show_consultant_languages(consultant)
+
+
+def show_consultant_missions_tab(consultant):
+    """Wrapper pour afficher les missions du consultant"""
+    show_consultant_missions(consultant)
+
+
+def show_consultant_documents_tab(consultant):
+    """Wrapper pour afficher les documents du consultant"""
+    show_consultant_documents(consultant)
+
+
+def show_cv_missions_tab(missions, consultant):
+    """Wrapper pour afficher les missions du CV"""
+    show_cv_missions(missions, consultant)
+
+
+def show_cv_skills_tab(analysis):
+    """Wrapper pour afficher les compétences du CV"""
+    show_cv_skills(analysis)
+
+
+def show_cv_summary_tab(analysis, consultant):
+    """Wrapper pour afficher le résumé du CV"""
+    show_cv_summary(analysis, consultant)
+
+
+def show_cv_actions_tab(analysis, consultant):
+    """Wrapper pour afficher les actions du CV"""
+    show_cv_actions(analysis, consultant)
