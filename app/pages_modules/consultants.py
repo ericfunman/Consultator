@@ -28,6 +28,7 @@ try:
     from services.consultant_service import ConsultantService
     from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
     from services.document_service import DocumentService
+    from sqlalchemy.orm import joinedload
 
     imports_ok = True
 except ImportError as e:
@@ -41,6 +42,12 @@ def show():
     st.title("👥 Gestion des consultants")
     st.markdown("### Gérez les profils de vos consultants")
 
+    # DEBUG: Afficher l'état du session state
+    if "view_consultant_profile" in st.session_state:
+        st.info(f"🔍 DEBUG: Session state détecté - ID consultant = {st.session_state.view_consultant_profile}")
+    else:
+        st.info("🔍 DEBUG: Aucun session state 'view_consultant_profile' détecté")
+
     if not imports_ok:
         st.error("❌ Les services de base ne sont pas disponibles")
         st.info("Vérifiez que tous les modules sont correctement installés")
@@ -48,6 +55,7 @@ def show():
 
     # Vérifier si on doit afficher le profil d'un consultant spécifique
     if "view_consultant_profile" in st.session_state:
+        st.info("🔍 DEBUG: Appel de show_consultant_profile() en cours...")
         show_consultant_profile()
         return
 
@@ -142,18 +150,43 @@ def show_consultant_profile():
 
     consultant_id = st.session_state.view_consultant_profile
     
+    # DEBUG: Confirmation d'entrée dans la fonction
+    st.success(f"✅ DEBUG: Fonction show_consultant_profile() appelée avec ID = {consultant_id}")
+    
     try:
-        # Utiliser la méthode optimisée du service
-        consultant_data = ConsultantService.get_consultant_with_stats(consultant_id)
-        
-        if not consultant_data:
-            st.error("❌ Consultant introuvable")
-            del st.session_state.view_consultant_profile
-            st.rerun()
-            return
+        # Charger le consultant avec toutes les relations nécessaires dans la même session
+        with get_database_session() as session:
+            consultant = session.query(Consultant)\
+                .options(joinedload(Consultant.practice))\
+                .filter(Consultant.id == consultant_id)\
+                .first()
+            
+            if not consultant:
+                st.error("❌ Consultant introuvable")
+                st.error(f"🔍 DEBUG: Aucun consultant trouvé avec l'ID {consultant_id}")
+                if st.button("← Retour à la liste", key="back_to_list_error"):
+                    del st.session_state.view_consultant_profile
+                    st.rerun()
+                return
 
-        # Pour compatibilité avec les fonctions existantes, on charge aussi l'objet complet
-        consultant = ConsultantService.get_consultant_by_id(consultant_id)
+            # Charger toutes les données nécessaires dans la session
+            practice_name = consultant.practice.nom if consultant.practice else "Non affecté"
+            
+            # Créer un dictionnaire avec toutes les données nécessaires
+            consultant_data = {
+                'id': consultant.id,
+                'prenom': consultant.prenom,
+                'nom': consultant.nom,
+                'email': consultant.email,
+                'telephone': consultant.telephone,
+                'salaire_actuel': consultant.salaire_actuel,
+                'disponibilite': consultant.disponibilite,
+                'notes': consultant.notes,
+                'date_creation': consultant.date_creation,
+                'practice_name': practice_name
+            }
+
+        st.success(f"✅ DEBUG: Consultant trouvé = {consultant_data['prenom']} {consultant_data['nom']}")
         
         # En-tête avec bouton retour
         col1, col2 = st.columns([6, 1])
@@ -172,7 +205,7 @@ def show_consultant_profile():
         col1, col2, col3, col4, col5 = st.columns(5)
 
         with col1:
-            salaire = consultant_data.get('salaire_actuel', 0) or 0
+            salaire = consultant_data['salaire_actuel'] or 0
             st.metric("💰 Salaire annuel", f"{salaire:,}€")
 
         with col2:
@@ -182,23 +215,20 @@ def show_consultant_profile():
 
         with col3:
             status = (
-                "✅ Disponible" if consultant_data.get('disponibilite', False) else "🔴 En mission"
+                "✅ Disponible" if consultant_data['disponibilite'] else "🔴 En mission"
             )
             st.metric("📊 Statut", status)
 
         with col4:
             creation_date = (
                 consultant_data['date_creation'].strftime("%d/%m/%Y")
-                if consultant_data.get('date_creation')
+                if consultant_data['date_creation']
                 else "N/A"
             )
             st.metric("📅 Membre depuis", creation_date)
 
         with col5:
-            practice_name = "Non affecté"  # Valeur par défaut
-            if consultant and hasattr(consultant, 'practice') and consultant.practice:
-                practice_name = consultant.practice.nom
-            st.metric("🏢 Practice", practice_name)
+            st.metric("🏢 Practice", consultant_data['practice_name'])
 
         st.markdown("---")
 
@@ -207,31 +237,39 @@ def show_consultant_profile():
             show_cv_analysis_fullwidth()
             st.markdown("---")
 
-        # Onglets de détail
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(
-            ["📋 Informations", "💼 Compétences", "🌍 Langues", "🚀 Missions", "📁 Documents"]
-        )
+        # Pour les onglets, on va récupérer l'objet consultant avec une nouvelle session
+        with get_database_session() as session:
+            consultant_obj = session.query(Consultant).filter(Consultant.id == consultant_id).first()
+            
+            # Onglets de détail
+            tab1, tab2, tab3, tab4, tab5 = st.tabs(
+                ["📋 Informations", "💼 Compétences", "🌍 Langues", "🚀 Missions", "📁 Documents"]
+            )
 
-        with tab1:
-            show_consultant_info(consultant)
+            with tab1:
+                show_consultant_info(consultant_obj)
 
-        with tab2:
-            show_consultant_skills(consultant)
+            with tab2:
+                show_consultant_skills(consultant_obj)
 
-        with tab3:
-            show_consultant_languages(consultant)
+            with tab3:
+                show_consultant_languages(consultant_obj)
 
-        with tab4:
-            show_consultant_missions(consultant)
+            with tab4:
+                show_consultant_missions(consultant_obj)
 
-        with tab5:
-            show_consultant_documents(consultant)
+            with tab5:
+                show_consultant_documents(consultant_obj)
     
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du profil consultant: {e}")
-        st.error("Retour à la liste des consultants...")
-        del st.session_state.view_consultant_profile
-        st.rerun()
+        st.error(f"🔍 DEBUG: Détails de l'erreur pour consultant ID {consultant_id}")
+        st.code(str(e))
+        
+        # Bouton manuel pour retourner à la liste
+        if st.button("← Retour à la liste", key="back_to_list_exception"):
+            del st.session_state.view_consultant_profile
+            st.rerun()
 
 
 def show_consultant_info(consultant):
@@ -1297,7 +1335,9 @@ def show_consultants_list():
                         use_container_width=True,
                         key=f"view_{selected_id}",
                     ):
+                        st.success(f"🔍 DEBUG: Bouton cliqué pour consultant ID = {selected_id}")
                         st.session_state.view_consultant_profile = selected_id
+                        st.success(f"✅ DEBUG: Session state défini = {st.session_state.view_consultant_profile}")
                         st.rerun()
 
                 with col2:
