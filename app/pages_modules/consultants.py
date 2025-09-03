@@ -350,6 +350,88 @@ def show_consultant_info(consultant):
             placeholder="Notes sur le consultant...",
         )
 
+        # Section historique société (nouveaux champs V1.2)
+        st.markdown("---")
+        st.markdown("### 🏢 Historique Société")
+        
+        col3, col4 = st.columns(2)
+        
+        with col3:
+            societe = st.selectbox(
+                "🏢 Société",
+                options=["Quanteam", "Asigma"],
+                index=0 if (consultant_db.societe or "Quanteam") == "Quanteam" else 1
+            )
+            date_entree = st.date_input(
+                "📅 Date d'entrée société",
+                value=consultant_db.date_entree_societe,
+                help="Date d'entrée dans la société"
+            )
+            
+        with col4:
+            date_sortie = st.date_input(
+                "📅 Date de sortie société (optionnel)",
+                value=consultant_db.date_sortie_societe,
+                help="Laissez vide si encore en poste"
+            )
+            date_premiere_mission = st.date_input(
+                "🚀 Date première mission (optionnel)",
+                value=consultant_db.date_premiere_mission,
+                help="Date de début de la première mission"
+            )
+
+        # Section profil professionnel (nouveaux champs V1.2.1)
+        st.markdown("---")
+        st.markdown("### 👔 Profil Professionnel")
+        
+        col5, col6 = st.columns(2)
+        
+        with col5:
+            grade_options = ["Junior", "Confirmé", "Consultant Manager", "Directeur de Practice"]
+            current_grade = consultant_db.grade or 'Junior'
+            grade_index = grade_options.index(current_grade) if current_grade in grade_options else 0
+            grade = st.selectbox(
+                "🎯 Grade",
+                options=grade_options,
+                index=grade_index,
+                help="Niveau d'expérience du consultant"
+            )
+            
+        with col6:
+            contrat_options = ["CDI", "CDD", "Stagiaire", "Alternant", "Indépendant"]
+            current_contrat = consultant_db.type_contrat or 'CDI'
+            contrat_index = contrat_options.index(current_contrat) if current_contrat in contrat_options else 0
+            type_contrat = st.selectbox(
+                "📋 Type de contrat",
+                options=contrat_options,
+                index=contrat_index,
+                help="Type de contrat de travail"
+            )
+            
+        st.markdown("---")
+            
+        # Affichage de l'expérience calculée
+        if consultant_db.date_premiere_mission:
+            try:
+                experience = consultant_db.experience_annees
+                st.info(f"📊 **Expérience calculée :** {experience} années")
+            except:
+                st.info("📊 **Expérience :** Calcul en cours...")
+        else:
+            st.info("📊 **Expérience :** Non calculée (date première mission manquante)")
+            
+        # Statut société
+        try:
+            statut = consultant_db.statut_societe
+            if statut == "En poste":
+                st.success(f"✅ **Statut :** {statut}")
+            elif statut == "Départ prévu":
+                st.warning(f"⚠️ **Statut :** {statut}")
+            else:
+                st.error(f"❌ **Statut :** {statut}")
+        except:
+            st.info("📊 **Statut :** En cours de calcul...")
+
         # Bouton de sauvegarde
         col1, col2, col3 = st.columns([2, 1, 2])
         with col2:
@@ -382,6 +464,14 @@ def show_consultant_info(consultant):
                             "disponibilite": disponibilite,
                             "notes": notes.strip() if notes else None,
                             "practice_id": selected_practice_id,
+                            # Nouveaux champs V1.2
+                            "societe": societe,
+                            "date_entree_societe": date_entree,
+                            "date_sortie_societe": date_sortie if date_sortie else None,
+                            "date_premiere_mission": date_premiere_mission if date_premiere_mission else None,
+                            # Nouveaux champs V1.2.1
+                            "grade": grade,
+                            "type_contrat": type_contrat,
                         }
 
                         if ConsultantService.update_consultant(
@@ -1268,8 +1358,12 @@ def show_consultants_list():
                         "Prénom": consultant['prenom'],
                         "Nom": consultant['nom'],
                         "Email": consultant['email'],
+                        "Société": consultant['societe'],
+                        "Grade": consultant['grade'],
+                        "Contrat": consultant['type_contrat'],
                         "Salaire": consultant['salaire_formatted'],
                         "CJM": consultant['cjm_formatted'],
+                        "Expérience": consultant['experience_formatted'],
                         "Statut": consultant['statut'],
                         "Missions": consultant['nb_missions'],
                     }
@@ -1397,6 +1491,57 @@ def show_add_consultant_form():
             )
             disponibilite = st.checkbox("✅ Disponible", value=True)
 
+        # Section historique société (nouveaux champs V1.2)
+        st.markdown("---")
+        st.markdown("### 🏢 Historique Société")
+        
+        col3, col4 = st.columns(2)
+        
+        with col3:
+            societe = st.selectbox(
+                "🏢 Société",
+                options=["Quanteam", "Asigma"],
+                index=0
+            )
+            date_entree = st.date_input(
+                "📅 Date d'entrée société",
+                help="Date d'entrée dans la société"
+            )
+            
+        with col4:
+            date_sortie = st.date_input(
+                "📅 Date de sortie société (optionnel)",
+                value=None,
+                help="Laissez vide si encore en poste"
+            )
+            date_premiere_mission = st.date_input(
+                "🚀 Date première mission (optionnel)",
+                value=None,
+                help="Date de début de la première mission"
+            )
+
+        # Section profil professionnel (nouveaux champs V1.2.1)
+        st.markdown("---")
+        st.markdown("### 👔 Profil Professionnel")
+        
+        col5, col6 = st.columns(2)
+        
+        with col5:
+            grade = st.selectbox(
+                "🎯 Grade",
+                options=["Junior", "Confirmé", "Consultant Manager", "Directeur de Practice"],
+                index=0,
+                help="Niveau d'expérience du consultant"
+            )
+            
+        with col6:
+            type_contrat = st.selectbox(
+                "📋 Type de contrat",
+                options=["CDI", "CDD", "Stagiaire", "Alternant", "Indépendant"],
+                index=0,
+                help="Type de contrat de travail"
+            )
+
         # Notes optionnelles
         notes = st.text_area(
             "📝 Notes (optionnel)",
@@ -1434,6 +1579,14 @@ def show_add_consultant_form():
                             "disponible": disponibilite,
                             "notes": notes.strip() if notes else None,
                             "practice_id": selected_practice_id,
+                            # Nouveaux champs V1.2
+                            "societe": societe,
+                            "date_entree_societe": date_entree,
+                            "date_sortie_societe": date_sortie if date_sortie else None,
+                            "date_premiere_mission": date_premiere_mission if date_premiere_mission else None,
+                            # Nouveaux champs V1.2.1
+                            "grade": grade,
+                            "type_contrat": type_contrat,
                         }
 
                         if ConsultantService.create_consultant(

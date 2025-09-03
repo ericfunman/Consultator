@@ -43,6 +43,10 @@ class ChatbotService:
             # Générer la réponse selon l'intention
             if intent == "salaire":
                 return self._handle_salary_question(entities)
+            elif intent == "experience":
+                return self._handle_experience_question(entities)
+            elif intent == "profil_professionnel":
+                return self._handle_professional_profile_question(entities)
             elif intent == "competences":
                 return self._handle_skills_question(entities)
             elif intent == "langues":
@@ -100,6 +104,17 @@ class ChatbotService:
             "salaire": [
                 r"salaire", r"rémunération", r"paie", r"combien gagne", 
                 r"revenus", r"euros", r"€", r"salaire de", r"gagne", r"cjm", r"coût journalier"
+            ],
+            "experience": [
+                r"expérience", r"experience", r"années d'expérience", r"annees d'experience",
+                r"ancienneté", r"seniorité", r"séniorité", r"depuis quand", r"depuis combien",
+                r"combien d'années", r"combien d'annees", r"quel âge", r"âge professionnel"
+            ],
+            "profil_professionnel": [
+                r"grade", r"niveau", r"poste", r"fonction", r"junior", r"confirmé", r"senior",
+                r"manager", r"directeur", r"type contrat", r"type de contrat", r"contrat",
+                r"cdi", r"cdd", r"stagiaire", r"alternant", r"indépendant", r"freelance",
+                r"société", r"societe", r"quanteam", r"asigma", r"entreprise"
             ],
             "competences": [
                 r"compétences", r"competences", r"maîtrise", r"maitrise", r"sait faire", r"technologies",
@@ -166,6 +181,14 @@ class ChatbotService:
         # c'est forcément une question de missions spécifique
         if has_consultant_name and intent_scores.get("missions", 0) > 0:
             return "missions"
+        
+        # Si c'est une question de type "combien de consultants en CDI/CDD", c'est du profil professionnel
+        if re.search(r"combien.+(consultants?).+(cdi|cdd|stagiaire|alternant|indépendant)", question):
+            return "profil_professionnel"
+        
+        # Si c'est une question de type "qui travaille chez", c'est du profil professionnel  
+        if re.search(r"qui.+(travaille|est).+(chez|dans).+(quanteam|asigma)", question):
+            return "profil_professionnel"
         
         # Si c'est une question de type "combien de missions", c'est des missions
         if re.search(r"combien.+missions?", question):
@@ -343,6 +366,336 @@ class ChatbotService:
                 "response": response,
                 "data": {"stats": stats},
                 "intent": "salaire",
+                "confidence": 0.8
+            }
+    
+    def _handle_experience_question(self, entities: Dict) -> Dict[str, Any]:
+        """Gère les questions sur l'expérience des consultants"""
+        
+        # Si un nom est mentionné, chercher ce consultant spécifique
+        if entities["noms"]:
+            nom_recherche = entities["noms"][0]
+            consultant = self._find_consultant_by_name(nom_recherche)
+            
+            if consultant:
+                # Récupérer les informations d'expérience depuis la base de données
+                try:
+                    with get_database_session() as session:
+                        consultant_db = session.query(Consultant).filter(Consultant.id == consultant.id).first()
+                        
+                        if consultant_db:
+                            if consultant_db.date_premiere_mission:
+                                # Utiliser la propriété calculée du modèle
+                                experience_annees = consultant_db.experience_annees
+                                
+                                response = f"📊 **Expérience de {consultant.prenom} {consultant.nom}** :\n\n"
+                                response += f"🚀 **Première mission :** {consultant_db.date_premiere_mission.strftime('%d/%m/%Y')}\n"
+                                response += f"⏱️ **Expérience totale :** **{experience_annees} années**\n"
+                                
+                                # Ajouter des informations contextuelles
+                                if consultant_db.grade:
+                                    response += f"🎯 **Grade actuel :** {consultant_db.grade}\n"
+                                
+                                if consultant_db.societe:
+                                    response += f"🏢 **Société :** {consultant_db.societe}\n"
+                                    
+                                if consultant_db.date_entree_societe:
+                                    response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
+                                
+                                # Calculer l'ancienneté dans la société
+                                if consultant_db.date_entree_societe:
+                                    from datetime import date
+                                    today = date.today()
+                                    if consultant_db.date_sortie_societe:
+                                        fin_periode = consultant_db.date_sortie_societe
+                                    else:
+                                        fin_periode = today
+                                    delta_societe = fin_periode - consultant_db.date_entree_societe
+                                    anciennete_societe = round(delta_societe.days / 365.25, 1)
+                                    response += f"🏢 **Ancienneté société :** {anciennete_societe} années\n"
+                                
+                                # Statut société
+                                statut = consultant_db.statut_societe
+                                if statut == "En poste":
+                                    response += f"✅ **Statut :** {statut}"
+                                elif statut == "Départ prévu":
+                                    response += f"⚠️ **Statut :** {statut}"
+                                else:
+                                    response += f"❌ **Statut :** {statut}"
+                                
+                            else:
+                                response = f"❓ L'expérience de **{consultant.prenom} {consultant.nom}** ne peut pas être calculée car la date de première mission n'est pas renseignée."
+                        else:
+                            response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {consultant.nom}**."
+                            
+                except Exception as e:
+                    response = f"❌ Erreur lors de la récupération des données d'expérience : {str(e)}"
+                
+                return {
+                    "response": response,
+                    "data": {
+                        "consultant": {
+                            "nom": consultant.nom,
+                            "prenom": consultant.prenom,
+                            "experience_annees": getattr(consultant_db, 'experience_annees', None) if 'consultant_db' in locals() else None,
+                            "date_premiere_mission": consultant_db.date_premiere_mission.isoformat() if 'consultant_db' in locals() and consultant_db.date_premiere_mission else None,
+                            "grade": getattr(consultant_db, 'grade', None) if 'consultant_db' in locals() else None,
+                            "societe": getattr(consultant_db, 'societe', None) if 'consultant_db' in locals() else None
+                        }
+                    },
+                    "intent": "experience",
+                    "confidence": 0.9
+                }
+            else:
+                return {
+                    "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom_recherche}** dans la base de données.",
+                    "data": None,
+                    "intent": "experience",
+                    "confidence": 0.7
+                }
+        
+        # Statistiques générales sur l'expérience
+        else:
+            try:
+                with get_database_session() as session:
+                    consultants_avec_experience = session.query(Consultant).filter(
+                        Consultant.date_premiere_mission.isnot(None)
+                    ).all()
+                    
+                    if consultants_avec_experience:
+                        experiences = [c.experience_annees for c in consultants_avec_experience]
+                        
+                        response = f"📊 **Statistiques d'expérience :**\n\n"
+                        response += f"• **Consultants avec expérience renseignée :** {len(consultants_avec_experience)}\n"
+                        response += f"• **Expérience moyenne :** {sum(experiences) / len(experiences):.1f} années\n"
+                        response += f"• **Expérience minimum :** {min(experiences):.1f} années\n"
+                        response += f"• **Expérience maximum :** {max(experiences):.1f} années\n"
+                        
+                        # Top 3 des plus expérimentés
+                        top_experienced = sorted(consultants_avec_experience, key=lambda c: c.experience_annees, reverse=True)[:3]
+                        response += f"\n🏆 **Top 3 des plus expérimentés :**\n"
+                        for i, consultant in enumerate(top_experienced, 1):
+                            response += f"{i}. **{consultant.prenom} {consultant.nom}** : {consultant.experience_annees} années\n"
+                        
+                    else:
+                        response = "❓ Aucun consultant n'a d'expérience renseignée dans la base."
+                
+            except Exception as e:
+                response = f"❌ Erreur lors du calcul des statistiques : {str(e)}"
+            
+            return {
+                "response": response,
+                "data": {"consultants_count": len(consultants_avec_experience) if 'consultants_avec_experience' in locals() else 0},
+                "intent": "experience",
+                "confidence": 0.8
+            }
+    
+    def _handle_professional_profile_question(self, entities: Dict) -> Dict[str, Any]:
+        """Gère les questions sur le profil professionnel (grade, type contrat, société)"""
+        
+        question_lower = self.last_question.lower()
+        
+        # Si un nom est mentionné, chercher ce consultant spécifique
+        if entities["noms"]:
+            nom_recherche = entities["noms"][0]
+            consultant = self._find_consultant_by_name(nom_recherche)
+            
+            if consultant:
+                try:
+                    with get_database_session() as session:
+                        consultant_db = session.query(Consultant).filter(Consultant.id == consultant.id).first()
+                        
+                        if consultant_db:
+                            # Déterminer le type d'information demandée
+                            if any(word in question_lower for word in ["grade", "niveau", "poste", "fonction"]):
+                                response = f"🎯 **Grade de {consultant.prenom} {consultant.nom}** : **{consultant_db.grade or 'Non renseigné'}**"
+                                
+                            elif any(word in question_lower for word in ["contrat", "type contrat", "cdi", "cdd"]):
+                                response = f"📋 **Type de contrat de {consultant.prenom} {consultant.nom}** : **{consultant_db.type_contrat or 'Non renseigné'}**"
+                                
+                            elif any(word in question_lower for word in ["société", "societe", "entreprise", "quanteam", "asigma"]):
+                                response = f"🏢 **Société de {consultant.prenom} {consultant.nom}** : **{consultant_db.societe or 'Non renseigné'}**"
+                                if consultant_db.date_entree_societe:
+                                    response += f"\n📅 **Date d'entrée :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}"
+                                if consultant_db.date_sortie_societe:
+                                    response += f"\n📅 **Date de sortie :** {consultant_db.date_sortie_societe.strftime('%d/%m/%Y')}"
+                                else:
+                                    response += "\n✅ **Toujours en poste**"
+                                    
+                            else:
+                                # Profil complet
+                                response = f"👔 **Profil professionnel de {consultant.prenom} {consultant.nom}** :\n\n"
+                                response += f"🎯 **Grade :** {consultant_db.grade or 'Non renseigné'}\n"
+                                response += f"📋 **Type de contrat :** {consultant_db.type_contrat or 'Non renseigné'}\n"
+                                response += f"🏢 **Société :** {consultant_db.societe or 'Non renseigné'}\n"
+                                
+                                if consultant_db.date_entree_societe:
+                                    response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
+                                
+                                if consultant_db.date_sortie_societe:
+                                    response += f"📅 **Date de sortie société :** {consultant_db.date_sortie_societe.strftime('%d/%m/%Y')}\n"
+                                else:
+                                    response += "✅ **Statut :** Toujours en poste\n"
+                                
+                                if consultant_db.experience_annees:
+                                    response += f"⏱️ **Expérience :** {consultant_db.experience_annees} années\n"
+                                
+                                # Informations salariales si disponibles
+                                if consultant_db.salaire_actuel:
+                                    cjm = consultant_db.salaire_actuel * 1.8 / 216
+                                    response += f"💰 **Salaire :** {consultant_db.salaire_actuel:,.0f} €/an\n"
+                                    response += f"📈 **CJM :** {cjm:,.0f} €/jour"
+                        else:
+                            response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {consultant.nom}**."
+                            
+                except Exception as e:
+                    response = f"❌ Erreur lors de la récupération du profil : {str(e)}"
+                
+                return {
+                    "response": response,
+                    "data": {
+                        "consultant": {
+                            "nom": consultant.nom,
+                            "prenom": consultant.prenom,
+                            "grade": getattr(consultant_db, 'grade', None) if 'consultant_db' in locals() else None,
+                            "type_contrat": getattr(consultant_db, 'type_contrat', None) if 'consultant_db' in locals() else None,
+                            "societe": getattr(consultant_db, 'societe', None) if 'consultant_db' in locals() else None
+                        }
+                    },
+                    "intent": "profil_professionnel",
+                    "confidence": 0.9
+                }
+            else:
+                return {
+                    "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom_recherche}** dans la base de données.",
+                    "data": None,
+                    "intent": "profil_professionnel",
+                    "confidence": 0.7
+                }
+        
+        # Questions générales par critère
+        else:
+            try:
+                with get_database_session() as session:
+                    if any(word in question_lower for word in ["grade", "niveau", "junior", "confirmé", "manager", "directeur"]):
+                        # Statistiques par grade
+                        consultants = session.query(Consultant).filter(Consultant.grade.isnot(None)).all()
+                        
+                        if consultants:
+                            grades_count = {}
+                            for consultant in consultants:
+                                grade = consultant.grade
+                                if grade not in grades_count:
+                                    grades_count[grade] = []
+                                grades_count[grade].append(consultant)
+                            
+                            response = "🎯 **Répartition par grade :**\n\n"
+                            for grade, consultants_list in grades_count.items():
+                                response += f"• **{grade}** : {len(consultants_list)} consultant(s)\n"
+                                if len(consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                                    for c in consultants_list:
+                                        response += f"  - {c.prenom} {c.nom}\n"
+                        else:
+                            response = "❓ Aucun consultant n'a de grade renseigné."
+                    
+                    elif any(word in question_lower for word in ["contrat", "cdi", "cdd", "stagiaire"]):
+                        # Statistiques par type de contrat ou recherche spécifique
+                        consultants = session.query(Consultant).filter(Consultant.type_contrat.isnot(None)).all()
+                        
+                        # Si c'est une question "combien de consultants en CDI/CDD"
+                        if any(word in question_lower for word in ["combien"]):
+                            if "cdi" in question_lower:
+                                consultants_cdi = [c for c in consultants if c.type_contrat and c.type_contrat.upper() == "CDI"]
+                                response = f"📋 **{len(consultants_cdi)} consultant(s) en CDI**"
+                            elif "cdd" in question_lower:
+                                consultants_cdd = [c for c in consultants if c.type_contrat and c.type_contrat.upper() == "CDD"]
+                                response = f"📋 **{len(consultants_cdd)} consultant(s) en CDD**"
+                            elif "stagiaire" in question_lower:
+                                consultants_stagiaire = [c for c in consultants if c.type_contrat and c.type_contrat.lower() == "stagiaire"]
+                                response = f"📋 **{len(consultants_stagiaire)} consultant(s) stagiaire(s)**"
+                            else:
+                                # Statistiques complètes
+                                contrats_count = {}
+                                for consultant in consultants:
+                                    contrat = consultant.type_contrat
+                                    if contrat not in contrats_count:
+                                        contrats_count[contrat] = 0
+                                    contrats_count[contrat] += 1
+                                
+                                response = "📋 **Nombre de consultants par type de contrat :**\n\n"
+                                for contrat, count in contrats_count.items():
+                                    response += f"• **{contrat}** : {count} consultant(s)\n"
+                        else:
+                            # Répartition complète par type de contrat
+                            if consultants:
+                                contrats_count = {}
+                                for consultant in consultants:
+                                    contrat = consultant.type_contrat
+                                    if contrat not in contrats_count:
+                                        contrats_count[contrat] = []
+                                    contrats_count[contrat].append(consultant)
+                                
+                                response = "📋 **Répartition par type de contrat :**\n\n"
+                                for contrat, consultants_list in contrats_count.items():
+                                    response += f"• **{contrat}** : {len(consultants_list)} consultant(s)\n"
+                                    if len(consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                                        for c in consultants_list:
+                                            response += f"  - {c.prenom} {c.nom}\n"
+                            else:
+                                response = "❓ Aucun consultant n'a de type de contrat renseigné."
+                    
+                    elif any(word in question_lower for word in ["société", "societe", "quanteam", "asigma", "qui travaille", "qui est"]):
+                        # Statistiques par société ou recherche de consultants par société
+                        consultants = session.query(Consultant).filter(Consultant.societe.isnot(None)).all()
+                        
+                        # Si c'est une recherche spécifique pour une société
+                        if any(word in question_lower for word in ["quanteam", "asigma"]):
+                            societe_recherchee = "Quanteam" if "quanteam" in question_lower else "Asigma"
+                            consultants_societe = [c for c in consultants if c.societe and c.societe.lower() == societe_recherchee.lower()]
+                            
+                            if consultants_societe:
+                                response = f"🏢 **Consultants chez {societe_recherchee}** :\n\n"
+                                for i, consultant in enumerate(consultants_societe, 1):
+                                    status_icon = "🟢" if consultant.disponibilite else "🔴"
+                                    response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
+                                    if consultant.grade:
+                                        response += f" - {consultant.grade}"
+                                    if consultant.type_contrat:
+                                        response += f" ({consultant.type_contrat})"
+                                    response += "\n"
+                                
+                                response += f"\n📊 **Total : {len(consultants_societe)} consultant(s)**"
+                            else:
+                                response = f"❓ Aucun consultant trouvé chez {societe_recherchee}."
+                        else:
+                            # Statistiques générales par société
+                            if consultants:
+                                societes_count = {}
+                                for consultant in consultants:
+                                    societe = consultant.societe
+                                    if societe not in societes_count:
+                                        societes_count[societe] = []
+                                    societes_count[societe].append(consultant)
+                                
+                                response = "🏢 **Répartition par société :**\n\n"
+                                for societe, consultants_list in societes_count.items():
+                                    response += f"• **{societe}** : {len(consultants_list)} consultant(s)\n"
+                                    if len(consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                                        for c in consultants_list:
+                                            response += f"  - {c.prenom} {c.nom}\n"
+                            else:
+                                response = "❓ Aucun consultant n'a de société renseignée."
+                    
+                    else:
+                        response = "🤔 Précisez quel aspect du profil professionnel vous intéresse : grade, type de contrat, ou société ?"
+                
+            except Exception as e:
+                response = f"❌ Erreur lors de la récupération des données : {str(e)}"
+            
+            return {
+                "response": response,
+                "data": None,
+                "intent": "profil_professionnel",
                 "confidence": 0.8
             }
     
@@ -931,11 +1284,15 @@ class ChatbotService:
             "💡 **Voici quelques exemples de questions :**",
             "",
             "💰 *Salaires :* \"Quel est le salaire de Jean Dupont ?\"",
-            "📧 *Contact :* \"Quel est l'email de Marie ?\"",
+            "� *Expérience :* \"Quelle est l'expérience de Jean Dupont ?\"",
+            "🎯 *Grade :* \"Quel est le grade de Marie ?\"",
+            "📋 *Contrat :* \"Quel est le type de contrat de Paul ?\"",
+            "🏢 *Société :* \"Dans quelle société travaille Anne ?\"",
+            "�📧 *Contact :* \"Quel est l'email de Marie ?\"",
             "👥 *Listes :* \"Quels sont les consultants disponibles ?\"",
-            "🎯 *Compétences :* \"Qui maîtrise Python ?\"", 
+            "🔍 *Compétences :* \"Qui maîtrise Python ?\"", 
             "💼 *Missions :* \"Quelles sont les missions chez BNP Paribas ?\"",
-            "📊 *Statistiques :* \"Combien de consultants sont actifs ?\"",
+            "� *Statistiques :* \"Combien de consultants sont actifs ?\"",
             "👤 *Profils :* \"Qui est Marie Martin ?\"",
             "",
             "Que souhaitez-vous savoir ? 😊"

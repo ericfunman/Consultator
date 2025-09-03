@@ -86,6 +86,10 @@ class ConsultantService:
                     Consultant.salaire_actuel,
                     Consultant.disponibilite,
                     Consultant.date_creation,
+                    Consultant.societe,
+                    Consultant.date_entree_societe,
+                    Consultant.date_sortie_societe,
+                    Consultant.date_premiere_mission,
                     Practice.nom.label('practice_name'),
                     func.count(Mission.id).label('nb_missions')
                 ).outerjoin(Practice, Consultant.practice_id == Practice.id)\
@@ -108,6 +112,10 @@ class ConsultantService:
                     Consultant.salaire_actuel,
                     Consultant.disponibilite,
                     Consultant.date_creation,
+                    Consultant.societe,
+                    Consultant.date_entree_societe,
+                    Consultant.date_sortie_societe,
+                    Consultant.date_premiere_mission,
                     Practice.nom
                 ).offset((page - 1) * per_page).limit(per_page)
 
@@ -118,6 +126,14 @@ class ConsultantService:
                 for row in results:
                     salaire = row.salaire_actuel or 0
                     cjm = (salaire * 1.8 / 216) if salaire else 0
+                    
+                    # Calcul de l'expérience
+                    experience_annees = 0
+                    if row.date_premiere_mission:
+                        from datetime import date
+                        today = date.today()
+                        delta = today - row.date_premiere_mission
+                        experience_annees = round(delta.days / 365.25, 1)
                     
                     consultant_dict = {
                         'id': row.id,
@@ -133,7 +149,11 @@ class ConsultantService:
                         'cjm': cjm,
                         'salaire_formatted': f"{salaire:,}€",
                         'cjm_formatted': f"{cjm:,.0f}€",
-                        'statut': "✅ Disponible" if row.disponibilite else "🔴 Occupé"
+                        'statut': "✅ Disponible" if row.disponibilite else "🔴 Occupé",
+                        # Nouveaux champs V1.2
+                        'societe': row.societe or 'Quanteam',
+                        'experience_annees': experience_annees,
+                        'experience_formatted': f"{experience_annees} ans" if experience_annees > 0 else "N/A"
                     }
                     consultant_list.append(consultant_dict)
                 
@@ -173,6 +193,12 @@ class ConsultantService:
                     Consultant.disponibilite,
                     Consultant.date_creation,
                     Consultant.derniere_maj,
+                    Consultant.societe,
+                    Consultant.date_entree_societe,
+                    Consultant.date_sortie_societe,
+                    Consultant.date_premiere_mission,
+                    Consultant.grade,
+                    Consultant.type_contrat,
                     Practice.nom.label('practice_name'),
                     func.count(Mission.id).label('nb_missions')
                 ).outerjoin(Practice, Consultant.practice_id == Practice.id)\
@@ -187,6 +213,12 @@ class ConsultantService:
                      Consultant.disponibilite,
                      Consultant.date_creation,
                      Consultant.derniere_maj,
+                     Consultant.societe,
+                     Consultant.date_entree_societe,
+                     Consultant.date_sortie_societe,
+                     Consultant.date_premiere_mission,
+                     Consultant.grade,
+                     Consultant.type_contrat,
                      Practice.nom
                  )\
                  .offset((page - 1) * per_page)\
@@ -199,6 +231,14 @@ class ConsultantService:
                 for row in results:
                     salaire = row.salaire_actuel or 0
                     cjm = (salaire * 1.8 / 216) if salaire else 0
+                    
+                    # Calcul de l'expérience
+                    experience_annees = 0
+                    if row.date_premiere_mission:
+                        from datetime import date
+                        today = date.today()
+                        delta = today - row.date_premiere_mission
+                        experience_annees = round(delta.days / 365.25, 1)
                     
                     consultant_dict = {
                         'id': row.id,
@@ -215,7 +255,14 @@ class ConsultantService:
                         'cjm': cjm,
                         'salaire_formatted': f"{salaire:,}€",
                         'cjm_formatted': f"{cjm:,.0f}€",
-                        'statut': "✅ Disponible" if row.disponibilite else "🔴 Occupé"
+                        'statut': "✅ Disponible" if row.disponibilite else "🔴 Occupé",
+                        # Nouveaux champs V1.2
+                        'societe': row.societe or 'Quanteam',
+                        'experience_annees': experience_annees,
+                        'experience_formatted': f"{experience_annees} ans" if experience_annees > 0 else "N/A",
+                        # Nouveaux champs V1.2.1
+                        'grade': row.grade or 'Junior',
+                        'type_contrat': row.type_contrat or 'CDI'
                     }
                     consultant_list.append(consultant_dict)
                 
@@ -360,12 +407,20 @@ class ConsultantService:
                     nom=data.get('nom'),
                     email=data.get('email'),
                     telephone=data.get('telephone'),
-                    salaire_actuel=data.get('salaire'),  # Corrigé: salaire_actuel au lieu de salaire
-                    practice_id=data.get('practice_id'),  # Nouveau champ pour la practice
-                    disponibilite=data.get('disponible', True),  # Corrigé: disponibilite au lieu de disponible
+                    salaire_actuel=data.get('salaire'),
+                    practice_id=data.get('practice_id'),
+                    disponibilite=data.get('disponible', True),
                     notes=data.get('notes'),
                     date_creation=datetime.now(),
-                    derniere_maj=datetime.now()  # Corrigé: derniere_maj au lieu de date_mise_a_jour
+                    derniere_maj=datetime.now(),
+                    # Nouveaux champs V1.2
+                    societe=data.get('societe', 'Quanteam'),
+                    date_entree_societe=data.get('date_entree_societe'),
+                    date_sortie_societe=data.get('date_sortie_societe'),
+                    date_premiere_mission=data.get('date_premiere_mission'),
+                    # Nouveaux champs V1.2.1
+                    grade=data.get('grade', 'Junior'),
+                    type_contrat=data.get('type_contrat', 'CDI')
                 )
                 
                 session.add(consultant)

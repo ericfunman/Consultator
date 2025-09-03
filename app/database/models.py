@@ -47,6 +47,16 @@ class Consultant(Base):
     disponibilite = Column(Boolean, default=True)
     notes = Column(Text)
     
+    # Nouveaux champs pour l'historique société V1.2
+    date_entree_societe = Column(Date)  # Date d'entrée dans la société
+    date_sortie_societe = Column(Date)  # Date de sortie (peut être null si encore en poste)
+    societe = Column(String(50), default='Quanteam')  # Quanteam ou Asigma
+    date_premiere_mission = Column(Date)  # Date de la première mission
+    
+    # Nouveaux champs pour grade et contrat V1.2.1
+    grade = Column(String(50), default='Junior')  # Junior, Confirmé, Consultant Manager, Directeur de Practice
+    type_contrat = Column(String(20), default='CDI')  # CDI, CDD, Stagiaire, Alternant, Indépendant
+    
     # Relations
     practice_id = Column(Integer, ForeignKey('practices.id'))
     practice = relationship("Practice", back_populates="consultants")
@@ -80,6 +90,29 @@ class Consultant(Base):
             if cbm.date_fin is None:
                 return cbm.business_manager
         return None
+    
+    @property
+    def experience_annees(self):
+        """Calcule l'expérience en années depuis la première mission"""
+        if not self.date_premiere_mission:
+            return 0
+        
+        from datetime import date
+        today = date.today()
+        delta = today - self.date_premiere_mission
+        return round(delta.days / 365.25, 1)  # Prise en compte des années bissextiles
+    
+    @property
+    def statut_societe(self):
+        """Retourne le statut actuel dans la société"""
+        if not self.date_sortie_societe:
+            return "En poste"
+        
+        from datetime import date
+        if self.date_sortie_societe > date.today():
+            return "Départ prévu"
+        else:
+            return "Parti"
 
 class Competence(Base):
     """Modèle pour les compétences techniques et fonctionnelles"""
