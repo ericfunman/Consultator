@@ -626,18 +626,24 @@ def show_mission_full_details(mission):
 
     with col2:
         st.markdown("#### 💰 Aspects financiers")
-        if mission.taux_journalier:
-            st.write(f"**Taux journalier :** {mission.taux_journalier:,}€")
+        
+        # Affichage TJM (nouveau champ V1.2.2)
+        if mission.tjm:
+            st.write(f"**TJM Mission :** {mission.tjm:,}€")
+        elif mission.taux_journalier:
+            st.write(f"**Taux journalier (ancien) :** {mission.taux_journalier:,}€")
 
-            # Calcul du revenu estimé
+        # Calcul du revenu estimé avec le bon TJM
+        tjm_value = mission.tjm if mission.tjm else mission.taux_journalier
+        if tjm_value:
             if mission.date_fin:
                 duration_days = (mission.date_fin - mission.date_debut).days
-                estimated_revenue = mission.taux_journalier * (duration_days // 7 * 5)  # Jours ouvrés
+                estimated_revenue = tjm_value * (duration_days // 7 * 5)  # Jours ouvrés
                 st.write(f"**Revenus estimés :** {estimated_revenue:,.0f}€")
             elif mission.en_cours:
                 today = date.today()
                 duration_days = (today - mission.date_debut).days
-                estimated_revenue = mission.taux_journalier * (duration_days // 7 * 5)
+                estimated_revenue = tjm_value * (duration_days // 7 * 5)
                 st.write(f"**Revenus à ce jour :** {estimated_revenue:,.0f}€")
 
         if mission.salaire_mensuel:

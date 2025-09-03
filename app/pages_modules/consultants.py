@@ -1146,6 +1146,13 @@ def show_mission_readonly(mission):
         st.write(
             f"**📅 Début**: {mission.date_debut.strftime('%Y-%m-%d') if mission.date_debut else 'N/A'}"
         )
+        
+        # Affichage TJM (nouveau champ V1.2.2)
+        if mission.tjm:
+            st.write(f"**💰 TJM Mission**: {mission.tjm:,}€")
+        elif mission.taux_journalier:
+            st.write(f"**💰 TJM (ancien)**: {mission.taux_journalier:,}€")
+        
         st.write(f"**💰 Revenus**: {mission.revenus_generes or 0:,}€")
 
     with col2:
