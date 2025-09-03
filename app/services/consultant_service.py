@@ -96,6 +96,8 @@ class ConsultantService:
                     Consultant.date_entree_societe,
                     Consultant.date_sortie_societe,
                     Consultant.date_premiere_mission,
+                    Consultant.grade,
+                    Consultant.type_contrat,
                     Practice.nom.label('practice_name'),
                     func.count(Mission.id).label('nb_missions')
                 ).outerjoin(Practice, Consultant.practice_id == Practice.id)\
@@ -122,6 +124,8 @@ class ConsultantService:
                     Consultant.date_entree_societe,
                     Consultant.date_sortie_societe,
                     Consultant.date_premiere_mission,
+                    Consultant.grade,
+                    Consultant.type_contrat,
                     Practice.nom
                 ).offset((page - 1) * per_page).limit(per_page)
 
@@ -149,6 +153,8 @@ class ConsultantService:
                         'telephone': row.telephone,
                         'salaire_actuel': salaire,
                         'disponibilite': row.disponibilite,
+                        'grade': row.grade or 'Junior',
+                        'type_contrat': row.type_contrat or 'CDI',
                         'practice_name': row.practice_name or 'Non affecté',
                         'date_creation': row.date_creation,
                         'nb_missions': row.nb_missions,
