@@ -72,9 +72,12 @@ def show_consultant_profile():
 
     consultant_id = st.session_state.view_consultant_profile
 
+<<<<<<< HEAD
     # Debug: Afficher l'ID récupéré
     st.info(f"🔍 Debug: ID du consultant récupéré = {consultant_id} (type: {type(consultant_id)})")
 
+=======
+>>>>>>> 61f896e ( Clean: Suppression des messages de debug)
     try:
         # Charger le consultant avec toutes les relations nécessaires dans la même session
         with get_database_session() as session:

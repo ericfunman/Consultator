@@ -336,7 +336,7 @@ def show_consultants_list():
     st.subheader("📋 Liste des consultants")
     
     try:
-        consultants = ConsultantService.get_all_consultants()
+        consultants = ConsultantService.get_all_consultants_objects()
         
         if consultants:
             # Préparer les données pour le tableau
