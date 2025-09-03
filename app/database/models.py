@@ -113,6 +113,34 @@ class Consultant(Base):
             return "Départ prévu"
         else:
             return "Parti"
+    
+    @property
+    def date_disponibilite(self):
+        """
+        Calcule la date de disponibilité du consultant
+        - Si disponible immédiatement: 'ASAP'
+        - Sinon: date de fin de la mission la plus tardive (si > aujourd'hui)
+        """
+        from datetime import date
+        
+        # Si marqué comme disponible, retour ASAP
+        if self.disponibilite:
+            return "ASAP"
+        
+        # Chercher la date de fin de mission la plus tardive
+        today = date.today()
+        max_date_fin = None
+        
+        for mission in self.missions:
+            if mission.date_fin and mission.date_fin > today:
+                if max_date_fin is None or mission.date_fin > max_date_fin:
+                    max_date_fin = mission.date_fin
+        
+        if max_date_fin:
+            return max_date_fin.strftime("%d/%m/%Y")
+        else:
+            # Aucune mission avec date de fin future, donc ASAP
+            return "ASAP"
 
 class Competence(Base):
     """Modèle pour les compétences techniques et fonctionnelles"""
@@ -163,7 +191,8 @@ class Mission(Base):
     date_debut = Column(Date, nullable=False)
     date_fin = Column(Date)
     statut = Column(String(20), default='en_cours')  # en_cours, terminee, suspendue
-    taux_journalier = Column(Float)
+    taux_journalier = Column(Float)  # Ancien champ, conservé pour compatibilité
+    tjm = Column(Float)  # Nouveau champ TJM spécifique mission V1.2.2
     revenus_generes = Column(Float)
     technologies_utilisees = Column(Text)  # JSON ou texte séparé par virgules
     description = Column(Text)

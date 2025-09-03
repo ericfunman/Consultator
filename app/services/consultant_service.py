@@ -61,7 +61,13 @@ class ConsultantService:
                         'disponibilite': consultant.disponibilite,
                         'practice_name': consultant.practice.nom if consultant.practice else 'N/A',
                         'date_creation': consultant.date_creation,
-                        'derniere_maj': consultant.derniere_maj
+                        'derniere_maj': consultant.derniere_maj,
+                        # Nouveaux champs V1.2.2
+                        'date_disponibilite': consultant.date_disponibilite,
+                        'experience_annees': consultant.experience_annees,
+                        'grade': consultant.grade,
+                        'type_contrat': consultant.type_contrat,
+                        'societe': consultant.societe
                     }
                     consultant_list.append(consultant_dict)
                 

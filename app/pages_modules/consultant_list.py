@@ -68,6 +68,9 @@ def show_consultants_list():
                 'Téléphone': consultant.telephone,
                 'Salaire annuel': consultant.salaire_actuel or 0,
                 'Disponibilité': "✅ Disponible" if consultant.disponibilite else "🔴 En mission",
+                'Date disponibilité': consultant.date_disponibilite,  # Nouveau champ V1.2.2
+                'Grade': consultant.grade,
+                'Type contrat': consultant.type_contrat,
                 'Practice': practice_name,
                 'Date création': consultant.date_creation.strftime("%d/%m/%Y") if consultant.date_creation else "N/A"
             })
@@ -144,7 +147,7 @@ def show_consultants_list():
             st.info("ℹ️ Aucun consultant ne correspond aux critères de recherche")
         else:
             # Configuration des colonnes à afficher
-            display_columns = ['Prénom', 'Nom', 'Email', 'Téléphone', 'Salaire annuel', 'Disponibilité', 'Practice']
+            display_columns = ['Prénom', 'Nom', 'Email', 'Disponibilité', 'Date disponibilité', 'Grade', 'Type contrat', 'Practice']
 
             # Afficher le DataFrame avec sélection interactive (comme dans business managers)
             event = st.dataframe(
@@ -154,12 +157,13 @@ def show_consultants_list():
                 on_select="rerun",
                 selection_mode="single-row",
                 column_config={
-                    "Prénom": st.column_config.TextColumn("Prénom", width="medium"),
-                    "Nom": st.column_config.TextColumn("Nom", width="medium"),
+                    "Prénom": st.column_config.TextColumn("Prénom", width="small"),
+                    "Nom": st.column_config.TextColumn("Nom", width="small"),
                     "Email": st.column_config.TextColumn("Email", width="large"),
-                    "Téléphone": st.column_config.TextColumn("Téléphone", width="medium"),
-                    "Salaire annuel": st.column_config.NumberColumn("Salaire annuel", width="medium", format="€%d"),
                     "Disponibilité": st.column_config.TextColumn("Disponibilité", width="small"),
+                    "Date disponibilité": st.column_config.TextColumn("Date disponibilité", width="small"),
+                    "Grade": st.column_config.TextColumn("Grade", width="small"),
+                    "Type contrat": st.column_config.TextColumn("Type contrat", width="small"),
                     "Practice": st.column_config.TextColumn("Practice", width="medium")
                 }
             )

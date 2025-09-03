@@ -63,6 +63,10 @@ class ChatbotService:
                 return self._handle_cvs_question(entities)
             elif intent == "statistiques":
                 return self._handle_stats_question(entities)
+            elif intent == "disponibilite":  # Nouveau handler V1.2.2
+                return self._handle_availability_question(entities)
+            elif intent == "tjm_mission":  # Nouveau handler V1.2.2
+                return self._handle_mission_tjm_question(entities)
             elif intent == "recherche_consultant":
                 return self._handle_consultant_search(entities)
             else:
@@ -152,6 +156,18 @@ class ChatbotService:
                 r"nombre", r"moyenne", r"total", r"statistiques", r"combien.+missions",
                 r"actifs", r"inactifs", r"tjm moyen", r"combien y a", r"il y a combien"
             ],
+            "disponibilite": [  # Nouvelle intention V1.2.2
+                r"disponible", r"disponibilité", r"libre", r"quand.+libre", r"quand.+disponible",
+                r"date.+disponibilité", r"fin.+mission", r"libéré", r"fini", r"termine",
+                r"asap", r"immédiatement", r"tout de suite", r"prochaine disponibilité"
+            ],
+            "tjm_mission": [  # Nouvelle intention V1.2.2
+                r"tjm.+mission", r"taux.+mission", r"prix.+mission", r"coût.+mission",
+                r"tarif.+mission", r"facturation.+mission", r"journalier.+mission",
+                r"combien.+coûte.+mission", r"prix.+journée.+mission",
+                r"tjm mission", r"prix mission", r"coût mission", r"tarif mission",
+                r"taux journalier mission", r"combien coûte mission"
+            ],
             "recherche_consultant": [
                 r"qui est", r"consultant", r"profil", r"information sur",
                 r"details"
@@ -176,6 +192,10 @@ class ChatbotService:
         # c'est forcément une question de contact
         if has_consultant_name and intent_scores.get("contact", 0) > 0:
             return "contact"
+        
+        # NOUVELLE RÈGLE V1.2.2 : Prioriser tjm_mission sur missions si TJM est mentionné
+        if intent_scores.get("tjm_mission", 0) > 0 and re.search(r"tjm|taux|prix|coût|tarif", question):
+            return "tjm_mission"
         
         # Si un nom de consultant est mentionné et qu'on parle de missions,
         # c'est forcément une question de missions spécifique
@@ -1665,6 +1685,259 @@ class ChatbotService:
             "salaire_moyen": salaire_moyen,
             "cjm_moyen": cjm_moyen
         }
+    
+    def _handle_availability_question(self, entities: Dict) -> Dict[str, Any]:
+        """Gère les questions sur la disponibilité des consultants"""
+        
+        # Chercher un consultant spécifique
+        consultant = None
+        if entities['noms']:
+            nom_complet = ' '.join(entities['noms'])
+            consultant = self._find_consultant_by_name(nom_complet)
+        
+        if consultant:
+            try:
+                # Récupérer les données de disponibilité
+                consultant_db = self.session.query(Consultant).filter(Consultant.id == consultant.id).first()
+                
+                if consultant_db:
+                    response = f"📅 **Disponibilité de {consultant.prenom} {consultant.nom}** :\n\n"
+                    
+                    # Date de disponibilité calculée
+                    date_dispo = consultant_db.date_disponibilite
+                    if date_dispo == "ASAP":
+                        response += "✅ **Disponible immédiatement (ASAP)**\n\n"
+                        
+                        # Vérifier s'il y a des missions en cours
+                        missions_en_cours = [m for m in consultant_db.missions if m.statut == 'en_cours']
+                        if missions_en_cours:
+                            response += "⚠️ **Attention :** Le consultant a des missions en cours mais est marqué disponible\n"
+                            for mission in missions_en_cours:
+                                response += f"   • {mission.nom_mission} chez {mission.client}\n"
+                    else:
+                        response += f"📅 **Disponible à partir du :** {date_dispo}\n\n"
+                        
+                        # Afficher les missions qui retardent la disponibilité
+                        from datetime import date
+                        missions_futures = [m for m in consultant_db.missions 
+                                          if m.date_fin and m.date_fin > date.today()]
+                        if missions_futures:
+                            response += "🎯 **Missions en cours/planifiées :**\n"
+                            for mission in missions_futures:
+                                fin_mission = mission.date_fin.strftime('%d/%m/%Y')
+                                response += f"   • {mission.nom_mission} (fin: {fin_mission})\n"
+                    
+                    # Statut général
+                    response += f"\n📊 **Statut actuel :** "
+                    if consultant_db.disponibilite:
+                        response += "✅ Marqué disponible"
+                    else:
+                        response += "🔴 Marqué occupé"
+                        
+                    # Informations complémentaires
+                    if consultant_db.grade:
+                        response += f"\n🎯 **Grade :** {consultant_db.grade}"
+                    if consultant_db.type_contrat:
+                        response += f"\n📝 **Contrat :** {consultant_db.type_contrat}"
+                
+                else:
+                    response = f"❌ Impossible de récupérer les données de disponibilité pour **{consultant.prenom} {consultant.nom}**."
+                    
+            except Exception as e:
+                response = f"❌ Erreur lors de la récupération des données de disponibilité : {str(e)}"
+            
+            return {
+                "response": response,
+                "data": {
+                    "consultant": {
+                        "nom": consultant.nom,
+                        "prenom": consultant.prenom,
+                        "date_disponibilite": getattr(consultant_db, 'date_disponibilite', None) if 'consultant_db' in locals() else None,
+                        "disponibilite_immediate": getattr(consultant_db, 'disponibilite', None) if 'consultant_db' in locals() else None
+                    }
+                },
+                "intent": "disponibilite",
+                "confidence": 0.9
+            }
+        else:
+            # Question générale sur les disponibilités
+            try:
+                consultants_dispos = self.session.query(Consultant).filter(Consultant.disponibilite == True).all()
+                consultants_occupes = self.session.query(Consultant).filter(Consultant.disponibilite == False).all()
+                
+                response = "📅 **État des disponibilités** :\n\n"
+                response += f"✅ **Disponibles immédiatement :** {len(consultants_dispos)} consultant(s)\n"
+                
+                if consultants_dispos:
+                    for consultant in consultants_dispos[:5]:  # Limiter à 5
+                        response += f"   • {consultant.prenom} {consultant.nom}\n"
+                    if len(consultants_dispos) > 5:
+                        response += f"   • ... et {len(consultants_dispos) - 5} autre(s)\n"
+                
+                response += f"\n🔴 **Occupés :** {len(consultants_occupes)} consultant(s)\n"
+                
+                if consultants_occupes:
+                    for consultant in consultants_occupes[:5]:  # Limiter à 5
+                        date_dispo = consultant.date_disponibilite
+                        response += f"   • {consultant.prenom} {consultant.nom} (dispo: {date_dispo})\n"
+                    if len(consultants_occupes) > 5:
+                        response += f"   • ... et {len(consultants_occupes) - 5} autre(s)\n"
+                
+                return {
+                    "response": response,
+                    "data": {
+                        "disponibles": len(consultants_dispos),
+                        "occupes": len(consultants_occupes),
+                        "total": len(consultants_dispos) + len(consultants_occupes)
+                    },
+                    "intent": "disponibilite",
+                    "confidence": 0.8
+                }
+                
+            except Exception as e:
+                return {
+                    "response": f"❌ Erreur lors de la récupération des disponibilités : {str(e)}",
+                    "data": {},
+                    "intent": "disponibilite",
+                    "confidence": 0.3
+                }
+    
+    def _handle_mission_tjm_question(self, entities: Dict) -> Dict[str, Any]:
+        """Gère les questions sur les TJM des missions"""
+        
+        # Chercher un consultant spécifique
+        consultant = None
+        if entities['noms']:
+            nom_complet = ' '.join(entities['noms'])
+            consultant = self._find_consultant_by_name(nom_complet)
+        
+        if consultant:
+            try:
+                # Récupérer les missions avec TJM
+                consultant_db = self.session.query(Consultant).filter(Consultant.id == consultant.id).first()
+                
+                if consultant_db and consultant_db.missions:
+                    missions_avec_tjm = [m for m in consultant_db.missions if m.tjm or m.taux_journalier]
+                    
+                    if missions_avec_tjm:
+                        response = f"💰 **TJM des missions de {consultant.prenom} {consultant.nom}** :\n\n"
+                        
+                        total_tjm = 0
+                        count_tjm = 0
+                        
+                        for mission in missions_avec_tjm:
+                            tjm = mission.tjm or mission.taux_journalier
+                            tjm_type = "TJM" if mission.tjm else "TJM (ancien)"
+                            
+                            response += f"🎯 **{mission.nom_mission}**\n"
+                            response += f"   • Client: {mission.client}\n"
+                            response += f"   • {tjm_type}: {tjm:,.0f}€\n"
+                            
+                            if mission.date_debut:
+                                debut = mission.date_debut.strftime('%d/%m/%Y')
+                                if mission.date_fin:
+                                    fin = mission.date_fin.strftime('%d/%m/%Y')
+                                    response += f"   • Période: {debut} → {fin}\n"
+                                else:
+                                    response += f"   • Début: {debut} (en cours)\n"
+                            
+                            response += "\n"
+                            
+                            total_tjm += tjm
+                            count_tjm += 1
+                        
+                        if count_tjm > 1:
+                            tjm_moyen = total_tjm / count_tjm
+                            response += f"📊 **TJM moyen :** {tjm_moyen:,.0f}€ (sur {count_tjm} missions)"
+                        
+                    else:
+                        response = f"💰 **{consultant.prenom} {consultant.nom}** : Aucun TJM renseigné dans les missions"
+                else:
+                    response = f"💰 **{consultant.prenom} {consultant.nom}** : Aucune mission trouvée"
+                    
+            except Exception as e:
+                response = f"❌ Erreur lors de la récupération des TJM : {str(e)}"
+            
+            return {
+                "response": response,
+                "data": {
+                    "consultant": {
+                        "nom": consultant.nom,
+                        "prenom": consultant.prenom
+                    }
+                },
+                "intent": "tjm_mission",
+                "confidence": 0.9
+            }
+        else:
+            # Question générale sur les TJM
+            try:
+                # TJM moyen avec nouveau champ
+                tjm_nouveau_moyen = self.session.query(func.avg(Mission.tjm)).filter(Mission.tjm.isnot(None)).scalar() or 0
+                
+                # TJM moyen avec ancien champ  
+                tjm_ancien_moyen = self.session.query(func.avg(Mission.taux_journalier)).filter(Mission.taux_journalier.isnot(None)).scalar() or 0
+                
+                # Compter les missions avec TJM
+                missions_nouveau_tjm = self.session.query(Mission).filter(Mission.tjm.isnot(None)).count()
+                missions_ancien_tjm = self.session.query(Mission).filter(Mission.taux_journalier.isnot(None)).count()
+                
+                response = "💰 **Statistiques TJM des missions** :\n\n"
+                
+                if missions_nouveau_tjm > 0:
+                    response += f"🆕 **Nouveau format TJM :**\n"
+                    response += f"   • Missions avec TJM: {missions_nouveau_tjm}\n"
+                    response += f"   • TJM moyen: {tjm_nouveau_moyen:,.0f}€\n\n"
+                
+                if missions_ancien_tjm > 0:
+                    response += f"📊 **Ancien format TJM :**\n"
+                    response += f"   • Missions avec TJM: {missions_ancien_tjm}\n"
+                    response += f"   • TJM moyen: {tjm_ancien_moyen:,.0f}€\n\n"
+                
+                # Calcul global
+                if missions_nouveau_tjm > 0 or missions_ancien_tjm > 0:
+                    total_missions = missions_nouveau_tjm + missions_ancien_tjm
+                    tjm_global = ((tjm_nouveau_moyen * missions_nouveau_tjm) + (tjm_ancien_moyen * missions_ancien_tjm)) / total_missions
+                    response += f"🎯 **TJM global moyen :** {tjm_global:,.0f}€ (sur {total_missions} missions)"
+                else:
+                    response = "💰 **Aucun TJM renseigné** dans les missions"
+                
+                return {
+                    "response": response,
+                    "data": {
+                        "tjm_nouveau_moyen": tjm_nouveau_moyen,
+                        "tjm_ancien_moyen": tjm_ancien_moyen,
+                        "missions_nouveau": missions_nouveau_tjm,
+                        "missions_ancien": missions_ancien_tjm
+                    },
+                    "intent": "tjm_mission",
+                    "confidence": 0.8
+                }
+                
+            except Exception as e:
+                return {
+                    "response": f"❌ Erreur lors de la récupération des statistiques TJM : {str(e)}",
+                    "data": {},
+                    "intent": "tjm_mission",
+                    "confidence": 0.3
+                }
+    
+    def get_response(self, question: str) -> str:
+        """
+        Interface simplifiée pour obtenir une réponse textuelle
+        Compatible avec les tests existants
+        
+        Args:
+            question: Question de l'utilisateur
+            
+        Returns:
+            Réponse textuelle du chatbot
+        """
+        try:
+            result = self.process_question(question)
+            return result.get("response", "❓ Je n'ai pas compris votre question.")
+        except Exception as e:
+            return f"❌ Erreur: {str(e)}"
     
     def __del__(self):
         """Ferme la session DB"""

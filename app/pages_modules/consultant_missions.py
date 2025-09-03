@@ -120,8 +120,10 @@ def show_mission_details(mission):
 
     with col2:
         st.markdown("**💰 Rémunération**")
-        if mission.taux_journalier:
-            st.write(f"**TJM :** {mission.taux_journalier:,}€")
+        if mission.tjm:
+            st.write(f"**TJM Mission :** {mission.tjm:,}€")
+        elif mission.taux_journalier:
+            st.write(f"**TJM (ancien) :** {mission.taux_journalier:,}€")
         if mission.salaire_mensuel:
             st.write(f"**Salaire mensuel :** {mission.salaire_mensuel:,}€")
 
@@ -252,17 +254,25 @@ def show_add_mission_form(consultant_id: int):
 
             st.markdown("#### 💰 Rémunération")
 
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
 
             with col1:
                 taux_journalier = st.number_input(
                     "Taux journalier (€)",
                     min_value=0,
                     step=10,
-                    help="Taux journalier moyen de la mission"
+                    help="Taux journalier moyen de la mission (ancien champ)"
                 )
 
             with col2:
+                tjm = st.number_input(
+                    "TJM Mission (€)",
+                    min_value=0,
+                    step=10,
+                    help="Taux Journalier Moyen spécifique à cette mission"
+                )
+
+            with col3:
                 salaire_mensuel = st.number_input(
                     "Salaire mensuel (€)",
                     min_value=0,
@@ -305,6 +315,7 @@ def show_add_mission_form(consultant_id: int):
                         'date_fin': date_fin,
                         'en_cours': en_cours,
                         'taux_journalier': taux_journalier,
+                        'tjm': tjm,  # Nouveau champ TJM V1.2.2
                         'salaire_mensuel': salaire_mensuel,
                         'description': description,
                         'competences_requises': competences_requises
@@ -367,6 +378,7 @@ def create_mission(consultant_id: int, data: Dict[str, Any]) -> bool:
                 date_fin=data['date_fin'] if not data['en_cours'] else None,
                 en_cours=data['en_cours'],
                 taux_journalier=data['taux_journalier'] if data['taux_journalier'] > 0 else None,
+                tjm=data['tjm'] if data['tjm'] > 0 else None,  # Nouveau champ TJM V1.2.2
                 salaire_mensuel=data['salaire_mensuel'] if data['salaire_mensuel'] > 0 else None,
                 description=data['description'].strip() if data['description'] else None,
                 competences_requises=data['competences_requises'].strip() if data['competences_requises'] else None
