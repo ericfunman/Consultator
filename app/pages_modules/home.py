@@ -15,8 +15,15 @@ import streamlit as st
 warnings.filterwarnings('ignore', category=FutureWarning, message=".*deprecated.*")
 
 # Import des services
-sys.path.append(os.path.dirname(__file__))
-from app.database.database import get_database_info
+import sys
+import os
+# Ajouter le répertoire parent au path pour les imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from database.database import get_database_info
 
 
 def show():
@@ -31,7 +38,7 @@ def show():
     if not db_info.get("exists", False):
         st.error("❌ Base de données non initialisée")
         if st.button("Initialiser la base de données"):
-            from app.database.database import init_database
+            from database.database import init_database
 
             if init_database():
                 st.success("✅ Base de données initialisée avec succès !")
@@ -63,22 +70,6 @@ def show():
             value=f"{taux_occupation}%",
             delta="2%" if taux_occupation > 80 else "-3%",
         )
-        # Métriques principales (Compétences supprimé)
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.metric(
-                label="👥 Consultants",
-                value=db_info.get("consultants", 0),
-                delta="Actifs dans la practice",
-            )
-
-        with col2:
-            st.metric(
-                label="💼 Missions",
-                value=db_info.get("missions", 0),
-                delta="En cours et terminées",
-            )
 
     st.markdown("---")
 

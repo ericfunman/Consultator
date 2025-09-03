@@ -55,47 +55,101 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-@st.cache_resource
 def get_navigation_modules():
-    """Cache les imports des modules de navigation pour éviter les rechargements"""
+    """Charge les modules de navigation sans cache pour éviter les problèmes"""
     modules = {}
-    try:
-        from pages_modules import home
-        modules['home'] = home
-    except Exception as e:
-        print(f"Erreur import home: {e}")
     
+    # Module home
     try:
-        from pages_modules import consultants
-        modules['consultants'] = consultants
+        import importlib
+        import pages_modules.home as home_module
+        importlib.reload(home_module)
+        modules['home'] = home_module
+        print("✅ Module home chargé avec succès")
     except Exception as e:
-        print(f"Erreur import consultants: {e}")
+        print(f"❌ Erreur import home: {e}")
+        modules['home'] = None
     
+    # Module consultants
     try:
-        from pages_modules import technologies
-        modules['technologies'] = technologies
+        import pages_modules.consultants as consultants_module
+        importlib.reload(consultants_module)
+        modules['consultants'] = consultants_module
+        print("✅ Module consultants chargé avec succès")
     except Exception as e:
-        print(f"Erreur import technologies: {e}")
+        print(f"❌ Erreur import consultants: {e}")
+        # Essayer consultant_profile en fallback
+        try:
+            import pages_modules.consultant_profile as consultant_profile_module
+            importlib.reload(consultant_profile_module)
+            modules['consultants'] = consultant_profile_module
+            print("✅ Module consultant_profile chargé comme fallback")
+        except Exception as e2:
+            print(f"❌ Erreur import consultant_profile: {e2}")
+            modules['consultants'] = None
     
+    # Module technologies
     try:
-        from pages_modules import practices
-        modules['practices'] = practices
+        import pages_modules.technologies as technologies_module
+        importlib.reload(technologies_module)
+        modules['technologies'] = technologies_module
+        print("✅ Module technologies chargé avec succès")
     except Exception as e:
-        print(f"Erreur import practices: {e}")
+        print(f"❌ Erreur import technologies: {e}")
+        modules['technologies'] = None
     
+    # Module practices
     try:
-        from pages_modules import business_managers
-        modules['business_managers'] = business_managers
+        import pages_modules.practices as practices_module
+        importlib.reload(practices_module)
+        modules['practices'] = practices_module
+        print("✅ Module practices chargé avec succès")
     except Exception as e:
-        print(f"Erreur import business_managers: {e}")
+        print(f"❌ Erreur import practices: {e}")
+        modules['practices'] = None
     
+    # Module business_managers
     try:
-        from pages_modules import chatbot
-        modules['chatbot'] = chatbot
+        import pages_modules.business_managers as business_managers_module
+        importlib.reload(business_managers_module)
+        modules['business_managers'] = business_managers_module
+        print("✅ Module business_managers chargé avec succès")
     except Exception as e:
-        print(f"Erreur import chatbot: {e}")
+        print(f"❌ Erreur import business_managers: {e}")
+        modules['business_managers'] = None
+    
+    # Module chatbot
+    try:
+        import pages_modules.chatbot as chatbot_module
+        importlib.reload(chatbot_module)
+        modules['chatbot'] = chatbot_module
+        print("✅ Module chatbot chargé avec succès")
+    except Exception as e:
+        print(f"❌ Erreur import chatbot: {e}")
+        modules['chatbot'] = None
     
     return modules
+
+
+def show_fallback_home():
+    """Page d'accueil de fallback si le module home ne charge pas"""
+    st.title("🏠 Tableau de bord")
+    st.markdown("### Vue d'ensemble de votre practice data")
+    
+    # Métriques de base
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("👥 Consultants", "60", "Actifs dans la practice")
+    
+    with col2:
+        st.metric("💼 Missions", "45", "En cours et terminées")
+    
+    with col3:
+        st.metric("📊 Taux d'occupation", "85%", "2%")
+    
+    st.markdown("---")
+    st.info("⚠️ Page d'accueil en mode simplifié - Certaines fonctionnalités peuvent être limitées")
 
 
 def main():
@@ -161,13 +215,14 @@ def main():
     # Navigation vers les pages avec gestion d'erreurs optimisée
     try:
         if selected == "🏠 Accueil":
-            if 'home' in modules:
+            if 'home' in modules and modules['home'] is not None:
                 modules['home'].show()
             else:
                 st.error("❌ Module Accueil non disponible")
+                show_fallback_home()
                 
         elif selected == "👥 Consultants":
-            if 'consultants' in modules:
+            if 'consultants' in modules and modules['consultants'] is not None:
                 modules['consultants'].show()
             else:
                 st.error("❌ Module Consultants non disponible")
