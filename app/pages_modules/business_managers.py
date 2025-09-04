@@ -574,7 +574,6 @@ def show_bm_assignments_history(bm, session):
 
 def show_business_managers_list():
     """Affiche la liste des Business Managers avec interactions"""
-    st.subheader("📋 Liste des Business Managers")
     
     # Champ de recherche en temps réel
     search_term = st.text_input(

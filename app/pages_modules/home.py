@@ -30,7 +30,6 @@ def show():
     """Affiche la page d'accueil"""
 
     st.title("🏠 Tableau de bord")
-    st.markdown("### Vue d'ensemble de votre practice data")
 
     # Informations sur la base de données
     db_info = get_database_info()

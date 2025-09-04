@@ -40,7 +40,6 @@ def show():
     """Affiche la page de gestion des consultants"""
 
     st.title("👥 Gestion des consultants")
-    st.markdown("### Gérez les profils de vos consultants")
 
     if not imports_ok:
         st.error("❌ Les services de base ne sont pas disponibles")
@@ -54,7 +53,7 @@ def show():
 
     # Onglets pour organiser les fonctionnalités
     tab1, tab2 = st.tabs(
-        ["📋 Liste des consultants", "➕ Ajouter un consultant"]
+        ["� Consultants", "➕ Ajouter un consultant"]
     )
 
     with tab1:
@@ -1333,8 +1332,6 @@ def show_add_mission_form(consultant):
 def show_consultants_list():
     """Affiche la liste des consultants avec interactions optimisée"""
 
-    st.subheader("📋 Liste des consultants")
-    
     # Champ de recherche en temps réel
     search_term = st.text_input(
         "🔍 Rechercher un consultant", 

@@ -28,11 +28,18 @@ st.markdown(
     """
 <style>
     .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
+        font-size: 3.5rem;
+        font-weight: 900;
         color: #1f77b4;
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 3rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #1f77b4, #2196F3);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        letter-spacing: 2px;
     }
     .sidebar .sidebar-content {
         background-color: #f0f2f6;
@@ -165,26 +172,14 @@ def main():
     st.markdown(
         '<div class="main-header">🏢 Consultator</div>', unsafe_allow_html=True
     )
-    st.markdown("### 📊 Plateforme de gestion de practice data (1000+ consultants)")
 
     # Charger les modules avec cache
     modules = get_navigation_modules()
 
     # Menu de navigation dans la sidebar
     with st.sidebar:
-        # Affichage rapide des statistiques si possible
-        if 'consultants' in modules:
-            try:
-                from services.consultant_service import ConsultantService
-                stats = ConsultantService.get_consultant_summary_stats()
-                st.metric("👥 Total Consultants", stats.get('total_consultants', 0))
-                st.metric("✅ Disponibles", stats.get('available_consultants', 0))
-                st.divider()
-            except:
-                pass  # Ignore si erreur stats
-        
         selected = option_menu(
-            menu_title="🧭 Navigation",
+            menu_title=None,
             options=[
                 "🏠 Accueil",
                 "👥 Consultants",

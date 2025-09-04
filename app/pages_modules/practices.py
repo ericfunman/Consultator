@@ -14,7 +14,6 @@ def show():
     """Affiche la page de gestion des practices"""
     
     st.title("🏢 Gestion des Practices")
-    st.markdown("### Vue d'ensemble des practices et de leurs consultants")
     
     # Initialiser les practices par défaut si nécessaire
     PracticeService.init_default_practices()
