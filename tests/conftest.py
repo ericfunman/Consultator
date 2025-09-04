@@ -54,24 +54,28 @@ def db_session(test_db):
         # Commit des changements si pas d'erreur
         session.commit()
     except Exception:
-        # Rollback en cas d'erreur
-        session.rollback()
+        # En cas d'erreur, faire un rollback explicite
+        try:
+            session.rollback()
+        except Exception:
+            pass  # Ignorer les erreurs de rollback
         raise
     finally:
-        # Fermeture propre de la session
         try:
             session.expunge_all()  # Détacher tous les objets
             session.close()
         except Exception:
-            pass  # Ignore les erreurs de fermeture
+            pass  # Ignorer les erreurs de fermeture
 
 @pytest.fixture
 def sample_consultant_data():
-    """Données de test pour un consultant"""
+    """Données de test pour un consultant avec email unique"""
+    import uuid
+    unique_id = uuid.uuid4().hex[:8]
     return {
         "nom": "Dupont",
         "prenom": "Jean",
-        "email": "jean.dupont@test.com",
+        "email": f"jean.dupont.{unique_id}@test.com",
         "telephone": "0123456789",
         "disponibilite": True,
         "salaire_souhaite": 45000,
