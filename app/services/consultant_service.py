@@ -314,6 +314,36 @@ class ConsultantService:
             }
     
     @staticmethod
+    def get_consultants_by_availability(available: bool = True) -> List[Dict]:
+        """Récupère les consultants selon leur disponibilité"""
+        try:
+            with get_database_session() as session:
+                consultants = session.query(Consultant)\
+                    .filter(Consultant.disponibilite == available)\
+                    .all()
+                
+                # Convertir en dictionnaires
+                result = []
+                for consultant in consultants:
+                    result.append({
+                        'id': consultant.id,
+                        'prenom': consultant.prenom,
+                        'nom': consultant.nom,
+                        'email': consultant.email,
+                        'telephone': consultant.telephone,
+                        'salaire_actuel': consultant.salaire_actuel,
+                        'disponibilite': consultant.disponibilite,
+                        'grade': consultant.grade,
+                        'type_contrat': consultant.type_contrat,
+                        'statut': "✅ Disponible" if consultant.disponibilite else "🔴 Occupé"
+                    })
+                
+                return result
+        except Exception as e:
+            print(f"Erreur lors de la récupération des consultants par disponibilité: {e}")
+            return []
+    
+    @staticmethod
     def get_consultant_by_id(consultant_id: int) -> Optional[Consultant]:
         """Récupère un consultant par son ID avec toutes ses relations"""
         try:

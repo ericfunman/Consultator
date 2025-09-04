@@ -8,22 +8,29 @@ import sys
 import os
 from pathlib import Path
 
-# Ajouter le répertoire app au PYTHONPATH
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app'))
+# Ajouter les répertoires nécessaires au PYTHONPATH
+project_root = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(project_root, 'app'))
+sys.path.insert(0, project_root)
 
 # Configuration de base de données de test
-TEST_DATABASE_URL = "sqlite:///test_consultator.db"
+TEST_DATABASE_URL = "sqlite:///:memory:"  # Base en mémoire - pas de fichier
 
 @pytest.fixture(scope="session")
 def test_db():
-    """Base de données de test"""
-    from database.database import init_database, get_database_session
-    from database.models import Base
+    """Base de données de test en mémoire (Windows-safe)"""
+    from app.database.database import init_database, get_database_session
+    from app.database.models import Base
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
     
-    # Créer engine de test
-    engine = create_engine(TEST_DATABASE_URL, echo=False)
+    # Créer engine de test en mémoire
+    engine = create_engine(
+        TEST_DATABASE_URL, 
+        echo=False,
+        pool_pre_ping=True,  # Vérifier les connexions
+        pool_recycle=300     # Recycler les connexions
+    )
     Base.metadata.create_all(engine)
     
     # Session de test
@@ -31,20 +38,32 @@ def test_db():
     
     yield TestSessionLocal
     
-    # Cleanup
-    Base.metadata.drop_all(engine)
-    test_db_file = Path("test_consultator.db")
-    if test_db_file.exists():
-        test_db_file.unlink()
+    # Cleanup automatique (mémoire libérée)
+    try:
+        Base.metadata.drop_all(engine)
+        engine.dispose()  # Fermer toutes les connexions
+    except Exception:
+        pass  # Ignore les erreurs de cleanup
 
 @pytest.fixture
 def db_session(test_db):
-    """Session de base de données pour chaque test"""
+    """Session de base de données pour chaque test avec gestion robuste"""
     session = test_db()
     try:
         yield session
+        # Commit des changements si pas d'erreur
+        session.commit()
+    except Exception:
+        # Rollback en cas d'erreur
+        session.rollback()
+        raise
     finally:
-        session.close()
+        # Fermeture propre de la session
+        try:
+            session.expunge_all()  # Détacher tous les objets
+            session.close()
+        except Exception:
+            pass  # Ignore les erreurs de fermeture
 
 @pytest.fixture
 def sample_consultant_data():
