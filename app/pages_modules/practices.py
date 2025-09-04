@@ -499,13 +499,18 @@ def show_assign_consultant_form_optimized(practices_cached: list):
     # Sélection du consultant
     consultant_options = {}
     for c in consultants:
-        if hasattr(c, 'nom_complet'):
-            # Objet Consultant avec propriété nom_complet
+        if hasattr(c, 'nom_complet') and hasattr(c, 'email'):
+            # Objet Consultant avec propriétés
             consultant_options[f"{c.nom_complet} ({c.email})"] = c
-        else:
+        elif isinstance(c, dict):
             # Dict avec nom et prenom séparés
             nom_complet = f"{c.get('prenom', '')} {c.get('nom', '')}".strip()
             email = c.get('email', 'Pas d\'email')
+            consultant_options[f"{nom_complet} ({email})"] = c
+        else:
+            # Gestion défensive pour autres formats
+            nom_complet = getattr(c, 'nom_complet', f"{getattr(c, 'prenom', '')} {getattr(c, 'nom', '')}".strip())
+            email = getattr(c, 'email', 'Pas d\'email')
             consultant_options[f"{nom_complet} ({email})"] = c
     selected_consultant_name = st.selectbox(
         "Sélectionner le consultant",
@@ -517,7 +522,12 @@ def show_assign_consultant_form_optimized(practices_cached: list):
         
         # Afficher la practice actuelle
         try:
-            current_practice = consultant.practice.nom if consultant.practice else "Aucune"
+            if hasattr(consultant, 'practice') and consultant.practice:
+                current_practice = consultant.practice.nom
+            elif isinstance(consultant, dict) and consultant.get('practice'):
+                current_practice = consultant.get('practice', {}).get('nom', 'Aucune')
+            else:
+                current_practice = "Aucune"
         except:
             current_practice = "Aucune"
         st.info(f"Practice actuelle : **{current_practice}**")
@@ -537,12 +547,26 @@ def show_assign_consultant_form_optimized(practices_cached: list):
             
             # Utiliser le service original pour l'assignation
             from services.practice_service import PracticeService
-            success = PracticeService.assign_consultant_to_practice(
-                consultant.id,
-                practice_id
-            )
             
-            if success:
-                # Effacer le cache après assignation
-                PracticeServiceOptimized.clear_practices_cache()
-                st.rerun()
+            # Récupérer l'ID du consultant de manière défensive
+            consultant_id = None
+            if hasattr(consultant, 'id'):
+                consultant_id = consultant.id
+            elif isinstance(consultant, dict):
+                consultant_id = consultant.get('id')
+            
+            if consultant_id:
+                success = PracticeService.assign_consultant_to_practice(
+                    consultant_id,
+                    practice_id
+                )
+                
+                if success:
+                    # Effacer le cache après assignation
+                    PracticeServiceOptimized.clear_practices_cache()
+                    st.success("✅ Consultant assigné avec succès !")
+                    st.rerun()
+                else:
+                    st.error("❌ Erreur lors de l'assignation")
+            else:
+                st.error("❌ Impossible de récupérer l'ID du consultant")
