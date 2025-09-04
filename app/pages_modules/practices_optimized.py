@@ -5,7 +5,6 @@ Performance améliorée avec cache, pagination et requêtes SQL optimisées
 
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 from datetime import datetime
 from services.practice_service_optimized import PracticeServiceOptimized
 from services.consultant_service import ConsultantService
@@ -113,21 +112,9 @@ def show_practice_overview_optimized():
             
             with col2:
                 st.subheader("🎯 Taux d'activité par Practice")
-                # Graphique en secteurs avec Plotly
-                if len(df_practices) > 0:
-                    # Préparer les données pour le graphique en secteurs
-                    fig = px.pie(
-                        df_practices, 
-                        values='Consultants Actifs', 
-                        names='Practice',
-                        title="Répartition des consultants actifs",
-                        color_discrete_sequence=px.colors.qualitative.Set3
-                    )
-                    fig.update_traces(textposition='inside', textinfo='percent+label')
-                    fig.update_layout(height=300, showlegend=True)
-                    st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.info("Pas assez de données pour le graphique")
+                # Graphique en secteurs pour les taux d'activité
+                taux_data = df_practices.set_index("Practice")["Consultants Actifs"]
+                st.pie_chart(taux_data)
     
     else:
         st.info("ℹ️ Aucune practice trouvée. Créez votre première practice dans l'onglet 'Gestion des Practices'.")
@@ -254,17 +241,14 @@ def show_practice_consultants_optimized(practice_name: str, consultants: list):
     # Créer un DataFrame optimisé (données déjà préparées)
     consultants_data = []
     for consultant in consultants:
-        # Gérer les deux formats possibles
-        nom_complet = consultant.get("nom_complet") or f"{consultant.get('prenom', '')} {consultant.get('nom', '')}".strip()
-        
         consultants_data.append({
-            "Nom": nom_complet,
-            "Email": consultant.get("email") or "Non renseigné",
-            "Téléphone": consultant.get("telephone") or "Non renseigné",
-            "Salaire": f"{consultant.get('salaire_actuel', 0):,.0f} €" if consultant.get("salaire_actuel") else "Non renseigné",
-            "Disponible": "✅" if consultant.get("disponibilite") else "❌",
-            "Missions": consultant.get("nb_missions", 0),
-            "Compétences": consultant.get("nb_competences", 0)
+            "Nom": consultant["nom_complet"],
+            "Email": consultant["email"] or "Non renseigné",
+            "Téléphone": consultant["telephone"],
+            "Salaire": f"{consultant['salaire_actuel']:,.0f} €" if consultant["salaire_actuel"] else "Non renseigné",
+            "Disponible": "✅" if consultant["disponibilite"] else "❌",
+            "Missions": consultant["nb_missions"],
+            "Compétences": consultant["nb_competences"]
         })
     
     if consultants_data:
@@ -497,16 +481,7 @@ def show_assign_consultant_form_optimized(practices_cached: list):
         return
     
     # Sélection du consultant
-    consultant_options = {}
-    for c in consultants:
-        if hasattr(c, 'nom_complet'):
-            # Objet Consultant avec propriété nom_complet
-            consultant_options[f"{c.nom_complet} ({c.email})"] = c
-        else:
-            # Dict avec nom et prenom séparés
-            nom_complet = f"{c.get('prenom', '')} {c.get('nom', '')}".strip()
-            email = c.get('email', 'Pas d\'email')
-            consultant_options[f"{nom_complet} ({email})"] = c
+    consultant_options = {f"{c.nom_complet} ({c.email})": c for c in consultants}
     selected_consultant_name = st.selectbox(
         "Sélectionner le consultant",
         options=list(consultant_options.keys())
