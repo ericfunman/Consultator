@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 from sqlalchemy import and_
-from app.database.models import BusinessManager, Consultant, ConsultantBusinessManager
-from app.database.database import get_session
+from database.models import BusinessManager, Consultant, ConsultantBusinessManager
+from database.database import get_session
 from services.business_manager_service import BusinessManagerService
 from datetime import datetime, date
 

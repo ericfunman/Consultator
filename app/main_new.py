@@ -11,7 +11,7 @@ from streamlit_option_menu import option_menu
 # Configuration de la page
 st.set_page_config(
     page_title="Consultator",
-    page_icon="📊",
+    page_icon="🏢",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -60,7 +60,7 @@ def show_navigation():
             options=[
                 "🏠 Accueil",
                 "👥 Consultants",
-                "👨‍💼 Business Managers",
+                "🤵‍♂ Business Managers",
                 "🏢 Practices",
                 "🔧 Technologies",
                 "🤖 Assistant IA",
@@ -88,7 +88,7 @@ def show_navigation():
     page_mapping = {
         "🏠 Accueil": "home",
         "👥 Consultants": "consultants",
-        "👨‍💼 Business Managers": "business_managers",
+        "🤵‍♂ Business Managers": "business_managers",
         "🏢 Practices": "practices",
         "🔧 Technologies": "technologies",
         "🤖 Assistant IA": "chatbot"
@@ -150,10 +150,10 @@ def show_fallback_home():
         st.metric("💼 Missions", "500+", "En cours et terminées")
     
     with col3:
-        st.metric("📊 Taux d'occupation", "85%", "2%")
+        st.metric("📈 Taux d'occupation", "85%", "2%")
     
     st.markdown("---")
-    st.info("⚠️ Page d'accueil en mode simplifié - Module home non disponible")
+    st.info("ℹ️ Page d'accueil en mode simplifié - Module home non disponible")
 
 if __name__ == "__main__":
     main()
