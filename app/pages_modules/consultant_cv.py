@@ -22,9 +22,9 @@ Consultant = None
 imports_ok = False
 
 try:
-    from app.database.database import get_database_session
-    from app.database.models import Consultant, Competence, ConsultantCompetence, Client
-    from app.services.consultant_service import ConsultantService
+    from database.database import get_database_session
+    from database.models import Consultant, Competence, ConsultantCompetence, Client
+    from services.consultant_service import ConsultantService
 
     imports_ok = True
 except ImportError as e:
@@ -511,7 +511,7 @@ def save_mission_from_cv(data: Dict, consultant_id: int) -> bool:
             else:
                 # Créer un nouveau client
                 if data['client_name']:
-                    from app.database.models import Client
+                    from database.models import Client
                     new_client = Client(
                         nom=data['client_name'],
                         secteur="Non spécifié"
@@ -521,7 +521,7 @@ def save_mission_from_cv(data: Dict, consultant_id: int) -> bool:
                     client_id = new_client.id
 
             # Créer la mission
-            from app.database.models import Mission
+            from database.models import Mission
             from datetime import datetime
 
             mission = Mission(

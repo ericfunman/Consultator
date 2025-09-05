@@ -22,11 +22,11 @@ Mission = None
 imports_ok = False
 
 try:
-    from app.database.database import get_database_session
-    from app.database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire, Langue, ConsultantLangue, BusinessManager
-    from app.services.consultant_service import ConsultantService
-    from app.services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
-    from app.services.document_service import DocumentService
+    from database.database import get_database_session
+    from database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire, Langue, ConsultantLangue, BusinessManager
+    from services.consultant_service import ConsultantService
+    from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
+    from services.document_service import DocumentService
     from sqlalchemy.orm import joinedload
 
     imports_ok = True

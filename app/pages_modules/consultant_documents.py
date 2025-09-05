@@ -23,11 +23,11 @@ Consultant = None
 imports_ok = False
 
 try:
-    from app.database.database import get_database_session
-    from app.database.models import Consultant, Document
-    from app.services.consultant_service import ConsultantService
-    from app.services.document_service import DocumentService
-    from app.services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
+    from database.database import get_database_session
+    from database.models import Consultant, Document
+    from services.consultant_service import ConsultantService
+    from services.document_service import DocumentService
+    from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
 
     imports_ok = True
 except ImportError as e:

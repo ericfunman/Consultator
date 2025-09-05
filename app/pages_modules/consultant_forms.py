@@ -24,9 +24,9 @@ Practice = None
 imports_ok = False
 
 try:
-    from app.database.database import get_database_session
-    from app.database.models import Consultant, Practice, Competence, ConsultantCompetence, Langue, ConsultantLangue
-    from app.services.consultant_service import ConsultantService
+    from database.database import get_database_session
+    from database.models import Consultant, Practice, Competence, ConsultantCompetence, Langue, ConsultantLangue
+    from services.consultant_service import ConsultantService
     from sqlalchemy.orm import joinedload
 
     imports_ok = True

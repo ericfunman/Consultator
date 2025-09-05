@@ -737,7 +737,7 @@ def _add_skills_form(consultant):
 
 def _add_technical_skill_form(consultant):
     """Formulaire pour ajouter une compétence technique"""
-    from app.utils.skill_categories import COMPETENCES_TECHNIQUES
+    from utils.skill_categories import COMPETENCES_TECHNIQUES
     
     # Sélection de la catégorie
     categories_tech = list(COMPETENCES_TECHNIQUES.keys())
@@ -779,7 +779,7 @@ def _add_technical_skill_form(consultant):
 
 def _add_functional_skill_form(consultant):
     """Formulaire pour ajouter une compétence fonctionnelle"""
-    from app.utils.skill_categories import COMPETENCES_FONCTIONNELLES
+    from utils.skill_categories import COMPETENCES_FONCTIONNELLES
     
     # Sélection de la catégorie
     categories_func = list(COMPETENCES_FONCTIONNELLES.keys())

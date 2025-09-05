@@ -22,10 +22,10 @@ Consultant = None
 imports_ok = False
 
 try:
-    from app.database.database import get_database_session
-    from app.database.models import Consultant, Competence, ConsultantCompetence
-    from app.services.consultant_service import ConsultantService
-    from app.utils.skill_categories import SKILL_CATEGORIES
+    from database.database import get_database_session
+    from database.models import Consultant, Competence, ConsultantCompetence
+    from services.consultant_service import ConsultantService
+    from utils.skill_categories import SKILL_CATEGORIES
 
     imports_ok = True
 except ImportError as e:
