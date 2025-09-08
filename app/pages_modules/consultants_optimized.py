@@ -33,12 +33,13 @@ try:
     from database.models import Mission
     from database.models import Practice
     from services.consultant_service import ConsultantService
+
     imports_ok = True
 except ImportError as e:
     imports_ok = False
 
 
-@st.cache_data(ttl=CACHE_CONFIG['stats_ttl'])
+@st.cache_data(ttl=CACHE_CONFIG["stats_ttl"])
 def get_dashboard_stats() -> Dict:
     """Récupère les statistiques du tableau de bord avec cache optimisé"""
     if not imports_ok:
@@ -51,11 +52,10 @@ def get_dashboard_stats() -> Dict:
         return {}
 
 
-@st.cache_data(ttl=CACHE_CONFIG['default_ttl'])
+@st.cache_data(ttl=CACHE_CONFIG["default_ttl"])
 def get_consultants_paginated(
-        page: int = 1,
-        search_term: str = "",
-        per_page: int = 50) -> Dict:
+    page: int = 1, search_term: str = "", per_page: int = 50
+) -> Dict:
     """Récupère les consultants avec pagination et cache"""
     if not imports_ok:
         return {"consultants": [], "total": 0, "pages": 0}
@@ -63,7 +63,8 @@ def get_consultants_paginated(
     try:
         if search_term:
             consultants = ConsultantService.search_consultants_optimized(
-                search_term, page, per_page)
+                search_term, page, per_page
+            )
         else:
             consultants = ConsultantService.get_all_consultants(page, per_page)
 
@@ -75,7 +76,7 @@ def get_consultants_paginated(
             "total": total,
             "pages": pages,
             "current_page": page,
-            "per_page": per_page
+            "per_page": per_page,
         }
     except Exception as e:
         st.error(f"Erreur récupération consultants: {e}")
@@ -86,19 +87,27 @@ def show_performance_info():
     """Affiche les informations de performance pour les gros volumes"""
     dataset_info = is_large_dataset()
 
-    if dataset_info.get('is_large', False):
+    if dataset_info.get("is_large", False):
         with st.expander("⚡ Informations de performance", expanded=False):
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                st.metric("👥 Consultants", dataset_info.get('consultants_count', 0))
+                st.metric("👥 Consultants", dataset_info.get("consultants_count", 0))
             with col2:
-                st.metric("🎯 Missions", dataset_info.get('missions_count', 0))
+                st.metric("🎯 Missions", dataset_info.get("missions_count", 0))
             with col3:
-                st.metric("⚡ Optimisations", "✅ Activées" if dataset_info.get(
-                    'optimizations_enabled') else "❌ Désactivées")
+                st.metric(
+                    "⚡ Optimisations",
+                    (
+                        "✅ Activées"
+                        if dataset_info.get("optimizations_enabled")
+                        else "❌ Désactivées"
+                    ),
+                )
 
-            st.info("🚀 Optimisations activées pour gérer efficacement un grand volume de données")
+            st.info(
+                "🚀 Optimisations activées pour gérer efficacement un grand volume de données"
+            )
 
 
 def show_consultants_dashboard():
@@ -113,29 +122,29 @@ def show_consultants_dashboard():
         with col1:
             st.metric(
                 "👥 Total Consultants",
-                stats.get('total_consultants', 0),
-                help="Nombre total de consultants dans la base"
+                stats.get("total_consultants", 0),
+                help="Nombre total de consultants dans la base",
             )
 
         with col2:
             st.metric(
                 "✅ Disponibles",
-                stats.get('available_consultants', 0),
-                help="Consultants actuellement disponibles"
+                stats.get("available_consultants", 0),
+                help="Consultants actuellement disponibles",
             )
 
         with col3:
             st.metric(
                 "🎯 Missions Actives",
-                stats.get('active_missions', 0),
-                help="Missions en cours d'exécution"
+                stats.get("active_missions", 0),
+                help="Missions en cours d'exécution",
             )
 
         with col4:
             st.metric(
                 "💼 En Mission",
-                stats.get('busy_consultants', 0),
-                help="Consultants actuellement en mission"
+                stats.get("busy_consultants", 0),
+                help="Consultants actuellement en mission",
             )
 
 
@@ -150,29 +159,29 @@ def show_consultants_list_optimized():
         search_term = st.text_input(
             "🔍 Rechercher un consultant",
             placeholder="Nom, prénom ou email...",
-            help="Recherche optimisée pour de gros volumes"
+            help="Recherche optimisée pour de gros volumes",
         )
 
     with col_filters:
         show_available_only = st.checkbox(
-            "✅ Disponibles uniquement",
-            help="Filtrer les consultants disponibles")
+            "✅ Disponibles uniquement", help="Filtrer les consultants disponibles"
+        )
 
     # Configuration de la pagination
-    if 'consultant_page' not in st.session_state:
+    if "consultant_page" not in st.session_state:
         st.session_state.consultant_page = 1
 
     # Récupération des données avec cache
-    per_page = get_optimal_page_size(get_dashboard_stats().get('total_consultants', 50))
+    per_page = get_optimal_page_size(get_dashboard_stats().get("total_consultants", 50))
     data = get_consultants_paginated(
         page=st.session_state.consultant_page,
         search_term=search_term,
-        per_page=per_page
+        per_page=per_page,
     )
 
-    consultants = data['consultants']
-    total = data['total']
-    pages = data['pages']
+    consultants = data["consultants"]
+    total = data["total"]
+    pages = data["pages"]
 
     # Affichage des informations de pagination
     if total > 0:
@@ -188,8 +197,8 @@ def show_consultants_list_optimized():
 
             with col_prev:
                 if st.button(
-                    "⬅️ Précédent", disabled=(
-                        st.session_state.consultant_page <= 1)):
+                    "⬅️ Précédent", disabled=(st.session_state.consultant_page <= 1)
+                ):
                     st.session_state.consultant_page -= 1
                     st.rerun()
 
@@ -198,8 +207,8 @@ def show_consultants_list_optimized():
 
             with col_next:
                 if st.button(
-                    "➡️ Suivant", disabled=(
-                        st.session_state.consultant_page >= pages)):
+                    "➡️ Suivant", disabled=(st.session_state.consultant_page >= pages)
+                ):
                     st.session_state.consultant_page += 1
                     st.rerun()
 
@@ -209,27 +218,29 @@ def show_consultants_list_optimized():
 
         # Sélection des colonnes à afficher
         columns_to_show = [
-            'id',
-            'prenom',
-            'nom',
-            'email',
-            'practice_name',
-            'disponibilite']
+            "id",
+            "prenom",
+            "nom",
+            "email",
+            "practice_name",
+            "disponibilite",
+        ]
         if all(col in df_display.columns for col in columns_to_show):
             df_filtered = df_display[columns_to_show].copy()
 
             # Renommage des colonnes pour l'affichage
             df_filtered.columns = [
-                'ID',
-                'Prénom',
-                'Nom',
-                'Email',
-                'Practice',
-                'Disponible']
+                "ID",
+                "Prénom",
+                "Nom",
+                "Email",
+                "Practice",
+                "Disponible",
+            ]
 
             # Application du filtre disponibilité
             if show_available_only:
-                df_filtered = df_filtered[df_filtered['Disponible']]
+                df_filtered = df_filtered[df_filtered["Disponible"]]
 
             # Configuration de l'affichage du dataframe
             st.dataframe(
@@ -240,8 +251,8 @@ def show_consultants_list_optimized():
                     "ID": st.column_config.NumberColumn("ID", width="small"),
                     "Disponible": st.column_config.CheckboxColumn("Disponible"),
                     "Email": st.column_config.TextColumn("Email", width="medium"),
-                    "Practice": st.column_config.TextColumn("Practice", width="medium")
-                }
+                    "Practice": st.column_config.TextColumn("Practice", width="medium"),
+                },
             )
 
             # Actions rapides sur la sélection
@@ -250,13 +261,14 @@ def show_consultants_list_optimized():
 
             with col_actions[0]:
                 if st.button("📊 Exporter cette page"):
-                    csv = df_filtered.to_csv(index=False).encode('utf-8')
+                    csv = df_filtered.to_csv(index=False).encode("utf-8")
                     st.download_button(
                         label="💾 Télécharger CSV",
                         data=csv,
                         file_name=f"consultants_page_{
                             st.session_state.consultant_page}.csv",
-                        mime="text/csv")
+                        mime="text/csv",
+                    )
 
             with col_actions[1]:
                 if st.button("🔄 Actualiser"):
@@ -286,7 +298,8 @@ def show_quick_add_consultant():
         with col2:
             telephone = st.text_input("Téléphone")
             salaire = st.number_input(
-                "Salaire (€)", min_value=0, value=45000, step=1000)
+                "Salaire (€)", min_value=0, value=45000, step=1000
+            )
             disponible = st.checkbox("Disponible", value=True)
 
         submitted = st.form_submit_button("✅ Ajouter le consultant")
@@ -294,13 +307,13 @@ def show_quick_add_consultant():
         if submitted:
             if prenom and nom and email:
                 data = {
-                    'prenom': prenom,
-                    'nom': nom,
-                    'email': email,
-                    'telephone': telephone,
-                    'salaire': salaire,
-                    'disponible': disponible,
-                    'practice_id': None  # À améliorer avec un sélecteur
+                    "prenom": prenom,
+                    "nom": nom,
+                    "email": email,
+                    "telephone": telephone,
+                    "salaire": salaire,
+                    "disponible": disponible,
+                    "practice_id": None,  # À améliorer avec un sélecteur
                 }
 
                 if ConsultantService.create_consultant(data):
@@ -335,11 +348,9 @@ def show():
     st.divider()
 
     # Organisation en onglets optimisés
-    tab1, tab2, tab3 = st.tabs([
-        "📋 Liste et recherche",
-        "➕ Ajout rapide",
-        "📊 Statistiques détaillées"
-    ])
+    tab1, tab2, tab3 = st.tabs(
+        ["📋 Liste et recherche", "➕ Ajout rapide", "📊 Statistiques détaillées"]
+    )
 
     with tab1:
         show_consultants_list_optimized()
@@ -368,8 +379,8 @@ def show_detailed_statistics():
         st.subheader("📈 Répartition par disponibilité")
 
         availability_data = {
-            'Disponibles': stats.get('available_consultants', 0),
-            'En mission': stats.get('busy_consultants', 0)
+            "Disponibles": stats.get("available_consultants", 0),
+            "En mission": stats.get("busy_consultants", 0),
         }
 
         if sum(availability_data.values()) > 0:
@@ -381,15 +392,10 @@ def show_detailed_statistics():
         st.subheader("🎯 Activité des missions")
 
         mission_data = {
-            'Missions actives': stats.get(
-                'active_missions',
-                0),
-            'Total missions': stats.get(
-                'total_missions',
-                0) -
-            stats.get(
-                'active_missions',
-                0)}
+            "Missions actives": stats.get("active_missions", 0),
+            "Total missions": stats.get("total_missions", 0)
+            - stats.get("active_missions", 0),
+        }
 
         if sum(mission_data.values()) > 0:
             st.bar_chart(mission_data)
@@ -402,17 +408,19 @@ def show_detailed_statistics():
     col_metrics = st.columns(3)
 
     with col_metrics[0]:
-        avg_missions = stats.get('total_missions', 0) / \
-            max(stats.get('total_consultants', 1), 1)
+        avg_missions = stats.get("total_missions", 0) / max(
+            stats.get("total_consultants", 1), 1
+        )
         st.metric("📊 Missions/Consultant", f"{avg_missions:.1f}")
 
     with col_metrics[1]:
-        utilization = (stats.get('busy_consultants', 0) /
-                       max(stats.get('total_consultants', 1), 1)) * 100
+        utilization = (
+            stats.get("busy_consultants", 0) / max(stats.get("total_consultants", 1), 1)
+        ) * 100
         st.metric("📈 Taux d'utilisation", f"{utilization:.1f}%")
 
     with col_metrics[2]:
-        if stats.get('total_consultants', 0) >= 1000:
+        if stats.get("total_consultants", 0) >= 1000:
             st.metric("🎯 Volume", "Gros volume", delta="Optimisé")
         else:
             st.metric("🎯 Volume", "Standard")

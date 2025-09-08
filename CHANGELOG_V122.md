@@ -9,7 +9,7 @@
 - **Compatibilité** : Maintien du champ taux_journalier pour rétrocompatibilité
 
 ### 📅 Calcul Automatique Disponibilité
-- **Logique intelligente** : 
+- **Logique intelligente** :
   - "ASAP" si aucune mission en cours
   - Date de fin de mission la plus tardive si missions actives
 - **Propriété calculée** : `date_disponibilite` mise à jour automatiquement
@@ -26,7 +26,7 @@
 # Disponibilité
 "disponible", "libre", "quand disponible", "asap", "immédiatement"
 
-# TJM Mission  
+# TJM Mission
 "tjm mission", "prix mission", "coût mission", "tarif mission"
 ```
 
@@ -51,7 +51,7 @@ UPDATE missions SET tjm = taux_journalier WHERE tjm IS NULL;
 class Mission:
     tjm = Column(Float)  # Nouveau champ
 
-# Consultant  
+# Consultant
 class Consultant:
     @property
     def date_disponibilite(self):
@@ -101,7 +101,7 @@ class Consultant:
 
 ---
 
-**Version** : 1.2.2  
-**Date** : 03/09/2025  
-**Commit** : 86de73e  
+**Version** : 1.2.2
+**Date** : 03/09/2025
+**Commit** : 86de73e
 **Tests** : ✅ Tous validés

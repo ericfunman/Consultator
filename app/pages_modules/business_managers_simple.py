@@ -29,10 +29,12 @@ def show():
         from app.database.models import BusinessManager
         from app.database.models import Consultant
         from app.database.models import ConsultantBusinessManager
+
         st.success("✅ Modèles importés avec succès")
 
         st.write("🔍 **Test 2: Import get_database_session...**")
         from app.database.database import get_database_session
+
         st.success("✅ get_database_session importé avec succès")
 
         st.write("🔍 **Test 3: Test de connexion...**")
@@ -46,7 +48,8 @@ def show():
             consultant_count = session.query(Consultant).count()
 
         st.success(
-            f"✅ Requêtes réussies: {bm_count} BMs, {consultant_count} consultants")
+            f"✅ Requêtes réussies: {bm_count} BMs, {consultant_count} consultants"
+        )
 
         # Interface simple
         st.subheader("📋 Business Managers")
@@ -75,4 +78,5 @@ def show():
         st.error("🚫 Erreur lors du chargement:")
         st.error(str(e))
         import traceback
+
         st.code(traceback.format_exc())

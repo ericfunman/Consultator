@@ -27,6 +27,7 @@ try:
 except ImportError as e:
     st.error(f" Erreur d'import: {e}")
 
+
 def show_document_upload_section(consultant_id=None):
     """Affiche la section d'upload de documents"""
 
@@ -60,10 +61,9 @@ def show_document_upload_section(consultant_id=None):
             st.metric(" Taille", size_display)
 
         # Boutons d'action
-        if st.button(
-            " Sauvegarder document", type="primary", key="save_document"
-        ):
+        if st.button(" Sauvegarder document", type="primary", key="save_document"):
             save_uploaded_document(uploaded_file)
+
 
 def save_uploaded_document(uploaded_file):
     """Sauvegarde le document uploadé"""
@@ -88,6 +88,7 @@ def save_uploaded_document(uploaded_file):
 
     except Exception as e:
         st.error(f" Erreur lors de la sauvegarde: {e}")
+
 
 def show():
     """Point d'entrée principal pour la page de gestion des documents"""

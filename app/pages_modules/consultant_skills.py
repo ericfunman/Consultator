@@ -53,10 +53,12 @@ def show_consultant_skills(consultant):
     try:
         # Récupérer les compétences du consultant
         with get_database_session() as session:
-            consultant_competences = session.query(ConsultantCompetence)\
-                .join(Competence)\
-                .filter(ConsultantCompetence.consultant_id == consultant.id)\
+            consultant_competences = (
+                session.query(ConsultantCompetence)
+                .join(Competence)
+                .filter(ConsultantCompetence.consultant_id == consultant.id)
                 .all()
+            )
 
         if not consultant_competences:
             st.info("ℹ️ Aucune compétence enregistrée pour ce consultant")
@@ -69,14 +71,16 @@ def show_consultant_skills(consultant):
             category = cc.competence.categorie or "Autre"
             if category not in skills_by_category:
                 skills_by_category[category] = []
-            skills_by_category[category].append({
-                'id': cc.id,
-                'nom': cc.competence.nom,
-                'niveau': cc.niveau,
-                'annees_experience': cc.annees_experience,
-                'certification': cc.certification,
-                'date_acquisition': cc.date_acquisition
-            })
+            skills_by_category[category].append(
+                {
+                    "id": cc.id,
+                    "nom": cc.competence.nom,
+                    "niveau": cc.niveau,
+                    "annees_experience": cc.annees_experience,
+                    "certification": cc.certification,
+                    "date_acquisition": cc.date_acquisition,
+                }
+            )
 
         # Afficher les compétences par catégorie
         for category, skills in skills_by_category.items():
@@ -85,15 +89,22 @@ def show_consultant_skills(consultant):
             # Créer un tableau pour cette catégorie
             skill_data = []
             for skill in skills:
-                skill_data.append({
-                    'Compétence': skill['nom'],
-                    'Niveau': get_niveau_label(skill['niveau']),
-                    'Expérience': f"{skill['annees_experience']} an(s)" if skill['annees_experience'] else "N/A",
-                    'Certification': "✅" if skill['certification'] else "❌",
-                    'Actions': f"edit_{skill['id']}"
-                })
+                skill_data.append(
+                    {
+                        "Compétence": skill["nom"],
+                        "Niveau": get_niveau_label(skill["niveau"]),
+                        "Expérience": (
+                            f"{skill['annees_experience']} an(s)"
+                            if skill["annees_experience"]
+                            else "N/A"
+                        ),
+                        "Certification": "✅" if skill["certification"] else "❌",
+                        "Actions": f"edit_{skill['id']}",
+                    }
+                )
 
             import pandas as pd
+
             df = pd.DataFrame(skill_data)
 
             # Afficher le tableau avec actions
@@ -104,23 +115,20 @@ def show_consultant_skills(consultant):
                     st.write(f"**{row['Compétence']}**")
 
                 with col2:
-                    st.write(row['Niveau'])
+                    st.write(row["Niveau"])
 
                 with col3:
-                    st.write(row['Expérience'])
+                    st.write(row["Expérience"])
 
                 with col4:
-                    st.write(row['Certification'])
+                    st.write(row["Certification"])
 
                 with col5:
-                    skill_id = row['Actions'].replace('edit_', '')
+                    skill_id = row["Actions"].replace("edit_", "")
                     if st.button("✏️", key=f"edit_skill_{skill_id}", help="Modifier"):
                         st.session_state.edit_skill = int(skill_id)
                         st.rerun()
-                    if st.button(
-                        "🗑️",
-                        key=f"delete_skill_{skill_id}",
-                            help="Supprimer"):
+                    if st.button("🗑️", key=f"delete_skill_{skill_id}", help="Supprimer"):
                         if delete_skill(int(skill_id)):
                             st.rerun()
 
@@ -141,7 +149,8 @@ def show_consultant_skills(consultant):
             if st.button(
                 "📊 Analyse compétences",
                 key=f"analyze_skills_{
-                    consultant.id}"):
+                    consultant.id}",
+            ):
                 show_skills_analysis(consultant_competences)
 
         with col3:
@@ -149,7 +158,10 @@ def show_consultant_skills(consultant):
                 show_skills_evolution(consultant.id)
 
         # Formulaire d'ajout (si activé)
-        if "add_skill" in st.session_state and st.session_state.add_skill == consultant.id:
+        if (
+            "add_skill" in st.session_state
+            and st.session_state.add_skill == consultant.id
+        ):
             show_add_skill_form(consultant.id)
 
         # Formulaire de modification (si activé)
@@ -164,13 +176,7 @@ def show_consultant_skills(consultant):
 def get_niveau_label(niveau: int) -> str:
     """Retourne le label du niveau de compétence"""
 
-    niveaux = {
-        1: "Débutant",
-        2: "Intermédiaire",
-        3: "Avancé",
-        4: "Expert",
-        5: "Maître"
-    }
+    niveaux = {1: "Débutant", 2: "Intermédiaire", 3: "Avancé", 4: "Expert", 5: "Maître"}
     return niveaux.get(niveau, f"Niveau {niveau}")
 
 
@@ -189,8 +195,9 @@ def show_skills_statistics(consultant_competences):
         st.metric("Total compétences", total_skills)
 
     with col2:
-        avg_level = sum(cc.niveau for cc in consultant_competences) / \
-            len(consultant_competences)
+        avg_level = sum(cc.niveau for cc in consultant_competences) / len(
+            consultant_competences
+        )
         st.metric("Niveau moyen", f"{avg_level:.1f}/5")
 
     with col3:
@@ -199,7 +206,8 @@ def show_skills_statistics(consultant_competences):
 
     with col4:
         avg_experience = sum(
-            cc.annees_experience or 0 for cc in consultant_competences) / len(consultant_competences)
+            cc.annees_experience or 0 for cc in consultant_competences
+        ) / len(consultant_competences)
         st.metric("Expérience moyenne", f"{avg_experience:.1f} ans")
 
 
@@ -211,19 +219,24 @@ def show_add_skill_form(consultant_id: int):
     try:
         # Récupérer les compétences disponibles
         with get_database_session() as session:
-            existing_competences = session.query(ConsultantCompetence)\
-                .filter(ConsultantCompetence.consultant_id == consultant_id)\
+            existing_competences = (
+                session.query(ConsultantCompetence)
+                .filter(ConsultantCompetence.consultant_id == consultant_id)
                 .all()
+            )
 
             existing_skill_ids = [cc.competence_id for cc in existing_competences]
 
-            available_competences = session.query(Competence)\
-                .filter(~Competence.id.in_(existing_skill_ids))\
+            available_competences = (
+                session.query(Competence)
+                .filter(~Competence.id.in_(existing_skill_ids))
                 .all()
+            )
 
         if not available_competences:
             st.warning(
-                "⚠️ Toutes les compétences existantes sont déjà associées à ce consultant")
+                "⚠️ Toutes les compétences existantes sont déjà associées à ce consultant"
+            )
             return
 
         with st.form(f"add_skill_form_{consultant_id}", clear_on_submit=True):
@@ -231,12 +244,14 @@ def show_add_skill_form(consultant_id: int):
             skill_options = {
                 c.id: f"{
                     c.nom} ({
-                    c.categorie})" for c in available_competences}
+                    c.categorie})"
+                for c in available_competences
+            }
             selected_skill = st.selectbox(
                 "Compétence *",
                 options=list(skill_options.keys()),
                 format_func=lambda x: skill_options[x],
-                help="Sélectionnez une compétence à ajouter"
+                help="Sélectionnez une compétence à ajouter",
             )
 
             col1, col2 = st.columns(2)
@@ -247,12 +262,12 @@ def show_add_skill_form(consultant_id: int):
                     min_value=1,
                     max_value=5,
                     value=3,
-                    help="Niveau de maîtrise (1=Débutant, 5=Expert)"
+                    help="Niveau de maîtrise (1=Débutant, 5=Expert)",
                 )
 
                 certification = st.checkbox(
                     "Certification",
-                    help="Le consultant possède-t-il une certification ?"
+                    help="Le consultant possède-t-il une certification ?",
                 )
 
             with col2:
@@ -261,7 +276,7 @@ def show_add_skill_form(consultant_id: int):
                     min_value=0,
                     max_value=50,
                     value=0,
-                    help="Nombre d'années d'expérience dans cette compétence"
+                    help="Nombre d'années d'expérience dans cette compétence",
                 )
 
             # Boutons
@@ -277,12 +292,15 @@ def show_add_skill_form(consultant_id: int):
                 pass
 
             if submitted:
-                success = add_skill_to_consultant(consultant_id, {
-                    'competence_id': selected_skill,
-                    'niveau': niveau,
-                    'annees_experience': annees_experience,
-                    'certification': certification
-                })
+                success = add_skill_to_consultant(
+                    consultant_id,
+                    {
+                        "competence_id": selected_skill,
+                        "niveau": niveau,
+                        "annees_experience": annees_experience,
+                        "certification": certification,
+                    },
+                )
 
                 if success:
                     st.success("✅ Compétence ajoutée avec succès !")
@@ -307,12 +325,14 @@ def add_skill_to_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
     try:
         with get_database_session() as session:
             # Vérifier que la compétence n'existe pas déjà
-            existing = session.query(ConsultantCompetence)\
+            existing = (
+                session.query(ConsultantCompetence)
                 .filter(
                     ConsultantCompetence.consultant_id == consultant_id,
-                    ConsultantCompetence.competence_id == data['competence_id']
-            )\
+                    ConsultantCompetence.competence_id == data["competence_id"],
+                )
                 .first()
+            )
 
             if existing:
                 st.error("❌ Cette compétence est déjà associée au consultant")
@@ -320,13 +340,14 @@ def add_skill_to_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
 
             # Créer la nouvelle association
             from datetime import datetime
+
             consultant_competence = ConsultantCompetence(
                 consultant_id=consultant_id,
-                competence_id=data['competence_id'],
-                niveau=data['niveau'],
-                annees_experience=data['annees_experience'],
-                certification=data['certification'],
-                date_acquisition=datetime.now()
+                competence_id=data["competence_id"],
+                niveau=data["niveau"],
+                annees_experience=data["annees_experience"],
+                certification=data["certification"],
+                date_acquisition=datetime.now(),
             )
 
             session.add(consultant_competence)
@@ -346,16 +367,20 @@ def show_edit_skill_form(consultant_competence_id: int):
 
     try:
         with get_database_session() as session:
-            cc = session.query(ConsultantCompetence)\
-                .join(Competence)\
-                .filter(ConsultantCompetence.id == consultant_competence_id)\
+            cc = (
+                session.query(ConsultantCompetence)
+                .join(Competence)
+                .filter(ConsultantCompetence.id == consultant_competence_id)
                 .first()
+            )
 
             if not cc:
                 st.error("❌ Compétence introuvable")
                 return
 
-        with st.form(f"edit_skill_form_{consultant_competence_id}", clear_on_submit=False):
+        with st.form(
+            f"edit_skill_form_{consultant_competence_id}", clear_on_submit=False
+        ):
             st.write(f"**Compétence :** {cc.competence.nom}")
 
             col1, col2 = st.columns(2)
@@ -366,13 +391,13 @@ def show_edit_skill_form(consultant_competence_id: int):
                     min_value=1,
                     max_value=5,
                     value=cc.niveau,
-                    help="Niveau de maîtrise (1=Débutant, 5=Expert)"
+                    help="Niveau de maîtrise (1=Débutant, 5=Expert)",
                 )
 
                 certification = st.checkbox(
                     "Certification",
                     value=cc.certification,
-                    help="Le consultant possède-t-il une certification ?"
+                    help="Le consultant possède-t-il une certification ?",
                 )
 
             with col2:
@@ -381,7 +406,7 @@ def show_edit_skill_form(consultant_competence_id: int):
                     min_value=0,
                     max_value=50,
                     value=cc.annees_experience or 0,
-                    help="Nombre d'années d'expérience dans cette compétence"
+                    help="Nombre d'années d'expérience dans cette compétence",
                 )
 
             # Boutons
@@ -397,11 +422,14 @@ def show_edit_skill_form(consultant_competence_id: int):
                 pass
 
             if submitted:
-                success = update_consultant_skill(consultant_competence_id, {
-                    'niveau': niveau,
-                    'annees_experience': annees_experience,
-                    'certification': certification
-                })
+                success = update_consultant_skill(
+                    consultant_competence_id,
+                    {
+                        "niveau": niveau,
+                        "annees_experience": annees_experience,
+                        "certification": certification,
+                    },
+                )
 
                 if success:
                     st.success("✅ Compétence mise à jour avec succès !")
@@ -420,24 +448,27 @@ def show_edit_skill_form(consultant_competence_id: int):
         st.error(f"❌ Erreur lors du chargement du formulaire de modification: {e}")
 
 
-def update_consultant_skill(consultant_competence_id: int,
-                            data: Dict[str, Any]) -> bool:
+def update_consultant_skill(
+    consultant_competence_id: int, data: Dict[str, Any]
+) -> bool:
     """Met à jour une compétence du consultant"""
 
     try:
         with get_database_session() as session:
-            cc = session.query(ConsultantCompetence)\
-                .filter(ConsultantCompetence.id == consultant_competence_id)\
+            cc = (
+                session.query(ConsultantCompetence)
+                .filter(ConsultantCompetence.id == consultant_competence_id)
                 .first()
+            )
 
             if not cc:
                 st.error("❌ Compétence introuvable")
                 return False
 
             # Mettre à jour les données
-            cc.niveau = data['niveau']
-            cc.annees_experience = data['annees_experience']
-            cc.certification = data['certification']
+            cc.niveau = data["niveau"]
+            cc.annees_experience = data["annees_experience"]
+            cc.certification = data["certification"]
 
             session.commit()
 
@@ -453,9 +484,11 @@ def delete_skill(consultant_competence_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            cc = session.query(ConsultantCompetence)\
-                .filter(ConsultantCompetence.id == consultant_competence_id)\
+            cc = (
+                session.query(ConsultantCompetence)
+                .filter(ConsultantCompetence.id == consultant_competence_id)
                 .first()
+            )
 
             if not cc:
                 st.error("❌ Compétence introuvable")
@@ -516,11 +549,11 @@ def show_skills_analysis(consultant_competences):
 
     if strong_skills:
         st.success(
-            f"✅ **Points forts :** {len(strong_skills)} compétence(s) de haut niveau")
+            f"✅ **Points forts :** {len(strong_skills)} compétence(s) de haut niveau"
+        )
 
     if weak_skills:
-        st.warning(
-            f"⚠️ **À développer :** {len(weak_skills)} compétence(s) à renforcer")
+        st.warning(f"⚠️ **À développer :** {len(weak_skills)} compétence(s) à renforcer")
 
     # Certifications
     certified_count = sum(1 for cc in consultant_competences if cc.certification)
@@ -536,11 +569,13 @@ def show_skills_evolution(consultant_id: int):
     try:
         with get_database_session() as session:
             # Récupérer l'historique des compétences (basé sur les dates d'acquisition)
-            consultant_competences = session.query(ConsultantCompetence)\
-                .join(Competence)\
-                .filter(ConsultantCompetence.consultant_id == consultant_id)\
-                .order_by(ConsultantCompetence.date_acquisition)\
+            consultant_competences = (
+                session.query(ConsultantCompetence)
+                .join(Competence)
+                .filter(ConsultantCompetence.consultant_id == consultant_id)
+                .order_by(ConsultantCompetence.date_acquisition)
                 .all()
+            )
 
         if not consultant_competences:
             st.info("ℹ️ Aucune donnée d'évolution disponible")

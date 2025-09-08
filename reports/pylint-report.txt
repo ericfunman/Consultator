@@ -2017,4 +2017,3 @@ app\utils\technologies_referentiel.py:198:8: W0612: Unused variable 'category' (
 
 ------------------------------------------------------------------
 Your code has been rated at 7.99/10 (previous run: 7.99/10, +0.00)
-

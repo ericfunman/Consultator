@@ -30,8 +30,8 @@ try:
     from database.models import Consultant
     from database.models import Document
     from services.consultant_service import ConsultantService
-    from services.document_service import DocumentService
     from services.document_analyzer import DocumentAnalyzer
+    from services.document_service import DocumentService
 
     imports_ok = True
 except ImportError as e:
@@ -55,10 +55,12 @@ def show_consultant_documents(consultant):
     try:
         # Récupérer les documents du consultant
         with get_database_session() as session:
-            documents = session.query(Document)\
-                .filter(Document.consultant_id == consultant.id)\
-                .order_by(Document.date_upload.desc())\
+            documents = (
+                session.query(Document)
+                .filter(Document.consultant_id == consultant.id)
+                .order_by(Document.date_upload.desc())
                 .all()
+            )
 
         # Statistiques des documents
         show_documents_statistics(documents)
@@ -92,7 +94,10 @@ def show_consultant_documents(consultant):
                 show_documents_report(documents)
 
         # Formulaire d'upload (si activé)
-        if "upload_document" in st.session_state and st.session_state.upload_document == consultant.id:
+        if (
+            "upload_document" in st.session_state
+            and st.session_state.upload_document == consultant.id
+        ):
             show_upload_document_form(consultant.id)
 
     except Exception as e:
@@ -132,6 +137,7 @@ def show_document_details(document, consultant):
         st.markdown("**🔍 Analyse CV**")
         try:
             import json
+
             analysis = json.loads(document.analyse_cv)
 
             # Afficher un résumé de l'analyse
@@ -145,7 +151,8 @@ def show_document_details(document, consultant):
             if st.button(
                 "👁️ Voir analyse complète",
                 key=f"view_analysis_{
-                    document.id}"):
+                    document.id}",
+            ):
                 show_full_cv_analysis(analysis, document.nom_fichier, consultant)
 
         except Exception as e:
@@ -174,7 +181,10 @@ def show_document_details(document, consultant):
                 st.rerun()
 
     # Formulaire de renommage (si activé)
-    if "rename_document" in st.session_state and st.session_state.rename_document == document.id:
+    if (
+        "rename_document" in st.session_state
+        and st.session_state.rename_document == document.id
+    ):
         show_rename_document_form(document.id)
 
 
@@ -199,11 +209,9 @@ def show_documents_statistics(documents):
             doc_type = doc.type_document or "Autre"
             types[doc_type] = types.get(doc_type, 0) + 1
 
-        most_common_type = max(
-            types.items(),
-            key=lambda x: x[1]) if types else (
-            "N/A",
-            0)
+        most_common_type = (
+            max(types.items(), key=lambda x: x[1]) if types else ("N/A", 0)
+        )
         st.metric("Type principal", most_common_type[0])
 
     with col3:
@@ -234,27 +242,25 @@ def show_upload_document_form(consultant_id: int):
             "Certification",
             "Contrat",
             "Évaluation",
-            "Autre"
+            "Autre",
         ]
 
         type_document = st.selectbox(
             "Type de document *",
             options=document_types,
-            help="Sélectionnez le type de document"
+            help="Sélectionnez le type de document",
         )
 
         description = st.text_area(
-            "Description",
-            height=80,
-            help="Description optionnelle du document"
+            "Description", height=80, help="Description optionnelle du document"
         )
 
         st.markdown("#### 📎 Fichier à uploader")
 
         uploaded_file = st.file_uploader(
             "Sélectionnez un fichier",
-            type=['pdf', 'doc', 'docx', 'txt', 'rtf'],
-            help="Formats acceptés: PDF, DOC, DOCX, TXT, RTF"
+            type=["pdf", "doc", "docx", "txt", "rtf"],
+            help="Formats acceptés: PDF, DOC, DOCX, TXT, RTF",
         )
 
         # Boutons
@@ -273,11 +279,14 @@ def show_upload_document_form(consultant_id: int):
             if not uploaded_file:
                 st.error("❌ Veuillez sélectionner un fichier")
             else:
-                success = upload_document(consultant_id, {
-                    'file': uploaded_file,
-                    'type_document': type_document,
-                    'description': description
-                })
+                success = upload_document(
+                    consultant_id,
+                    {
+                        "file": uploaded_file,
+                        "type_document": type_document,
+                        "description": description,
+                    },
+                )
 
                 if success:
                     st.success("✅ Document uploadé avec succès !")
@@ -297,7 +306,7 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
     """Upload un document pour le consultant"""
 
     try:
-        uploaded_file = data['file']
+        uploaded_file = data["file"]
 
         # Créer le répertoire d'upload s'il n'existe pas
         upload_dir = os.path.join("data", "uploads")
@@ -317,16 +326,15 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
 
         # Analyser le document si c'est un CV
         analysis_result = None
-        if data['type_document'] == "CV":
+        if data["type_document"] == "CV":
             try:
                 # Extraire le texte du fichier
                 extracted_text = DocumentAnalyzer.extract_text_from_file(file_path)
-                
+
                 # Analyser le contenu du CV
                 if extracted_text:
                     analysis_result = DocumentAnalyzer.analyze_cv_content(
-                        extracted_text, 
-                        f"{consultant_id}"
+                        extracted_text, f"{consultant_id}"
                     )
             except Exception as e:
                 st.warning(f"⚠️ Analyse CV non disponible: {e}")
@@ -337,13 +345,15 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
                 consultant_id=consultant_id,
                 nom_fichier=original_name,
                 chemin_fichier=file_path,
-                type_document=data['type_document'],
-                taille_fichier=len(
-                    uploaded_file.getbuffer()),
+                type_document=data["type_document"],
+                taille_fichier=len(uploaded_file.getbuffer()),
                 mimetype=uploaded_file.type,
-                description=data['description'].strip() if data['description'] else None,
+                description=(
+                    data["description"].strip() if data["description"] else None
+                ),
                 date_upload=datetime.now(),
-                analyse_cv=str(analysis_result) if analysis_result else None)
+                analyse_cv=str(analysis_result) if analysis_result else None,
+            )
 
             session.add(document)
             session.commit()
@@ -371,7 +381,7 @@ def download_document(document):
             data=file_data,
             file_name=document.nom_fichier,
             mime=document.mimetype,
-            key=f"download_btn_{document.id}"
+            key=f"download_btn_{document.id}",
         )
 
     except Exception as e:
@@ -383,8 +393,9 @@ def reanalyze_document(document_id: int, consultant) -> bool:
 
     try:
         with get_database_session() as session:
-            document = session.query(Document).filter(
-                Document.id == document_id).first()
+            document = (
+                session.query(Document).filter(Document.id == document_id).first()
+            )
 
             if not document:
                 st.error("❌ Document introuvable")
@@ -395,11 +406,12 @@ def reanalyze_document(document_id: int, consultant) -> bool:
                 return False
 
             # Réanalyser le document
-            extracted_text = DocumentAnalyzer.extract_text_from_file(document.chemin_fichier)
+            extracted_text = DocumentAnalyzer.extract_text_from_file(
+                document.chemin_fichier
+            )
             if extracted_text:
                 analysis_result = DocumentAnalyzer.analyze_cv_content(
-                    extracted_text, 
-                    f"{consultant.prenom} {consultant.nom}"
+                    extracted_text, f"{consultant.prenom} {consultant.nom}"
                 )
             else:
                 analysis_result = None
@@ -423,8 +435,9 @@ def show_rename_document_form(document_id: int):
 
     try:
         with get_database_session() as session:
-            document = session.query(Document).filter(
-                Document.id == document_id).first()
+            document = (
+                session.query(Document).filter(Document.id == document_id).first()
+            )
 
             if not document:
                 st.error("❌ Document introuvable")
@@ -434,14 +447,14 @@ def show_rename_document_form(document_id: int):
             new_name = st.text_input(
                 "Nouveau nom du fichier",
                 value=document.nom_fichier,
-                help="Entrez le nouveau nom du fichier (sans extension)"
+                help="Entrez le nouveau nom du fichier (sans extension)",
             )
 
             new_description = st.text_area(
                 "Nouvelle description",
                 value=document.description or "",
                 height=80,
-                help="Description optionnelle du document"
+                help="Description optionnelle du document",
             )
 
             # Boutons
@@ -460,10 +473,15 @@ def show_rename_document_form(document_id: int):
                 if not new_name or not new_name.strip():
                     st.error("❌ Le nom du fichier est obligatoire")
                 else:
-                    success = rename_document(document_id, {
-                        'new_name': new_name.strip(),
-                        'new_description': new_description.strip() if new_description else None
-                    })
+                    success = rename_document(
+                        document_id,
+                        {
+                            "new_name": new_name.strip(),
+                            "new_description": (
+                                new_description.strip() if new_description else None
+                            ),
+                        },
+                    )
 
                     if success:
                         st.success("✅ Document renommé avec succès !")
@@ -487,16 +505,17 @@ def rename_document(document_id: int, data: Dict[str, Any]) -> bool:
 
     try:
         with get_database_session() as session:
-            document = session.query(Document).filter(
-                Document.id == document_id).first()
+            document = (
+                session.query(Document).filter(Document.id == document_id).first()
+            )
 
             if not document:
                 st.error("❌ Document introuvable")
                 return False
 
             # Mettre à jour les informations
-            document.nom_fichier = data['new_name']
-            document.description = data['new_description']
+            document.nom_fichier = data["new_name"]
+            document.description = data["new_description"]
 
             session.commit()
 
@@ -512,8 +531,9 @@ def delete_document(document_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            document = session.query(Document).filter(
-                Document.id == document_id).first()
+            document = (
+                session.query(Document).filter(Document.id == document_id).first()
+            )
 
             if not document:
                 st.error("❌ Document introuvable")
@@ -546,13 +566,15 @@ def analyze_consultant_cv(consultant):
     try:
         with get_database_session() as session:
             # Chercher le CV le plus récent
-            cv_document = session.query(Document)\
+            cv_document = (
+                session.query(Document)
                 .filter(
                     Document.consultant_id == consultant.id,
-                    Document.type_document == "CV"
-            )\
-                .order_by(Document.date_upload.desc())\
+                    Document.type_document == "CV",
+                )
+                .order_by(Document.date_upload.desc())
                 .first()
+            )
 
             if not cv_document:
                 st.warning("⚠️ Aucun CV trouvé pour ce consultant")
@@ -563,13 +585,16 @@ def analyze_consultant_cv(consultant):
 
                 if reanalyze_document(cv_document.id, consultant):
                     # Recharger le document
-                    cv_document = session.query(Document)\
-                        .filter(Document.id == cv_document.id)\
+                    cv_document = (
+                        session.query(Document)
+                        .filter(Document.id == cv_document.id)
                         .first()
+                    )
 
             if cv_document.analyse_cv:
                 try:
                     import json
+
                     analysis = json.loads(cv_document.analyse_cv)
                     show_full_cv_analysis(analysis, cv_document.nom_fichier, consultant)
                 except Exception as e:
@@ -600,7 +625,7 @@ def show_full_cv_analysis(analysis, file_name, consultant):
                 with st.expander(f"Mission {i}: {mission.get('titre', 'Sans titre')}"):
                     st.write(f"**Client :** {mission.get('client', 'N/A')}")
                     st.write(f"**Période :** {mission.get('periode', 'N/A')}")
-                    if mission.get('description'):
+                    if mission.get("description"):
                         st.write(f"**Description :** {mission['description']}")
 
         # Compétences détectées
@@ -613,9 +638,9 @@ def show_full_cv_analysis(analysis, file_name, consultant):
         if "contact" in analysis and analysis["contact"]:
             st.markdown("#### 📞 Informations de contact")
             contact = analysis["contact"]
-            if contact.get('email'):
+            if contact.get("email"):
                 st.write(f"**Email :** {contact['email']}")
-            if contact.get('telephone'):
+            if contact.get("telephone"):
                 st.write(f"**Téléphone :** {contact['telephone']}")
 
         # Actions sur l'analyse
@@ -650,7 +675,7 @@ def generate_cv_report(analysis, consultant):
 ## Missions ({len(analysis.get('missions', []))} détectées)
 """
 
-        for i, mission in enumerate(analysis.get('missions', []), 1):
+        for i, mission in enumerate(analysis.get("missions", []), 1):
             report += f"""
 ### Mission {i}
 - **Titre :** {mission.get('titre', 'N/A')}
@@ -662,7 +687,7 @@ def generate_cv_report(analysis, consultant):
         report += f"""
 ## Compétences ({len(analysis.get('competences', []))} détectées)
 """
-        for competence in analysis.get('competences', []):
+        for competence in analysis.get("competences", []):
             report += f"- {competence}\n"
 
         # Télécharger le rapport
@@ -674,7 +699,8 @@ def generate_cv_report(analysis, consultant):
                 consultant.nom}_{
                 datetime.now().strftime('%Y%m%d')}.md",
             mime="text/markdown",
-            key="download_cv_report")
+            key="download_cv_report",
+        )
 
         st.success("✅ Rapport généré avec succès !")
 
@@ -719,10 +745,13 @@ def show_documents_report(documents):
         # Documents par mois
         current_month = datetime.now().month
         current_year = datetime.now().year
-        recent_docs = sum(1 for doc in documents
-                          if doc.date_upload and
-                          doc.date_upload.month == current_month and
-                          doc.date_upload.year == current_year)
+        recent_docs = sum(
+            1
+            for doc in documents
+            if doc.date_upload
+            and doc.date_upload.month == current_month
+            and doc.date_upload.year == current_year
+        )
         st.write(f"**Documents ce mois :** {recent_docs}")
 
     # Liste détaillée
@@ -730,14 +759,19 @@ def show_documents_report(documents):
 
     doc_data = []
     for doc in documents:
-        doc_data.append({
-            'Nom': doc.nom_fichier,
-            'Type': doc.type_document or "N/A",
-            'Taille (KB)': round((doc.taille_fichier or 0) / 1024, 1),
-            'Date upload': doc.date_upload.strftime('%d/%m/%Y') if doc.date_upload else "N/A",
-            'Analysé': "✅" if doc.analyse_cv else "❌"
-        })
+        doc_data.append(
+            {
+                "Nom": doc.nom_fichier,
+                "Type": doc.type_document or "N/A",
+                "Taille (KB)": round((doc.taille_fichier or 0) / 1024, 1),
+                "Date upload": (
+                    doc.date_upload.strftime("%d/%m/%Y") if doc.date_upload else "N/A"
+                ),
+                "Analysé": "✅" if doc.analyse_cv else "❌",
+            }
+        )
 
     import pandas as pd
+
     df = pd.DataFrame(doc_data)
     st.dataframe(df, use_container_width=True, hide_index=True)

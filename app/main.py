@@ -14,11 +14,11 @@ st.set_page_config(
     page_title="Consultator",
     page_icon="🏢",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # Cache des modules pour éviter les reimports
-if 'modules_cache' not in st.session_state:
+if "modules_cache" not in st.session_state:
     st.session_state.modules_cache = {}
 
 
@@ -28,17 +28,17 @@ def load_module_safe(module_name):
         return st.session_state.modules_cache[module_name]
 
     try:
-        if module_name == 'home':
+        if module_name == "home":
             import pages_modules.home as module
-        elif module_name == 'consultants':
+        elif module_name == "consultants":
             import pages_modules.consultants as module
-        elif module_name == 'practices':
+        elif module_name == "practices":
             import pages_modules.practices as module
-        elif module_name == 'technologies':
+        elif module_name == "technologies":
             import pages_modules.technologies as module
-        elif module_name == 'business_managers':
+        elif module_name == "business_managers":
             import pages_modules.business_managers as module
-        elif module_name == 'chatbot':
+        elif module_name == "chatbot":
             import pages_modules.chatbot as module
         else:
             return None
@@ -94,7 +94,7 @@ def show_navigation():
         "🤵‍♂ Business Managers": "business_managers",
         "🏢 Practices": "practices",
         "🔧 Technologies": "technologies",
-        "🤖 Assistant IA": "chatbot"
+        "🤖 Assistant IA": "chatbot",
     }
 
     return page_mapping.get(selected, "home")
@@ -114,7 +114,7 @@ def main():
         # Chargement et affichage de la page
         module = load_module_safe(current_page)
 
-        if module and hasattr(module, 'show'):
+        if module and hasattr(module, "show"):
             try:
                 module.show()
             except Exception as e:
@@ -122,6 +122,7 @@ def main():
                 st.info("🔄 Essayez de recharger la page")
                 # Afficher les détails de l'erreur
                 import traceback
+
                 with st.expander("🔍 Détails de l'erreur"):
                     st.code(traceback.format_exc())
         else:

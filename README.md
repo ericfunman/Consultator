@@ -8,7 +8,7 @@ Une application Streamlit moderne pour gérer efficacement vos équipes de consu
 
 ### Phase 1 - CRUD de base ✅
 - **Gestion des consultants** : Ajout, modification, suppression des profils
-- **Gestion des compétences** : Association compétences techniques et fonctionnelles  
+- **Gestion des compétences** : Association compétences techniques et fonctionnelles
 - **Gestion des missions** : Suivi des missions et revenus
 - **Import de CV** : Parsing automatique des CVs (PDF/Word)
 - **Tableaux de bord** : Métriques et visualisations
@@ -18,7 +18,7 @@ Une application Streamlit moderne pour gérer efficacement vos équipes de consu
 - **Rapports automatiques** : Export Excel/PDF
 - **Métriques business** : KPIs et indicateurs de performance
 
-### Phase 3 - IA (À venir)  
+### Phase 3 - IA (À venir)
 - **Chatbot intégré** : Recherche intelligente par compétences
 - **Analyses prédictives** : Recommandations de staffing
 - **Matching automatique** : Consultant → Mission optimal
@@ -53,7 +53,7 @@ Consultator/
 ├── 📁 app/                     # Application principale
 │   ├── main.py                 # Point d'entrée Streamlit
 │   ├── 📁 pages/               # Pages de l'application
-│   │   ├── home.py            # Dashboard principal  
+│   │   ├── home.py            # Dashboard principal
 │   │   ├── consultants.py     # Gestion consultants
 │   │   ├── skills.py          # Gestion compétences
 │   │   └── missions.py        # Gestion missions
@@ -96,7 +96,7 @@ Consultator/
 - **Cloud** : AWS, Azure, GCP, Docker, Kubernetes...
 - **Mobile** : React Native, Flutter, iOS, Android...
 
-### Fonctionnelles par secteur  
+### Fonctionnelles par secteur
 - **Finance** : Banking, Trading, Risk Management...
 - **Assurance** : Actuariat, Solvency II, Souscription...
 - **Santé** : FDA, Clinical Trials, HIPAA...
@@ -113,7 +113,7 @@ Consultator/
 ### Librairies principales
 - `streamlit` : Interface web moderne
 - `pandas` : Manipulation de données
-- `sqlalchemy` : ORM base de données  
+- `sqlalchemy` : ORM base de données
 - `plotly` : Visualisations interactives
 - `PyPDF2` / `python-docx` : Parsing CVs
 
@@ -124,7 +124,7 @@ Consultator/
 - Métriques de performance et revenus
 - Planification des missions
 
-### 👥 Manager équipe  
+### 👥 Manager équipe
 - Recherche par compétences
 - Disponibilité consultants
 - Suivi missions en cours
@@ -163,7 +163,7 @@ Le projet est en développement actif. Les contributions sont les bienvenues !
 # Installation mode développement
 pip install -r requirements.txt
 
-# Lancement avec hot-reload  
+# Lancement avec hot-reload
 streamlit run app/main.py
 
 # Tests (à venir)

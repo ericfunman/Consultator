@@ -48,7 +48,7 @@ Permettre aux utilisateurs de rechercher rapidement des consultants et des Busin
 col1, col2 = st.columns([3, 1])
 with col1:
     search_term = st.text_input(
-        "🔍 Rechercher un consultant", 
+        "🔍 Rechercher un consultant",
         placeholder="Tapez un prénom, nom ou email...",
         help="Recherche dans les prénoms, noms et emails des consultants"
     )
@@ -71,8 +71,8 @@ with col2:
 ### 🔍 Requêtes SQL Optimisées
 ```sql
 -- Recherche avec ILIKE pour insensibilité à la casse
-WHERE (nom ILIKE '%terme%') 
-   OR (prenom ILIKE '%terme%') 
+WHERE (nom ILIKE '%terme%')
+   OR (prenom ILIKE '%terme%')
    OR (email ILIKE '%terme%')
 ```
 

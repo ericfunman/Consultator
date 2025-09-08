@@ -32,17 +32,24 @@ class PracticeServiceOptimized:
         """Récupère toutes les practices actives avec cache"""
         session = get_database_session()
         try:
-            practices = session.query(Practice).filter(
-                Practice.actif).order_by(Practice.nom).all()
+            practices = (
+                session.query(Practice)
+                .filter(Practice.actif)
+                .order_by(Practice.nom)
+                .all()
+            )
 
             # Convertir en dict pour le cache
-            return [{
-                'id': p.id,
-                'nom': p.nom,
-                'description': p.description,
-                'responsable': p.responsable,
-                'actif': p.actif
-            } for p in practices]
+            return [
+                {
+                    "id": p.id,
+                    "nom": p.nom,
+                    "description": p.description,
+                    "responsable": p.responsable,
+                    "actif": p.actif,
+                }
+                for p in practices
+            ]
         except Exception as e:
             st.error(f"Erreur lors de la récupération des practices: {e}")
             return []
@@ -56,7 +63,8 @@ class PracticeServiceOptimized:
         session = get_database_session()
         try:
             # Requête SQL optimisée avec GROUP BY au lieu de N requêtes
-            query = text("""
+            query = text(
+                """
                 SELECT
                     COALESCE(p.nom, 'Sans Practice') as practice_nom,
                     COALESCE(p.responsable, 'Non défini') as responsable,
@@ -67,14 +75,15 @@ class PracticeServiceOptimized:
                 WHERE p.actif = 1 OR p.actif IS NULL
                 GROUP BY p.id, p.nom, p.responsable
                 ORDER BY practice_nom
-            """)
+            """
+            )
 
             result = session.execute(query).fetchall()
 
             stats = {
                 "total_practices": 0,
                 "total_consultants": 0,
-                "practices_detail": []
+                "practices_detail": [],
             }
 
             for row in result:
@@ -82,12 +91,12 @@ class PracticeServiceOptimized:
                     "nom": row.practice_nom,
                     "total_consultants": row.total_consultants,
                     "consultants_actifs": row.consultants_actifs,
-                    "responsable": row.responsable
+                    "responsable": row.responsable,
                 }
                 stats["practices_detail"].append(practice_detail)
                 stats["total_consultants"] += row.total_consultants
 
-                if row.practice_nom != 'Sans Practice':
+                if row.practice_nom != "Sans Practice":
                     stats["total_practices"] += 1
 
             return stats
@@ -96,7 +105,8 @@ class PracticeServiceOptimized:
             return {
                 "total_practices": 0,
                 "total_consultants": 0,
-                "practices_detail": []}
+                "practices_detail": [],
+            }
         finally:
             session.close()
 
@@ -107,7 +117,8 @@ class PracticeServiceOptimized:
         session = get_database_session()
         try:
             # Requête unique optimisée avec sous-requêtes pour les comptes
-            query = text("""
+            query = text(
+                """
                 SELECT
                     c.id,
                     c.nom,
@@ -133,7 +144,8 @@ class PracticeServiceOptimized:
                 ) comp_count ON c.id = comp_count.consultant_id
                 WHERE p.actif = 1 OR p.actif IS NULL
                 ORDER BY practice_nom, c.nom, c.prenom
-            """)
+            """
+            )
 
             result = session.execute(query).fetchall()
 
@@ -150,7 +162,7 @@ class PracticeServiceOptimized:
                     "salaire_actuel": row.salaire_actuel,
                     "disponibilite": bool(row.disponibilite),
                     "nb_missions": row.nb_missions,
-                    "nb_competences": row.nb_competences
+                    "nb_competences": row.nb_competences,
                 }
 
                 if practice_nom not in consultants_by_practice:
@@ -167,7 +179,8 @@ class PracticeServiceOptimized:
 
     @staticmethod
     def get_consultants_by_practice_paginated(
-            practice_name: str = None, page: int = 1, per_page: int = 50) -> Tuple[List[Dict], int]:
+        practice_name: str = None, page: int = 1, per_page: int = 50
+    ) -> Tuple[List[Dict], int]:
         """Récupère les consultants avec pagination pour éviter de charger tous d'un coup"""
         session = get_database_session()
         try:
@@ -210,14 +223,17 @@ class PracticeServiceOptimized:
 
             # Pagination
             query = text(
-                base_query +
-                f" ORDER BY practice_nom, c.nom, c.prenom LIMIT {per_page} OFFSET {offset}")
+                base_query
+                + f" ORDER BY practice_nom, c.nom, c.prenom LIMIT {per_page} OFFSET {offset}"
+            )
 
             # Compter le total
             count_query = text(
                 base_query.replace(
                     "SELECT c.id,c.nom,c.prenom,c.email,c.telephone,c.salaire_actuel,c.disponibilite,COALESCE(p.nom, 'Sans Practice') as practice_nom,COALESCE(mission_count.count, 0) as nb_missions,COALESCE(comp_count.count, 0) as nb_competences",
-                    "SELECT COUNT(DISTINCT c.id)"))
+                    "SELECT COUNT(DISTINCT c.id)",
+                )
+            )
 
             result = session.execute(query).fetchall()
             total = session.execute(count_query).scalar()
@@ -233,7 +249,7 @@ class PracticeServiceOptimized:
                     "disponibilite": bool(row.disponibilite),
                     "nb_missions": row.nb_missions,
                     "nb_competences": row.nb_competences,
-                    "practice_nom": row.practice_nom
+                    "practice_nom": row.practice_nom,
                 }
                 consultants.append(consultant_data)
 
@@ -251,7 +267,8 @@ class PracticeServiceOptimized:
         session = get_database_session()
         try:
             # Requête optimisée pour les stats détaillées
-            query = text("""
+            query = text(
+                """
                 SELECT
                     COUNT(*) as total_consultants,
                     SUM(CASE WHEN c.disponibilite = 1 THEN 1 ELSE 0 END) as disponibles,
@@ -271,7 +288,8 @@ class PracticeServiceOptimized:
                     GROUP BY consultant_id
                 ) comp_count ON c.id = comp_count.consultant_id
                 WHERE COALESCE(p.nom, 'Sans Practice') = :practice_name
-            """)
+            """
+            )
 
             result = session.execute(query, {"practice_name": practice_name}).fetchone()
 
@@ -280,7 +298,7 @@ class PracticeServiceOptimized:
                 "disponibles": result.disponibles or 0,
                 "salaire_moyen": float(result.salaire_moyen or 0),
                 "total_missions": result.total_missions or 0,
-                "total_competences": result.total_competences or 0
+                "total_competences": result.total_competences or 0,
             }
         except Exception as e:
             st.error(f"Erreur lors du calcul des stats détaillées: {e}")

@@ -228,7 +228,7 @@
 ```
 Compétence Fonctionnelle:
 ├── Nom: "Analyse de crédit"
-├── Catégorie: "Crédit & Risques"  
+├── Catégorie: "Crédit & Risques"
 ├── Secteur: "Bancaire"
 ├── Niveau requis: junior/senior/expert
 ├── Description: "Évaluation du risque de crédit..."

@@ -35,14 +35,14 @@ if 'database_initialized' not in st.session_state:
 def get_all_consultants(page=1, per_page=50):
     # Retourne des dictionnaires sérialisables
 
-@st.cache_data(ttl=600)  # 10 minutes  
+@st.cache_data(ttl=600)  # 10 minutes
 def get_consultant_summary_stats():
     # Statistiques générales cachées
 ```
 
 **Stratégie de cache:**
 - Données générales: 5 min TTL
-- Statistiques: 10 min TTL  
+- Statistiques: 10 min TTL
 - Recherches: 3 min TTL
 - Détails consultant: 5 min TTL
 
@@ -99,7 +99,7 @@ dataFrameSerialization = "arrow"
 ### Volume de Test:
 - **1000 consultants** ✅
 - **10000+ missions** ✅
-- **2000+ documents** ✅  
+- **2000+ documents** ✅
 - **100+ compétences** ✅
 - **8 practices** ✅
 
@@ -130,7 +130,7 @@ PAGINATION_CONFIG = {
 
 CACHE_CONFIG = {
     "default_ttl": 300,          # 5 minutes
-    "stats_ttl": 600,            # 10 minutes  
+    "stats_ttl": 600,            # 10 minutes
     "search_ttl": 180            # 3 minutes
 }
 ```
@@ -171,7 +171,7 @@ def is_large_dataset() -> dict:
 
 ### 🔒 Sécurité:
 - Validation côté serveur maintenue
-- Sessions DB sécurisées  
+- Sessions DB sécurisées
 - Limites de sécurité configurables
 
 ### 📊 Monitoring:

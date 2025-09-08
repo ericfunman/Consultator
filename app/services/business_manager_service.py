@@ -33,23 +33,28 @@ class BusinessManagerService:
                 bm_list = []
                 for bm in business_managers:
                     # Compter les consultants assignés (actifs)
-                    consultants_count = session.query(ConsultantBusinessManager)\
+                    consultants_count = (
+                        session.query(ConsultantBusinessManager)
                         .filter(
                             ConsultantBusinessManager.business_manager_id == bm.id,
-                            ConsultantBusinessManager.date_fin.is_(None)
-                    ).count()
+                            ConsultantBusinessManager.date_fin.is_(None),
+                        )
+                        .count()
+                    )
 
-                    bm_list.append({
-                        'id': bm.id,
-                        'prenom': bm.prenom,
-                        'nom': bm.nom,
-                        'email': bm.email,
-                        'telephone': bm.telephone,
-                        'actif': bm.actif,
-                        'consultants_count': consultants_count,
-                        'date_creation': bm.date_creation,
-                        'notes': bm.notes
-                    })
+                    bm_list.append(
+                        {
+                            "id": bm.id,
+                            "prenom": bm.prenom,
+                            "nom": bm.nom,
+                            "email": bm.email,
+                            "telephone": bm.telephone,
+                            "actif": bm.actif,
+                            "consultants_count": consultants_count,
+                            "date_creation": bm.date_creation,
+                            "notes": bm.notes,
+                        }
+                    )
 
                 return bm_list
         except Exception as e:
@@ -67,9 +72,9 @@ class BusinessManagerService:
                 if search_term:
                     search_filter = f"%{search_term}%"
                     query = query.filter(
-                        (BusinessManager.nom.ilike(search_filter)) |
-                        (BusinessManager.prenom.ilike(search_filter)) |
-                        (BusinessManager.email.ilike(search_filter))
+                        (BusinessManager.nom.ilike(search_filter))
+                        | (BusinessManager.prenom.ilike(search_filter))
+                        | (BusinessManager.email.ilike(search_filter))
                     )
 
                 business_managers = query.all()
@@ -78,23 +83,28 @@ class BusinessManagerService:
                 bm_list = []
                 for bm in business_managers:
                     # Compter les consultants assignés (actifs)
-                    consultants_count = session.query(ConsultantBusinessManager)\
+                    consultants_count = (
+                        session.query(ConsultantBusinessManager)
                         .filter(
                             ConsultantBusinessManager.business_manager_id == bm.id,
-                            ConsultantBusinessManager.date_fin.is_(None)
-                    ).count()
+                            ConsultantBusinessManager.date_fin.is_(None),
+                        )
+                        .count()
+                    )
 
-                    bm_list.append({
-                        'id': bm.id,
-                        'prenom': bm.prenom,
-                        'nom': bm.nom,
-                        'email': bm.email,
-                        'telephone': bm.telephone,
-                        'actif': bm.actif,
-                        'consultants_count': consultants_count,
-                        'date_creation': bm.date_creation,
-                        'notes': bm.notes
-                    })
+                    bm_list.append(
+                        {
+                            "id": bm.id,
+                            "prenom": bm.prenom,
+                            "nom": bm.nom,
+                            "email": bm.email,
+                            "telephone": bm.telephone,
+                            "actif": bm.actif,
+                            "consultants_count": consultants_count,
+                            "date_creation": bm.date_creation,
+                            "notes": bm.notes,
+                        }
+                    )
 
                 return bm_list
         except Exception as e:
@@ -117,8 +127,11 @@ class BusinessManagerService:
         """Récupère un Business Manager par son ID"""
         try:
             with get_database_session() as session:
-                return session.query(BusinessManager).filter(
-                    BusinessManager.id == bm_id).first()
+                return (
+                    session.query(BusinessManager)
+                    .filter(BusinessManager.id == bm_id)
+                    .first()
+                )
         except Exception as e:
             print(f"Erreur lors de la récupération du Business Manager {bm_id}: {e}")
             return None

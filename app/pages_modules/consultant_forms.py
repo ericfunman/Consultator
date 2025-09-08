@@ -59,7 +59,9 @@ def show_add_consultant_form():
             practice_options = {p.id: p.nom for p in practices}
 
         if not practice_options:
-            st.warning("⚠️ Aucune practice trouvée. Veuillez créer des practices d'abord.")
+            st.warning(
+                "⚠️ Aucune practice trouvée. Veuillez créer des practices d'abord."
+            )
             return
 
         with st.form("add_consultant_form", clear_on_submit=True):
@@ -68,39 +70,29 @@ def show_add_consultant_form():
             col1, col2 = st.columns(2)
 
             with col1:
-                prenom = st.text_input(
-                    "Prénom *",
-                    help="Prénom du consultant"
-                )
+                prenom = st.text_input("Prénom *", help="Prénom du consultant")
 
-                email = st.text_input(
-                    "Email *",
-                    help="Adresse email professionnelle"
-                )
+                email = st.text_input("Email *", help="Adresse email professionnelle")
 
                 salaire_actuel = st.number_input(
                     "Salaire annuel (€)",
                     min_value=0,
                     step=1000,
-                    help="Salaire annuel brut en euros"
+                    help="Salaire annuel brut en euros",
                 )
 
             with col2:
-                nom = st.text_input(
-                    "Nom *",
-                    help="Nom de famille du consultant"
-                )
+                nom = st.text_input("Nom *", help="Nom de famille du consultant")
 
                 telephone = st.text_input(
-                    "Téléphone",
-                    help="Numéro de téléphone professionnel"
+                    "Téléphone", help="Numéro de téléphone professionnel"
                 )
 
                 practice_id = st.selectbox(
                     "Practice *",
                     options=list(practice_options.keys()),
                     format_func=lambda x: practice_options[x],
-                    help="Practice d'affectation"
+                    help="Practice d'affectation",
                 )
 
             st.markdown("#### 📝 Informations complémentaires")
@@ -108,13 +100,13 @@ def show_add_consultant_form():
             disponibilite = st.checkbox(
                 "Disponible pour de nouvelles missions",
                 value=True,
-                help="Cochez si le consultant est disponible"
+                help="Cochez si le consultant est disponible",
             )
 
             notes = st.text_area(
                 "Notes",
                 height=100,
-                help="Informations complémentaires sur le consultant"
+                help="Informations complémentaires sur le consultant",
             )
 
             # Boutons du formulaire
@@ -132,16 +124,18 @@ def show_add_consultant_form():
             # Traitement du formulaire
             if submitted:
                 if validate_consultant_form(prenom, nom, email, practice_id):
-                    success = create_consultant({
-                        'prenom': prenom,
-                        'nom': nom,
-                        'email': email,
-                        'telephone': telephone,
-                        'salaire_actuel': salaire_actuel,
-                        'practice_id': practice_id,
-                        'disponibilite': disponibilite,
-                        'notes': notes
-                    })
+                    success = create_consultant(
+                        {
+                            "prenom": prenom,
+                            "nom": nom,
+                            "email": email,
+                            "telephone": telephone,
+                            "salaire_actuel": salaire_actuel,
+                            "practice_id": practice_id,
+                            "disponibilite": disponibilite,
+                            "notes": notes,
+                        }
+                    )
 
                     if success:
                         st.success("✅ Consultant ajouté avec succès !")
@@ -165,10 +159,8 @@ def show_add_consultant_form():
 
 
 def validate_consultant_form(
-        prenom: str,
-        nom: str,
-        email: str,
-        practice_id: int) -> bool:
+    prenom: str, nom: str, email: str, practice_id: int
+) -> bool:
     """Valide les données du formulaire consultant"""
 
     errors = []
@@ -201,23 +193,26 @@ def create_consultant(data: Dict[str, Any]) -> bool:
     try:
         with get_database_session() as session:
             # Vérifier si l'email existe déjà
-            existing = session.query(Consultant).filter(
-                Consultant.email == data['email']).first()
+            existing = (
+                session.query(Consultant)
+                .filter(Consultant.email == data["email"])
+                .first()
+            )
             if existing:
                 st.error("❌ Un consultant avec cet email existe déjà")
                 return False
 
             # Créer le consultant
             consultant = Consultant(
-                prenom=data['prenom'].strip(),
-                nom=data['nom'].strip(),
-                email=data['email'].strip().lower(),
-                telephone=data['telephone'].strip() if data['telephone'] else None,
-                salaire_actuel=data['salaire_actuel'],
-                practice_id=data['practice_id'],
-                disponibilite=data['disponibilite'],
-                notes=data['notes'].strip() if data['notes'] else None,
-                date_creation=datetime.now()
+                prenom=data["prenom"].strip(),
+                nom=data["nom"].strip(),
+                email=data["email"].strip().lower(),
+                telephone=data["telephone"].strip() if data["telephone"] else None,
+                salaire_actuel=data["salaire_actuel"],
+                practice_id=data["practice_id"],
+                disponibilite=data["disponibilite"],
+                notes=data["notes"].strip() if data["notes"] else None,
+                date_creation=datetime.now(),
             )
 
             session.add(consultant)
@@ -227,7 +222,8 @@ def create_consultant(data: Dict[str, Any]) -> bool:
                 f"✅ Consultant {
                     consultant.prenom} {
                     consultant.nom} créé avec l'ID {
-                    consultant.id}")
+                    consultant.id}"
+            )
             return True
 
     except Exception as e:
@@ -245,10 +241,12 @@ def show_edit_consultant_form(consultant_id: int):
     try:
         # Charger le consultant
         with get_database_session() as session:
-            consultant = session.query(Consultant)\
-                .options(joinedload(Consultant.practice))\
-                .filter(Consultant.id == consultant_id)\
+            consultant = (
+                session.query(Consultant)
+                .options(joinedload(Consultant.practice))
+                .filter(Consultant.id == consultant_id)
                 .first()
+            )
 
             if not consultant:
                 st.error("❌ Consultant introuvable")
@@ -267,15 +265,13 @@ def show_edit_consultant_form(consultant_id: int):
 
             with col1:
                 prenom = st.text_input(
-                    "Prénom *",
-                    value=consultant.prenom,
-                    help="Prénom du consultant"
+                    "Prénom *", value=consultant.prenom, help="Prénom du consultant"
                 )
 
                 email = st.text_input(
                     "Email *",
                     value=consultant.email,
-                    help="Adresse email professionnelle"
+                    help="Adresse email professionnelle",
                 )
 
                 salaire_actuel = st.number_input(
@@ -283,45 +279,45 @@ def show_edit_consultant_form(consultant_id: int):
                     value=consultant.salaire_actuel or 0,
                     min_value=0,
                     step=1000,
-                    help="Salaire annuel brut en euros"
+                    help="Salaire annuel brut en euros",
                 )
 
             with col2:
                 nom = st.text_input(
-                    "Nom *",
-                    value=consultant.nom,
-                    help="Nom de famille du consultant"
+                    "Nom *", value=consultant.nom, help="Nom de famille du consultant"
                 )
 
                 telephone = st.text_input(
                     "Téléphone",
                     value=consultant.telephone or "",
-                    help="Numéro de téléphone professionnel"
+                    help="Numéro de téléphone professionnel",
                 )
 
                 practice_id = st.selectbox(
                     "Practice *",
-                    options=list(
-                        practice_options.keys()),
+                    options=list(practice_options.keys()),
                     format_func=lambda x: practice_options[x],
-                    index=list(
-                        practice_options.keys()).index(
-                        consultant.practice_id) if consultant.practice_id in practice_options else 0,
-                    help="Practice d'affectation")
+                    index=(
+                        list(practice_options.keys()).index(consultant.practice_id)
+                        if consultant.practice_id in practice_options
+                        else 0
+                    ),
+                    help="Practice d'affectation",
+                )
 
             st.markdown("#### 📝 Informations complémentaires")
 
             disponibilite = st.checkbox(
                 "Disponible pour de nouvelles missions",
                 value=consultant.disponibilite,
-                help="Cochez si le consultant est disponible"
+                help="Cochez si le consultant est disponible",
             )
 
             notes = st.text_area(
                 "Notes",
                 value=consultant.notes or "",
                 height=100,
-                help="Informations complémentaires sur le consultant"
+                help="Informations complémentaires sur le consultant",
             )
 
             # Boutons du formulaire
@@ -339,16 +335,19 @@ def show_edit_consultant_form(consultant_id: int):
             # Traitement du formulaire
             if submitted:
                 if validate_consultant_form(prenom, nom, email, practice_id):
-                    success = update_consultant(consultant_id, {
-                        'prenom': prenom,
-                        'nom': nom,
-                        'email': email,
-                        'telephone': telephone,
-                        'salaire_actuel': salaire_actuel,
-                        'practice_id': practice_id,
-                        'disponibilite': disponibilite,
-                        'notes': notes
-                    })
+                    success = update_consultant(
+                        consultant_id,
+                        {
+                            "prenom": prenom,
+                            "nom": nom,
+                            "email": email,
+                            "telephone": telephone,
+                            "salaire_actuel": salaire_actuel,
+                            "practice_id": practice_id,
+                            "disponibilite": disponibilite,
+                            "notes": notes,
+                        },
+                    )
 
                     if success:
                         st.success("✅ Consultant modifié avec succès !")
@@ -381,31 +380,37 @@ def update_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = session.query(Consultant).filter(
-                Consultant.id == consultant_id).first()
+            consultant = (
+                session.query(Consultant).filter(Consultant.id == consultant_id).first()
+            )
 
             if not consultant:
                 st.error("❌ Consultant introuvable")
                 return False
 
             # Vérifier si l'email existe déjà pour un autre consultant
-            existing = session.query(Consultant) .filter(
-                Consultant.email == data['email'],
-                Consultant.id != consultant_id) .first()
+            existing = (
+                session.query(Consultant)
+                .filter(
+                    Consultant.email == data["email"], Consultant.id != consultant_id
+                )
+                .first()
+            )
             if existing:
                 st.error("❌ Un autre consultant utilise déjà cet email")
                 return False
 
             # Mettre à jour les données
-            consultant.prenom = data['prenom'].strip()
-            consultant.nom = data['nom'].strip()
-            consultant.email = data['email'].strip().lower()
-            consultant.telephone = data['telephone'].strip(
-            ) if data['telephone'] else None
-            consultant.salaire_actuel = data['salaire_actuel']
-            consultant.practice_id = data['practice_id']
-            consultant.disponibilite = data['disponibilite']
-            consultant.notes = data['notes'].strip() if data['notes'] else None
+            consultant.prenom = data["prenom"].strip()
+            consultant.nom = data["nom"].strip()
+            consultant.email = data["email"].strip().lower()
+            consultant.telephone = (
+                data["telephone"].strip() if data["telephone"] else None
+            )
+            consultant.salaire_actuel = data["salaire_actuel"]
+            consultant.practice_id = data["practice_id"]
+            consultant.disponibilite = data["disponibilite"]
+            consultant.notes = data["notes"].strip() if data["notes"] else None
 
             session.commit()
 
@@ -422,8 +427,9 @@ def delete_consultant(consultant_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = session.query(Consultant).filter(
-                Consultant.id == consultant_id).first()
+            consultant = (
+                session.query(Consultant).filter(Consultant.id == consultant_id).first()
+            )
 
             if not consultant:
                 st.error("❌ Consultant introuvable")

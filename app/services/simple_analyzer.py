@@ -1,6 +1,7 @@
 """
 Analyseur de CV simplifié et fonctionnel
 """
+
 import re
 from typing import Any
 from typing import Dict
@@ -8,76 +9,96 @@ from typing import List
 
 import streamlit as st
 
+
 class SimpleDocumentAnalyzer:
     """Analyseur de CV simplifié"""
 
     # Technologies communes
     TECHNOLOGIES = [
-        'Python',
-        'Java',
-        'JavaScript',
-        'TypeScript',
-        'C#',
-        'C++',
-        'PHP',
-        'Ruby',
-        'Go',
-        'Rust',
-        'SQL',
-        'PostgreSQL',
-        'MySQL',
-        'Oracle',
-        'MongoDB',
-        'Redis',
-        'Elasticsearch',
-        'React',
-        'Angular',
-        'Vue.js',
-        'Node.js',
-        'Express',
-        'Django',
-        'Flask',
-        'Spring',
-        'Docker',
-        'Kubernetes',
-        'AWS',
-        'Azure',
-        'GCP',
-        'Jenkins',
-        'GitLab',
-        'Git',
-        'Pandas',
-        'NumPy',
-        'TensorFlow',
-        'PyTorch',
-        'Scikit-learn',
-        'Jupyter',
-        'Power BI',
-        'Tableau',
-        'Excel',
-        'Talend',
-        'Informatica',
-        'SSIS']
+        "Python",
+        "Java",
+        "JavaScript",
+        "TypeScript",
+        "C#",
+        "C++",
+        "PHP",
+        "Ruby",
+        "Go",
+        "Rust",
+        "SQL",
+        "PostgreSQL",
+        "MySQL",
+        "Oracle",
+        "MongoDB",
+        "Redis",
+        "Elasticsearch",
+        "React",
+        "Angular",
+        "Vue.js",
+        "Node.js",
+        "Express",
+        "Django",
+        "Flask",
+        "Spring",
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "Azure",
+        "GCP",
+        "Jenkins",
+        "GitLab",
+        "Git",
+        "Pandas",
+        "NumPy",
+        "TensorFlow",
+        "PyTorch",
+        "Scikit-learn",
+        "Jupyter",
+        "Power BI",
+        "Tableau",
+        "Excel",
+        "Talend",
+        "Informatica",
+        "SSIS",
+    ]
 
     # Clients communs
     CLIENTS = [
-        'BNP Paribas', 'BNPP', 'Société Générale', 'SG', 'SGCIB',
-        'Crédit Agricole', 'BPCE', 'Natixis', 'AXA', 'Generali',
-        'Orange', 'SFR', 'Bouygues', 'Free', 'Capgemini', 'Accenture',
-        'Sopra Steria', 'Atos', 'CGI', 'IBM', 'Quanteam'
+        "BNP Paribas",
+        "BNPP",
+        "Société Générale",
+        "SG",
+        "SGCIB",
+        "Crédit Agricole",
+        "BPCE",
+        "Natixis",
+        "AXA",
+        "Generali",
+        "Orange",
+        "SFR",
+        "Bouygues",
+        "Free",
+        "Capgemini",
+        "Accenture",
+        "Sopra Steria",
+        "Atos",
+        "CGI",
+        "IBM",
+        "Quanteam",
     ]
 
     @staticmethod
     def extract_text_from_file(file_path: str) -> str:
         """Extraction simple de texte depuis un fichier"""
         try:
-            if file_path.lower().endswith('.txt'):
-                with open(file_path, 'r', encoding='utf-8') as f:
+            if file_path.lower().endswith(".txt"):
+                with open(file_path, "r", encoding="utf-8") as f:
                     return f.read()
-            elif file_path.lower().endswith('.pdf'):
+            elif file_path.lower().endswith(".pdf"):
                 try:
                     import PyPDF2
-                    with open(file_path, 'rb') as f:
+
+                    with open(file_path, "rb") as f:
                         reader = PyPDF2.PdfReader(f)
                         text = ""
                         for page in reader.pages:
@@ -85,26 +106,28 @@ class SimpleDocumentAnalyzer:
                         return text
                 except BaseException:
                     return "Erreur lors de l'extraction PDF"
-            elif file_path.lower().endswith('.docx'):
+            elif file_path.lower().endswith(".docx"):
                 try:
                     from docx import Document
+
                     doc = Document(file_path)
                     text = []
                     for paragraph in doc.paragraphs:
                         text.append(paragraph.text)
-                    return '\n'.join(text)
+                    return "\n".join(text)
                 except BaseException:
                     return "Erreur lors de l'extraction DOCX"
-            elif file_path.lower().endswith(('.pptx', '.ppt')):
+            elif file_path.lower().endswith((".pptx", ".ppt")):
                 try:
                     from pptx import Presentation
+
                     prs = Presentation(file_path)
                     text = []
                     for slide in prs.slides:
                         for shape in slide.shapes:
                             if hasattr(shape, "text"):
                                 text.append(shape.text)
-                    return '\n'.join(text)
+                    return "\n".join(text)
                 except Exception as e:
                     return f"Erreur lors de l'extraction PowerPoint: {str(e)}"
             else:
@@ -125,7 +148,7 @@ class SimpleDocumentAnalyzer:
             "langages_techniques": [],
             "competences_fonctionnelles": [],
             "informations_generales": {},
-            "texte_brut": text[:500] + "..." if len(text) > 500 else text
+            "texte_brut": text[:500] + "..." if len(text) > 500 else text,
         }
 
         try:
@@ -148,8 +171,10 @@ class SimpleDocumentAnalyzer:
                         "client": client,
                         "titre": f"Mission chez {client}",
                         "description": f"Intervention chez {client}",
-                        "langages_techniques": [tech for tech in technologies_found[:5]],
-                        "duree": "Non spécifiée"
+                        "langages_techniques": [
+                            tech for tech in technologies_found[:5]
+                        ],
+                        "duree": "Non spécifiée",
                     }
                     missions.append(mission)
 
@@ -173,13 +198,14 @@ class SimpleDocumentAnalyzer:
                 "longueur_texte": len(text),
                 "nombre_mots": len(text.split()),
                 "technologies_detectees": len(technologies_found),
-                "clients_detectes": len(missions)
+                "clients_detectes": len(missions),
             }
 
             st.success(
                 f"✅ Analyse terminée: {
                     len(missions)} missions, {
-                    len(technologies_found)} technologies")
+                    len(technologies_found)} technologies"
+            )
 
         except Exception as e:
             st.error(f"❌ Erreur pendant l'analyse: {str(e)}")

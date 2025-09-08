@@ -9,7 +9,7 @@ J'ai implementé avec succès les fonctionnalités de recherche demandées pour 
 ### 👥 Recherche de Consultants
 - ✅ **Champ de recherche** dans la page "Gestion des consultants"
 - ✅ **Recherche par prénom** (partielle, insensible à la casse)
-- ✅ **Recherche par nom** (partielle, insensible à la casse)  
+- ✅ **Recherche par nom** (partielle, insensible à la casse)
 - ✅ **Recherche par email** (partielle, insensible à la casse)
 - ✅ **Utilise le service optimisé** `search_consultants_optimized()` existant
 - ✅ **Interface intuitive** avec placeholder explicatif

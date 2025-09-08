@@ -44,7 +44,7 @@ data/consultator.db
 
 ### Tables créées automatiquement
 - **consultants** : Informations des consultants
-- **competences** : Compétences techniques et métier  
+- **competences** : Compétences techniques et métier
 - **missions** : Historique des missions
 
 ### Données de test (optionnel)

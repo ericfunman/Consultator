@@ -2,19 +2,20 @@
 Service de gestion des technologies personnalisées
 """
 
-from utils.technologies_referentiel import get_all_technologies
-from utils.technologies_referentiel import TECHNOLOGIES_REFERENTIEL
-from database.models import CustomTechnology
-from database.database import get_database_session
-from typing import Optional
-from typing import List
 import os
 import sys
+from typing import List
+from typing import Optional
+
+from database.database import get_database_session
+from database.models import CustomTechnology
+from utils.technologies_referentiel import TECHNOLOGIES_REFERENTIEL
+from utils.technologies_referentiel import get_all_technologies
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-class TechnologyService:
 
+class TechnologyService:
     @staticmethod
     def get_all_available_technologies() -> List[str]:
         """Retourne toutes les technologies disponibles (référentiel + personnalisées)"""
@@ -33,7 +34,8 @@ class TechnologyService:
 
         except Exception as e:
             print(
-                f"Erreur lors de la récupération des technologies personnalisées: {e}")
+                f"Erreur lors de la récupération des technologies personnalisées: {e}"
+            )
             return ref_technologies
 
     @staticmethod
@@ -42,9 +44,11 @@ class TechnologyService:
         try:
             with get_database_session() as session:
                 # Vérifier si elle existe déjà
-                existing = session.query(CustomTechnology).filter(
-                    CustomTechnology.nom == name
-                ).first()
+                existing = (
+                    session.query(CustomTechnology)
+                    .filter(CustomTechnology.nom == name)
+                    .first()
+                )
 
                 if existing:
                     return False
@@ -53,7 +57,7 @@ class TechnologyService:
                 new_tech = CustomTechnology(
                     nom=name,
                     categorie=category,
-                    description=f"Technologie personnalisée: {name}"
+                    description=f"Technologie personnalisée: {name}",
                 )
 
                 session.add(new_tech)
@@ -73,17 +77,18 @@ class TechnologyService:
 
                 return [
                     {
-                        'id': tech.id,
-                        'nom': tech.nom,
-                        'categorie': tech.categorie,
-                        'description': tech.description
+                        "id": tech.id,
+                        "nom": tech.nom,
+                        "categorie": tech.categorie,
+                        "description": tech.description,
                     }
                     for tech in custom_techs
                 ]
 
         except Exception as e:
             print(
-                f"Erreur lors de la récupération des technologies personnalisées: {e}")
+                f"Erreur lors de la récupération des technologies personnalisées: {e}"
+            )
             return []
 
     @staticmethod
@@ -91,9 +96,11 @@ class TechnologyService:
         """Supprime une technologie personnalisée"""
         try:
             with get_database_session() as session:
-                tech = session.query(CustomTechnology).filter(
-                    CustomTechnology.id == tech_id
-                ).first()
+                tech = (
+                    session.query(CustomTechnology)
+                    .filter(CustomTechnology.id == tech_id)
+                    .first()
+                )
 
                 if tech:
                     session.delete(tech)
@@ -121,10 +128,10 @@ class TechnologyService:
         # Ajouter les technologies personnalisées
         custom_techs = TechnologyService.get_custom_technologies()
         for tech in custom_techs:
-            category = tech['categorie']
+            category = tech["categorie"]
             if category not in technologies:
                 technologies[category] = []
-            technologies[category].append(tech['nom'])
+            technologies[category].append(tech["nom"])
 
         # Trier chaque catégorie
         for category in technologies:

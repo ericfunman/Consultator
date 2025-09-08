@@ -22,17 +22,57 @@ class DocumentAnalyzer:
 
     # Clients connus pour améliorer la détection
     CLIENTS_CONNUS = [
-        'BNP Paribas', 'Société Générale', 'Crédit Agricole', 'BPCE', 'Natixis',
-        'AXA', 'CNP Assurances', 'Generali', 'Allianz', 'Swiss Life',
-        'Orange', 'SFR', 'Bouygues Telecom', 'Free',
-        'Capgemini', 'Accenture', 'Sopra Steria', 'Atos', 'CGI', 'IBM', 'TCS',
-        'Renault', 'PSA', 'Stellantis', 'Michelin', 'Valeo',
-        'Total', 'Engie', 'EDF', 'Veolia', 'Suez',
-        'SNCF', 'Airbus', 'Safran', 'Thales', 'Dassault',
-        'Amazon', 'Microsoft', 'Google', 'Meta', 'Apple',
-        'La Poste', 'Pôle Emploi', 'CAF', 'CPAM',
-        'FNAC', 'Carrefour', 'Leclerc', 'Auchan',
-        'Quanteam', 'Rainbow Partners'
+        "BNP Paribas",
+        "Société Générale",
+        "Crédit Agricole",
+        "BPCE",
+        "Natixis",
+        "AXA",
+        "CNP Assurances",
+        "Generali",
+        "Allianz",
+        "Swiss Life",
+        "Orange",
+        "SFR",
+        "Bouygues Telecom",
+        "Free",
+        "Capgemini",
+        "Accenture",
+        "Sopra Steria",
+        "Atos",
+        "CGI",
+        "IBM",
+        "TCS",
+        "Renault",
+        "PSA",
+        "Stellantis",
+        "Michelin",
+        "Valeo",
+        "Total",
+        "Engie",
+        "EDF",
+        "Veolia",
+        "Suez",
+        "SNCF",
+        "Airbus",
+        "Safran",
+        "Thales",
+        "Dassault",
+        "Amazon",
+        "Microsoft",
+        "Google",
+        "Meta",
+        "Apple",
+        "La Poste",
+        "Pôle Emploi",
+        "CAF",
+        "CPAM",
+        "FNAC",
+        "Carrefour",
+        "Leclerc",
+        "Auchan",
+        "Quanteam",
+        "Rainbow Partners",
     ]
 
     @staticmethod
@@ -41,11 +81,11 @@ class DocumentAnalyzer:
         try:
             file_extension = os.path.splitext(file_path)[1].lower()
 
-            if file_extension == '.pdf':
+            if file_extension == ".pdf":
                 return DocumentAnalyzer._extract_text_from_pdf(file_path)
-            elif file_extension in ['.docx', '.doc']:
+            elif file_extension in [".docx", ".doc"]:
                 return DocumentAnalyzer._extract_text_from_docx(file_path)
-            elif file_extension in ['.pptx', '.ppt']:
+            elif file_extension in [".pptx", ".ppt"]:
                 return DocumentAnalyzer._extract_text_from_pptx(file_path)
             else:
                 raise ValueError(f"Format de fichier non supporté: {file_extension}")
@@ -76,10 +116,15 @@ class DocumentAnalyzer:
                         tables = page.extract_tables()
                         for table in tables:
                             table_text = "\n".join(
-                                ["\t".join([cell or "" for cell in row]) for row in table])
+                                [
+                                    "\t".join([cell or "" for cell in row])
+                                    for row in table
+                                ]
+                            )
                             if table_text.strip():
                                 text_parts.append(
-                                    f"--- TABLEAU PAGE {page_num} ---\n{table_text}")
+                                    f"--- TABLEAU PAGE {page_num} ---\n{table_text}"
+                                )
 
                     except Exception as e:
                         st.warning(f"⚠️ Erreur page {page_num}: {e}")
@@ -88,12 +133,13 @@ class DocumentAnalyzer:
                 if text_parts:
                     st.success(
                         f"✅ {
-                            len(text_parts)} sections extraites avec pdfplumber")
+                            len(text_parts)} sections extraites avec pdfplumber"
+                    )
                     return "\n\n".join(text_parts)
 
             # Méthode 2 : PyPDF2 (fallback)
             st.info("📄 Fallback avec PyPDF2...")
-            with open(file_path, 'rb') as file:
+            with open(file_path, "rb") as file:
                 pdf_reader = PyPDF2.PdfReader(file)
                 st.info(f"📄 PDF contient {len(pdf_reader.pages)} page(s)")
 
@@ -148,14 +194,15 @@ class DocumentAnalyzer:
 
                 if table_text:
                     text_parts.append(
-                        f"--- TABLEAU {table_num} ---\n" +
-                        "\n".join(table_text))
+                        f"--- TABLEAU {table_num} ---\n" + "\n".join(table_text)
+                    )
 
             result = "\n\n".join(text_parts)
             st.success(
                 f"✅ {
                     len(text_parts)} éléments extraits ({
-                    len(result)} caractères)")
+                    len(result)} caractères)"
+            )
             return result
 
         except Exception as e:
@@ -192,18 +239,23 @@ class DocumentAnalyzer:
                                 table_text.append("\t".join(row_text))
                             if table_text:
                                 slide_text.append(
-                                    "--- TABLEAU ---\n" + "\n".join(table_text))
+                                    "--- TABLEAU ---\n" + "\n".join(table_text)
+                                )
                     except Exception as e:
-                        st.warning(f"⚠️ Erreur lors du traitement d'une forme PowerPoint: {e}")
+                        st.warning(
+                            f"⚠️ Erreur lors du traitement d'une forme PowerPoint: {e}"
+                        )
                         continue
 
                 if slide_text:
                     text_parts.append(
-                        f"--- SLIDE {slide_num} ---\n" +
-                        "\n".join(slide_text))
+                        f"--- SLIDE {slide_num} ---\n" + "\n".join(slide_text)
+                    )
 
             result = "\n\n".join(text_parts)
-            st.success(f"✅ {len(text_parts)} slides traités ({len(result)} caractères)")
+            st.success(
+                f"✅ {len(text_parts)} slides traités ({len(result)} caractères)"
+            )
             return result
 
         except Exception as e:
@@ -216,47 +268,51 @@ class DocumentAnalyzer:
         st.info(f"🔍 Début de l'analyse pour {consultant_name}")
 
         analysis = {
-            'consultant': consultant_name,
-            'missions': [],
-            'langages_techniques': [],
-            'competences_fonctionnelles': [],
-            'informations_generales': {},
-            'texte_brut': text[:1000]  # Aperçu pour debug
+            "consultant": consultant_name,
+            "missions": [],
+            "langages_techniques": [],
+            "competences_fonctionnelles": [],
+            "informations_generales": {},
+            "texte_brut": text[:1000],  # Aperçu pour debug
         }
 
         try:
             # Extraction des missions
             missions = DocumentAnalyzer._extract_missions(text)
-            analysis['missions'] = missions
+            analysis["missions"] = missions
 
             # Extraction des compétences techniques globales
             all_skills = set()
             for mission in missions:
-                all_skills.update(mission.get('langages_techniques', []))
+                all_skills.update(mission.get("langages_techniques", []))
 
             # Ajouter les compétences globales du texte
             global_skills = DocumentAnalyzer._extract_technical_skills(text)
             all_skills.update(global_skills)
 
-            analysis['langages_techniques'] = list(all_skills)[:25]  # Top 25
+            analysis["langages_techniques"] = list(all_skills)[:25]  # Top 25
 
             # Extraction des compétences fonctionnelles
-            analysis['competences_fonctionnelles'] = DocumentAnalyzer._extract_functional_skills(
-                text)
+            analysis["competences_fonctionnelles"] = (
+                DocumentAnalyzer._extract_functional_skills(text)
+            )
 
             # Informations générales
-            analysis['informations_generales'] = DocumentAnalyzer._extract_general_info(
-                text)
+            analysis["informations_generales"] = DocumentAnalyzer._extract_general_info(
+                text
+            )
 
             st.success(
                 f"✅ Analyse terminée: {
                     len(missions)} missions, {
                     len(
-                        analysis['langages_techniques'])} technologies")
+                        analysis['langages_techniques'])} technologies"
+            )
 
         except Exception as e:
             st.error(f"❌ Erreur analyse: {e}")
             import traceback
+
             traceback.print_exc()
 
         return analysis
@@ -269,31 +325,32 @@ class DocumentAnalyzer:
         st.info(f"🔍 Analyse de {len(text)} caractères de texte...")
 
         # Nettoyer et préparer le texte
-        text = text.replace('\r\n', '\n').replace('\r', '\n')
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
 
         # Séparer par pages pour mieux analyser
-        pages = text.split('--- PAGE')
+        pages = text.split("--- PAGE")
         st.info(f"📄 Analyse de {len(pages)} section(s) de document")
 
-        all_text = ' '.join(pages)  # Recombiner pour l'analyse globale
+        all_text = " ".join(pages)  # Recombiner pour l'analyse globale
 
         # Trouver la section expérience
         experience_keywords = [
-            'expérience professionnelle',
-            'parcours professionnel',
-            'historique professionnel',
-            'expériences',
-            'missions',
-            'emplois',
-            'postes',
-            'carrière',
-            'activités professionnelles',
-            'réalisations',
-            'projets',
-            'interventions',
-            'mandats',
-            'consulting',
-            'conseil']
+            "expérience professionnelle",
+            "parcours professionnel",
+            "historique professionnel",
+            "expériences",
+            "missions",
+            "emplois",
+            "postes",
+            "carrière",
+            "activités professionnelles",
+            "réalisations",
+            "projets",
+            "interventions",
+            "mandats",
+            "consulting",
+            "conseil",
+        ]
 
         text_lower = all_text.lower()
         experience_start = 0
@@ -303,11 +360,14 @@ class DocumentAnalyzer:
             if match:
                 experience_start = match.end()
                 st.success(
-                    f"✅ Section '{keyword}' trouvée à la position {experience_start}")
+                    f"✅ Section '{keyword}' trouvée à la position {experience_start}"
+                )
                 break
 
         # Prendre le texte d'expérience
-        experience_text = all_text[experience_start:] if experience_start > 0 else all_text
+        experience_text = (
+            all_text[experience_start:] if experience_start > 0 else all_text
+        )
         st.info(f"📝 Analyse de {len(experience_text)} caractères d'expérience")
 
         # Méthode 1: Analyse par blocs logiques
@@ -318,7 +378,8 @@ class DocumentAnalyzer:
 
         # Méthode 3: Recherche par clients connus
         missions.extend(
-            DocumentAnalyzer._extract_missions_by_known_clients(experience_text))
+            DocumentAnalyzer._extract_missions_by_known_clients(experience_text)
+        )
 
         st.info(f"🚀 {len(missions)} missions brutes trouvées avant nettoyage")
 
@@ -328,11 +389,9 @@ class DocumentAnalyzer:
         # Trier par date de début (plus récent en premier)
         sorted_missions = sorted(
             unique_missions,
-            key=lambda x: DocumentAnalyzer._date_sort_key(
-                x.get(
-                    'date_debut',
-                    '')),
-            reverse=True)
+            key=lambda x: DocumentAnalyzer._date_sort_key(x.get("date_debut", "")),
+            reverse=True,
+        )
 
         st.success(f"✅ {len(sorted_missions)} missions finales après nettoyage")
 
@@ -344,19 +403,20 @@ class DocumentAnalyzer:
         missions = []
 
         # Diviser en blocs plus intelligemment
-        blocks = re.split(r'\n\s*\n|\.\s*\n\s*\n|\.{2,}', text)
+        blocks = re.split(r"\n\s*\n|\.\s*\n\s*\n|\.{2,}", text)
 
         # Filtrer les blocs significatifs (au moins 100 caractères)
         significant_blocks = [
-            block.strip() for block in blocks if len(
-                block.strip()) > 100]
+            block.strip() for block in blocks if len(block.strip()) > 100
+        ]
 
         st.info(f"📦 Analyse de {len(significant_blocks)} blocs significatifs")
 
         for i, block in enumerate(significant_blocks):
             mission = DocumentAnalyzer._extract_mission_from_block(
-                block, block_num=i + 1)
-            if mission and mission.get('client') and len(mission['client']) > 2:
+                block, block_num=i + 1
+            )
+            if mission and mission.get("client") and len(mission["client"]) > 2:
                 missions.append(mission)
 
         return missions
@@ -365,36 +425,36 @@ class DocumentAnalyzer:
     def _extract_mission_from_block(block: str, block_num: int = 0) -> Dict:
         """Extrait une mission d'un bloc de texte"""
         mission = {
-            'date_debut': '',
-            'date_fin': '',
-            'client': '',
-            'resume': '',
-            'langages_techniques': [],
-            'contexte': block[:500] + "..." if len(block) > 500 else block
+            "date_debut": "",
+            "date_fin": "",
+            "client": "",
+            "resume": "",
+            "langages_techniques": [],
+            "contexte": block[:500] + "..." if len(block) > 500 else block,
         }
 
         # Recherche de dates dans le bloc
         dates = DocumentAnalyzer._find_dates_in_text_improved(block)
 
         if len(dates) >= 2:
-            mission['date_debut'] = dates[0]
-            mission['date_fin'] = dates[1]
+            mission["date_debut"] = dates[0]
+            mission["date_fin"] = dates[1]
         elif len(dates) == 1:
-            mission['date_debut'] = dates[0]
-            mission['date_fin'] = 'En cours'
+            mission["date_debut"] = dates[0]
+            mission["date_fin"] = "En cours"
 
         # Recherche de client
         client = DocumentAnalyzer._find_client_in_block_improved(block)
         if client:
-            mission['client'] = client
+            mission["client"] = client
 
         # Extraction du résumé long
         resume = DocumentAnalyzer._extract_long_mission_summary(block)
-        mission['resume'] = resume
+        mission["resume"] = resume
 
         # Extraction des technologies
         techs = DocumentAnalyzer._extract_technical_skills(block)
-        mission['langages_techniques'] = techs[:10]
+        mission["langages_techniques"] = techs[:10]
 
         return mission
 
@@ -406,54 +466,58 @@ class DocumentAnalyzer:
         # Patterns de dates très complets
         date_patterns = [
             # Formats avec séparateurs
-            (r'\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})\b', 'dmy'),  # DD/MM/YYYY
-            (r'\b(\d{1,2})[\/\-\.](\d{4})\b', 'my'),  # MM/YYYY
-            (r'\b(\d{4})[\/\-\.](\d{1,2})\b', 'ym'),  # YYYY/MM
-
+            (r"\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})\b", "dmy"),  # DD/MM/YYYY
+            (r"\b(\d{1,2})[\/\-\.](\d{4})\b", "my"),  # MM/YYYY
+            (r"\b(\d{4})[\/\-\.](\d{1,2})\b", "ym"),  # YYYY/MM
             # Années dans un contexte temporel
-            (r'\b(\d{4})\s*[-–—]\s*(\d{4})\b', 'range'),  # 2020-2023
+            (r"\b(\d{4})\s*[-–—]\s*(\d{4})\b", "range"),  # 2020-2023
             # 2020-en cours
-            (r'\b(\d{4})\s*[-–—]\s*(en\s+cours|actuel|présent|aujourd\'hui)\b', 'ongoing'),
-            (r'\bdepuis\s+(\d{4})\b', 'since'),  # depuis 2020
-            (r'\ben\s+(\d{4})\b', 'year'),  # en 2020
-
+            (
+                r"\b(\d{4})\s*[-–—]\s*(en\s+cours|actuel|présent|aujourd\'hui)\b",
+                "ongoing",
+            ),
+            (r"\bdepuis\s+(\d{4})\b", "since"),  # depuis 2020
+            (r"\ben\s+(\d{4})\b", "year"),  # en 2020
             # Mois en français
             (
-                r'\b(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})\b',
-                'month_fr'),
+                r"\b(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})\b",
+                "month_fr",
+            ),
             (
-                r'\b(jan|fév|mar|avr|mai|jun|jul|aoû|sep|oct|nov|déc)\.?\s+(\d{4})\b',
-                'month_abbr'),
+                r"\b(jan|fév|mar|avr|mai|jun|jul|aoû|sep|oct|nov|déc)\.?\s+(\d{4})\b",
+                "month_abbr",
+            ),
         ]
 
         for pattern, pattern_type in date_patterns:
             matches = re.finditer(pattern, text, re.IGNORECASE)
 
             for match in matches:
-                if pattern_type == 'dmy':
+                if pattern_type == "dmy":
                     day, month, year = match.groups()
                     date_str = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
-                elif pattern_type == 'my':
+                elif pattern_type == "my":
                     month, year = match.groups()
                     date_str = f"{year}-{month.zfill(2)}-01"
-                elif pattern_type == 'ym':
+                elif pattern_type == "ym":
                     year, month = match.groups()
                     date_str = f"{year}-{month.zfill(2)}-01"
-                elif pattern_type == 'range':
+                elif pattern_type == "range":
                     start_year, end_year = match.groups()
                     dates.extend([f"{start_year}-01-01", f"{end_year}-12-31"])
                     continue
-                elif pattern_type == 'ongoing':
+                elif pattern_type == "ongoing":
                     start_year = match.group(1)
                     dates.extend([f"{start_year}-01-01", "En cours"])
                     continue
-                elif pattern_type in ['since', 'year']:
+                elif pattern_type in ["since", "year"]:
                     year = match.group(1)
                     date_str = f"{year}-01-01"
-                elif pattern_type in ['month_fr', 'month_abbr']:
+                elif pattern_type in ["month_fr", "month_abbr"]:
                     month_name, year = match.groups()
                     month_num = DocumentAnalyzer._month_name_to_number(
-                        month_name.lower())
+                        month_name.lower()
+                    )
                     date_str = f"{year}-{month_num}-01"
                 else:
                     continue
@@ -475,35 +539,53 @@ class DocumentAnalyzer:
     def _month_name_to_number(month_name: str) -> str:
         """Convertit un nom de mois français en numéro"""
         months = {
-            'janvier': '01', 'février': '02', 'mars': '03', 'avril': '04',
-            'mai': '05', 'juin': '06', 'juillet': '07', 'août': '08',
-            'septembre': '09', 'octobre': '10', 'novembre': '11', 'décembre': '12',
-            'jan': '01', 'fév': '02', 'mar': '03', 'avr': '04',
-            'mai': '05', 'jun': '06', 'jul': '07', 'aoû': '08',
-            'sep': '09', 'oct': '10', 'nov': '11', 'déc': '12'
+            "janvier": "01",
+            "février": "02",
+            "mars": "03",
+            "avril": "04",
+            "mai": "05",
+            "juin": "06",
+            "juillet": "07",
+            "août": "08",
+            "septembre": "09",
+            "octobre": "10",
+            "novembre": "11",
+            "décembre": "12",
+            "jan": "01",
+            "fév": "02",
+            "mar": "03",
+            "avr": "04",
+            "mai": "05",
+            "jun": "06",
+            "jul": "07",
+            "aoû": "08",
+            "sep": "09",
+            "oct": "10",
+            "nov": "11",
+            "déc": "12",
         }
-        return months.get(month_name, '01')
+        return months.get(month_name, "01")
 
     @staticmethod
     def _find_client_in_block_improved(block: str) -> str:
         """Trouve le nom du client dans un bloc - Version améliorée"""
         # Patterns pour identifier les clients
         client_patterns = [
-            r'(?:chez|pour|client[:\s]*)\s+([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,60})',
-            r'(?:société|entreprise|groupe|compagnie)\s+([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,50})',
-            r'([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,50})\s+[-–—]\s*(?:consultant|développeur|chef|responsable|manager|directeur|lead|senior)',
-            r'\b([A-Z][A-Za-z\s&\-\.]{3,50})\s+(?:SA|SAS|SARL|EURL|SNC|GIE|SCOP|AG|SE|SCA)\b',
-            r'\b(Société\s+[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,40})',
-            r'\b(Groupe\s+[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,40})',
-            r'^([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{5,50})\s*[-–—:]',
+            r"(?:chez|pour|client[:\s]*)\s+([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,60})",
+            r"(?:société|entreprise|groupe|compagnie)\s+([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,50})",
+            r"([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,50})\s+[-–—]\s*(?:consultant|développeur|chef|responsable|manager|directeur|lead|senior)",
+            r"\b([A-Z][A-Za-z\s&\-\.]{3,50})\s+(?:SA|SAS|SARL|EURL|SNC|GIE|SCOP|AG|SE|SCA)\b",
+            r"\b(Société\s+[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,40})",
+            r"\b(Groupe\s+[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,40})",
+            r"^([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{5,50})\s*[-–—:]",
         ]
 
         for pattern in client_patterns:
             matches = re.finditer(pattern, block, re.IGNORECASE | re.MULTILINE)
             for match in matches:
                 client = match.group(1).strip()
-                client = re.sub(r'\s*[-–—:]\s*.*$', '', client)
-                client = re.sub(r'\s*\([^)]*\)\s*', '', client)
+                client = re.sub(r"\s*[-–—:]\s*.*$", "", client)
+                client = re.sub(r"\s*\([^)]*\)\s*", "", client)
                 client = DocumentAnalyzer._clean_client_name(client)
 
                 if 3 < len(client) < 60:
@@ -520,32 +602,33 @@ class DocumentAnalyzer:
     def _extract_long_mission_summary(text: str) -> str:
         """Extrait un résumé long et détaillé de la mission (jusqu'à 1000 caractères)"""
         mission_keywords = [
-            'mission',
-            'projet',
-            'développement',
-            'conception',
-            'réalisation',
-            'mise en place',
-            'création',
-            'analyse',
-            'étude',
-            'design',
-            'architecture',
-            'implémentation',
-            'déploiement',
-            'maintenance',
-            'support',
-            'optimisation',
-            'migration',
-            'formation',
-            'conseil',
-            'audit',
-            'expertise',
-            'accompagnement',
-            'pilotage']
+            "mission",
+            "projet",
+            "développement",
+            "conception",
+            "réalisation",
+            "mise en place",
+            "création",
+            "analyse",
+            "étude",
+            "design",
+            "architecture",
+            "implémentation",
+            "déploiement",
+            "maintenance",
+            "support",
+            "optimisation",
+            "migration",
+            "formation",
+            "conseil",
+            "audit",
+            "expertise",
+            "accompagnement",
+            "pilotage",
+        ]
 
         # Diviser en phrases
-        sentences = re.split(r'[\.!?]+', text)
+        sentences = re.split(r"[\.!?]+", text)
         relevant_sentences = []
 
         for sentence in sentences:
@@ -561,12 +644,13 @@ class DocumentAnalyzer:
 
                 # Score pour verbes d'action
                 action_verbs = [
-                    'développé',
-                    'créé',
-                    'conçu',
-                    'réalisé',
-                    'mis en place',
-                    'déployé']
+                    "développé",
+                    "créé",
+                    "conçu",
+                    "réalisé",
+                    "mis en place",
+                    "déployé",
+                ]
                 for verb in action_verbs:
                     if verb in sentence_lower:
                         score += 3
@@ -583,7 +667,7 @@ class DocumentAnalyzer:
             max_length = 1000
 
             for sentence, score in relevant_sentences:
-                clean_sentence = re.sub(r'^\s*[-–—•]\s*', '', sentence).strip()
+                clean_sentence = re.sub(r"^\s*[-–—•]\s*", "", sentence).strip()
 
                 if total_length + len(clean_sentence) < max_length:
                     summary_parts.append(clean_sentence)
@@ -593,20 +677,20 @@ class DocumentAnalyzer:
 
             if summary_parts:
                 full_summary = ". ".join(summary_parts)
-                if not full_summary.endswith('.'):
+                if not full_summary.endswith("."):
                     full_summary += "."
                 return full_summary
 
         # Fallback
-        clean_text = re.sub(r'^\s*[-–—•]\s*', '', text.strip())
-        clean_text = re.sub(r'^\d{4}.*?:', '', clean_text)
+        clean_text = re.sub(r"^\s*[-–—•]\s*", "", text.strip())
+        clean_text = re.sub(r"^\d{4}.*?:", "", clean_text)
 
         if len(clean_text) > 20:
             summary = clean_text[:1000]
             if len(clean_text) > 1000:
-                last_period = summary.rfind('.')
+                last_period = summary.rfind(".")
                 if last_period > 500:
-                    summary = summary[:last_period + 1]
+                    summary = summary[: last_period + 1]
                 else:
                     summary += "..."
             return summary
@@ -619,19 +703,26 @@ class DocumentAnalyzer:
         missions = []
 
         # Pattern année-année avec description
-        pattern1 = r'(\d{4})\s*[-–—]\s*(\d{4}|en\s+cours|actuel|présent)\s*[:\-]\s*([^\n\.]{30,})'
+        pattern1 = r"(\d{4})\s*[-–—]\s*(\d{4}|en\s+cours|actuel|présent)\s*[:\-]\s*([^\n\.]{30,})"
         matches1 = re.finditer(pattern1, text, re.IGNORECASE)
 
         for match in matches1:
             start_year, end_year, description = match.groups()
             mission = {
-                'date_debut': f"{start_year}-01-01",
-                'date_fin': 'En cours' if end_year.lower() in ['en cours', 'actuel', 'présent'] else f"{end_year}-12-31",
-                'client': DocumentAnalyzer._extract_client_from_text(description),
-                'resume': description.strip()[:800] + ("..." if len(description) > 800 else ""),
-                'langages_techniques': DocumentAnalyzer._extract_technical_skills(description)
+                "date_debut": f"{start_year}-01-01",
+                "date_fin": (
+                    "En cours"
+                    if end_year.lower() in ["en cours", "actuel", "présent"]
+                    else f"{end_year}-12-31"
+                ),
+                "client": DocumentAnalyzer._extract_client_from_text(description),
+                "resume": description.strip()[:800]
+                + ("..." if len(description) > 800 else ""),
+                "langages_techniques": DocumentAnalyzer._extract_technical_skills(
+                    description
+                ),
             }
-            if mission['client']:
+            if mission["client"]:
                 missions.append(mission)
 
         return missions
@@ -650,11 +741,16 @@ class DocumentAnalyzer:
                 dates = DocumentAnalyzer._find_dates_in_text_improved(context)
                 if dates:
                     mission = {
-                        'date_debut': dates[0] if dates else '',
-                        'date_fin': dates[1] if len(dates) > 1 else 'En cours',
-                        'client': client,
-                        'resume': DocumentAnalyzer._extract_long_mission_summary(context),
-                        'langages_techniques': DocumentAnalyzer._extract_technical_skills(context)}
+                        "date_debut": dates[0] if dates else "",
+                        "date_fin": dates[1] if len(dates) > 1 else "En cours",
+                        "client": client,
+                        "resume": DocumentAnalyzer._extract_long_mission_summary(
+                            context
+                        ),
+                        "langages_techniques": DocumentAnalyzer._extract_technical_skills(
+                            context
+                        ),
+                    }
                     missions.append(mission)
 
         return missions
@@ -667,9 +763,9 @@ class DocumentAnalyzer:
                 return client
 
         patterns = [
-            r'\b([A-Z][A-Za-z\s&]{3,40})\s+(?:SA|SAS|SARL|EURL|SNC|GIE)\b',
-            r'(?:chez|pour|client)\s+([A-Z][A-Za-z\s&]{3,40})',
-            r'\b([A-Z]{2,})\b',
+            r"\b([A-Z][A-Za-z\s&]{3,40})\s+(?:SA|SAS|SARL|EURL|SNC|GIE)\b",
+            r"(?:chez|pour|client)\s+([A-Z][A-Za-z\s&]{3,40})",
+            r"\b([A-Z]{2,})\b",
         ]
 
         for pattern in patterns:
@@ -688,13 +784,13 @@ class DocumentAnalyzer:
         seen_combinations = set()
 
         for mission in missions:
-            client = mission.get('client', '').strip()
-            date_debut = mission.get('date_debut', '').strip()
+            client = mission.get("client", "").strip()
+            date_debut = mission.get("date_debut", "").strip()
 
             if not client or len(client) < 3:
                 continue
 
-            year = date_debut[:4] if len(date_debut) >= 4 else 'unknown'
+            year = date_debut[:4] if len(date_debut) >= 4 else "unknown"
             key = f"{client.lower().strip()}_{year}"
 
             if key not in seen_combinations:
@@ -714,7 +810,7 @@ class DocumentAnalyzer:
         elif len(date_str) >= 10:
             return date_str[:10]
         else:
-            return date_str.ljust(10, '0')
+            return date_str.ljust(10, "0")
 
     @staticmethod
     def _extract_technical_skills(text: str) -> List[str]:
@@ -724,41 +820,64 @@ class DocumentAnalyzer:
 
         # Langages de programmation
         programming_languages = [
-            'java',
-            'python',
-            'javascript',
-            'typescript',
-            'c++',
-            'c#',
-            'php',
-            'ruby',
-            'go',
-            'scala',
-            'kotlin',
-            'swift',
-            'sql',
-            'html',
-            'css',
-            'sass',
-            'xml',
-            'json']
+            "java",
+            "python",
+            "javascript",
+            "typescript",
+            "c++",
+            "c#",
+            "php",
+            "ruby",
+            "go",
+            "scala",
+            "kotlin",
+            "swift",
+            "sql",
+            "html",
+            "css",
+            "sass",
+            "xml",
+            "json",
+        ]
 
         # Frameworks et technologies
         frameworks = [
-            'react', 'angular', 'vue.js', 'spring', 'spring boot', 'django', 'flask',
-            'express', 'node.js', 'laravel', 'symfony', '.net', 'asp.net'
+            "react",
+            "angular",
+            "vue.js",
+            "spring",
+            "spring boot",
+            "django",
+            "flask",
+            "express",
+            "node.js",
+            "laravel",
+            "symfony",
+            ".net",
+            "asp.net",
         ]
 
         # Outils et plateformes
         tools = [
-            'docker', 'kubernetes', 'jenkins', 'gitlab', 'github', 'aws', 'azure',
-            'mongodb', 'postgresql', 'mysql', 'oracle', 'redis', 'elasticsearch'
+            "docker",
+            "kubernetes",
+            "jenkins",
+            "gitlab",
+            "github",
+            "aws",
+            "azure",
+            "mongodb",
+            "postgresql",
+            "mysql",
+            "oracle",
+            "redis",
+            "elasticsearch",
         ]
 
         all_skills = programming_languages + frameworks + tools
 
         for skill in all_skills:
-            pattern = r'\b' + re.escape(skill.lower()) + r'\b'
+            pattern = r"\b" + re.escape(skill.lower()) + r"\b"
             if re.search(pattern, text_lower):
                 skills.append(skill.title())
 
@@ -771,9 +890,21 @@ class DocumentAnalyzer:
         text_lower = text.lower()
 
         functional_skills = [
-            'gestion de projet', 'management', 'leadership', 'formation', 'conseil',
-            'analyse fonctionnelle', 'architecture', 'design', 'scrum', 'agile',
-            'devops', 'tests', 'qualité', 'sécurité', 'performance'
+            "gestion de projet",
+            "management",
+            "leadership",
+            "formation",
+            "conseil",
+            "analyse fonctionnelle",
+            "architecture",
+            "design",
+            "scrum",
+            "agile",
+            "devops",
+            "tests",
+            "qualité",
+            "sécurité",
+            "performance",
         ]
 
         for skill in functional_skills:
@@ -789,22 +920,23 @@ class DocumentAnalyzer:
 
         # Recherche email
         email_match = re.search(
-            r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', text)
+            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", text
+        )
         if email_match:
-            info['email'] = email_match.group()
+            info["email"] = email_match.group()
 
         # Recherche téléphone
-        phone_match = re.search(r'(\+33|0)[1-9](?:[-.\s]?\d{2}){4}', text)
+        phone_match = re.search(r"(\+33|0)[1-9](?:[-.\s]?\d{2}){4}", text)
         if phone_match:
-            info['telephone'] = phone_match.group()
+            info["telephone"] = phone_match.group()
 
         return info
 
     @staticmethod
     def _clean_client_name(client: str) -> str:
         """Nettoie le nom du client"""
-        client = re.sub(r'[^\w\s&\-àâäéèêëïîôùûüÿç]', '', client)
-        client = ' '.join(client.split())
+        client = re.sub(r"[^\w\s&\-àâäéèêëïîôùûüÿç]", "", client)
+        client = " ".join(client.split())
 
         if len(client) > 2:
             client = client.title()

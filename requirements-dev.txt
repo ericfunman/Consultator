@@ -1,5 +1,8 @@
 # Outils d'analyse de qualité de code pour Consultator
 
+# Pre-commit hooks
+pre-commit>=3.5.0
+
 # Code quality et linting
 pylint>=2.17.0
 flake8>=6.0.0

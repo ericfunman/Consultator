@@ -1,5 +1,6 @@
-import streamlit as st
 from datetime import datetime
+
+import streamlit as st
 
 from services.document_service import DocumentService
 
@@ -73,9 +74,7 @@ def show_consultant_documents(consultant):
     show_existing_documents(consultant)
 
 
-def save_consultant_document(
-    uploaded_file, consultant, document_type, description
-):
+def save_consultant_document(uploaded_file, consultant, document_type, description):
     """Sauvegarde un document pour le consultant"""
 
     try:
@@ -160,9 +159,7 @@ def show_existing_documents(consultant):
                     doc_type = dtype.replace("_", " ")
                     break
 
-            with st.expander(
-                f" {doc_type} - {file_path.name}", expanded=False
-            ):
+            with st.expander(f" {doc_type} - {file_path.name}", expanded=False):
                 col1, col2, col3, col4 = st.columns(4)
 
                 with col1:
@@ -175,9 +172,7 @@ def show_existing_documents(consultant):
                     st.metric(" Type", doc_type)
 
                 with col4:
-                    if st.button(
-                        f" Supprimer", key=f"delete_{file_path.name}"
-                    ):
+                    if st.button(f" Supprimer", key=f"delete_{file_path.name}"):
                         delete_consultant_document(file_path)
 
                 # Boutons d'action
@@ -190,18 +185,12 @@ def show_existing_documents(consultant):
                         st.info(" Analyse de CV en cours de developpement...")
 
                 with col2:
-                    if st.button(
-                        f" Telecharger", key=f"download_{file_path.name}"
-                    ):
+                    if st.button(f" Telecharger", key=f"download_{file_path.name}"):
                         st.info(" Telechargement en cours de developpement...")
 
                 with col3:
-                    if st.button(
-                        f" Previsualiser", key=f"preview_{file_path.name}"
-                    ):
-                        st.info(
-                            " Previsualisation en cours de developpement..."
-                        )
+                    if st.button(f" Previsualiser", key=f"preview_{file_path.name}"):
+                        st.info(" Previsualisation en cours de developpement...")
 
     except Exception as e:
         st.error(f" Erreur lors de l'affichage des documents: {e}")

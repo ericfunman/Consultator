@@ -17,21 +17,24 @@ try:
     from services.chatbot_service import ChatbotService
 except ImportError:
     # Import alternatif si le chemin ne fonctionne pas
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+    sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
     from services.chatbot_service import ChatbotService
+
 
 def show():
     """Affiche la page du chatbot"""
 
     st.title("🤖 Assistant IA Consultator")
-    st.markdown("### Interrogez vos données de consultant avec l'intelligence artificielle")
+    st.markdown(
+        "### Interrogez vos données de consultant avec l'intelligence artificielle"
+    )
 
     # Initialiser le service chatbot dans la session
-    if 'chatbot_service' not in st.session_state:
+    if "chatbot_service" not in st.session_state:
         st.session_state.chatbot_service = ChatbotService()
 
     # Initialiser l'historique des conversations
-    if 'messages' not in st.session_state:
+    if "messages" not in st.session_state:
         st.session_state.messages = []
 
         # Message de bienvenue
@@ -49,7 +52,7 @@ Je peux vous aider à interroger vos données de consultants, missions et compé
 - "Quel est le TJM moyen ?"
 
 Que souhaitez-vous savoir ? 😊""",
-            "timestamp": datetime.now()
+            "timestamp": datetime.now(),
         }
         st.session_state.messages.append(welcome_message)
 
@@ -62,8 +65,10 @@ Que souhaitez-vous savoir ? 😊""",
                 st.markdown(message["content"])
 
                 # Afficher un timestamp pour les anciens messages
-                if message["role"] == "assistant" and len(
-                        st.session_state.messages) > 1:
+                if (
+                    message["role"] == "assistant"
+                    and len(st.session_state.messages) > 1
+                ):
                     timestamp = message.get("timestamp", datetime.now())
                     st.caption(f"⏰ {timestamp.strftime('%H:%M')}")
 
@@ -75,7 +80,7 @@ Que souhaitez-vous savoir ? 😊""",
         user_message = {
             "role": "user",
             "content": user_input,
-            "timestamp": datetime.now()
+            "timestamp": datetime.now(),
         }
         st.session_state.messages.append(user_message)
 
@@ -89,11 +94,13 @@ Que souhaitez-vous savoir ? 😊""",
                 try:
                     # Traiter la question
                     response_data = st.session_state.chatbot_service.process_question(
-                        user_input)
+                        user_input
+                    )
 
                     # Extraire la réponse
                     response_content = response_data.get(
-                        "response", "❌ Erreur lors du traitement")
+                        "response", "❌ Erreur lors du traitement"
+                    )
                     confidence = response_data.get("confidence", 0.0)
                     intent = response_data.get("intent", "unknown")
 
@@ -104,7 +111,8 @@ Que souhaitez-vous savoir ? 😊""",
                     if st.session_state.get("debug_mode", False):
                         st.caption(
                             f"🎯 Intention: {intent} | 📊 Confiance: {
-                                confidence:.1%}")
+                                confidence:.1%}"
+                        )
 
                     # Si des données sont retournées, les afficher
                     if response_data.get("data"):
@@ -118,8 +126,8 @@ Que souhaitez-vous savoir ? 😊""",
                         "metadata": {
                             "intent": intent,
                             "confidence": confidence,
-                            "data": response_data.get("data")
-                        }
+                            "data": response_data.get("data"),
+                        },
                     }
                     st.session_state.messages.append(assistant_message)
 
@@ -131,7 +139,7 @@ Que souhaitez-vous savoir ? 😊""",
                     error_response = {
                         "role": "assistant",
                         "content": error_message,
-                        "timestamp": datetime.now()
+                        "timestamp": datetime.now(),
                     }
                     st.session_state.messages.append(error_response)
 
@@ -140,6 +148,7 @@ Que souhaitez-vous savoir ? 😊""",
 
     # Sidebar avec options et historique
     show_sidebar()
+
 
 def show_data_insights(data: dict, intent: str):
     """Affiche des insights visuels basés sur les données retournées"""
@@ -173,20 +182,24 @@ def show_data_insights(data: dict, intent: str):
 
         with col1:
             st.markdown("**👥 Consultants**")
-            st.metric("Total", stats['consultants_total'])
-            st.metric("Actifs", stats['consultants_actifs'],
-                      delta=stats['consultants_actifs'] - stats['consultants_inactifs'])
+            st.metric("Total", stats["consultants_total"])
+            st.metric(
+                "Actifs",
+                stats["consultants_actifs"],
+                delta=stats["consultants_actifs"] - stats["consultants_inactifs"],
+            )
 
         with col2:
             st.markdown("**💼 Missions**")
-            st.metric("Total", stats['missions_total'])
-            st.metric("En cours", stats['missions_en_cours'])
+            st.metric("Total", stats["missions_total"])
+            st.metric("En cours", stats["missions_en_cours"])
 
         # Graphique simple avec st.progress
-        if stats['consultants_total'] > 0:
-            actifs_ratio = stats['consultants_actifs'] / stats['consultants_total']
+        if stats["consultants_total"] > 0:
+            actifs_ratio = stats["consultants_actifs"] / stats["consultants_total"]
             st.markdown(f"**Taux d'activité : {actifs_ratio:.1%}**")
             st.progress(actifs_ratio)
+
 
 def show_sidebar():
     """Affiche la sidebar avec les options"""
@@ -197,22 +210,24 @@ def show_sidebar():
         # Bouton pour effacer l'historique
         if st.button("🗑️ Effacer l'historique", type="secondary"):
             st.session_state.messages = []
-            if 'chatbot_service' in st.session_state:
+            if "chatbot_service" in st.session_state:
                 del st.session_state.chatbot_service
             st.rerun()
 
         st.markdown("---")
 
         # Mode debug (optionnel)
-        debug_mode = st.checkbox("🔧 Mode debug",
-                                 value=st.session_state.get("debug_mode", False))
+        debug_mode = st.checkbox(
+            "🔧 Mode debug", value=st.session_state.get("debug_mode", False)
+        )
         st.session_state.debug_mode = debug_mode
 
         st.markdown("---")
         st.markdown("### 💡 Conseils d'utilisation")
 
         with st.expander("🎯 Types de questions", expanded=False):
-            st.markdown("""
+            st.markdown(
+                """
 **💰 Salaires :**
 - "Quel est le salaire de [nom] ?"
 - "Salaire moyen des consultants"
@@ -228,33 +243,37 @@ def show_sidebar():
 **📊 Statistiques :**
 - "Combien de consultants actifs ?"
 - "TJM moyen"
-""")
+"""
+            )
 
         with st.expander("🚀 Fonctionnalités", expanded=False):
-            st.markdown("""
+            st.markdown(
+                """
 ✅ Recherche intelligente de consultants
 ✅ Analyse des salaires et TJM
 ✅ Historique des missions
 ✅ Statistiques en temps réel
 ✅ Interface conversationnelle
-""")
+"""
+            )
 
         st.markdown("---")
         st.markdown("### 📊 Statistiques rapides")
 
         # Afficher quelques stats rapides
         try:
-            if 'chatbot_service' in st.session_state:
+            if "chatbot_service" in st.session_state:
                 stats = st.session_state.chatbot_service._get_general_stats()
 
-                st.metric("👥 Consultants", stats['consultants_total'])
-                st.metric("💼 Missions", stats['missions_total'])
+                st.metric("👥 Consultants", stats["consultants_total"])
+                st.metric("💼 Missions", stats["missions_total"])
 
-                if stats['tjm_moyen'] > 0:
+                if stats["tjm_moyen"] > 0:
                     st.metric("💰 TJM moyen", f"{stats['tjm_moyen']:.0f} €")
 
         except Exception:
             st.caption("⏳ Chargement des statistiques...")
+
 
 if __name__ == "__main__":
     show()

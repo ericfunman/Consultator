@@ -61,9 +61,9 @@ def show_cv_missions(missions: List[Dict], consultant):
             with col2:
                 st.write(f"**Technologies :** {mission.get('technologies', 'N/A')}")
 
-            if mission.get('description'):
+            if mission.get("description"):
                 st.markdown("**Description :**")
-                st.write(mission['description'])
+                st.write(mission["description"])
 
             # Actions sur la mission
             col1, col2, col3 = st.columns(3)
@@ -72,7 +72,8 @@ def show_cv_missions(missions: List[Dict], consultant):
                 if st.button(
                     "➕ Créer mission",
                     key=f"create_mission_{i}_{
-                        consultant.id}"):
+                        consultant.id}",
+                ):
                     create_mission_from_cv(mission, consultant)
 
             with col2:
@@ -115,7 +116,8 @@ def show_cv_skills(analysis: Dict):
             with cols[i % len(cols)]:
                 # Vérifier si la compétence existe déjà pour le consultant
                 existing = check_existing_skill(
-                    skill, st.session_state.get('view_consultant_profile'))
+                    skill, st.session_state.get("view_consultant_profile")
+                )
                 status = "✅ Existe" if existing else "➕ Nouveau"
 
                 if st.button(
@@ -123,10 +125,12 @@ def show_cv_skills(analysis: Dict):
                     key=f"skill_{category}_{i}_{
                         st.session_state.get(
                             'view_consultant_profile',
-                            0)}"):
+                            0)}",
+                ):
                     if not existing:
                         add_skill_from_cv(
-                            skill, st.session_state.get('view_consultant_profile'))
+                            skill, st.session_state.get("view_consultant_profile")
+                        )
                     else:
                         st.info(f"📋 La compétence '{skill}' existe déjà")
 
@@ -167,11 +171,11 @@ def show_cv_summary(analysis: Dict, consultant):
     if "contact" in analysis and analysis["contact"]:
         st.markdown("**Informations de contact :**")
         contact = analysis["contact"]
-        if contact.get('email'):
+        if contact.get("email"):
             st.write(f"📧 Email : {contact['email']}")
-        if contact.get('telephone'):
+        if contact.get("telephone"):
             st.write(f"📞 Téléphone : {contact['telephone']}")
-        if contact.get('linkedin'):
+        if contact.get("linkedin"):
             st.write(f"💼 LinkedIn : {contact['linkedin']}")
 
     # Recommandations
@@ -219,48 +223,51 @@ def categorize_skill(skill: str) -> str:
 
     # Technologies
     tech_keywords = [
-        'python',
-        'java',
-        'javascript',
-        'react',
-        'angular',
-        'vue',
-        'node',
-        'django',
-        'flask',
-        'spring',
-        'hibernate',
-        'sql',
-        'mysql',
-        'postgresql',
-        'mongodb',
-        'docker',
-        'kubernetes',
-        'aws',
-        'azure',
-        'git',
-        'linux',
-        'windows']
+        "python",
+        "java",
+        "javascript",
+        "react",
+        "angular",
+        "vue",
+        "node",
+        "django",
+        "flask",
+        "spring",
+        "hibernate",
+        "sql",
+        "mysql",
+        "postgresql",
+        "mongodb",
+        "docker",
+        "kubernetes",
+        "aws",
+        "azure",
+        "git",
+        "linux",
+        "windows",
+    ]
 
     # Méthodologies
     method_keywords = [
-        'agile',
-        'scrum',
-        'kanban',
-        'devops',
-        'ci/cd',
-        'tdd',
-        'bdd',
-        'uml']
+        "agile",
+        "scrum",
+        "kanban",
+        "devops",
+        "ci/cd",
+        "tdd",
+        "bdd",
+        "uml",
+    ]
 
     # Soft skills
     soft_keywords = [
-        'management',
-        'leadership',
-        'communication',
-        'présentation',
-        'anglais',
-        'français']
+        "management",
+        "leadership",
+        "communication",
+        "présentation",
+        "anglais",
+        "français",
+    ]
 
     for keyword in tech_keywords:
         if keyword in skill_lower:
@@ -285,13 +292,15 @@ def check_existing_skill(skill_name: str, consultant_id: Optional[int]) -> bool:
 
     try:
         with get_database_session() as session:
-            existing = session.query(ConsultantCompetence)\
-                .join(Competence)\
+            existing = (
+                session.query(ConsultantCompetence)
+                .join(Competence)
                 .filter(
                     ConsultantCompetence.consultant_id == consultant_id,
-                    Competence.nom.ilike(f"%{skill_name}%")
-            )\
+                    Competence.nom.ilike(f"%{skill_name}%"),
+                )
                 .first()
+            )
 
             return existing is not None
 
@@ -309,34 +318,35 @@ def add_skill_from_cv(skill_name: str, consultant_id: Optional[int]):
     try:
         with get_database_session() as session:
             # Chercher ou créer la compétence
-            competence = session.query(Competence)\
-                .filter(Competence.nom.ilike(skill_name))\
+            competence = (
+                session.query(Competence)
+                .filter(Competence.nom.ilike(skill_name))
                 .first()
+            )
 
             if not competence:
                 # Créer une nouvelle compétence
                 competence = Competence(
                     nom=skill_name,
-                    categorie=categorize_skill(skill_name).replace(
-                        "🛠️ ",
-                        "").replace(
-                        "📋 ",
-                        "").replace(
-                        "🤝 ",
-                        "").replace(
-                        "📚 ",
-                        ""),
-                    description=f"Compétence extraite du CV")
+                    categorie=categorize_skill(skill_name)
+                    .replace("🛠️ ", "")
+                    .replace("📋 ", "")
+                    .replace("🤝 ", "")
+                    .replace("📚 ", ""),
+                    description=f"Compétence extraite du CV",
+                )
                 session.add(competence)
                 session.flush()
 
             # Vérifier si l'association existe déjà
-            existing_assoc = session.query(ConsultantCompetence)\
+            existing_assoc = (
+                session.query(ConsultantCompetence)
                 .filter(
                     ConsultantCompetence.consultant_id == consultant_id,
-                    ConsultantCompetence.competence_id == competence.id
-            )\
+                    ConsultantCompetence.competence_id == competence.id,
+                )
                 .first()
+            )
 
             if existing_assoc:
                 st.info(f"📋 La compétence '{skill_name}' existe déjà")
@@ -344,12 +354,13 @@ def add_skill_from_cv(skill_name: str, consultant_id: Optional[int]):
 
             # Créer l'association
             from datetime import datetime
+
             consultant_competence = ConsultantCompetence(
                 consultant_id=consultant_id,
                 competence_id=competence.id,
                 niveau=3,  # Niveau par défaut
                 annees_experience=2,  # Expérience par défaut
-                date_acquisition=datetime.now()
+                date_acquisition=datetime.now(),
             )
 
             session.add(consultant_competence)
@@ -381,11 +392,9 @@ def show_cv_skills_statistics(competences: List[str]):
             category = categorize_skill(skill)
             categories[category] = categories.get(category, 0) + 1
 
-        main_category = max(
-            categories.items(),
-            key=lambda x: x[1]) if categories else (
-            "N/A",
-            0)
+        main_category = (
+            max(categories.items(), key=lambda x: x[1]) if categories else ("N/A", 0)
+        )
         st.metric("Catégorie principale", main_category[0])
 
     with col3:
@@ -411,11 +420,11 @@ def calculate_cv_quality_score(analysis: Dict) -> int:
 
     # Informations de contact (20 points max)
     contact = analysis.get("contact", {})
-    if contact.get('email'):
+    if contact.get("email"):
         score += 10
-    if contact.get('telephone'):
+    if contact.get("telephone"):
         score += 5
-    if contact.get('linkedin'):
+    if contact.get("linkedin"):
         score += 5
 
     # Résumé (20 points max)
@@ -436,7 +445,8 @@ def show_cv_recommendations(analysis: Dict, consultant=None):
     missions = analysis.get("missions", [])
     if len(missions) < 3:
         recommendations.append(
-            "⚠️ Ajouter plus de missions dans le CV pour montrer l'expérience")
+            "⚠️ Ajouter plus de missions dans le CV pour montrer l'expérience"
+        )
 
     # Vérifier les compétences
     competences = analysis.get("competences", [])
@@ -445,10 +455,10 @@ def show_cv_recommendations(analysis: Dict, consultant=None):
 
     # Vérifier les informations de contact
     contact = analysis.get("contact", {})
-    if not contact.get('email'):
+    if not contact.get("email"):
         recommendations.append("⚠️ Ajouter une adresse email professionnelle")
 
-    if not contact.get('linkedin'):
+    if not contact.get("linkedin"):
         recommendations.append("💼 Créer un profil LinkedIn si inexistant")
 
     # Vérifier la diversité des compétences
@@ -460,7 +470,8 @@ def show_cv_recommendations(analysis: Dict, consultant=None):
 
         if len(categories) < 2:
             recommendations.append(
-                "📚 Diversifier les compétences (techniques, méthodologiques, soft skills)")
+                "📚 Diversifier les compétences (techniques, méthodologiques, soft skills)"
+            )
 
     # Afficher les recommandations
     if recommendations:
@@ -480,14 +491,14 @@ def create_mission_from_cv(mission_data: Dict, consultant):
             # Pré-remplir avec les données extraites
             titre = st.text_input(
                 "Titre de la mission *",
-                value=mission_data.get('titre', ''),
-                help="Titre de la mission"
+                value=mission_data.get("titre", ""),
+                help="Titre de la mission",
             )
 
             client_name = st.text_input(
                 "Nom du client",
-                value=mission_data.get('client', ''),
-                help="Nom du client"
+                value=mission_data.get("client", ""),
+                help="Nom du client",
             )
 
             # Essayer de trouver le client dans la base
@@ -500,37 +511,35 @@ def create_mission_from_cv(mission_data: Dict, consultant):
             selected_client = st.selectbox(
                 "Client existant ou nouveau",
                 options=client_options,
-                help="Sélectionnez un client existant ou créez-en un nouveau"
+                help="Sélectionnez un client existant ou créez-en un nouveau",
             )
 
             col1, col2 = st.columns(2)
 
             with col1:
                 date_debut = st.date_input(
-                    "Date de début",
-                    value=None,
-                    help="Date de début de la mission"
+                    "Date de début", value=None, help="Date de début de la mission"
                 )
 
             with col2:
                 date_fin = st.date_input(
                     "Date de fin",
                     value=None,
-                    help="Date de fin de la mission (laisser vide si en cours)"
+                    help="Date de fin de la mission (laisser vide si en cours)",
                 )
 
             taux_journalier = st.number_input(
                 "Taux journalier (€)",
                 min_value=0,
                 step=10,
-                help="Taux journalier de la mission"
+                help="Taux journalier de la mission",
             )
 
             description = st.text_area(
                 "Description",
-                value=mission_data.get('description', ''),
+                value=mission_data.get("description", ""),
                 height=100,
-                help="Description détaillée de la mission"
+                help="Description détaillée de la mission",
             )
 
             submitted = st.form_submit_button("💾 Créer la mission", type="primary")
@@ -539,16 +548,19 @@ def create_mission_from_cv(mission_data: Dict, consultant):
                 if not titre:
                     st.error("❌ Le titre est obligatoire")
                 else:
-                    success = save_mission_from_cv({
-                        'titre': titre,
-                        'client_name': client_name,
-                        'selected_client': selected_client,
-                        'date_debut': date_debut,
-                        'date_fin': date_fin,
-                        'taux_journalier': taux_journalier,
-                        'description': description,
-                        'technologies': mission_data.get('technologies', '')
-                    }, consultant.id)
+                    success = save_mission_from_cv(
+                        {
+                            "titre": titre,
+                            "client_name": client_name,
+                            "selected_client": selected_client,
+                            "date_debut": date_debut,
+                            "date_fin": date_fin,
+                            "taux_journalier": taux_journalier,
+                            "description": description,
+                            "technologies": mission_data.get("technologies", ""),
+                        },
+                        consultant.id,
+                    )
 
                     if success:
                         st.success("✅ Mission créée avec succès !")
@@ -566,21 +578,21 @@ def save_mission_from_cv(data: Dict, consultant_id: int) -> bool:
         with get_database_session() as session:
             # Gérer le client
             client_id = None
-            if data['selected_client'] != "Nouveau client":
+            if data["selected_client"] != "Nouveau client":
                 # Chercher le client existant
-                client = session.query(Client)\
-                    .filter(Client.nom == data['selected_client'])\
+                client = (
+                    session.query(Client)
+                    .filter(Client.nom == data["selected_client"])
                     .first()
+                )
                 if client:
                     client_id = client.id
             else:
                 # Créer un nouveau client
-                if data['client_name']:
+                if data["client_name"]:
                     from database.models import Client
-                    new_client = Client(
-                        nom=data['client_name'],
-                        secteur="Non spécifié"
-                    )
+
+                    new_client = Client(nom=data["client_name"], secteur="Non spécifié")
                     session.add(new_client)
                     session.flush()
                     client_id = new_client.id
@@ -592,15 +604,17 @@ def save_mission_from_cv(data: Dict, consultant_id: int) -> bool:
 
             mission = Mission(
                 consultant_id=consultant_id,
-                titre=data['titre'],
+                titre=data["titre"],
                 client_id=client_id,
-                date_debut=data['date_debut'],
-                date_fin=data['date_fin'],
-                en_cours=not bool(
-                    data['date_fin']),
-                taux_journalier=data['taux_journalier'] if data['taux_journalier'] > 0 else None,
-                description=data['description'],
-                competences_requises=data['technologies'])
+                date_debut=data["date_debut"],
+                date_fin=data["date_fin"],
+                en_cours=not bool(data["date_fin"]),
+                taux_journalier=(
+                    data["taux_journalier"] if data["taux_journalier"] > 0 else None
+                ),
+                description=data["description"],
+                competences_requises=data["technologies"],
+            )
 
             session.add(mission)
             session.commit()
@@ -618,42 +632,43 @@ def analyze_mission_details(mission_data: Dict):
     st.markdown("### 🔍 Analyse de la mission")
 
     # Analyser la durée estimée
-    periode = mission_data.get('periode', '')
+    periode = mission_data.get("periode", "")
     if periode:
         st.write(f"**Période détectée :** {periode}")
 
         # Essayer d'extraire les dates
         try:
             # Analyse simple de la période
-            if 'à' in periode.lower() or '-' in periode:
+            if "à" in periode.lower() or "-" in periode:
                 st.info("ℹ️ Mission avec période définie détectée")
-            elif 'présent' in periode.lower() or 'actuellement' in periode.lower():
+            elif "présent" in periode.lower() or "actuellement" in periode.lower():
                 st.info("ℹ️ Mission en cours détectée")
         except Exception as e:
             st.warning(f"⚠️ Erreur lors de l'extraction des dates: {e}")
 
     # Analyser les technologies
-    technologies = mission_data.get('technologies', '')
+    technologies = mission_data.get("technologies", "")
     if technologies:
         st.write(f"**Technologies :** {technologies}")
 
         # Compter les technologies
-        tech_list = [t.strip() for t in technologies.split(',') if t.strip()]
+        tech_list = [t.strip() for t in technologies.split(",") if t.strip()]
         st.write(f"**Nombre de technologies :** {len(tech_list)}")
 
     # Analyser la description
-    description = mission_data.get('description', '')
+    description = mission_data.get("description", "")
     if description:
         word_count = len(description.split())
         st.write(f"**Longueur description :** {word_count} mots")
 
         # Détecter des mots-clés
         keywords = [
-            'responsable',
-            'développement',
-            'conception',
-            'maintenance',
-            'migration']
+            "responsable",
+            "développement",
+            "conception",
+            "maintenance",
+            "migration",
+        ]
         found_keywords = [kw for kw in keywords if kw in description.lower()]
         if found_keywords:
             st.write(f"**Mots-clés détectés :** {', '.join(found_keywords)}")
@@ -674,7 +689,7 @@ Description: {mission_data.get('description', 'N/A')}
         "Informations de la mission (copiez-collez)",
         value=mission_text.strip(),
         height=150,
-        key="mission_clipboard"
+        key="mission_clipboard",
     )
 
     st.info("ℹ️ Copiez le contenu ci-dessus pour l'utiliser ailleurs")
@@ -686,7 +701,9 @@ def save_cv_analysis_to_profile(analysis: Dict, consultant):
     try:
         # Cette fonction pourrait mettre à jour le profil avec les informations
         # extraites
-        st.success("✅ Analyse sauvegardée dans le profil (fonctionnalité à implémenter)")
+        st.success(
+            "✅ Analyse sauvegardée dans le profil (fonctionnalité à implémenter)"
+        )
 
         # TODO: Implémenter la sauvegarde effective des données extraites
 
@@ -731,10 +748,10 @@ def generate_cv_analysis_report(analysis: Dict, consultant):
             recommendations.append("- Ajouter plus de compétences techniques")
 
         contact = analysis.get("contact", {})
-        if not contact.get('email'):
+        if not contact.get("email"):
             recommendations.append("- Ajouter une adresse email professionnelle")
 
-        if not contact.get('linkedin'):
+        if not contact.get("linkedin"):
             recommendations.append("- Créer un profil LinkedIn")
 
         if not recommendations:
@@ -752,7 +769,8 @@ def generate_cv_analysis_report(analysis: Dict, consultant):
                 consultant.nom}_{
                 datetime.now().strftime('%Y%m%d')}.md",
             mime="text/markdown",
-            key="download_analysis_report")
+            key="download_analysis_report",
+        )
 
         st.success("✅ Rapport généré avec succès !")
 
@@ -772,15 +790,17 @@ def compare_cv_with_profile(analysis: Dict, consultant):
 
         with get_database_session() as session:
             # Récupérer les compétences du profil
-            profile_skills = session.query(Competence)\
-                .join(ConsultantCompetence)\
-                .filter(ConsultantCompetence.consultant_id == consultant.id)\
+            profile_skills = (
+                session.query(Competence)
+                .join(ConsultantCompetence)
+                .filter(ConsultantCompetence.consultant_id == consultant.id)
                 .all()
+            )
 
             profile_skill_names = [skill.nom.lower() for skill in profile_skills]
 
             # Compétences du CV
-            cv_skills = [skill.lower() for skill in analysis.get('competences', [])]
+            cv_skills = [skill.lower() for skill in analysis.get("competences", [])]
 
             # Comparaison
             common_skills = set(profile_skill_names) & set(cv_skills)
@@ -825,8 +845,8 @@ def show_career_suggestions(analysis: Dict, consultant):
 
     try:
         # Analyser les compétences
-        competences = analysis.get('competences', [])
-        missions = analysis.get('missions', [])
+        competences = analysis.get("competences", [])
+        missions = analysis.get("missions", [])
 
         suggestions = []
 
@@ -834,26 +854,37 @@ def show_career_suggestions(analysis: Dict, consultant):
         if competences:
             # Détecter le domaine principal
             tech_count = sum(
-                1 for skill in competences if categorize_skill(skill) == "🛠️ Technologies")
+                1
+                for skill in competences
+                if categorize_skill(skill) == "🛠️ Technologies"
+            )
             method_count = sum(
-                1 for skill in competences if categorize_skill(skill) == "📋 Méthodologies")
+                1
+                for skill in competences
+                if categorize_skill(skill) == "📋 Méthodologies"
+            )
 
             if tech_count > method_count:
                 suggestions.append(
-                    "💡 Focus sur les aspects techniques - considérer une certification architecte")
+                    "💡 Focus sur les aspects techniques - considérer une certification architecte"
+                )
             elif method_count > tech_count:
                 suggestions.append(
-                    "💡 Orientation management - formation en leadership d'équipe")
+                    "💡 Orientation management - formation en leadership d'équipe"
+                )
 
             # Détecter des lacunes
-            has_cloud = any('aws' in skill.lower() or 'azure' in skill.lower()
-                            for skill in competences)
-            has_devops = any('docker' in skill.lower()
-                             or 'kubernetes' in skill.lower() for skill in competences)
+            has_cloud = any(
+                "aws" in skill.lower() or "azure" in skill.lower()
+                for skill in competences
+            )
+            has_devops = any(
+                "docker" in skill.lower() or "kubernetes" in skill.lower()
+                for skill in competences
+            )
 
             if not has_cloud:
-                suggestions.append(
-                    "☁️ Acquérir des compétences cloud (AWS, Azure, GCP)")
+                suggestions.append("☁️ Acquérir des compétences cloud (AWS, Azure, GCP)")
 
             if not has_devops:
                 suggestions.append("🔄 Se former aux pratiques DevOps et CI/CD")
@@ -863,21 +894,25 @@ def show_career_suggestions(analysis: Dict, consultant):
             avg_mission_length = len(missions)
             if avg_mission_length < 3:
                 suggestions.append(
-                    "📈 Accumuler plus d'expérience sur différents projets")
+                    "📈 Accumuler plus d'expérience sur différents projets"
+                )
 
         # Suggestions générales
-        suggestions.extend([
-            "🎓 Poursuivre une formation continue",
-            "🌍 Améliorer les compétences linguistiques",
-            "🤝 Développer les soft skills (communication, leadership)"
-        ])
+        suggestions.extend(
+            [
+                "🎓 Poursuivre une formation continue",
+                "🌍 Améliorer les compétences linguistiques",
+                "🤝 Développer les soft skills (communication, leadership)",
+            ]
+        )
 
         # Afficher les suggestions
         for suggestion in suggestions:
             st.write(f"• {suggestion}")
 
         st.info(
-            "💡 Ces suggestions sont basées sur l'analyse de votre CV et peuvent être adaptées à vos objectifs")
+            "💡 Ces suggestions sont basées sur l'analyse de votre CV et peuvent être adaptées à vos objectifs"
+        )
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'analyse des suggestions: {e}")

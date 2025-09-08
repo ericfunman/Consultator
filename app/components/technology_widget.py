@@ -1,6 +1,7 @@
 """
 Widget de sélection de technologies avec référentiel
 """
+
 import os
 import sys
 from typing import List
@@ -13,10 +14,8 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
 def technology_multiselect(
-        label: str,
-        current_technologies: str = "",
-        key: str = None,
-        help_text: str = None) -> str:
+    label: str, current_technologies: str = "", key: str = None, help_text: str = None
+) -> str:
     """
     Widget de sélection multiple de technologies avec possibilité d'ajout
 
@@ -36,8 +35,9 @@ def technology_multiselect(
     # Parser les technologies actuelles
     current_techs = []
     if current_technologies:
-        current_techs_raw = [tech.strip()
-                             for tech in current_technologies.split(',') if tech.strip()]
+        current_techs_raw = [
+            tech.strip() for tech in current_technologies.split(",") if tech.strip()
+        ]
 
         # Matcher les technologies actuelles avec celles disponibles (insensible à
         # la casse)
@@ -70,21 +70,22 @@ def technology_multiselect(
             options=all_techs,
             default=valid_current_techs,
             key=key,
-            help=help_text or "Sélectionnez les technologies utilisées"
+            help=help_text or "Sélectionnez les technologies utilisées",
         )
 
         def show_technologies_referentiel():
             """Page de gestion du référentiel de technologies"""
+
         st.markdown("<br>", unsafe_allow_html=True)  # Espacement
         if st.button("➕ Ajouter", key=f"{key}_add_btn" if key else "add_tech_btn"):
-            st.session_state[f'show_add_tech_{key}'] = True
+            st.session_state[f"show_add_tech_{key}"] = True
 
     # Formulaire d'ajout de technologie personnalisée
-    if st.session_state.get(f'show_add_tech_{key}', False):
+    if st.session_state.get(f"show_add_tech_{key}", False):
         with st.expander("➕ Ajouter une technologie personnalisée", expanded=True):
             new_tech_name = st.text_input(
-                "Nom de la technologie",
-                key=f"{key}_new_tech_name")
+                "Nom de la technologie", key=f"{key}_new_tech_name"
+            )
             new_tech_category = st.selectbox(
                 "Catégorie",
                 [
@@ -99,18 +100,19 @@ def technology_multiselect(
                     "Architecture & Design",
                     "Sécurité",
                     "Systèmes d'exploitation",
-                    "Méthodologies"
+                    "Méthodologies",
                 ],
-                key=f"{key}_new_tech_cat"
+                key=f"{key}_new_tech_cat",
             )
             col_add_btn, col_cancel_btn = st.columns(2)
             with col_add_btn:
                 if st.button("Ajouter", key=f"{key}_confirm_add", type="primary"):
                     if new_tech_name:
                         if TechnologyService.add_custom_technology(
-                                new_tech_name, new_tech_category):
+                            new_tech_name, new_tech_category
+                        ):
                             st.success(f"✅ Technologie '{new_tech_name}' ajoutée !")
-                            st.session_state[f'show_add_tech_{key}'] = False
+                            st.session_state[f"show_add_tech_{key}"] = False
                             st.rerun()
                         else:
                             st.error("❌ Cette technologie existe déjà")
@@ -118,24 +120,25 @@ def technology_multiselect(
                         st.error("❌ Veuillez saisir le nom de la technologie")
             with col_cancel_btn:
                 if st.button("Annuler", key=f"{key}_cancel_add"):
-                    st.session_state[f'show_add_tech_{key}'] = False
+                    st.session_state[f"show_add_tech_{key}"] = False
                     st.rerun()
 
     # Retourner la chaîne des technologies sélectionnées
-    return ', '.join(selected_techs)
+    return ", ".join(selected_techs)
 
 
 def show_technologies_referentiel():
     """Page de gestion du référentiel de technologies"""
     st.subheader("🛠️ Référentiel des Technologies")
-    tab1, tab2 = st.tabs(["📋 Technologies disponibles",
-                         "➕ Gérer les technologies personnalisées"])
+    tab1, tab2 = st.tabs(
+        ["📋 Technologies disponibles", "➕ Gérer les technologies personnalisées"]
+    )
     with tab1:
         # Affichage du référentiel par catégorie
         technologies_by_cat = TechnologyService.get_technologies_by_category()
         search_query = st.text_input(
-            "🔍 Rechercher une technologie",
-            placeholder="Ex: Python, React, Docker...")
+            "🔍 Rechercher une technologie", placeholder="Ex: Python, React, Docker..."
+        )
         if search_query:
             # Recherche
             found_techs = TechnologyService.search_technologies(search_query)
@@ -173,15 +176,18 @@ def show_technologies_referentiel():
                     "Architecture & Design",
                     "Sécurité",
                     "Systèmes d'exploitation",
-                    "Méthodologies"
-                ]
+                    "Méthodologies",
+                ],
             )
             st.text_area("Description (optionnel)")
             if st.form_submit_button("➕ Ajouter la technologie", type="primary"):
                 if tech_name:
                     if TechnologyService.add_custom_technology(
-                            tech_name, tech_category):
-                        st.success(f"✅ Technologie '{tech_name}' ajoutée avec succès !")
+                        tech_name, tech_category
+                    ):
+                        st.success(
+                            f"✅ Technologie '{tech_name}' ajoutée avec succès !"
+                        )
                         st.rerun()
                     else:
                         st.error("❌ Cette technologie existe déjà")
@@ -200,7 +206,7 @@ def show_technologies_referentiel():
                     st.write(f"*{tech['categorie']}*")
                 with col3:
                     if st.button("🗑️", key=f"del_{tech['id']}", help="Supprimer"):
-                        if TechnologyService.delete_custom_technology(tech['id']):
+                        if TechnologyService.delete_custom_technology(tech["id"]):
                             st.success("✅ Technologie supprimée !")
                             st.rerun()
         else:

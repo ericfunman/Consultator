@@ -20,7 +20,7 @@ STREAMLIT_CONFIG = {
     "page_title": "Consultator",
     "page_icon": "👥",
     "layout": "wide",
-    "initial_sidebar_state": "expanded"
+    "initial_sidebar_state": "expanded",
 }
 
 # Configuration de l'application
@@ -30,14 +30,14 @@ APP_CONFIG = {
     "description": "Plateforme de gestion de practice data",
     "author": "Équipe Consultator",
     "max_file_size": 10 * 1024 * 1024,  # 10MB
-    "supported_cv_formats": [".pdf", ".docx", ".doc"]
+    "supported_cv_formats": [".pdf", ".docx", ".doc"],
 }
 
 # Paramètres de pagination
 PAGINATION = {
     "consultants_per_page": 20,
     "missions_per_page": 15,
-    "max_search_results": 100
+    "max_search_results": 100,
 }
 
 # Messages de l'application
@@ -50,7 +50,7 @@ MESSAGES = {
     "file_upload_success": "📄 Fichier uploadé avec succès !",
     "file_upload_error": "❌ Erreur lors de l'upload du fichier",
     "cv_parsing_success": "🎯 CV analysé avec succès !",
-    "cv_parsing_error": "❌ Erreur lors de l'analyse du CV"
+    "cv_parsing_error": "❌ Erreur lors de l'analyse du CV",
 }
 
 # Styles CSS personnalisés
@@ -114,5 +114,5 @@ def get_app_info():
         "version": APP_CONFIG["version"],
         "description": APP_CONFIG["description"],
         "database_path": str(DATABASE_PATH),
-        "uploads_path": str(UPLOADS_DIR)
+        "uploads_path": str(UPLOADS_DIR),
     }

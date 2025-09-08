@@ -3,7 +3,6 @@ Page d'accueil de Consultator
 Dashboard principal avec statistiques et vue d'ensemble
 """
 
-from database.database import get_database_info
 import os
 import sys
 import warnings
@@ -12,8 +11,10 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from database.database import get_database_info
+
 # Supprimer les FutureWarnings de pandas
-warnings.filterwarnings('ignore', category=FutureWarning, message=".*deprecated.*")
+warnings.filterwarnings("ignore", category=FutureWarning, message=".*deprecated.*")
 
 
 # Import des services
@@ -109,9 +110,7 @@ def show_dashboard_charts():
             dates.append(last_day)
             current = next_month
 
-        revenus = [
-            50000 + i * 5000 + (i % 3) * 2000 for i in range(len(dates))
-        ]
+        revenus = [50000 + i * 5000 + (i % 3) * 2000 for i in range(len(dates))]
 
         df_revenus = pd.DataFrame({"Mois": dates, "Revenus": revenus})
 

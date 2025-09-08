@@ -88,17 +88,17 @@ class ChatbotService:
                 "response": f"❌ Désolé, j'ai rencontré une erreur : {str(e)}",
                 "data": None,
                 "intent": "error",
-                "confidence": 0.0
+                "confidence": 0.0,
             }
 
     def _clean_question(self, question: str) -> str:
         """Nettoie et normalise la question"""
         # Supprimer la ponctuation excessive
-        question = re.sub(r'[!]{2,}', '!', question)
-        question = re.sub(r'[?]{2,}', '?', question)
+        question = re.sub(r"[!]{2,}", "!", question)
+        question = re.sub(r"[?]{2,}", "?", question)
 
         # Normaliser les espaces
-        question = re.sub(r'\s+', ' ', question.strip())
+        question = re.sub(r"\s+", " ", question.strip())
 
         return question.lower()
 
@@ -107,88 +107,222 @@ class ChatbotService:
 
         # D'abord, vérifier s'il y a un nom de consultant mentionné
         all_consultants = self.session.query(Consultant).all()
-        has_consultant_name = False
+        has_consultant_name: bool = False
         for consultant in all_consultants:
-            if (re.search(rf'\b{re.escape(consultant.prenom.lower())}\b', question) or
-                    re.search(rf'\b{re.escape(consultant.nom.lower())}\b', question)):
+            if re.search(
+                rf"\b{re.escape(consultant.prenom.lower())}\b", question
+            ) or re.search(rf"\b{re.escape(consultant.nom.lower())}\b", question):
                 has_consultant_name = True
                 break
 
         # Patterns pour identifier les intentions
         intent_patterns = {
             "salaire": [
-                r"salaire", r"rémunération", r"paie", r"combien gagne",
-                r"revenus", r"euros", r"€", r"salaire de", r"gagne", r"cjm", r"coût journalier"
+                r"salaire",
+                r"rémunération",
+                r"paie",
+                r"combien gagne",
+                r"revenus",
+                r"euros",
+                r"€",
+                r"salaire de",
+                r"gagne",
+                r"cjm",
+                r"coût journalier",
             ],
             "experience": [
-                r"expérience", r"experience", r"années d'expérience", r"annees d'experience",
-                r"ancienneté", r"seniorité", r"séniorité", r"depuis quand", r"depuis combien",
-                r"combien d'années", r"combien d'annees", r"quel âge", r"âge professionnel"
+                r"expérience",
+                r"experience",
+                r"années d'expérience",
+                r"annees d'experience",
+                r"ancienneté",
+                r"seniorité",
+                r"séniorité",
+                r"depuis quand",
+                r"depuis combien",
+                r"combien d'années",
+                r"combien d'annees",
+                r"quel âge",
+                r"âge professionnel",
             ],
             "profil_professionnel": [
-                r"grade", r"niveau", r"poste", r"fonction", r"junior", r"confirmé", r"senior",
-                r"manager", r"directeur", r"type contrat", r"type de contrat", r"contrat",
-                r"cdi", r"cdd", r"stagiaire", r"alternant", r"indépendant", r"freelance",
-                r"société", r"societe", r"quanteam", r"asigma", r"entreprise"
+                r"grade",
+                r"niveau",
+                r"poste",
+                r"fonction",
+                r"junior",
+                r"confirmé",
+                r"senior",
+                r"manager",
+                r"directeur",
+                r"type contrat",
+                r"type de contrat",
+                r"contrat",
+                r"cdi",
+                r"cdd",
+                r"stagiaire",
+                r"alternant",
+                r"indépendant",
+                r"freelance",
+                r"société",
+                r"societe",
+                r"quanteam",
+                r"asigma",
+                r"entreprise",
             ],
             "competences": [
-                r"compétences", r"competences", r"maîtrise", r"maitrise", r"sait faire", r"technologies",
-                r"langages", r"outils", r"expertise", r"python", r"sql", r"java",
-                r"quelles.+compétences", r"quelles.+competences", r"skills", r"techno", r"connaît", r"connait"
+                r"compétences",
+                r"competences",
+                r"maîtrise",
+                r"maitrise",
+                r"sait faire",
+                r"technologies",
+                r"langages",
+                r"outils",
+                r"expertise",
+                r"python",
+                r"sql",
+                r"java",
+                r"quelles.+compétences",
+                r"quelles.+competences",
+                r"skills",
+                r"techno",
+                r"connaît",
+                r"connait",
             ],
             "langues": [
-                r"langues?", r"langue", r"parle", r"parlent", r"anglais", r"français", r"espagnol",
-                r"allemand", r"italien", r"bilingue", r"niveau.+langue", r"parle.+anglais",
-                r"qui.+parle", r"quelles.+langues", r"polyglotte", r"linguistique"
+                r"langues?",
+                r"langue",
+                r"parle",
+                r"parlent",
+                r"anglais",
+                r"français",
+                r"espagnol",
+                r"allemand",
+                r"italien",
+                r"bilingue",
+                r"niveau.+langue",
+                r"parle.+anglais",
+                r"qui.+parle",
+                r"quelles.+langues",
+                r"polyglotte",
+                r"linguistique",
             ],
             "missions": [
-                r"missions", r"mission", r"travaille", r"chez", r"entreprise", r"client",
-                r"projet", r"bnp", r"paribas", r"société générale", r"combien.+missions?",
-                r"nombre.+missions?", r"projets"
+                r"missions",
+                r"mission",
+                r"travaille",
+                r"chez",
+                r"entreprise",
+                r"client",
+                r"projet",
+                r"bnp",
+                r"paribas",
+                r"société générale",
+                r"combien.+missions?",
+                r"nombre.+missions?",
+                r"projets",
             ],
             "contact": [
-                r"mail", r"email", r"e-mail", r"téléphone", r"tel", r"numéro",
-                r"contact", r"joindre", r"coordonnées"
+                r"mail",
+                r"email",
+                r"e-mail",
+                r"téléphone",
+                r"tel",
+                r"numéro",
+                r"contact",
+                r"joindre",
+                r"coordonnées",
             ],
             "liste_consultants": [
-                r"quels sont les consultants", r"liste des consultants", r"consultants disponibles",
-                r"consultants actifs", r"tous les consultants", r"lister les consultants",
-                r"qui sont les consultants", r"montrer les consultants"
+                r"quels sont les consultants",
+                r"liste des consultants",
+                r"consultants disponibles",
+                r"consultants actifs",
+                r"tous les consultants",
+                r"lister les consultants",
+                r"qui sont les consultants",
+                r"montrer les consultants",
             ],
             "practices": [
-                r"practice", r"practices", r"qui est dans la practice", r"consultants de la practice",
-                r"practice data", r"practice quant", r"équipe", r"dans quelle practice"
+                r"practice",
+                r"practices",
+                r"qui est dans la practice",
+                r"consultants de la practice",
+                r"practice data",
+                r"practice quant",
+                r"équipe",
+                r"dans quelle practice",
             ],
             "cvs": [
-                r"cv", r"curriculum", r"document", r"fichier", r"upload", r"téléchargé"
+                r"cv",
+                r"curriculum",
+                r"document",
+                r"fichier",
+                r"upload",
+                r"téléchargé",
             ],
             "statistiques": [
-                r"combien.+consultants", r"nombre.+consultants", r"combien.+dans.+base",
-                r"nombre", r"moyenne", r"total", r"statistiques", r"combien.+missions",
-                r"actifs", r"inactifs", r"tjm moyen", r"combien y a", r"il y a combien"
+                r"combien.+consultants",
+                r"nombre.+consultants",
+                r"combien.+dans.+base",
+                r"nombre",
+                r"moyenne",
+                r"total",
+                r"statistiques",
+                r"combien.+missions",
+                r"actifs",
+                r"inactifs",
+                r"tjm moyen",
+                r"combien y a",
+                r"il y a combien",
             ],
             "disponibilite": [  # Nouvelle intention V1.2.2
-                r"disponible", r"disponibilité", r"libre", r"quand.+libre", r"quand.+disponible",
-                r"date.+disponibilité", r"fin.+mission", r"libéré", r"fini", r"termine",
-                r"asap", r"immédiatement", r"tout de suite", r"prochaine disponibilité"
+                r"disponible",
+                r"disponibilité",
+                r"libre",
+                r"quand.+libre",
+                r"quand.+disponible",
+                r"date.+disponibilité",
+                r"fin.+mission",
+                r"libéré",
+                r"fini",
+                r"termine",
+                r"asap",
+                r"immédiatement",
+                r"tout de suite",
+                r"prochaine disponibilité",
             ],
             "tjm_mission": [  # Nouvelle intention V1.2.2
-                r"tjm.+mission", r"taux.+mission", r"prix.+mission", r"coût.+mission",
-                r"tarif.+mission", r"facturation.+mission", r"journalier.+mission",
-                r"combien.+coûte.+mission", r"prix.+journée.+mission",
-                r"tjm mission", r"prix mission", r"coût mission", r"tarif mission",
-                r"taux journalier mission", r"combien coûte mission"
+                r"tjm.+mission",
+                r"taux.+mission",
+                r"prix.+mission",
+                r"coût.+mission",
+                r"tarif.+mission",
+                r"facturation.+mission",
+                r"journalier.+mission",
+                r"combien.+coûte.+mission",
+                r"prix.+journée.+mission",
+                r"tjm mission",
+                r"prix mission",
+                r"coût mission",
+                r"tarif mission",
+                r"taux journalier mission",
+                r"combien coûte mission",
             ],
             "recherche_consultant": [
-                r"qui est", r"consultant", r"profil", r"information sur",
-                r"details"
-            ]
+                r"qui est",
+                r"consultant",
+                r"profil",
+                r"information sur",
+                r"details",
+            ],
         }
 
         # Scorer chaque intention
-        intent_scores = {}
+        intent_scores: Dict[str, int] = {}
         for intent, patterns in intent_patterns.items():
-            score = 0
+            score: int = 0
             for pattern in patterns:
                 if re.search(pattern, question):
                     score += 1
@@ -206,11 +340,9 @@ class ChatbotService:
 
         # NOUVELLE RÈGLE V1.2.2 : Prioriser tjm_mission sur missions si TJM est
         # mentionné
-        if intent_scores.get(
-                "tjm_mission",
-                0) > 0 and re.search(
-                r"tjm|taux|prix|coût|tarif",
-                question):
+        if intent_scores.get("tjm_mission", 0) > 0 and re.search(
+            r"tjm|taux|prix|coût|tarif", question
+        ):
             return "tjm_mission"
 
         # Si un nom de consultant est mentionné et qu'on parle de missions,
@@ -222,7 +354,8 @@ class ChatbotService:
         # du profil professionnel
         if re.search(
             r"combien.+(consultants?).+(cdi|cdd|stagiaire|alternant|indépendant)",
-                question):
+            question,
+        ):
             return "profil_professionnel"
 
         # Si c'est une question de type "qui travaille chez", c'est du profil
@@ -245,19 +378,20 @@ class ChatbotService:
 
         # Retourner l'intention avec le meilleur score
         if max(intent_scores.values()) > 0:
-            return max(intent_scores, key=intent_scores.get)
+            best_intent = max(intent_scores, key=lambda k: intent_scores[k])
+            return best_intent
         else:
             return "general"
 
     def _extract_entities(self, question: str) -> Dict[str, List[str]]:
         """Extrait les entités nommées de la question"""
-        entities = {
+        entities: Dict[str, List[str]] = {
             "noms": [],
             "entreprises": [],
             "competences": [],
             "langues": [],
             "montants": [],
-            "practices": []
+            "practices": [],
         }
 
         # Patterns pour extraire les entités
@@ -266,13 +400,13 @@ class ChatbotService:
         all_consultants = self.session.query(Consultant).all()
         for consultant in all_consultants:
             # Chercher le prénom dans la question (insensible à la casse)
-            if re.search(rf'\b{re.escape(consultant.prenom.lower())}\b', question):
+            if re.search(rf"\b{re.escape(consultant.prenom.lower())}\b", question):
                 entities["noms"].append(consultant.prenom)
             # Chercher le nom de famille dans la question
-            if re.search(rf'\b{re.escape(consultant.nom.lower())}\b', question):
+            if re.search(rf"\b{re.escape(consultant.nom.lower())}\b", question):
                 entities["noms"].append(consultant.nom)
             # Chercher le nom complet
-            nom_complet = f"{consultant.prenom} {consultant.nom}".lower()
+            nom_complet: str = f"{consultant.prenom} {consultant.nom}".lower()
             if nom_complet in question:
                 entities["noms"].append(f"{consultant.prenom} {consultant.nom}")
 
@@ -280,19 +414,40 @@ class ChatbotService:
         entities["noms"] = list(dict.fromkeys(entities["noms"]))
 
         # Entreprises connues
-        entreprises_connues = [
-            "bnp paribas", "société générale", "axa", "orange", "airbus",
-            "renault", "peugeot", "total", "carrefour", "crédit agricole"
+        entreprises_connues: List[str] = [
+            "bnp paribas",
+            "société générale",
+            "axa",
+            "orange",
+            "airbus",
+            "renault",
+            "peugeot",
+            "total",
+            "carrefour",
+            "crédit agricole",
         ]
         for entreprise in entreprises_connues:
             if entreprise in question:
                 entities["entreprises"].append(entreprise)
 
         # Compétences techniques - chercher dans la liste prédéfinie ET dans la base
-        competences_connues = [
-            "python", "java", "javascript", "sql", "react", "angular",
-            "node.js", "docker", "kubernetes", "aws", "azure", "power bi",
-            "agile", "scrum", "finance", "devops"
+        competences_connues: List[str] = [
+            "python",
+            "java",
+            "javascript",
+            "sql",
+            "react",
+            "angular",
+            "node.js",
+            "docker",
+            "kubernetes",
+            "aws",
+            "azure",
+            "power bi",
+            "agile",
+            "scrum",
+            "finance",
+            "devops",
         ]
         for competence in competences_connues:
             if competence in question:
@@ -300,9 +455,10 @@ class ChatbotService:
 
         # Chercher aussi dans la base de données des compétences
         from database.models import Competence
+
         all_competences = self.session.query(Competence).all()
         for competence in all_competences:
-            if re.search(rf'\b{re.escape(competence.nom.lower())}\b', question):
+            if re.search(rf"\b{re.escape(competence.nom.lower())}\b", question):
                 entities["competences"].append(competence.nom)
 
         # Supprimer les doublons
@@ -310,8 +466,9 @@ class ChatbotService:
 
         # Langues - chercher dans la base de données des langues
         from database.models import Langue
+
         all_langues = self.session.query(Langue).all()
-        langues_connues = [
+        langues_connues: List[str] = [
             "français",
             "anglais",
             "espagnol",
@@ -321,7 +478,8 @@ class ChatbotService:
             "chinois",
             "japonais",
             "arabe",
-            "russe"]
+            "russe",
+        ]
 
         # Chercher d'abord dans les langues prédéfinies
         for langue in langues_connues:
@@ -330,24 +488,25 @@ class ChatbotService:
 
         # Chercher dans la base de données
         for langue in all_langues:
-            if re.search(rf'\b{re.escape(langue.nom.lower())}\b', question):
+            if re.search(rf"\b{re.escape(langue.nom.lower())}\b", question):
                 entities["langues"].append(langue.nom)
 
         # Supprimer les doublons
         entities["langues"] = list(dict.fromkeys(entities["langues"]))
 
         # Montants
-        montants_pattern = r'(\d+(?:\s*\d{3})*)\s*(?:euros?|€)'
-        montants_matches = re.findall(montants_pattern, question)
+        montants_pattern: str = r"(\d+(?:\s*\d{3})*)\s*(?:euros?|€)"
+        montants_matches: List[str] = re.findall(montants_pattern, question)
         entities["montants"] = [
-            montant.replace(
-                ' ', '') for montant in montants_matches]
+            montant.replace(" ", "") for montant in montants_matches
+        ]
 
         # Practices - chercher dans la base de données
         from database.models import Practice
+
         all_practices = self.session.query(Practice).filter(Practice.actif).all()
         for practice in all_practices:
-            if re.search(rf'\b{re.escape(practice.nom.lower())}\b', question):
+            if re.search(rf"\b{re.escape(practice.nom.lower())}\b", question):
                 entities["practices"].append(practice.nom)
 
         return entities
@@ -356,12 +515,14 @@ class ChatbotService:
         """Gère les questions sur les salaires et le CJM"""
 
         # Détecter si c'est une question sur le CJM
-        is_cjm_question = "cjm" in self.last_question.lower(
-        ) or "coût journalier" in self.last_question.lower()
+        is_cjm_question = (
+            "cjm" in self.last_question.lower()
+            or "coût journalier" in self.last_question.lower()
+        )
 
         # Si un nom est mentionné, chercher ce consultant spécifique
         if entities["noms"]:
-            nom_recherche = entities["noms"][0]
+            nom_recherche: str = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom_recherche)
 
             if consultant:
@@ -369,18 +530,28 @@ class ChatbotService:
                     if is_cjm_question:
                         # Calculer le CJM
                         cjm = consultant.salaire_actuel * 1.8 / 216
-                        response = f"📈 Le CJM (Coût Journalier Moyen) de **{
-                            consultant.prenom} {
-                            consultant.nom}** est de **{
-                            cjm:,.0f} €**."
+                        response = (
+                            "📈 Le CJM (Coût Journalier Moyen) de **"
+                            + consultant.prenom
+                            + " "
+                            + consultant.nom
+                            + "** est de **"
+                            + f"{cjm:,.0f}"
+                            + " €**."
+                        )
                         response += f"\n💡 Calcul : {
                             consultant.salaire_actuel:,.0f} € × 1.8 ÷ 216 = {
                             cjm:,.0f} €"
                     else:
-                        response = f"💰 Le salaire de **{
-                            consultant.prenom} {
-                            consultant.nom}** est de **{
-                            consultant.salaire_actuel:,.0f} €** par an."
+                        response = (
+                            "💰 Le salaire de **"
+                            + consultant.prenom
+                            + " "
+                            + consultant.nom
+                            + "** est de **"
+                            + f"{consultant.salaire_actuel:,.0f}"
+                            + " €** par an."
+                        )
 
                     if not consultant.disponibilite:
                         response += "\n⚠️ Attention : ce consultant est actuellement indisponible."
@@ -402,18 +573,23 @@ class ChatbotService:
                             "prenom": consultant.prenom,
                             "salaire": consultant.salaire_actuel,
                             "cjm": (
-                                consultant.salaire_actuel *
-                                1.8 /
-                                216) if consultant.salaire_actuel else None,
-                            "disponibilite": consultant.disponibilite}},
+                                (consultant.salaire_actuel * 1.8 / 216)
+                                if consultant.salaire_actuel
+                                else None
+                            ),
+                            "disponibilite": consultant.disponibilite,
+                        }
+                    },
                     "intent": "salaire",
-                    "confidence": 0.9}
+                    "confidence": 0.9,
+                }
             else:
                 return {
                     "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom_recherche}** dans la base de données.",
                     "data": None,
                     "intent": "salaire",
-                    "confidence": 0.7}
+                    "confidence": 0.7,
+                }
 
         # Sinon, donner des statistiques générales
         else:
@@ -430,7 +606,7 @@ class ChatbotService:
                 "response": response,
                 "data": {"stats": stats},
                 "intent": "salaire",
-                "confidence": 0.8
+                "confidence": 0.8,
             }
 
     def _handle_experience_question(self, entities: Dict) -> Dict[str, Any]:
@@ -438,24 +614,31 @@ class ChatbotService:
 
         # Si un nom est mentionné, chercher ce consultant spécifique
         if entities["noms"]:
-            nom_recherche = entities["noms"][0]
+            nom_recherche: str = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom_recherche)
 
             if consultant:
                 # Récupérer les informations d'expérience depuis la base de données
                 try:
                     with get_database_session() as session:
-                        consultant_db = session.query(Consultant).filter(
-                            Consultant.id == consultant.id).first()
+                        consultant_db = (
+                            session.query(Consultant)
+                            .filter(Consultant.id == consultant.id)
+                            .first()
+                        )
 
                         if consultant_db:
                             if consultant_db.date_premiere_mission:
                                 # Utiliser la propriété calculée du modèle
                                 experience_annees = consultant_db.experience_annees
 
-                                response = f"📊 **Expérience de {
-                                    consultant.prenom} {
-                                    consultant.nom}** :\n\n"
+                                response = (
+                                    "📊 **Expérience de "
+                                    + consultant.prenom
+                                    + " "
+                                    + consultant.nom
+                                    + "** :\n\n"
+                                )
                                 response += f"🚀 **Première mission :** {
                                     consultant_db.date_premiere_mission.strftime('%d/%m/%Y')}\n"
                                 response += f"⏱️ **Expérience totale :** **{experience_annees} années**\n"
@@ -476,14 +659,18 @@ class ChatbotService:
                                 # Calculer l'ancienneté dans la société
                                 if consultant_db.date_entree_societe:
                                     from datetime import date
+
                                     today = date.today()
                                     if consultant_db.date_sortie_societe:
                                         fin_periode = consultant_db.date_sortie_societe
                                     else:
                                         fin_periode = today
-                                    delta_societe = fin_periode - consultant_db.date_entree_societe
+                                    delta_societe = (
+                                        fin_periode - consultant_db.date_entree_societe
+                                    )
                                     anciennete_societe = round(
-                                        delta_societe.days / 365.25, 1)
+                                        delta_societe.days / 365.25, 1
+                                    )
                                     response += f"🏢 **Ancienneté société :** {anciennete_societe} années\n"
 
                                 # Statut société
@@ -514,62 +701,91 @@ class ChatbotService:
                         "consultant": {
                             "nom": consultant.nom,
                             "prenom": consultant.prenom,
-                            "experience_annees": getattr(
-                                consultant_db,
-                                'experience_annees',
-                                None) if 'consultant_db' in locals() else None,
-                            "date_premiere_mission": consultant_db.date_premiere_mission.isoformat() if 'consultant_db' in locals() and consultant_db.date_premiere_mission else None,
-                            "grade": getattr(
-                                consultant_db,
-                                'grade',
-                                None) if 'consultant_db' in locals() else None,
-                            "societe": getattr(
-                                consultant_db,
-                                'societe',
-                                None) if 'consultant_db' in locals() else None}},
+                            "experience_annees": (
+                                getattr(consultant_db, "experience_annees", None)
+                                if "consultant_db" in locals()
+                                else None
+                            ),
+                            "date_premiere_mission": (
+                                consultant_db.date_premiere_mission.isoformat()
+                                if "consultant_db" in locals()
+                                and consultant_db.date_premiere_mission
+                                else None
+                            ),
+                            "grade": (
+                                getattr(consultant_db, "grade", None)
+                                if "consultant_db" in locals()
+                                else None
+                            ),
+                            "societe": (
+                                getattr(consultant_db, "societe", None)
+                                if "consultant_db" in locals()
+                                else None
+                            ),
+                        }
+                    },
                     "intent": "experience",
-                    "confidence": 0.9}
+                    "confidence": 0.9,
+                }
             else:
                 return {
                     "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom_recherche}** dans la base de données.",
                     "data": None,
                     "intent": "experience",
-                    "confidence": 0.7}
+                    "confidence": 0.7,
+                }
 
         # Statistiques générales sur l'expérience
         else:
             try:
                 with get_database_session() as session:
-                    consultants_avec_experience = session.query(Consultant).filter(
-                        Consultant.date_premiere_mission.isnot(None)
-                    ).all()
+                    consultants_avec_experience = (
+                        session.query(Consultant)
+                        .filter(Consultant.date_premiere_mission.isnot(None))
+                        .all()
+                    )
 
                     if consultants_avec_experience:
                         experiences = [
-                            c.experience_annees for c in consultants_avec_experience]
+                            c.experience_annees for c in consultants_avec_experience
+                        ]
 
-                        response = f"📊 **Statistiques d'expérience :**\n\n"
-                        response += f"• **Consultants avec expérience renseignée :** {
-                            len(consultants_avec_experience)}\n"
-                        response += f"• **Expérience moyenne :** {
-                            sum(experiences) / len(experiences):.1f} années\n"
-                        response += f"• **Expérience minimum :** {
-                            min(experiences):.1f} années\n"
-                        response += f"• **Expérience maximum :** {
-                            max(experiences):.1f} années\n"
+                        response = "📊 **Statistiques d'expérience :**\n\n"
+                        response += f"• **Consultants avec expérience renseignée :** {len(consultants_avec_experience)}\n"
+                        response += (
+                            "• **Expérience moyenne :** "
+                            + str(sum(experiences) / len(experiences))
+                            + " années\n"
+                        )
+                        response += (
+                            "• **Expérience minimum :** "
+                            + str(min(experiences))
+                            + " années\n"
+                        )
+                        response += (
+                            "• **Expérience maximum :** "
+                            + str(max(experiences))
+                            + " années\n"
+                        )
 
                         # Top 3 des plus expérimentés
                         top_experienced = sorted(
                             consultants_avec_experience,
                             key=lambda c: c.experience_annees,
-                            reverse=True)[
-                            :3]
-                        response += f"\n🏆 **Top 3 des plus expérimentés :**\n"
+                            reverse=True,
+                        )[:3]
+                        response += "\n🏆 **Top 3 des plus expérimentés :**\n"
                         for i, consultant in enumerate(top_experienced, 1):
-                            response += f"{i}. **{
-                                consultant.prenom} {
-                                consultant.nom}** : {
-                                consultant.experience_annees} années\n"
+                            response += (
+                                str(i)
+                                + ". **"
+                                + consultant.prenom
+                                + " "
+                                + consultant.nom
+                                + "** : "
+                                + str(consultant.experience_annees)
+                                + " années\n"
+                            )
 
                     else:
                         response = "❓ Aucun consultant n'a d'expérience renseignée dans la base."
@@ -580,43 +796,65 @@ class ChatbotService:
             return {
                 "response": response,
                 "data": {
-                    "consultants_count": len(consultants_avec_experience) if 'consultants_avec_experience' in locals() else 0},
+                    "consultants_count": (
+                        len(consultants_avec_experience)
+                        if "consultants_avec_experience" in locals()
+                        else 0
+                    )
+                },
                 "intent": "experience",
-                "confidence": 0.8}
+                "confidence": 0.8,
+            }
 
     def _handle_professional_profile_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur le profil professionnel (grade, type contrat, société)"""
 
-        question_lower = self.last_question.lower()
+        question_lower: str = self.last_question.lower()
 
         # Si un nom est mentionné, chercher ce consultant spécifique
         if entities["noms"]:
-            nom_recherche = entities["noms"][0]
+            nom_recherche: str = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom_recherche)
 
             if consultant:
                 try:
                     with get_database_session() as session:
-                        consultant_db = session.query(Consultant).filter(
-                            Consultant.id == consultant.id).first()
+                        consultant_db = (
+                            session.query(Consultant)
+                            .filter(Consultant.id == consultant.id)
+                            .first()
+                        )
 
                         if consultant_db:
                             # Déterminer le type d'information demandée
                             if any(
-                                word in question_lower for word in [
-                                    "grade", "niveau", "poste", "fonction"]):
+                                word in question_lower
+                                for word in ["grade", "niveau", "poste", "fonction"]
+                            ):
                                 response = f"🎯 **Grade de {
                                     consultant.prenom} {
                                     consultant.nom}** : **{
                                     consultant_db.grade or 'Non renseigné'}**"
 
-                            elif any(word in question_lower for word in ["contrat", "type contrat", "cdi", "cdd"]):
+                            elif any(
+                                word in question_lower
+                                for word in ["contrat", "type contrat", "cdi", "cdd"]
+                            ):
                                 response = f"📋 **Type de contrat de {
                                     consultant.prenom} {
                                     consultant.nom}** : **{
                                     consultant_db.type_contrat or 'Non renseigné'}**"
 
-                            elif any(word in question_lower for word in ["société", "societe", "entreprise", "quanteam", "asigma"]):
+                            elif any(
+                                word in question_lower
+                                for word in [
+                                    "société",
+                                    "societe",
+                                    "entreprise",
+                                    "quanteam",
+                                    "asigma",
+                                ]
+                            ):
                                 response = f"🏢 **Société de {
                                     consultant.prenom} {
                                     consultant.nom}** : **{
@@ -659,9 +897,14 @@ class ChatbotService:
                                 # Informations salariales si disponibles
                                 if consultant_db.salaire_actuel:
                                     cjm = consultant_db.salaire_actuel * 1.8 / 216
-                                    response += f"💰 **Salaire :** {
-                                        consultant_db.salaire_actuel:,.0f} €/an\n"
-                                    response += f"📈 **CJM :** {cjm:,.0f} €/jour"
+                                    response += (
+                                        "💰 **Salaire :** "
+                                        + f"{consultant_db.salaire_actuel:,.0f}"
+                                        + " €/an\n"
+                                    )
+                                    response += (
+                                        "📈 **CJM :** " + f"{cjm:,.0f}" + " €/jour"
+                                    )
                         else:
                             response = f"❌ Impossible de récupérer les données de **{
                                 consultant.prenom} {
@@ -676,45 +919,58 @@ class ChatbotService:
                         "consultant": {
                             "nom": consultant.nom,
                             "prenom": consultant.prenom,
-                            "grade": getattr(
-                                consultant_db,
-                                'grade',
-                                None) if 'consultant_db' in locals() else None,
-                            "type_contrat": getattr(
-                                consultant_db,
-                                'type_contrat',
-                                None) if 'consultant_db' in locals() else None,
-                            "societe": getattr(
-                                consultant_db,
-                                'societe',
-                                None) if 'consultant_db' in locals() else None}},
+                            "grade": (
+                                getattr(consultant_db, "grade", None)
+                                if "consultant_db" in locals()
+                                else None
+                            ),
+                            "type_contrat": (
+                                getattr(consultant_db, "type_contrat", None)
+                                if "consultant_db" in locals()
+                                else None
+                            ),
+                            "societe": (
+                                getattr(consultant_db, "societe", None)
+                                if "consultant_db" in locals()
+                                else None
+                            ),
+                        }
+                    },
                     "intent": "profil_professionnel",
-                    "confidence": 0.9}
+                    "confidence": 0.9,
+                }
             else:
                 return {
                     "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom_recherche}** dans la base de données.",
                     "data": None,
                     "intent": "profil_professionnel",
-                    "confidence": 0.7}
+                    "confidence": 0.7,
+                }
 
         # Questions générales par critère
         else:
             try:
                 with get_database_session() as session:
                     if any(
-                        word in question_lower for word in [
+                        word in question_lower
+                        for word in [
                             "grade",
                             "niveau",
                             "junior",
                             "confirmé",
                             "manager",
-                            "directeur"]):
+                            "directeur",
+                        ]
+                    ):
                         # Statistiques par grade
-                        consultants = session.query(Consultant).filter(
-                            Consultant.grade.isnot(None)).all()
+                        consultants = (
+                            session.query(Consultant)
+                            .filter(Consultant.grade.isnot(None))
+                            .all()
+                        )
 
                         if consultants:
-                            grades_count = {}
+                            grades_count: Dict[str, List[Consultant]] = {}
                             for consultant in consultants:
                                 grade = consultant.grade
                                 if grade not in grades_count:
@@ -725,38 +981,57 @@ class ChatbotService:
                             for grade, consultants_list in grades_count.items():
                                 response += f"• **{grade}** : {
                                     len(consultants_list)} consultant(s)\n"
-                                if len(
-                                        consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                                if (
+                                    len(consultants_list) <= 5
+                                ):  # Afficher les noms si pas trop nombreux
                                     for c in consultants_list:
                                         response += f"  - {c.prenom} {c.nom}\n"
                         else:
                             response = "❓ Aucun consultant n'a de grade renseigné."
 
-                    elif any(word in question_lower for word in ["contrat", "cdi", "cdd", "stagiaire"]):
+                    elif any(
+                        word in question_lower
+                        for word in ["contrat", "cdi", "cdd", "stagiaire"]
+                    ):
                         # Statistiques par type de contrat ou recherche spécifique
-                        consultants = session.query(Consultant).filter(
-                            Consultant.type_contrat.isnot(None)).all()
+                        consultants = (
+                            session.query(Consultant)
+                            .filter(Consultant.type_contrat.isnot(None))
+                            .all()
+                        )
 
                         # Si c'est une question "combien de consultants en CDI/CDD"
                         if any(word in question_lower for word in ["combien"]):
                             if "cdi" in question_lower:
                                 consultants_cdi = [
-                                    c for c in consultants if c.type_contrat and c.type_contrat.upper() == "CDI"]
+                                    c
+                                    for c in consultants
+                                    if c.type_contrat
+                                    and c.type_contrat.upper() == "CDI"
+                                ]
                                 response = f"📋 **{
                                     len(consultants_cdi)} consultant(s) en CDI**"
                             elif "cdd" in question_lower:
                                 consultants_cdd = [
-                                    c for c in consultants if c.type_contrat and c.type_contrat.upper() == "CDD"]
+                                    c
+                                    for c in consultants
+                                    if c.type_contrat
+                                    and c.type_contrat.upper() == "CDD"
+                                ]
                                 response = f"📋 **{
                                     len(consultants_cdd)} consultant(s) en CDD**"
                             elif "stagiaire" in question_lower:
                                 consultants_stagiaire = [
-                                    c for c in consultants if c.type_contrat and c.type_contrat.lower() == "stagiaire"]
+                                    c
+                                    for c in consultants
+                                    if c.type_contrat
+                                    and c.type_contrat.lower() == "stagiaire"
+                                ]
                                 response = f"📋 **{
                                     len(consultants_stagiaire)} consultant(s) stagiaire(s)**"
                             else:
                                 # Statistiques complètes
-                                contrats_count = {}
+                                contrats_count: Dict[str, int] = {}
                                 for consultant in consultants:
                                     contrat = consultant.type_contrat
                                     if contrat not in contrats_count:
@@ -765,47 +1040,72 @@ class ChatbotService:
 
                                 response = "📋 **Nombre de consultants par type de contrat :**\n\n"
                                 for contrat, count in contrats_count.items():
-                                    response += f"• **{contrat}** : {count} consultant(s)\n"
+                                    response += (
+                                        f"• **{contrat}** : {count} consultant(s)\n"
+                                    )
                         else:
                             # Répartition complète par type de contrat
                             if consultants:
-                                contrats_count = {}
+                                contrats_list: Dict[str, List[Consultant]] = {}
                                 for consultant in consultants:
                                     contrat = consultant.type_contrat
-                                    if contrat not in contrats_count:
-                                        contrats_count[contrat] = []
-                                    contrats_count[contrat].append(consultant)
+                                    if contrat not in contrats_list:
+                                        contrats_list[contrat] = []
+                                    contrats_list[contrat].append(consultant)
 
-                                response = "📋 **Répartition par type de contrat :**\n\n"
-                                for contrat, consultants_list in contrats_count.items():
+                                response = (
+                                    "📋 **Répartition par type de contrat :**\n\n"
+                                )
+                                for contrat, consultants_list in contrats_list.items():
                                     response += f"• **{contrat}** : {
                                         len(consultants_list)} consultant(s)\n"
-                                    if len(
-                                            consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                                    if (
+                                        len(consultants_list) <= 5
+                                    ):  # Afficher les noms si pas trop nombreux
                                         for c in consultants_list:
                                             response += f"  - {c.prenom} {c.nom}\n"
                             else:
                                 response = "❓ Aucun consultant n'a de type de contrat renseigné."
 
-                    elif any(word in question_lower for word in ["société", "societe", "quanteam", "asigma", "qui travaille", "qui est"]):
+                    elif any(
+                        word in question_lower
+                        for word in [
+                            "société",
+                            "societe",
+                            "quanteam",
+                            "asigma",
+                            "qui travaille",
+                            "qui est",
+                        ]
+                    ):
                         # Statistiques par société ou recherche de consultants par
                         # société
-                        consultants = session.query(Consultant).filter(
-                            Consultant.societe.isnot(None)).all()
+                        consultants = (
+                            session.query(Consultant)
+                            .filter(Consultant.societe.isnot(None))
+                            .all()
+                        )
 
                         # Si c'est une recherche spécifique pour une société
                         if any(
-                            word in question_lower for word in [
-                                "quanteam",
-                                "asigma"]):
-                            societe_recherchee = "Quanteam" if "quanteam" in question_lower else "Asigma"
+                            word in question_lower for word in ["quanteam", "asigma"]
+                        ):
+                            societe_recherchee = (
+                                "Quanteam" if "quanteam" in question_lower else "Asigma"
+                            )
                             consultants_societe = [
-                                c for c in consultants if c.societe and c.societe.lower() == societe_recherchee.lower()]
+                                c
+                                for c in consultants
+                                if c.societe
+                                and c.societe.lower() == societe_recherchee.lower()
+                            ]
 
                             if consultants_societe:
                                 response = f"🏢 **Consultants chez {societe_recherchee}** :\n\n"
                                 for i, consultant in enumerate(consultants_societe, 1):
-                                    status_icon = "🟢" if consultant.disponibilite else "🔴"
+                                    status_icon = (
+                                        "🟢" if consultant.disponibilite else "🔴"
+                                    )
                                     response += f"{i}. {status_icon} **{
                                         consultant.prenom} {
                                         consultant.nom}**"
@@ -815,14 +1115,17 @@ class ChatbotService:
                                         response += f" ({consultant.type_contrat})"
                                     response += "\n"
 
-                                response += f"\n📊 **Total : {
-                                    len(consultants_societe)} consultant(s)**"
+                                response += (
+                                    "\n📊 **Total : "
+                                    + str(len(consultants_societe))
+                                    + " consultant(s)**"
+                                )
                             else:
                                 response = f"❓ Aucun consultant trouvé chez {societe_recherchee}."
                         else:
                             # Statistiques générales par société
                             if consultants:
-                                societes_count = {}
+                                societes_count: Dict[str, List[Consultant]] = {}
                                 for consultant in consultants:
                                     societe = consultant.societe
                                     if societe not in societes_count:
@@ -833,12 +1136,15 @@ class ChatbotService:
                                 for societe, consultants_list in societes_count.items():
                                     response += f"• **{societe}** : {
                                         len(consultants_list)} consultant(s)\n"
-                                    if len(
-                                            consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                                    if (
+                                        len(consultants_list) <= 5
+                                    ):  # Afficher les noms si pas trop nombreux
                                         for c in consultants_list:
                                             response += f"  - {c.prenom} {c.nom}\n"
                             else:
-                                response = "❓ Aucun consultant n'a de société renseignée."
+                                response = (
+                                    "❓ Aucun consultant n'a de société renseignée."
+                                )
 
                     else:
                         response = "🤔 Précisez quel aspect du profil professionnel vous intéresse : grade, type de contrat, ou société ?"
@@ -850,29 +1156,41 @@ class ChatbotService:
                 "response": response,
                 "data": None,
                 "intent": "profil_professionnel",
-                "confidence": 0.8
+                "confidence": 0.8,
             }
 
     def _handle_skills_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les compétences"""
 
         # Détecter le type de compétences demandé
-        question_lower = self.last_question.lower()
+        question_lower: str = self.last_question.lower()
         type_competence = None
 
         if any(
-            word in question_lower for word in [
+            word in question_lower
+            for word in [
                 "compétences techniques",
                 "technique",
                 "technologie",
-                "programmation"]):
+                "programmation",
+            ]
+        ):
             type_competence = "technique"
-        elif any(word in question_lower for word in ["compétences fonctionnelles", "fonctionnelle", "métier", "bancaire", "finance"]):
+        elif any(
+            word in question_lower
+            for word in [
+                "compétences fonctionnelles",
+                "fonctionnelle",
+                "métier",
+                "bancaire",
+                "finance",
+            ]
+        ):
             type_competence = "fonctionnelle"
 
         # Si une compétence spécifique est mentionnée
         if entities["competences"]:
-            competence = entities["competences"][0]
+            competence: str = entities["competences"][0]
             consultants = self._find_consultants_by_skill(competence, type_competence)
 
             if consultants:
@@ -881,19 +1199,30 @@ class ChatbotService:
                 response += "\n".join([f"• {nom}" for nom in noms])
 
                 # Ajouter les détails des compétences
-                response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+                response += (
+                    "\n\n📊 **" + str(len(consultants)) + " consultant(s) trouvé(s)**"
+                )
             else:
-                response = f"❌ Aucun consultant ne maîtrise **{competence}** dans notre base."
+                response = (
+                    f"❌ Aucun consultant ne maîtrise **{competence}** dans notre base."
+                )
 
             return {
                 "response": response,
-                "data": {"consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]},
+                "data": {
+                    "consultants": [
+                        {"nom": c.nom, "prenom": c.prenom} for c in consultants
+                    ]
+                },
                 "intent": "competences",
-                "confidence": 0.9
+                "confidence": 0.9,
             }
 
         # Recherche dynamique de compétence dans la question
-        elif any(word in question_lower for word in ["qui maîtrise", "qui sait", "qui connaît", "qui connait"]):
+        elif any(
+            word in question_lower
+            for word in ["qui maîtrise", "qui sait", "qui connaît", "qui connait"]
+        ):
             # Extraire le nom de la compétence après le verbe
 
             # Chercher tous les mots après "maîtrise", "sait", "connaît"
@@ -903,7 +1232,7 @@ class ChatbotService:
                 r"qui\s+connaît\s+(.+?)(?:\?|$)",
                 r"qui\s+connait\s+(.+?)(?:\?|$)",
                 r"qui\s+a\s+(.+?)(?:\?|$)",
-                r"qui\s+possède\s+(.+?)(?:\?|$)"
+                r"qui\s+possède\s+(.+?)(?:\?|$)",
             ]
 
             competence_found = None
@@ -913,34 +1242,45 @@ class ChatbotService:
                     competence_found = match.group(1).strip()
                     # Nettoyer les articles et prépositions
                     competence_found = re.sub(
-                        r'^(le|la|les|du|de|des|en|une?)\s+', '', competence_found)
+                        r"^(le|la|les|du|de|des|en|une?)\s+", "", competence_found
+                    )
                     competence_found = re.sub(
-                        r'\s+(compétence|skill)s?$', '', competence_found)
+                        r"\s+(compétence|skill)s?$", "", competence_found
+                    )
                     break
 
             if competence_found:
                 consultants = self._find_consultants_by_skill(
-                    competence_found, type_competence)
+                    competence_found, type_competence
+                )
 
                 if consultants:
                     noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
                     response = f"🎯 Consultants maîtrisant **{
                         competence_found.title()}** :\n\n"
                     response += "\n".join([f"• {nom}" for nom in noms])
-                    response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+                    response += (
+                        "\n\n📊 **"
+                        + str(len(consultants))
+                        + " consultant(s) trouvé(s)**"
+                    )
                 else:
                     response = f"❌ Aucun consultant ne maîtrise **{competence_found}** dans notre base."
 
                 return {
                     "response": response,
-                    "data": {"consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]},
+                    "data": {
+                        "consultants": [
+                            {"nom": c.nom, "prenom": c.prenom} for c in consultants
+                        ]
+                    },
                     "intent": "competences",
-                    "confidence": 0.8
+                    "confidence": 0.8,
                 }
 
         # Question générale sur les compétences d'un consultant
         elif entities["noms"]:
-            nom = entities["noms"][0]
+            nom: str = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom)
 
             if consultant:
@@ -952,7 +1292,7 @@ class ChatbotService:
                         consultant.nom} :**\n\n"
 
                     # Grouper par catégorie
-                    categories = {}
+                    categories: Dict[str, List[Dict[str, Any]]] = {}
                     for skill in skills:
                         categorie = skill["categorie"] or "Autre"
                         if categorie not in categories:
@@ -966,11 +1306,14 @@ class ChatbotService:
                             niveau_emoji = {
                                 "debutant": "🟡",
                                 "intermediaire": "🟠",
-                                "expert": "🔴"
+                                "expert": "🔴",
                             }.get(comp["niveau_maitrise"], "⚪")
 
                             experience_text = ""
-                            if comp["annees_experience"] and comp["annees_experience"] > 0:
+                            if (
+                                comp["annees_experience"]
+                                and comp["annees_experience"] > 0
+                            ):
                                 if comp["annees_experience"] == 1:
                                     experience_text = f" ({
                                         comp['annees_experience']} an)"
@@ -995,22 +1338,25 @@ class ChatbotService:
                 "response": response,
                 "data": {
                     "consultant": consultant.nom if consultant else None,
-                    "skills_count": len(skills) if consultant else 0},
+                    "skills_count": len(skills) if consultant else 0,
+                },
                 "intent": "competences",
-                "confidence": 0.9}
+                "confidence": 0.9,
+            }
 
         return {
             "response": "🤔 Pouvez-vous préciser quelle compétence ou quel consultant vous intéresse ?",
             "data": None,
             "intent": "competences",
-            "confidence": 0.5}
+            "confidence": 0.5,
+        }
 
     def _handle_languages_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les langues parlées par les consultants"""
 
         # Si une langue spécifique est mentionnée
         if entities["langues"]:
-            langue_recherchee = entities["langues"][0]
+            langue_recherchee: str = entities["langues"][0]
             consultants = self._find_consultants_by_language(langue_recherchee)
 
             if consultants:
@@ -1020,7 +1366,9 @@ class ChatbotService:
                 response += "\n".join([f"• {nom}" for nom in noms])
 
                 # Ajouter les détails des niveaux
-                response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+                response += (
+                    "\n\n📊 **" + str(len(consultants)) + " consultant(s) trouvé(s)**"
+                )
 
                 # Détails des niveaux si moins de 5 consultants
                 if len(consultants) <= 5:
@@ -1038,9 +1386,13 @@ class ChatbotService:
 
                 return {
                     "response": response,
-                    "data": {"consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]},
+                    "data": {
+                        "consultants": [
+                            {"nom": c.nom, "prenom": c.prenom} for c in consultants
+                        ]
+                    },
                     "intent": "langues",
-                    "confidence": 0.9
+                    "confidence": 0.9,
                 }
             else:
                 response = f"❌ Aucun consultant ne parle **{langue_recherchee}** dans notre base."
@@ -1048,13 +1400,16 @@ class ChatbotService:
                     "response": response,
                     "data": {"consultants": []},
                     "intent": "langues",
-                    "confidence": 0.8
+                    "confidence": 0.8,
                 }
 
         # Question générale sur les langues d'un consultant (vérifier en premier)
-        elif entities["noms"] or any(word in self.last_question.lower() for word in ["quelles langues", "langues de", "langues parlées"]):
+        elif entities["noms"] or any(
+            word in self.last_question.lower()
+            for word in ["quelles langues", "langues de", "langues parlées"]
+        ):
             # Si pas de nom détecté dans entities, essayer d'extraire manuellement
-            nom = None
+            nom: Optional[str] = None
             if entities["noms"]:
                 nom = entities["noms"][0]
             else:
@@ -1064,7 +1419,7 @@ class ChatbotService:
                     r"langues?\s+parle\s+(\w+)",
                     r"langues?\s+de\s+(\w+)",
                     r"(\w+)\s+parle\s+quelles?\s+langues?",
-                    r"quelles?\s+sont\s+les\s+langues?\s+de\s+(\w+)"
+                    r"quelles?\s+sont\s+les\s+langues?\s+de\s+(\w+)",
                 ]
 
                 for pattern in patterns:
@@ -1078,31 +1433,42 @@ class ChatbotService:
 
                 if consultant:
                     if consultant.langues:
-                        response = f"🌍 **Langues parlées par {
-                            consultant.prenom} {
-                            consultant.nom} :**\n\n"
+                        response = (
+                            "🌍 **Langues parlées par "
+                            + consultant.prenom
+                            + " "
+                            + consultant.nom
+                            + " :**\n\n"
+                        )
 
                         for cl in consultant.langues:
                             flag_emoji = {
-                                'FR': '🇫🇷',
-                                'EN': '🇬🇧',
-                                'ES': '🇪🇸',
-                                'DE': '🇩🇪',
-                                'IT': '🇮🇹',
-                                'PT': '🇵🇹',
-                                'NL': '🇳🇱',
-                                'RU': '🇷🇺',
-                                'ZH': '🇨🇳',
-                                'JA': '🇯🇵',
-                                'AR': '🇸🇦',
-                                'HI': '🇮🇳'}
-                            emoji = flag_emoji.get(cl.langue.code_iso, '🌍')
-                            response += f"  {emoji} **{cl.langue.nom}** - {cl.niveau_label}"
+                                "FR": "🇫🇷",
+                                "EN": "🇬🇧",
+                                "ES": "🇪🇸",
+                                "DE": "🇩🇪",
+                                "IT": "🇮🇹",
+                                "PT": "🇵🇹",
+                                "NL": "🇳🇱",
+                                "RU": "🇷🇺",
+                                "ZH": "🇨🇳",
+                                "JA": "🇯🇵",
+                                "AR": "🇸🇦",
+                                "HI": "🇮🇳",
+                            }
+                            emoji = flag_emoji.get(cl.langue.code_iso, "🌍")
+                            response += (
+                                f"  {emoji} **{cl.langue.nom}** - {cl.niveau_label}"
+                            )
                             if cl.commentaire:
                                 response += f" - {cl.commentaire}"
                             response += "\n"
 
-                        response += f"\n📊 **Total : {len(consultant.langues)} langue(s)**"
+                        response += (
+                            "\n📊 **Total : "
+                            + str(len(consultant.langues))
+                            + " langue(s)**"
+                        )
                     else:
                         response = f"❌ Aucune langue enregistrée pour **{
                             consultant.prenom} {
@@ -1114,28 +1480,32 @@ class ChatbotService:
                     "response": response,
                     "data": {
                         "consultant": consultant.nom if consultant else None,
-                        "languages_count": len(
-                            consultant.langues) if consultant else 0},
+                        "languages_count": len(consultant.langues) if consultant else 0,
+                    },
                     "intent": "langues",
-                    "confidence": 0.8}
+                    "confidence": 0.8,
+                }
             else:
                 # Question générale sur les langues sans nom spécifique
                 return {
-                    "response": "🌍 Pour connaître les langues d'un consultant, demandez : \"Quelles langues parle [nom] ?\"\n\nOu pour trouver qui parle une langue : \"Qui parle anglais ?\"",
+                    "response": '🌍 Pour connaître les langues d\'un consultant, demandez : "Quelles langues parle [nom] ?"\n\nOu pour trouver qui parle une langue : "Qui parle anglais ?"',
                     "data": {},
                     "intent": "langues",
-                    "confidence": 0.6
+                    "confidence": 0.6,
                 }
 
         # Recherche dynamique de langue dans la question
-        elif any(word in self.last_question.lower() for word in ["qui parle", "parle", "parlent", "bilingue"]):
+        elif any(
+            word in self.last_question.lower()
+            for word in ["qui parle", "parle", "parlent", "bilingue"]
+        ):
             # Extraire le nom de la langue après "parle"
-            question_lower = self.last_question.lower()
+            question_lower: str = self.last_question.lower()
 
             patterns = [
                 r"qui\s+parle\s+(.+?)(?:\?|$)",
                 r"parlent\s+(.+?)(?:\?|$)",
-                r"qui.+parle.+(.+?)(?:\?|$)"
+                r"qui.+parle.+(.+?)(?:\?|$)",
             ]
 
             langue_found = None
@@ -1145,7 +1515,8 @@ class ChatbotService:
                     langue_found = match.group(1).strip()
                     # Nettoyer les articles
                     langue_found = re.sub(
-                        r'^(le|la|les|du|de|des|en|une?)\s+', '', langue_found)
+                        r"^(le|la|les|du|de|des|en|une?)\s+", "", langue_found
+                    )
                     break
 
             if langue_found:
@@ -1153,41 +1524,60 @@ class ChatbotService:
 
                 if consultants:
                     noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-                    response = f"🌍 Consultants parlant **{langue_found.title()}** :\n\n"
+                    response = (
+                        f"🌍 Consultants parlant **{langue_found.title()}** :\n\n"
+                    )
                     response += "\n".join([f"• {nom}" for nom in noms])
-                    response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+                    response += (
+                        "\n\n📊 **"
+                        + str(len(consultants))
+                        + " consultant(s) trouvé(s)**"
+                    )
                 else:
                     response = f"❌ Aucun consultant ne parle **{langue_found}** dans notre base."
 
-                return {"response": response,
-                        "data": {"consultants": [{"nom": c.nom,
-                                                  "prenom": c.prenom} for c in consultants] if consultants else []},
-                        "intent": "langues",
-                        "confidence": 0.8}
+                return {
+                    "response": response,
+                    "data": {
+                        "consultants": (
+                            [{"nom": c.nom, "prenom": c.prenom} for c in consultants]
+                            if consultants
+                            else []
+                        )
+                    },
+                    "intent": "langues",
+                    "confidence": 0.8,
+                }
 
         # Question générale sur les langues
         return {
-            "response": "🌍 Pour connaître les langues d'un consultant, demandez : \"Quelles langues parle [nom] ?\"\n\nOu pour trouver qui parle une langue : \"Qui parle anglais ?\"",
+            "response": '🌍 Pour connaître les langues d\'un consultant, demandez : "Quelles langues parle [nom] ?"\n\nOu pour trouver qui parle une langue : "Qui parle anglais ?"',
             "data": {},
             "intent": "langues",
-            "confidence": 0.6
+            "confidence": 0.6,
         }
 
     def _handle_missions_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les missions"""
 
         # Détecter si c'est une question sur le nombre de missions
-        question_lower = self.last_question.lower()
+        question_lower: str = self.last_question.lower()
         is_count_question = any(
-            word in question_lower for word in [
-                "combien", "nombre"])
+            word in question_lower for word in ["combien", "nombre"]
+        )
 
         if entities["entreprises"]:
-            entreprise = entities["entreprises"][0]
+            entreprise: str = entities["entreprises"][0]
             missions = self._get_missions_by_company(entreprise)
 
             if is_count_question:
-                response = f"📊 **{len(missions)} mission(s)** trouvée(s) chez **{entreprise.title()}**"
+                response = (
+                    "📊 **"
+                    + str(len(missions))
+                    + " mission(s)** trouvée(s) chez **"
+                    + entreprise.title()
+                    + "**"
+                )
             elif missions:
                 response = f"🏢 **Missions chez {entreprise.title()} :**\n\n"
                 for mission in missions[:5]:  # Limiter à 5 résultats
@@ -1201,7 +1591,7 @@ class ChatbotService:
                 if len(missions) > 5:
                     response += f"\n... et {len(missions) - 5} autres missions"
 
-                response += f"\n\n📊 **Total : {len(missions)} mission(s)**"
+                response += "\n\n📊 **Total : " + str(len(missions)) + " mission(s)**"
             else:
                 response = f"❌ Aucune mission trouvée chez **{entreprise}**."
 
@@ -1209,11 +1599,11 @@ class ChatbotService:
                 "response": response,
                 "data": {"missions": len(missions), "entreprise": entreprise},
                 "intent": "missions",
-                "confidence": 0.9
+                "confidence": 0.9,
             }
 
         elif entities["noms"]:
-            nom = entities["noms"][0]
+            nom: str = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom)
 
             if consultant:
@@ -1221,15 +1611,23 @@ class ChatbotService:
 
                 if is_count_question:
                     # Question spécifique sur le nombre
-                    response = f"📊 **{
-                        consultant.prenom} {
-                        consultant.nom}** a **{
-                        len(missions)} mission(s)** dans la base"
+                    response = (
+                        "📊 **"
+                        + consultant.prenom
+                        + " "
+                        + consultant.nom
+                        + "** a **"
+                        + str(len(missions))
+                        + " mission(s)** dans la base"
+                    )
                     if missions:
                         missions_en_cours = [
-                            m for m in missions if m.statut == "en_cours"]
+                            m for m in missions if m.statut == "en_cours"
+                        ]
                         if missions_en_cours:
-                            response += f" (dont {len(missions_en_cours)} en cours)"
+                            response += (
+                                " (dont " + str(len(missions_en_cours)) + " en cours)"
+                            )
                 elif missions:
                     response = f"💼 **Missions de {
                         consultant.prenom} {
@@ -1243,10 +1641,12 @@ class ChatbotService:
                         else:
                             response += "En cours"
                         if mission.taux_journalier:
-                            response += f" | 💰 {mission.taux_journalier}€/jour"
+                            response += (
+                                " | 💰 " + str(mission.taux_journalier) + "€/jour"
+                            )
                         response += "\n\n"
 
-                    response += f"📊 **Total : {len(missions)} mission(s)**"
+                    response += "📊 **Total : " + str(len(missions)) + " mission(s)**"
                 else:
                     response = f"❌ Aucune mission trouvée pour **{
                         consultant.prenom} {
@@ -1258,35 +1658,45 @@ class ChatbotService:
                 "response": response,
                 "data": {
                     "consultant": nom,
-                    "missions_count": len(missions) if consultant else 0},
+                    "missions_count": len(missions) if consultant else 0,
+                },
                 "intent": "missions",
-                "confidence": 0.9}
+                "confidence": 0.9,
+            }
 
         return {
             "response": "🤔 Voulez-vous connaître les missions d'un consultant ou d'une entreprise spécifique ?",
             "data": None,
             "intent": "missions",
-            "confidence": 0.5}
+            "confidence": 0.5,
+        }
 
-    def _handle_stats_question(self, entities: Dict) -> Dict[str, Any]:
+    def _handle_stats_question(self) -> Dict[str, Any]:
         """Gère les questions statistiques"""
 
         stats = self._get_general_stats()
 
         # Si c'est une question spécifique sur le nombre de consultants
         if any(pattern in self.last_question for pattern in ["combien", "nombre"]):
-            if "consultant" in self.last_question and "mission" not in self.last_question:
+            if (
+                "consultant" in self.last_question
+                and "mission" not in self.last_question
+            ):
                 response = f"👥 **Vous avez {
                     stats['consultants_total']} consultants** dans votre base de données.\n\n"
-                response += f"📊 Détail : {
-                    stats['consultants_actifs']} disponibles, {
-                    stats['consultants_inactifs']} indisponibles"
+                response += (
+                    "📊 Détail : "
+                    + str(stats["consultants_actifs"])
+                    + " disponibles, "
+                    + str(stats["consultants_inactifs"])
+                    + " indisponibles"
+                )
 
                 return {
                     "response": response,
-                    "data": {"consultants_count": stats['consultants_total']},
+                    "data": {"consultants_count": stats["consultants_total"]},
                     "intent": "statistiques",
-                    "confidence": 0.95
+                    "confidence": 0.95,
                 }
 
         # Statistiques complètes par défaut
@@ -1318,19 +1728,19 @@ class ChatbotService:
             "response": response,
             "data": {"stats": stats},
             "intent": "statistiques",
-            "confidence": 0.9
+            "confidence": 0.9,
         }
 
     def _handle_contact_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les contacts (email, téléphone)"""
 
         if entities["noms"]:
-            nom = entities["noms"][0]
+            nom: str = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom)
 
             if consultant:
                 # Déterminer le type d'information demandée
-                question_lower = self.last_question.lower()
+                question_lower: str = self.last_question.lower()
 
                 if any(word in question_lower for word in ["mail", "email", "e-mail"]):
                     if consultant.email:
@@ -1343,7 +1753,9 @@ class ChatbotService:
                             consultant.prenom} {
                             consultant.nom}** n'est pas renseigné dans la base."
 
-                elif any(word in question_lower for word in ["téléphone", "tel", "numéro"]):
+                elif any(
+                    word in question_lower for word in ["téléphone", "tel", "numéro"]
+                ):
                     if consultant.telephone:
                         response = f"📞 Le téléphone de **{
                             consultant.prenom} {
@@ -1359,7 +1771,9 @@ class ChatbotService:
                     response = f"📞 **Contact de {
                         consultant.prenom} {
                         consultant.nom} :**\n\n"
-                    response += f"📧 Email : **{consultant.email or 'Non renseigné'}**\n"
+                    response += (
+                        f"📧 Email : **{consultant.email or 'Non renseigné'}**\n"
+                    )
                     response += f"📞 Téléphone : **{
                         consultant.telephone or 'Non renseigné'}**"
 
@@ -1368,41 +1782,48 @@ class ChatbotService:
                     "data": {
                         "consultant": consultant.nom,
                         "email": consultant.email,
-                        "telephone": consultant.telephone
+                        "telephone": consultant.telephone,
                     },
                     "intent": "contact",
-                    "confidence": 0.9
+                    "confidence": 0.9,
                 }
             else:
                 return {
                     "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom}** dans la base de données.",
                     "data": None,
                     "intent": "contact",
-                    "confidence": 0.7}
+                    "confidence": 0.7,
+                }
 
         return {
             "response": "🤔 De quel consultant souhaitez-vous connaître les coordonnées ?",
             "data": None,
             "intent": "contact",
-            "confidence": 0.5}
+            "confidence": 0.5,
+        }
 
-    def _handle_list_consultants_question(self, entities: Dict) -> Dict[str, Any]:
+    def _handle_list_consultants_question(self) -> Dict[str, Any]:
         """Gère les questions pour lister les consultants selon des critères"""
 
-        question_lower = self.last_question.lower()
+        question_lower: str = self.last_question.lower()
 
         # Déterminer le filtre à appliquer
         if "disponibles" in question_lower or "disponible" in question_lower:
-            consultants = self.session.query(Consultant).filter(
-                Consultant.disponibilite).all()
+            consultants = (
+                self.session.query(Consultant).filter(Consultant.disponibilite).all()
+            )
             titre = "👥 **Consultants disponibles :**"
         elif "indisponibles" in question_lower or "indisponible" in question_lower:
-            consultants = self.session.query(Consultant).filter(
-                Consultant.disponibilite == False).all()
+            consultants = (
+                self.session.query(Consultant)
+                .filter(Consultant.disponibilite is False)
+                .all()
+            )
             titre = "👥 **Consultants indisponibles :**"
         elif "actifs" in question_lower or "actif" in question_lower:
-            consultants = self.session.query(Consultant).filter(
-                Consultant.disponibilite).all()
+            consultants = (
+                self.session.query(Consultant).filter(Consultant.disponibilite).all()
+            )
             titre = "👥 **Consultants actifs :**"
         else:
             # Tous les consultants
@@ -1414,7 +1835,7 @@ class ChatbotService:
                 "response": "❓ Aucun consultant ne correspond à ce critère.",
                 "data": None,
                 "intent": "liste_consultants",
-                "confidence": 0.8
+                "confidence": 0.8,
             }
 
         # Construire la réponse
@@ -1429,11 +1850,13 @@ class ChatbotService:
 
             if consultant.salaire_actuel:
                 cjm = consultant.salaire_actuel * 1.8 / 216
-                response += f" - {consultant.salaire_actuel:,.0f} €/an - CJM: {cjm:,.0f} €"
+                response += (
+                    f" - {consultant.salaire_actuel:,.0f} €/an - CJM: {cjm:,.0f} €"
+                )
 
             response += "\n"
 
-        response += f"\n📊 **Total : {len(consultants)} consultant(s)**"
+        response += "\n📊 **Total : " + str(len(consultants)) + " consultant(s)**"
 
         return {
             "response": response,
@@ -1446,18 +1869,22 @@ class ChatbotService:
                         "disponibilite": c.disponibilite,
                         "salaire": c.salaire_actuel,
                         "cjm": (
-                            c.salaire_actuel *
-                            1.8 /
-                            216) if c.salaire_actuel else None} for c in consultants],
-                "count": len(consultants)},
+                            (c.salaire_actuel * 1.8 / 216) if c.salaire_actuel else None
+                        ),
+                    }
+                    for c in consultants
+                ],
+                "count": len(consultants),
+            },
             "intent": "liste_consultants",
-            "confidence": 0.9}
+            "confidence": 0.9,
+        }
 
     def _handle_consultant_search(self, entities: Dict) -> Dict[str, Any]:
         """Gère la recherche d'informations sur un consultant"""
 
         if entities["noms"]:
-            nom = entities["noms"][0]
+            nom: str = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom)
 
             if consultant:
@@ -1470,30 +1897,37 @@ class ChatbotService:
 
                 if consultant.salaire_actuel:
                     cjm = consultant.salaire_actuel * 1.8 / 216
-                    response += f"\n💰 Salaire : **{consultant.salaire_actuel:,.0f} €**"
-                    response += f"\n📈 CJM : **{cjm:,.0f} €**"
+                    response += (
+                        "\n💰 Salaire : **"
+                        + f"{consultant.salaire_actuel:,.0f}"
+                        + " €**"
+                    )
+                    response += "\n📈 CJM : **" + f"{cjm:,.0f}" + " €**"
 
                 # Ajouter info sur les missions
                 missions_count = len(consultant.missions)
                 if missions_count > 0:
                     response += f"\n💼 Missions : **{missions_count}** mission(s)"
             else:
-                response = f"❌ Consultant **{nom}** introuvable dans la base de données."
+                response = (
+                    f"❌ Consultant **{nom}** introuvable dans la base de données."
+                )
 
             return {
                 "response": response,
                 "data": {"consultant": consultant.nom if consultant else None},
                 "intent": "recherche_consultant",
-                "confidence": 0.9
+                "confidence": 0.9,
             }
 
         return {
             "response": "🤔 De quel consultant souhaitez-vous connaître les informations ?",
             "data": None,
             "intent": "recherche_consultant",
-            "confidence": 0.5}
+            "confidence": 0.5,
+        }
 
-    def _handle_general_question(self, question: str) -> Dict[str, Any]:
+    def _handle_general_question(self) -> Dict[str, Any]:
         """Gère les questions générales"""
 
         responses = [
@@ -1501,25 +1935,26 @@ class ChatbotService:
             "",
             "💡 **Voici quelques exemples de questions :**",
             "",
-            "💰 *Salaires :* \"Quel est le salaire de Jean Dupont ?\"",
-            "� *Expérience :* \"Quelle est l'expérience de Jean Dupont ?\"",
-            "🎯 *Grade :* \"Quel est le grade de Marie ?\"",
-            "📋 *Contrat :* \"Quel est le type de contrat de Paul ?\"",
-            "🏢 *Société :* \"Dans quelle société travaille Anne ?\"",
-            "�📧 *Contact :* \"Quel est l'email de Marie ?\"",
-            "👥 *Listes :* \"Quels sont les consultants disponibles ?\"",
-            "🔍 *Compétences :* \"Qui maîtrise Python ?\"",
-            "💼 *Missions :* \"Quelles sont les missions chez BNP Paribas ?\"",
-            "� *Statistiques :* \"Combien de consultants sont actifs ?\"",
-            "👤 *Profils :* \"Qui est Marie Martin ?\"",
+            '💰 *Salaires :* "Quel est le salaire de Jean Dupont ?"',
+            '� *Expérience :* "Quelle est l\'expérience de Jean Dupont ?"',
+            '🎯 *Grade :* "Quel est le grade de Marie ?"',
+            '📋 *Contrat :* "Quel est le type de contrat de Paul ?"',
+            '🏢 *Société :* "Dans quelle société travaille Anne ?"',
+            '�📧 *Contact :* "Quel est l\'email de Marie ?"',
+            '👥 *Listes :* "Quels sont les consultants disponibles ?"',
+            '🔍 *Compétences :* "Qui maîtrise Python ?"',
+            '💼 *Missions :* "Quelles sont les missions chez BNP Paribas ?"',
+            '� *Statistiques :* "Combien de consultants sont actifs ?"',
+            '👤 *Profils :* "Qui est Marie Martin ?"',
             "",
-            "Que souhaitez-vous savoir ? 😊"]
+            "Que souhaitez-vous savoir ? 😊",
+        ]
 
         return {
             "response": "\n".join(responses),
             "data": None,
             "intent": "general",
-            "confidence": 1.0
+            "confidence": 1.0,
         }
 
     def _handle_practices_question(self, entities: Dict) -> Dict[str, Any]:
@@ -1529,14 +1964,16 @@ class ChatbotService:
 
         # Si une practice spécifique est mentionnée
         if entities["practices"]:
-            practice_name = entities["practices"][0]
-            practice = self.session.query(Practice).filter(
-                func.lower(Practice.nom) == practice_name.lower()
-            ).first()
+            practice_name: str = entities["practices"][0]
+            practice = (
+                self.session.query(Practice)
+                .filter(func.lower(Practice.nom) == practice_name.lower())
+                .first()
+            )
 
             if practice:
                 # Récupérer les consultants de cette practice
-                consultants = [c for c in practice.consultants]
+                consultants = list(practice.consultants)
 
                 if consultants:
                     response = f"👥 **Practice {practice.nom}** :\n\n"
@@ -1544,8 +1981,11 @@ class ChatbotService:
 
                     for i, consultant in enumerate(consultants, 1):
                         status_icon = "🟢" if consultant.disponibilite else "🔴"
-                        cjm = (consultant.salaire_actuel * 1.8 /
-                               216) if consultant.salaire_actuel else 0
+                        cjm = (
+                            (consultant.salaire_actuel * 1.8 / 216)
+                            if consultant.salaire_actuel
+                            else 0
+                        )
                         response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
                         if consultant.salaire_actuel:
                             response += f" - CJM: {cjm:,.0f} €"
@@ -1567,17 +2007,24 @@ class ChatbotService:
                                 "prenom": c.prenom,
                                 "disponibilite": c.disponibilite,
                                 "cjm": (
-                                    c.salaire_actuel *
-                                    1.8 /
-                                    216) if c.salaire_actuel else None} for c in consultants]},
+                                    (c.salaire_actuel * 1.8 / 216)
+                                    if c.salaire_actuel
+                                    else None
+                                ),
+                            }
+                            for c in consultants
+                        ],
+                    },
                     "intent": "practices",
-                    "confidence": 0.9}
+                    "confidence": 0.9,
+                }
             else:
                 return {
                     "response": f"❌ Practice **{practice_name}** introuvable dans la base.",
                     "data": None,
                     "intent": "practices",
-                    "confidence": 0.7}
+                    "confidence": 0.7,
+                }
 
         # Question générale sur les practices
         else:
@@ -1587,9 +2034,10 @@ class ChatbotService:
                 response = "🏢 **Practices disponibles** :\n\n"
 
                 for practice in practices:
-                    nb_consultants = len([c for c in practice.consultants])
+                    nb_consultants = len(list(practice.consultants))
                     nb_disponibles = len(
-                        [c for c in practice.consultants if c.disponibilite])
+                        [c for c in practice.consultants if c.disponibilite]
+                    )
 
                     response += f"• **{
                         practice.nom}** : {nb_consultants} consultant(s) ({nb_disponibles} disponible(s))\n"
@@ -1602,21 +2050,24 @@ class ChatbotService:
                         "practices": [
                             {
                                 "nom": p.nom,
-                                "consultants_total": len([c for c in p.consultants]),
-                                "consultants_disponibles": len([c for c in p.consultants if c.disponibilite]),
-                                "responsable": p.responsable
-                            } for p in practices
+                                "consultants_total": len(list(p.consultants)),
+                                "consultants_disponibles": len(
+                                    [c for c in p.consultants if c.disponibilite]
+                                ),
+                                "responsable": p.responsable,
+                            }
+                            for p in practices
                         ]
                     },
                     "intent": "practices",
-                    "confidence": 0.8
+                    "confidence": 0.8,
                 }
             else:
                 return {
                     "response": "❓ Aucune practice active trouvée dans la base.",
                     "data": None,
                     "intent": "practices",
-                    "confidence": 0.6
+                    "confidence": 0.6,
                 }
 
     def _handle_cvs_question(self, entities: Dict) -> Dict[str, Any]:
@@ -1626,75 +2077,95 @@ class ChatbotService:
 
         # Si un consultant spécifique est mentionné
         if entities["noms"]:
-            nom_recherche = entities["noms"][0]
+            nom_recherche: str = entities["noms"][0]
             consultant = self._find_consultant_by_name(nom_recherche)
 
             if consultant:
                 cvs = consultant.cvs
 
                 if cvs:
-                    response = f"📁 **CVs de {
-                        consultant.prenom} {
-                        consultant.nom}** :\n\n"
+                    response = (
+                        "📁 **CVs de "
+                        + consultant.prenom
+                        + " "
+                        + consultant.nom
+                        + "** :\n\n"
+                    )
 
                     for i, cv in enumerate(cvs, 1):
                         taille_mb = (
-                            cv.taille_fichier /
-                            1024 /
-                            1024) if cv.taille_fichier else 0
-                        date_upload = cv.date_upload.strftime(
-                            '%d/%m/%Y') if cv.date_upload else 'N/A'
+                            (cv.taille_fichier / 1024 / 1024)
+                            if cv.taille_fichier
+                            else 0
+                        )
+                        date_upload = (
+                            cv.date_upload.strftime("%d/%m/%Y")
+                            if cv.date_upload
+                            else "N/A"
+                        )
 
-                        response += f"{i}. **{cv.fichier_nom}**\n"
-                        response += f"   📅 Uploadé le : {date_upload}\n"
-                        response += f"   📏 Taille : {taille_mb:.1f} MB\n"
+                        response += str(i) + ". **" + cv.fichier_nom + "**\n"
+                        response += "   📅 Uploadé le : " + date_upload + "\n"
+                        response += "   📏 Taille : " + str(taille_mb) + " MB\n"
                         if cv.contenu_extrait:
-                            response += f"   ✅ Contenu analysé\n"
+                            response += "   ✅ Contenu analysé\n"
                         response += "\n"
 
-                    response += f"📊 **Total : {len(cvs)} document(s)**"
+                    response += "📊 **Total : " + str(len(cvs)) + " document(s)**"
                 else:
-                    response = f"📁 **{
-                        consultant.prenom} {
-                        consultant.nom}** : Aucun CV uploadé"
+                    response = (
+                        "📁 **"
+                        + consultant.prenom
+                        + " "
+                        + consultant.nom
+                        + "** : Aucun CV uploadé"
+                    )
 
                 return {
                     "response": response,
                     "data": {
-                        "consultant": f"{
-                            consultant.prenom} {
-                            consultant.nom}",
+                        "consultant": f"{consultant.prenom} {consultant.nom}",
                         "cvs": [
                             {
                                 "nom": cv.fichier_nom,
-                                "date_upload": cv.date_upload.isoformat() if cv.date_upload else None,
+                                "date_upload": (
+                                    cv.date_upload.isoformat()
+                                    if cv.date_upload
+                                    else None
+                                ),
                                 "taille": cv.taille_fichier,
-                                "contenu_analyse": bool(
-                                    cv.contenu_extrait)} for cv in cvs]},
+                                "contenu_analyse": bool(cv.contenu_extrait),
+                            }
+                            for cv in cvs
+                        ],
+                    },
                     "intent": "cvs",
-                    "confidence": 0.9}
+                    "confidence": 0.9,
+                }
             else:
                 return {
                     "response": f"❌ Consultant **{nom_recherche}** introuvable.",
                     "data": None,
                     "intent": "cvs",
-                    "confidence": 0.7
+                    "confidence": 0.7,
                 }
 
         # Question générale sur les CVs
         else:
             cvs_total = self.session.query(CV).count()
-            consultants_avec_cv = self.session.query(
-                Consultant).join(CV).distinct().count()
+            consultants_avec_cv = (
+                self.session.query(Consultant).join(CV).distinct().count()
+            )
 
-            response = f"📁 **Statistiques des CVs** :\n\n"
-            response += f"• Total de documents : **{cvs_total}**\n"
-            response += f"• Consultants avec CV : **{consultants_avec_cv}**\n"
+            response = "📁 **Statistiques des CVs** :\n\n"
+            response += "• Total de documents : **" + str(cvs_total) + "**\n"
+            response += "• Consultants avec CV : **" + str(consultants_avec_cv) + "**\n"
 
             # Top 3 consultants avec le plus de CVs
             from sqlalchemy import func
+
             top_consultants = (
-                self.session.query(Consultant, func.count(CV.id).label('nb_cvs'))
+                self.session.query(Consultant, func.count(CV.id).label("nb_cvs"))
                 .join(CV)
                 .group_by(Consultant.id)
                 .order_by(func.count(CV.id).desc())
@@ -1703,11 +2174,17 @@ class ChatbotService:
             )
 
             if top_consultants:
-                response += f"\n🏆 **Top consultants (nombre de CVs)** :\n"
+                response += "\n🏆 **Top consultants (nombre de CVs)** :\n"
                 for consultant, nb_cvs in top_consultants:
-                    response += f"• **{
-                        consultant.prenom} {
-                        consultant.nom}** : {nb_cvs} CV(s)\n"
+                    response += (
+                        "• **"
+                        + consultant.prenom
+                        + " "
+                        + consultant.nom
+                        + "** : "
+                        + str(nb_cvs)
+                        + " CV(s)\n"
+                    )
 
             return {
                 "response": response,
@@ -1715,15 +2192,12 @@ class ChatbotService:
                     "cvs_total": cvs_total,
                     "consultants_avec_cv": consultants_avec_cv,
                     "top_consultants": [
-                        {
-                            "nom": c.nom,
-                            "prenom": c.prenom,
-                            "nb_cvs": nb
-                        } for c, nb in top_consultants
-                    ]
+                        {"nom": c.nom, "prenom": c.prenom, "nb_cvs": nb}
+                        for c, nb in top_consultants
+                    ],
                 },
                 "intent": "cvs",
-                "confidence": 0.8
+                "confidence": 0.8,
             }
 
     # Méthodes utilitaires pour les requêtes DB
@@ -1732,43 +2206,54 @@ class ChatbotService:
         """Trouve un consultant par son nom (flexible)"""
 
         # Essayer une correspondance exacte d'abord
-        consultant = self.session.query(Consultant).filter(
-            or_(
-                func.lower(Consultant.nom) == nom_recherche.lower(),
-                func.lower(Consultant.prenom) == nom_recherche.lower(),
-                func.lower(func.concat(Consultant.prenom, ' ', Consultant.nom)) == nom_recherche.lower(),
-                func.lower(func.concat(Consultant.nom, ' ', Consultant.prenom)) == nom_recherche.lower()
+        consultant = (
+            self.session.query(Consultant)
+            .filter(
+                or_(
+                    func.lower(Consultant.nom) == nom_recherche.lower(),
+                    func.lower(Consultant.prenom) == nom_recherche.lower(),
+                    func.lower(func.concat(Consultant.prenom, " ", Consultant.nom))
+                    == nom_recherche.lower(),
+                    func.lower(func.concat(Consultant.nom, " ", Consultant.prenom))
+                    == nom_recherche.lower(),
+                )
             )
-        ).first()
+            .first()
+        )
 
         if consultant:
             return consultant
 
         # Essayer une correspondance partielle
-        consultant = self.session.query(Consultant).filter(
-            or_(
-                func.lower(Consultant.nom).like(f'%{nom_recherche.lower()}%'),
-                func.lower(Consultant.prenom).like(f'%{nom_recherche.lower()}%')
+        consultant = (
+            self.session.query(Consultant)
+            .filter(
+                or_(
+                    func.lower(Consultant.nom).like(f"%{nom_recherche.lower()}%"),
+                    func.lower(Consultant.prenom).like(f"%{nom_recherche.lower()}%"),
+                )
             )
-        ).first()
+            .first()
+        )
 
         return consultant
 
     def _find_consultants_by_skill(
-            self,
-            competence: str,
-            type_competence: str = None) -> List[Consultant]:
+        self, competence: str, type_competence: Optional[str] = None
+    ) -> List[Any]:
         """Trouve les consultants ayant une compétence avec filtre par type"""
         from database.models import Competence
         from database.models import ConsultantCompetence
 
         # Construction de la requête de base
-        query = self.session.query(Consultant).join(
-            ConsultantCompetence, Consultant.id == ConsultantCompetence.consultant_id
-        ).join(
-            Competence, ConsultantCompetence.competence_id == Competence.id
-        ).filter(
-            func.lower(Competence.nom).like(f'%{competence.lower()}%')
+        query = (
+            self.session.query(Consultant)
+            .join(
+                ConsultantCompetence,
+                Consultant.id == ConsultantCompetence.consultant_id,
+            )
+            .join(Competence, ConsultantCompetence.competence_id == Competence.id)
+            .filter(func.lower(Competence.nom).like(f"%{competence.lower()}%"))
         )
 
         # Ajouter le filtre par type si spécifié
@@ -1777,43 +2262,54 @@ class ChatbotService:
 
         consultants = query.distinct().all()
 
-        return consultants
+        return consultants  # type: ignore[no-any-return]
 
-    def _find_consultants_by_language(self, langue: str) -> List[Consultant]:
+    def _find_consultants_by_language(self, langue: str) -> List[Any]:
         """Trouve les consultants parlant une langue"""
         from database.models import ConsultantLangue
         from database.models import Langue
 
         # Construction de la requête de base
-        consultants = self.session.query(Consultant).join(
-            ConsultantLangue, Consultant.id == ConsultantLangue.consultant_id
-        ).join(
-            Langue, ConsultantLangue.langue_id == Langue.id
-        ).filter(
-            func.lower(Langue.nom).like(f'%{langue.lower()}%')
-        ).distinct().all()
+        consultants = (
+            self.session.query(Consultant)
+            .join(ConsultantLangue, Consultant.id == ConsultantLangue.consultant_id)
+            .join(Langue, ConsultantLangue.langue_id == Langue.id)
+            .filter(func.lower(Langue.nom).like(f"%{langue.lower()}%"))
+            .distinct()
+            .all()
+        )
 
-        return consultants
+        return consultants  # type: ignore[no-any-return]
 
     def _get_missions_by_company(self, entreprise: str) -> List[Mission]:
         """Récupère les missions pour une entreprise"""
-        return self.session.query(Mission).filter(
-            func.lower(Mission.entreprise).like(f'%{entreprise.lower()}%')
-        ).all()
+        return (
+            self.session.query(Mission)
+            .filter(  # type: ignore[no-any-return]
+                func.lower(Mission.entreprise).like(f"%{entreprise.lower()}%")
+            )
+            .all()
+        )
 
     def _get_missions_by_consultant(self, consultant_id: int) -> List[Mission]:
         """Récupère les missions d'un consultant"""
-        return self.session.query(Mission).filter(
-            Mission.consultant_id == consultant_id
-        ).order_by(Mission.date_debut.desc()).all()
+        return (
+            self.session.query(Mission)
+            .filter(  # type: ignore[no-any-return]
+                Mission.consultant_id == consultant_id
+            )
+            .order_by(Mission.date_debut.desc())
+            .all()
+        )
 
-    def _get_consultant_skills(self, consultant_id: int,
-                               type_competence: str = None) -> List[Dict[str, Any]]:
+    def _get_consultant_skills(
+        self, consultant_id: int, type_competence: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         """Récupère les compétences d'un consultant avec leurs détails"""
-        query = self.session.query(ConsultantCompetence).join(
-            Competence
-        ).filter(
-            ConsultantCompetence.consultant_id == consultant_id
+        query = (
+            self.session.query(ConsultantCompetence)
+            .join(Competence)
+            .filter(ConsultantCompetence.consultant_id == consultant_id)
         )
 
         # Ajouter le filtre par type si spécifié
@@ -1824,22 +2320,30 @@ class ChatbotService:
 
         skills = []
         for cc in consultant_competences:
-            skills.append({
-                "nom": cc.competence.nom,
-                "categorie": cc.competence.categorie,
-                "type": cc.competence.type_competence,
-                "niveau_maitrise": cc.niveau_maitrise,
-                "annees_experience": cc.annees_experience,
-                "description": cc.competence.description
-            })
+            skills.append(
+                {
+                    "nom": cc.competence.nom,
+                    "categorie": cc.competence.categorie,
+                    "type": cc.competence.type_competence,
+                    "niveau_maitrise": cc.niveau_maitrise,
+                    "annees_experience": cc.annees_experience,
+                    "description": cc.competence.description,
+                }
+            )
 
         return skills
 
     def _get_salary_stats(self) -> Dict[str, float]:
         """Calcule les statistiques des salaires"""
-        consultants = self.session.query(Consultant).filter(
-            and_(Consultant.salaire_actuel.isnot(None), Consultant.salaire_actuel > 0)
-        ).all()
+        consultants = (
+            self.session.query(Consultant)
+            .filter(
+                and_(
+                    Consultant.salaire_actuel.isnot(None), Consultant.salaire_actuel > 0
+                )
+            )
+            .all()
+        )
 
         if not consultants:
             return {"moyenne": 0, "mediane": 0, "minimum": 0, "maximum": 0, "total": 0}
@@ -1852,7 +2356,7 @@ class ChatbotService:
             "mediane": salaires[len(salaires) // 2],
             "minimum": min(salaires),
             "maximum": max(salaires),
-            "total": len(consultants)
+            "total": len(consultants),
         }
 
     def _get_general_stats(self) -> Dict[str, Any]:
@@ -1863,14 +2367,16 @@ class ChatbotService:
 
         # Consultants
         consultants_total = self.session.query(Consultant).count()
-        consultants_actifs = self.session.query(
-            Consultant).filter(Consultant.disponibilite).count()
+        consultants_actifs = (
+            self.session.query(Consultant).filter(Consultant.disponibilite).count()
+        )
         consultants_inactifs = consultants_total - consultants_actifs
 
         # Missions
         missions_total = self.session.query(Mission).count()
-        missions_en_cours = self.session.query(Mission).filter(
-            Mission.statut == "en_cours").count()
+        missions_en_cours = (
+            self.session.query(Mission).filter(Mission.statut == "en_cours").count()
+        )
         missions_terminees = missions_total - missions_en_cours
 
         # Practices
@@ -1881,15 +2387,20 @@ class ChatbotService:
         consultants_avec_cv = self.session.query(Consultant).join(CV).distinct().count()
 
         # TJM moyen
-        tjm_moyen = self.session.query(
-            func.avg(
-                Mission.taux_journalier)).filter(
-            Mission.taux_journalier.isnot(None)).scalar() or 0
+        tjm_moyen = (
+            self.session.query(func.avg(Mission.taux_journalier))
+            .filter(Mission.taux_journalier.isnot(None))
+            .scalar()
+            or 0
+        )
 
         # Salaire moyen et CJM moyen
-        salaire_moyen = self.session.query(func.avg(Consultant.salaire_actuel)).filter(
-            Consultant.salaire_actuel.isnot(None)
-        ).scalar() or 0
+        salaire_moyen = (
+            self.session.query(func.avg(Consultant.salaire_actuel))
+            .filter(Consultant.salaire_actuel.isnot(None))
+            .scalar()
+            or 0
+        )
         cjm_moyen = (salaire_moyen * 1.8 / 216) if salaire_moyen > 0 else 0
 
         return {
@@ -1904,7 +2415,7 @@ class ChatbotService:
             "consultants_avec_cv": consultants_avec_cv,
             "tjm_moyen": tjm_moyen,
             "salaire_moyen": salaire_moyen,
-            "cjm_moyen": cjm_moyen
+            "cjm_moyen": cjm_moyen,
         }
 
     def _handle_availability_question(self, entities: Dict) -> Dict[str, Any]:
@@ -1912,20 +2423,27 @@ class ChatbotService:
 
         # Chercher un consultant spécifique
         consultant = None
-        if entities['noms']:
-            nom_complet = ' '.join(entities['noms'])
+        if entities["noms"]:
+            nom_complet = " ".join(entities["noms"])
             consultant = self._find_consultant_by_name(nom_complet)
 
         if consultant:
             try:
                 # Récupérer les données de disponibilité
-                consultant_db = self.session.query(Consultant).filter(
-                    Consultant.id == consultant.id).first()
+                consultant_db = (
+                    self.session.query(Consultant)
+                    .filter(Consultant.id == consultant.id)
+                    .first()
+                )
 
                 if consultant_db:
-                    response = f"📅 **Disponibilité de {
-                        consultant.prenom} {
-                        consultant.nom}** :\n\n"
+                    response = (
+                        "📅 **Disponibilité de "
+                        + consultant.prenom
+                        + " "
+                        + consultant.nom
+                        + "** :\n\n"
+                    )
 
                     # Date de disponibilité calculée
                     date_dispo = consultant_db.date_disponibilite
@@ -1934,29 +2452,47 @@ class ChatbotService:
 
                         # Vérifier s'il y a des missions en cours
                         missions_en_cours = [
-                            m for m in consultant_db.missions if m.statut == 'en_cours']
+                            m for m in consultant_db.missions if m.statut == "en_cours"
+                        ]
                         if missions_en_cours:
                             response += "⚠️ **Attention :** Le consultant a des missions en cours mais est marqué disponible\n"
                             for mission in missions_en_cours:
-                                response += f"   • {
-                                    mission.nom_mission} chez {
-                                    mission.client}\n"
+                                response += (
+                                    "   • "
+                                    + mission.nom_mission
+                                    + " chez "
+                                    + mission.client
+                                    + "\n"
+                                )
                     else:
-                        response += f"📅 **Disponible à partir du :** {date_dispo}\n\n"
+                        response += (
+                            "📅 **Disponible à partir du :** "
+                            + str(date_dispo)
+                            + "\n\n"
+                        )
 
                         # Afficher les missions qui retardent la disponibilité
                         from datetime import date
-                        missions_futures = [m for m in consultant_db.missions
-                                            if m.date_fin and m.date_fin > date.today()]
+
+                        missions_futures = [
+                            m
+                            for m in consultant_db.missions
+                            if m.date_fin and m.date_fin > date.today()
+                        ]
                         if missions_futures:
                             response += "🎯 **Missions en cours/planifiées :**\n"
                             for mission in missions_futures:
-                                fin_mission = mission.date_fin.strftime('%d/%m/%Y')
-                                response += f"   • {
-                                    mission.nom_mission} (fin: {fin_mission})\n"
+                                fin_mission = mission.date_fin.strftime("%d/%m/%Y")
+                                response += (
+                                    "   • "
+                                    + mission.nom_mission
+                                    + " (fin: "
+                                    + fin_mission
+                                    + ")\n"
+                                )
 
                     # Statut général
-                    response += f"\n📊 **Statut actuel :** "
+                    response += "\n📊 **Statut actuel :** "
                     if consultant_db.disponibilite:
                         response += "✅ Marqué disponible"
                     else:
@@ -1964,18 +2500,26 @@ class ChatbotService:
 
                     # Informations complémentaires
                     if consultant_db.grade:
-                        response += f"\n🎯 **Grade :** {consultant_db.grade}"
+                        response += "\n🎯 **Grade :** " + str(consultant_db.grade)
                     if consultant_db.type_contrat:
-                        response += f"\n📝 **Contrat :** {consultant_db.type_contrat}"
+                        response += "\n📝 **Contrat :** " + str(
+                            consultant_db.type_contrat
+                        )
 
                 else:
-                    response = f"❌ Impossible de récupérer les données de disponibilité pour **{
-                        consultant.prenom} {
-                        consultant.nom}**."
+                    response = (
+                        "❌ Impossible de récupérer les données de disponibilité pour **"
+                        + consultant.prenom
+                        + " "
+                        + consultant.nom
+                        + "**."
+                    )
 
             except Exception as e:
-                response = f"❌ Erreur lors de la récupération des données de disponibilité : {
-                    str(e)}"
+                response = (
+                    "❌ Erreur lors de la récupération des données de disponibilité : "
+                    + str(e)
+                )
 
             return {
                 "response": response,
@@ -1983,90 +2527,130 @@ class ChatbotService:
                     "consultant": {
                         "nom": consultant.nom,
                         "prenom": consultant.prenom,
-                        "date_disponibilite": getattr(
-                            consultant_db,
-                            'date_disponibilite',
-                            None) if 'consultant_db' in locals() else None,
-                        "disponibilite_immediate": getattr(
-                            consultant_db,
-                            'disponibilite',
-                            None) if 'consultant_db' in locals() else None}},
+                        "date_disponibilite": (
+                            getattr(consultant_db, "date_disponibilite", None)
+                            if "consultant_db" in locals()
+                            else None
+                        ),
+                        "disponibilite_immediate": (
+                            getattr(consultant_db, "disponibilite", None)
+                            if "consultant_db" in locals()
+                            else None
+                        ),
+                    }
+                },
                 "intent": "disponibilite",
-                "confidence": 0.9}
+                "confidence": 0.9,
+            }
         else:
             # Question générale sur les disponibilités
             try:
-                consultants_dispos = self.session.query(
-                    Consultant).filter(Consultant.disponibilite).all()
-                consultants_occupes = self.session.query(Consultant).filter(
-                    Consultant.disponibilite == False).all()
+                consultants_dispos = (
+                    self.session.query(Consultant)
+                    .filter(Consultant.disponibilite)
+                    .all()
+                )
+                consultants_occupes = (
+                    self.session.query(Consultant)
+                    .filter(Consultant.disponibilite is False)
+                    .all()
+                )
 
                 response = "📅 **État des disponibilités** :\n\n"
-                response += f"✅ **Disponibles immédiatement :** {
-                    len(consultants_dispos)} consultant(s)\n"
+                response += (
+                    "✅ **Disponibles immédiatement :** "
+                    + str(len(consultants_dispos))
+                    + " consultant(s)\n"
+                )
 
                 if consultants_dispos:
                     for consultant in consultants_dispos[:5]:  # Limiter à 5
-                        response += f"   • {consultant.prenom} {consultant.nom}\n"
+                        response += (
+                            "   • " + consultant.prenom + " " + consultant.nom + "\n"
+                        )
                     if len(consultants_dispos) > 5:
-                        response += f"   • ... et {
-                            len(consultants_dispos) - 5} autre(s)\n"
+                        response += (
+                            "   • ... et "
+                            + str(len(consultants_dispos) - 5)
+                            + " autre(s)\n"
+                        )
 
-                response += f"\n🔴 **Occupés :** {
-                    len(consultants_occupes)} consultant(s)\n"
+                response += (
+                    "\n🔴 **Occupés :** "
+                    + str(len(consultants_occupes))
+                    + " consultant(s)\n"
+                )
 
                 if consultants_occupes:
                     for consultant in consultants_occupes[:5]:  # Limiter à 5
                         date_dispo = consultant.date_disponibilite
-                        response += f"   • {
-                            consultant.prenom} {
-                            consultant.nom} (dispo: {date_dispo})\n"
+                        response += (
+                            "   • "
+                            + consultant.prenom
+                            + " "
+                            + consultant.nom
+                            + " (dispo: "
+                            + str(date_dispo)
+                            + ")\n"
+                        )
                     if len(consultants_occupes) > 5:
-                        response += f"   • ... et {
-                            len(consultants_occupes) - 5} autre(s)\n"
+                        response += (
+                            "   • ... et "
+                            + str(len(consultants_occupes) - 5)
+                            + " autre(s)\n"
+                        )
 
                 return {
                     "response": response,
                     "data": {
                         "disponibles": len(consultants_dispos),
                         "occupes": len(consultants_occupes),
-                        "total": len(consultants_dispos) + len(consultants_occupes)
+                        "total": len(consultants_dispos) + len(consultants_occupes),
                     },
                     "intent": "disponibilite",
-                    "confidence": 0.8
+                    "confidence": 0.8,
                 }
 
             except Exception as e:
                 return {
-                    "response": f"❌ Erreur lors de la récupération des disponibilités : {
-                        str(e)}",
+                    "response": "❌ Erreur lors de la récupération des disponibilités : "
+                    + str(e),
                     "data": {},
                     "intent": "disponibilite",
-                    "confidence": 0.3}
+                    "confidence": 0.3,
+                }
 
     def _handle_mission_tjm_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les TJM des missions"""
 
         # Chercher un consultant spécifique
         consultant = None
-        if entities['noms']:
-            nom_complet = ' '.join(entities['noms'])
+        if entities["noms"]:
+            nom_complet = " ".join(entities["noms"])
             consultant = self._find_consultant_by_name(nom_complet)
 
         if consultant:
             try:
                 # Récupérer les missions avec TJM
-                consultant_db = self.session.query(Consultant).filter(
-                    Consultant.id == consultant.id).first()
+                consultant_db = (
+                    self.session.query(Consultant)
+                    .filter(Consultant.id == consultant.id)
+                    .first()
+                )
 
                 if consultant_db and consultant_db.missions:
                     missions_avec_tjm = [
-                        m for m in consultant_db.missions if m.tjm or m.taux_journalier]
+                        m for m in consultant_db.missions if m.tjm or m.taux_journalier
+                    ]
 
                     if missions_avec_tjm:
-                        response = f"💰 **TJM des missions de {
-                            consultant.prenom} {
-                            consultant.nom}** :\n\n"
+                        response = (
+                            "💰 **TJM des missions de "
+                            + consultant.prenom
+                            + " "
+                            + consultant.nom
+                            + "** :\n\n"
+                        )
 
                         total_tjm = 0
                         count_tjm = 0
@@ -2075,17 +2659,19 @@ class ChatbotService:
                             tjm = mission.tjm or mission.taux_journalier
                             tjm_type = "TJM" if mission.tjm else "TJM (ancien)"
 
-                            response += f"🎯 **{mission.nom_mission}**\n"
-                            response += f"   • Client: {mission.client}\n"
-                            response += f"   • {tjm_type}: {tjm:,.0f}€\n"
+                            response += "🎯 **" + mission.nom_mission + "**\n"
+                            response += "   • Client: " + mission.client + "\n"
+                            response += "   • " + tjm_type + ": " + str(tjm) + "€\n"
 
                             if mission.date_debut:
-                                debut = mission.date_debut.strftime('%d/%m/%Y')
+                                debut = mission.date_debut.strftime("%d/%m/%Y")
                                 if mission.date_fin:
-                                    fin = mission.date_fin.strftime('%d/%m/%Y')
-                                    response += f"   • Période: {debut} → {fin}\n"
+                                    fin = mission.date_fin.strftime("%d/%m/%Y")
+                                    response += (
+                                        "   • Période: " + debut + " → " + fin + "\n"
+                                    )
                                 else:
-                                    response += f"   • Début: {debut} (en cours)\n"
+                                    response += "   • Début: " + debut + " (en cours)\n"
 
                             response += "\n"
 
@@ -2094,72 +2680,101 @@ class ChatbotService:
 
                         if count_tjm > 1:
                             tjm_moyen = total_tjm / count_tjm
-                            response += f"📊 **TJM moyen :** {
-                                tjm_moyen:,.0f}€ (sur {count_tjm} missions)"
+                            response += (
+                                "📊 **TJM moyen :** "
+                                + str(tjm_moyen)
+                                + "€ (sur "
+                                + str(count_tjm)
+                                + " missions)"
+                            )
 
                     else:
-                        response = f"💰 **{
-                            consultant.prenom} {
-                            consultant.nom}** : Aucun TJM renseigné dans les missions"
+                        response = (
+                            "💰 **"
+                            + consultant.prenom
+                            + " "
+                            + consultant.nom
+                            + "** : Aucun TJM renseigné dans les missions"
+                        )
                 else:
-                    response = f"💰 **{
-                        consultant.prenom} {
-                        consultant.nom}** : Aucune mission trouvée"
+                    response = (
+                        "💰 **"
+                        + consultant.prenom
+                        + " "
+                        + consultant.nom
+                        + "** : Aucune mission trouvée"
+                    )
 
             except Exception as e:
-                response = f"❌ Erreur lors de la récupération des TJM : {str(e)}"
+                response = "❌ Erreur lors de la récupération des TJM : " + str(e)
 
             return {
                 "response": response,
                 "data": {
-                    "consultant": {
-                        "nom": consultant.nom,
-                        "prenom": consultant.prenom
-                    }
+                    "consultant": {"nom": consultant.nom, "prenom": consultant.prenom}
                 },
                 "intent": "tjm_mission",
-                "confidence": 0.9
+                "confidence": 0.9,
             }
         else:
             # Question générale sur les TJM
             try:
                 # TJM moyen avec nouveau champ
-                tjm_nouveau_moyen = self.session.query(
-                    func.avg(
-                        Mission.tjm)).filter(
-                    Mission.tjm.isnot(None)).scalar() or 0
+                tjm_nouveau_moyen = (
+                    self.session.query(func.avg(Mission.tjm))
+                    .filter(Mission.tjm.isnot(None))
+                    .scalar()
+                    or 0
+                )
 
                 # TJM moyen avec ancien champ
-                tjm_ancien_moyen = self.session.query(
-                    func.avg(
-                        Mission.taux_journalier)).filter(
-                    Mission.taux_journalier.isnot(None)).scalar() or 0
+                tjm_ancien_moyen = (
+                    self.session.query(func.avg(Mission.taux_journalier))
+                    .filter(Mission.taux_journalier.isnot(None))
+                    .scalar()
+                    or 0
+                )
 
                 # Compter les missions avec TJM
-                missions_nouveau_tjm = self.session.query(
-                    Mission).filter(Mission.tjm.isnot(None)).count()
-                missions_ancien_tjm = self.session.query(Mission).filter(
-                    Mission.taux_journalier.isnot(None)).count()
+                missions_nouveau_tjm = (
+                    self.session.query(Mission).filter(Mission.tjm.isnot(None)).count()
+                )
+                missions_ancien_tjm = (
+                    self.session.query(Mission)
+                    .filter(Mission.taux_journalier.isnot(None))
+                    .count()
+                )
 
                 response = "💰 **Statistiques TJM des missions** :\n\n"
 
                 if missions_nouveau_tjm > 0:
-                    response += f"🆕 **Nouveau format TJM :**\n"
-                    response += f"   • Missions avec TJM: {missions_nouveau_tjm}\n"
-                    response += f"   • TJM moyen: {tjm_nouveau_moyen:,.0f}€\n\n"
+                    response += "🆕 **Nouveau format TJM :**\n"
+                    response += (
+                        "   • Missions avec TJM: " + str(missions_nouveau_tjm) + "\n"
+                    )
+                    response += "   • TJM moyen: " + str(tjm_nouveau_moyen) + "€\n\n"
 
                 if missions_ancien_tjm > 0:
-                    response += f"📊 **Ancien format TJM :**\n"
-                    response += f"   • Missions avec TJM: {missions_ancien_tjm}\n"
-                    response += f"   • TJM moyen: {tjm_ancien_moyen:,.0f}€\n\n"
+                    response += "📊 **Ancien format TJM :**\n"
+                    response += (
+                        "   • Missions avec TJM: " + str(missions_ancien_tjm) + "\n"
+                    )
+                    response += "   • TJM moyen: " + str(tjm_ancien_moyen) + "€\n\n"
 
                 # Calcul global
                 if missions_nouveau_tjm > 0 or missions_ancien_tjm > 0:
                     total_missions = missions_nouveau_tjm + missions_ancien_tjm
-                    tjm_global = ((tjm_nouveau_moyen * missions_nouveau_tjm) +
-                                  (tjm_ancien_moyen * missions_ancien_tjm)) / total_missions
-                    response += f"🎯 **TJM global moyen :** {
-                        tjm_global:,.0f}€ (sur {total_missions} missions)"
+                    tjm_global = (
+                        (tjm_nouveau_moyen * missions_nouveau_tjm)
+                        + (tjm_ancien_moyen * missions_ancien_tjm)
+                    ) / total_missions
+                    response += (
+                        "🎯 **TJM global moyen :** "
+                        + str(tjm_global)
+                        + "€ (sur "
+                        + str(total_missions)
+                        + " missions)"
+                    )
                 else:
                     response = "💰 **Aucun TJM renseigné** dans les missions"
 
@@ -2169,19 +2784,20 @@ class ChatbotService:
                         "tjm_nouveau_moyen": tjm_nouveau_moyen,
                         "tjm_ancien_moyen": tjm_ancien_moyen,
                         "missions_nouveau": missions_nouveau_tjm,
-                        "missions_ancien": missions_ancien_tjm
+                        "missions_ancien": missions_ancien_tjm,
                     },
                     "intent": "tjm_mission",
-                    "confidence": 0.8
+                    "confidence": 0.8,
                 }
 
             except Exception as e:
                 return {
-                    "response": f"❌ Erreur lors de la récupération des statistiques TJM : {
-                        str(e)}",
+                    "response": "❌ Erreur lors de la récupération des statistiques TJM : "
+                    + str(e),
                     "data": {},
                     "intent": "tjm_mission",
-                    "confidence": 0.3}
+                    "confidence": 0.3,
+                }
 
     def get_response(self, question: str) -> str:
         """
@@ -2196,11 +2812,16 @@ class ChatbotService:
         """
         try:
             result = self.process_question(question)
-            return result.get("response", "❓ Je n'ai pas compris votre question.")
+            response = result.get("response", "❓ Je n'ai pas compris votre question.")
+            return (
+                str(response)
+                if response is not None
+                else "❓ Je n'ai pas compris votre question."
+            )
         except Exception as e:
-            return f"❌ Erreur: {str(e)}"
+            return "❌ Erreur: " + str(e)
 
     def __del__(self):
         """Ferme la session DB"""
-        if hasattr(self, 'session'):
+        if hasattr(self, "session"):
             self.session.close()

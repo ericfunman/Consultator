@@ -84,7 +84,7 @@ class ConsultantService:
     def get_all_consultants(page: int = 1, per_page: int = 20) -> List[Consultant]:
         # Implémentation avec pagination
         pass
-    
+
     @staticmethod
     def create_consultant(data: dict) -> Consultant:
         # Validation et création
@@ -95,13 +95,13 @@ class ConsultantService:
 ```python
 def show():
     st.title("📋 Titre de la page")
-    
+
     # Tabs pour organiser le contenu
     tab1, tab2 = st.tabs(["Vue", "Actions"])
-    
+
     with tab1:
         show_content()
-    
+
     with tab2:
         show_actions()
 
@@ -116,7 +116,7 @@ def show_content():
 with st.form("form_name"):
     # Champs du formulaire
     data = collect_form_data()
-    
+
     submitted = st.form_submit_button("Valider")
     if submitted:
         if validate_data(data):

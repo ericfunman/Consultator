@@ -3,14 +3,6 @@ Page de gestion des consultants
 CRUD complet pour les consultants avec formulaires, tableaux et gestion de documents
 """
 
-from services.technology_service import TechnologyService
-from services.document_analyzer import DocumentAnalyzer
-from services.consultant_service import ConsultantService
-from database.models import Mission
-from database.models import ConsultantCompetence
-from database.models import Competence
-from database.database import get_database_session
-from components.technology_widget import technology_multiselect
 import os
 import platform
 import sys
@@ -18,6 +10,15 @@ from datetime import datetime
 
 import pandas as pd
 import streamlit as st
+
+from components.technology_widget import technology_multiselect
+from database.database import get_database_session
+from database.models import Competence
+from database.models import ConsultantCompetence
+from database.models import Mission
+from services.consultant_service import ConsultantService
+from services.document_analyzer import DocumentAnalyzer
+from services.technology_service import TechnologyService
 
 # Import des modèles et services
 sys.path.append(os.path.dirname(__file__))
@@ -30,7 +31,9 @@ def show():
     print("🚨 TERMINAL LOG: La fonction show() de consultants.py a été appelée!")
 
     st.title("🚨 NOUVEAU TITRE UNIQUE 19/08/2025 - Gestion des consultants 🚨")
-    st.markdown("### ✅ CETTE PAGE A ÉTÉ MISE À JOUR - Gérez les profils de vos consultants")
+    st.markdown(
+        "### ✅ CETTE PAGE A ÉTÉ MISE À JOUR - Gérez les profils de vos consultants"
+    )
 
     # TEST FORCÉ POUR VÉRIFIER QUE CE FICHIER EST UTILISÉ - VERSION 19/08/2025 15:45
     st.error("🚨 DEBUG ACTIF - CONSULTANTS.PY PAGES_MODULES - 19/08/2025 15:45 🚨")
@@ -38,7 +41,7 @@ def show():
     st.balloons()
 
     # Vérifier si on doit afficher le profil d'un consultant spécifique
-    if 'view_consultant_profile' in st.session_state:
+    if "view_consultant_profile" in st.session_state:
         show_consultant_profile()
         return
 
@@ -68,7 +71,7 @@ def show_consultant_profile():
     col1, col2 = st.columns([6, 1])
 
     with col1:
-        st.title(f"👤 Profil de {consultant.prenom} {consultant.nom}")
+        st.title("👤 Profil de " + consultant.prenom + " " + consultant.nom)
 
     with col2:
         if st.button("← Retour", key="back_to_list"):
@@ -82,23 +85,36 @@ def show_consultant_profile():
 
     with col1:
         st.metric(
-            "💰 Salaire annuel", f"{
-                consultant.salaire_actuel or 0:,}€", delta=None)
+            "💰 Salaire annuel",
+            f"{
+                consultant.salaire_actuel or 0:,}€",
+            delta=None,
+        )
 
     with col2:
         status = "Disponible" if consultant.disponibilite else "En mission"
         st.metric("📊 Statut", status)
 
     with col3:
-        creation_date = consultant.date_creation.strftime(
-            "%d/%m/%Y") if consultant.date_creation else "N/A"
+        creation_date = (
+            consultant.date_creation.strftime("%d/%m/%Y")
+            if consultant.date_creation
+            else "N/A"
+        )
         st.metric("📅 Membre depuis", creation_date)
 
     st.markdown("---")
 
     # Détails du profil
     tab1, tab2, tab3, tab4, tab5 = st.tabs(
-        ["📋 Informations", "💼 Compétences", "🚀 Missions", "📄 Documents", "⚙️ Actions"])
+        [
+            "📋 Informations",
+            "💼 Compétences",
+            "🚀 Missions",
+            "📄 Documents",
+            "⚙️ Actions",
+        ]
+    )
 
     with tab1:
         show_consultant_info(consultant)
@@ -127,7 +143,8 @@ def show_consultant_skills(consultant):
         f"🔍 Consultant ID: {
             consultant.id}, Nom: {
             consultant.nom} {
-                consultant.prenom}")
+                consultant.prenom}"
+    )
 
     # Récupérer les technologies des missions du consultant
     technologies_missions = get_consultant_technologies_from_missions(consultant.id)
@@ -183,19 +200,29 @@ def get_consultant_technologies_from_missions(consultant_id):
 
     try:
         with get_database_session() as session:
-            missions = session.query(Mission).filter(
-                Mission.consultant_id == consultant_id).all()
+            missions = (
+                session.query(Mission)
+                .filter(Mission.consultant_id == consultant_id)
+                .all()
+            )
 
             # Debug temporaire
             st.write(
                 f"🔍 Debug: {
-                    len(missions)} missions trouvées pour consultant ID {consultant_id}")
+                    len(missions)} missions trouvées pour consultant ID {consultant_id}"
+            )
 
             for mission in missions:
-                if mission.technologies_utilisees and mission.technologies_utilisees.strip():
+                if (
+                    mission.technologies_utilisees
+                    and mission.technologies_utilisees.strip()
+                ):
                     # Diviser les technologies et les nettoyer
                     mission_techs = [
-                        tech.strip() for tech in mission.technologies_utilisees.split(',') if tech.strip()]
+                        tech.strip()
+                        for tech in mission.technologies_utilisees.split(",")
+                        if tech.strip()
+                    ]
                     technologies.update(mission_techs)
                     st.write(f"✅ Mission {mission.client}: {mission_techs}")
                 else:
@@ -223,7 +250,7 @@ def show_consultant_info(consultant):
     with col1:
         st.write(f"**👤 Prénom**: {consultant.prenom}")
         st.write(f"**📧 Email**: {consultant.email}")
-        st.write(f"**💰 Salaire**: {consultant.salaire_actuel or 0:,}€")
+        st.write("**💰 Salaire**: " + f"{consultant.salaire_actuel or 0:,}" + "€")
 
     with col2:
         st.write(f"**👤 Nom**: {consultant.nom}")
@@ -237,28 +264,40 @@ def show_consultant_missions(consultant):
 
     try:
         with get_database_session() as session:
-            missions = session.query(Mission).filter(
-                Mission.consultant_id == consultant.id).all()
+            missions = (
+                session.query(Mission)
+                .filter(Mission.consultant_id == consultant.id)
+                .all()
+            )
 
         if missions:
             for mission in missions:
-                with st.expander(f"🚀 {mission.client} - {mission.role or 'Rôle non défini'}"):
+                with st.expander(
+                    f"🚀 {mission.client} - {mission.role or 'Rôle non défini'}"
+                ):
                     col1, col2 = st.columns(2)
 
                     with col1:
                         st.write(f"**🏢 Client**: {mission.client}")
                         st.write(f"**👤 Rôle**: {mission.role or 'Non spécifié'}")
-                        st.write(f"**💰 Revenus**: {mission.revenus_generes or 0:,}€")
+                        st.write(
+                            "**💰 Revenus**: "
+                            + f"{mission.revenus_generes or 0:,}"
+                            + "€"
+                        )
 
                     with col2:
                         st.write(
-                            f"**📅 Début**: {mission.date_debut.strftime('%Y-%m-%d') if mission.date_debut else 'N/A'}")
+                            f"**📅 Début**: {mission.date_debut.strftime('%Y-%m-%d') if mission.date_debut else 'N/A'}"
+                        )
                         st.write(
-                            f"**📅 Fin**: {mission.date_fin.strftime('%Y-%m-%d') if mission.date_fin else 'En cours'}")
-                        st.write(f"**📊 Statut**: {mission.statut}")
+                            f"**📅 Fin**: {mission.date_fin.strftime('%Y-%m-%d') if mission.date_fin else 'En cours'}"
+                        )
+                        st.write("**📊 Statut**: " + str(mission.statut))
 
                     st.write(
-                        f"**🛠️ Technologies**: {mission.technologies_utilisees or 'Non spécifiées'}")
+                        f"**🛠️ Technologies**: {mission.technologies_utilisees or 'Non spécifiées'}"
+                    )
         else:
             st.info("📝 Aucune mission enregistrée")
 
@@ -290,14 +329,18 @@ def show_consultants_list():
             # Préparer les données pour le tableau
             consultants_data = []
             for consultant in consultants:
-                consultants_data.append({
-                    "ID": consultant.id,
-                    "Prénom": consultant.prenom,
-                    "Nom": consultant.nom,
-                    "Email": consultant.email,
-                    "Salaire": f"{consultant.salaire_actuel or 0:,}€",
-                    "Statut": "✅ Disponible" if consultant.disponibilite else "🔴 Occupé"
-                })
+                consultants_data.append(
+                    {
+                        "ID": consultant.id,
+                        "Prénom": consultant.prenom,
+                        "Nom": consultant.nom,
+                        "Email": consultant.email,
+                        "Salaire": f"{consultant.salaire_actuel or 0:,}€",
+                        "Statut": (
+                            "✅ Disponible" if consultant.disponibilite else "🔴 Occupé"
+                        ),
+                    }
+                )
 
             # Afficher le tableau
             df = pd.DataFrame(consultants_data)
@@ -308,7 +351,7 @@ def show_consultants_list():
                 use_container_width=True,
                 hide_index=True,
                 on_select="rerun",
-                selection_mode="single-row"
+                selection_mode="single-row",
             )
 
             # Gestion de la sélection
@@ -321,15 +364,18 @@ def show_consultants_list():
 
                 with col1:
                     if st.button(
-                        "👁️ Voir le profil",
-                        type="primary",
-                            use_container_width=True):
-                        st.session_state.view_consultant_profile = selected_consultant_id
+                        "👁️ Voir le profil", type="primary", use_container_width=True
+                    ):
+                        st.session_state.view_consultant_profile = (
+                            selected_consultant_id
+                        )
                         st.rerun()
 
                 with col2:
                     if st.button("✏️ Modifier", use_container_width=True):
-                        st.session_state.view_consultant_profile = selected_consultant_id
+                        st.session_state.view_consultant_profile = (
+                            selected_consultant_id
+                        )
                         st.rerun()
         else:
             st.info("📝 Aucun consultant enregistré")
@@ -350,10 +396,8 @@ def show_add_consultant_form():
             prenom = st.text_input("👤 Prénom *", placeholder="Ex: Jean")
             email = st.text_input("📧 Email *", placeholder="jean.dupont@example.com")
             salaire = st.number_input(
-                "💰 Salaire annuel (€)",
-                min_value=0,
-                value=45000,
-                step=1000)
+                "💰 Salaire annuel (€)", min_value=0, value=45000, step=1000
+            )
 
         with col2:
             nom = st.text_input("👤 Nom *", placeholder="Ex: Dupont")
@@ -368,16 +412,17 @@ def show_add_consultant_form():
             else:
                 try:
                     consultant_data = {
-                        'prenom': prenom.strip(),
-                        'nom': nom.strip(),
-                        'email': email.strip().lower(),
-                        'telephone': telephone.strip() if telephone else None,
-                        'salaire_actuel': salaire,
-                        'disponibilite': disponibilite
+                        "prenom": prenom.strip(),
+                        "nom": nom.strip(),
+                        "email": email.strip().lower(),
+                        "telephone": telephone.strip() if telephone else None,
+                        "salaire_actuel": salaire,
+                        "disponibilite": disponibilite,
                     }
 
                     nouveau_consultant = ConsultantService.create_consultant(
-                        consultant_data)
+                        consultant_data
+                    )
                     st.success(f"✅ {prenom} {nom} a été créé avec succès !")
                     st.rerun()
 

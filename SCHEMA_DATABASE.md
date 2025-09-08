@@ -79,7 +79,7 @@
    - **Cardinalité** : 1:N (Une practice peut avoir plusieurs consultants)
    - **Contrainte** : Un consultant peut être dans 0 ou 1 practice (practice_id nullable)
 
-2. **CONSULTANT ↔ MISSION** 
+2. **CONSULTANT ↔ MISSION**
    - **Cardinalité** : 1:N (Un consultant peut avoir plusieurs missions)
    - **Contrainte** : Une mission appartient obligatoirement à un consultant
 
@@ -102,7 +102,7 @@
 
 ### Clés uniques :
 - `practice.nom` : Nom unique pour chaque practice
-- `consultant.email` : Email unique pour chaque consultant  
+- `consultant.email` : Email unique pour chaque consultant
 - `competence.nom` : Nom unique pour chaque compétence
 - `custom_technology.nom` : Nom unique pour chaque technologie
 

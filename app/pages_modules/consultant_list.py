@@ -53,9 +53,9 @@ def show_consultants_list():
     # Récupérer tous les consultants
     try:
         with get_database_session() as session:
-            consultants = session.query(Consultant)\
-                .options(joinedload(Consultant.practice))\
-                .all()
+            consultants = (
+                session.query(Consultant).options(joinedload(Consultant.practice)).all()
+            )
 
         if not consultants:
             st.info("ℹ️ Aucun consultant trouvé dans la base de données")
@@ -64,22 +64,32 @@ def show_consultants_list():
         # Convertir en DataFrame pour faciliter la manipulation
         consultants_data = []
         for consultant in consultants:
-            practice_name = consultant.practice.nom if consultant.practice else "Non affecté"
+            practice_name = (
+                consultant.practice.nom if consultant.practice else "Non affecté"
+            )
 
-            consultants_data.append({
-                'ID': consultant.id,
-                'Prénom': consultant.prenom,
-                'Nom': consultant.nom,
-                'Email': consultant.email,
-                'Téléphone': consultant.telephone,
-                'Salaire annuel': consultant.salaire_actuel or 0,
-                'Disponibilité': "✅ Disponible" if consultant.disponibilite else "🔴 En mission",
-                'Date disponibilité': consultant.date_disponibilite,  # Nouveau champ V1.2.2
-                'Grade': consultant.grade,
-                'Type contrat': consultant.type_contrat,
-                'Practice': practice_name,
-                'Date création': consultant.date_creation.strftime("%d/%m/%Y") if consultant.date_creation else "N/A"
-            })
+            consultants_data.append(
+                {
+                    "ID": consultant.id,
+                    "Prénom": consultant.prenom,
+                    "Nom": consultant.nom,
+                    "Email": consultant.email,
+                    "Téléphone": consultant.telephone,
+                    "Salaire annuel": consultant.salaire_actuel or 0,
+                    "Disponibilité": (
+                        "✅ Disponible" if consultant.disponibilite else "🔴 En mission"
+                    ),
+                    "Date disponibilité": consultant.date_disponibilite,  # Nouveau champ V1.2.2
+                    "Grade": consultant.grade,
+                    "Type contrat": consultant.type_contrat,
+                    "Practice": practice_name,
+                    "Date création": (
+                        consultant.date_creation.strftime("%d/%m/%Y")
+                        if consultant.date_creation
+                        else "N/A"
+                    ),
+                }
+            )
 
         df = pd.DataFrame(consultants_data)
 
@@ -90,21 +100,21 @@ def show_consultants_list():
             search_term = st.text_input(
                 "🔍 Recherche",
                 placeholder="Nom, prénom, email...",
-                help="Rechercher par nom, prénom ou email"
+                help="Rechercher par nom, prénom ou email",
             )
 
         with col2:
             practice_filter = st.selectbox(
                 "🏢 Filtrer par practice",
-                options=["Tous"] + sorted(list(set(df['Practice'].tolist()))),
-                help="Filtrer les consultants par practice"
+                options=["Tous"] + sorted(list(set(df["Practice"].tolist()))),
+                help="Filtrer les consultants par practice",
             )
 
         with col3:
             availability_filter = st.selectbox(
                 "📊 Statut",
                 options=["Tous", "Disponible", "En mission"],
-                help="Filtrer par disponibilité"
+                help="Filtrer par disponibilité",
             )
 
         # Appliquer les filtres
@@ -112,21 +122,19 @@ def show_consultants_list():
 
         if search_term:
             filtered_df = filtered_df[
-                filtered_df['Prénom'].str.contains(search_term, case=False, na=False) |
-                filtered_df['Nom'].str.contains(search_term, case=False, na=False) |
-                filtered_df['Email'].str.contains(search_term, case=False, na=False)
+                filtered_df["Prénom"].str.contains(search_term, case=False, na=False)
+                | filtered_df["Nom"].str.contains(search_term, case=False, na=False)
+                | filtered_df["Email"].str.contains(search_term, case=False, na=False)
             ]
 
         if practice_filter != "Tous":
-            filtered_df = filtered_df[filtered_df['Practice'] == practice_filter]
+            filtered_df = filtered_df[filtered_df["Practice"] == practice_filter]
 
         if availability_filter != "Tous":
-            status_map = {
-                "Disponible": "✅ Disponible",
-                "En mission": "🔴 En mission"
-            }
-            filtered_df = filtered_df[filtered_df['Disponibilité']
-                                      == status_map[availability_filter]]
+            status_map = {"Disponible": "✅ Disponible", "En mission": "🔴 En mission"}
+            filtered_df = filtered_df[
+                filtered_df["Disponibilité"] == status_map[availability_filter]
+            ]
 
         # Statistiques
         col1, col2, col3, col4 = st.columns(4)
@@ -137,16 +145,18 @@ def show_consultants_list():
 
         with col2:
             available_count = len(
-                filtered_df[filtered_df['Disponibilité'] == "✅ Disponible"])
+                filtered_df[filtered_df["Disponibilité"] == "✅ Disponible"]
+            )
             st.metric("✅ Disponibles", available_count)
 
         with col3:
             busy_count = len(
-                filtered_df[filtered_df['Disponibilité'] == "🔴 En mission"])
+                filtered_df[filtered_df["Disponibilité"] == "🔴 En mission"]
+            )
             st.metric("🔴 En mission", busy_count)
 
         with col4:
-            total_salary = filtered_df['Salaire annuel'].sum()
+            total_salary = filtered_df["Salaire annuel"].sum()
             st.metric("💰 Masse salariale", f"{total_salary:,.0f}€")
 
         st.markdown("---")
@@ -157,14 +167,15 @@ def show_consultants_list():
         else:
             # Configuration des colonnes à afficher
             display_columns = [
-                'Prénom',
-                'Nom',
-                'Email',
-                'Disponibilité',
-                'Date disponibilité',
-                'Grade',
-                'Type contrat',
-                'Practice']
+                "Prénom",
+                "Nom",
+                "Email",
+                "Disponibilité",
+                "Date disponibilité",
+                "Grade",
+                "Type contrat",
+                "Practice",
+            ]
 
             # Afficher le DataFrame avec sélection interactive (comme dans business
             # managers)
@@ -175,30 +186,22 @@ def show_consultants_list():
                 on_select="rerun",
                 selection_mode="single-row",
                 column_config={
-                    "Prénom": st.column_config.TextColumn(
-                        "Prénom",
-                        width="small"),
-                    "Nom": st.column_config.TextColumn(
-                        "Nom",
-                        width="small"),
-                    "Email": st.column_config.TextColumn(
-                        "Email",
-                        width="large"),
+                    "Prénom": st.column_config.TextColumn("Prénom", width="small"),
+                    "Nom": st.column_config.TextColumn("Nom", width="small"),
+                    "Email": st.column_config.TextColumn("Email", width="large"),
                     "Disponibilité": st.column_config.TextColumn(
-                        "Disponibilité",
-                        width="small"),
+                        "Disponibilité", width="small"
+                    ),
                     "Date disponibilité": st.column_config.TextColumn(
-                        "Date disponibilité",
-                        width="small"),
-                    "Grade": st.column_config.TextColumn(
-                        "Grade",
-                        width="small"),
+                        "Date disponibilité", width="small"
+                    ),
+                    "Grade": st.column_config.TextColumn("Grade", width="small"),
                     "Type contrat": st.column_config.TextColumn(
-                        "Type contrat",
-                        width="small"),
-                    "Practice": st.column_config.TextColumn(
-                        "Practice",
-                        width="medium")})
+                        "Type contrat", width="small"
+                    ),
+                    "Practice": st.column_config.TextColumn("Practice", width="medium"),
+                },
+            )
 
             # Actions sur sélection (comme dans business managers)
             if event.selection.rows:
@@ -206,13 +209,14 @@ def show_consultants_list():
                 # Récupérer les données depuis le DataFrame filtré
                 selected_consultant_data = filtered_df.iloc[selected_row]
                 # S'assurer que c'est un int
-                selected_id = int(selected_consultant_data['ID'])
+                selected_id = int(selected_consultant_data["ID"])
                 selected_name = f"{
                     selected_consultant_data['Prénom']} {
                     selected_consultant_data['Nom']}"
 
                 st.success(
-                    f"✅ Consultant sélectionné : **{selected_name}** (ID: {selected_id})")
+                    f"✅ Consultant sélectionné : **{selected_name}** (ID: {selected_id})"
+                )
 
                 col1, col2, col3 = st.columns(3)
 
@@ -256,20 +260,26 @@ def show_consultants_list():
             # Sélection d'un consultant pour voir le détail
             selected_consultant = st.selectbox(
                 "👤 Ou sélectionner un consultant pour voir son profil détaillé",
-                options=[""] + [f"{row['Prénom']} {row['Nom']} (ID: {row['ID']})" for _, row in filtered_df.iterrows()],
-                help="Choisissez un consultant pour accéder à son profil complet"
+                options=[""]
+                + [
+                    f"{row['Prénom']} {row['Nom']} (ID: {row['ID']})"
+                    for _, row in filtered_df.iterrows()
+                ],
+                help="Choisissez un consultant pour accéder à son profil complet",
             )
 
             if selected_consultant:
                 # Extraire l'ID du consultant sélectionné
                 import re
-                match = re.search(r'\(ID: (\d+)\)', selected_consultant)
+
+                match = re.search(r"\(ID: (\d+)\)", selected_consultant)
                 if match:
                     consultant_id = int(match.group(1))
 
                     if st.button(
                         "👁️ Voir le profil détaillé",
-                            key=f"view_profile_alt_{consultant_id}"):
+                        key=f"view_profile_alt_{consultant_id}",
+                    ):
                         st.session_state.view_consultant_profile = consultant_id
                         st.rerun()
 
@@ -277,8 +287,9 @@ def show_consultants_list():
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("📊 Exporter en Excel",
-                             help="Télécharger la liste au format Excel"):
+                if st.button(
+                    "📊 Exporter en Excel", help="Télécharger la liste au format Excel"
+                ):
                     export_to_excel(filtered_df)
 
             with col2:
@@ -316,9 +327,8 @@ def export_to_excel(df: pd.DataFrame):
             cell = ws.cell(row=1, column=col_num, value=header)
             cell.font = Font(bold=True)
             cell.fill = PatternFill(
-                start_color="1f77b4",
-                end_color="1f77b4",
-                fill_type="solid")
+                start_color="1f77b4", end_color="1f77b4", fill_type="solid"
+            )
 
         # Données
         for row_num, row in enumerate(df.itertuples(index=False), 2):
@@ -348,13 +358,15 @@ def export_to_excel(df: pd.DataFrame):
             label="📥 Télécharger Excel",
             data=buffer,
             file_name=f"consultants_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
 
         st.success("✅ Fichier Excel généré avec succès !")
 
     except ImportError:
-        st.error("❌ Module openpyxl non installé. Installez-le avec : pip install openpyxl")
+        st.error(
+            "❌ Module openpyxl non installé. Installez-le avec : pip install openpyxl"
+        )
     except Exception as e:
         st.error(f"❌ Erreur lors de l'export Excel: {e}")
 
@@ -371,19 +383,19 @@ def generate_consultants_report(df: pd.DataFrame):
         with col1:
             st.subheader("👥 Effectif")
             st.metric("Total", len(df))
-            available = len(df[df['Disponibilité'] == "✅ Disponible"])
+            available = len(df[df["Disponibilité"] == "✅ Disponible"])
             st.metric("Disponibles", f"{available} ({available / len(df) * 100:.1f}%)")
 
         with col2:
             st.subheader("💰 Rémunération")
-            total_salary = df['Salaire annuel'].sum()
-            avg_salary = df['Salaire annuel'].mean()
+            total_salary = df["Salaire annuel"].sum()
+            avg_salary = df["Salaire annuel"].mean()
             st.metric("Masse salariale", f"{total_salary:,.0f}€")
             st.metric("Salaire moyen", f"{avg_salary:,.0f}€")
 
         with col3:
             st.subheader("🏢 Répartition")
-            practice_counts = df['Practice'].value_counts()
+            practice_counts = df["Practice"].value_counts()
             for practice, count in practice_counts.items():
                 st.metric(practice, count)
 
@@ -396,14 +408,15 @@ def generate_consultants_report(df: pd.DataFrame):
 
         # Distribution des salaires
         if len(df) > 1:
-            salary_data = df[['Prénom', 'Nom', 'Salaire annuel']].copy()
-            salary_data['Nom complet'] = salary_data['Prénom'] + \
-                ' ' + salary_data['Nom']
-            salary_data = salary_data.sort_values('Salaire annuel', ascending=False)
+            salary_data = df[["Prénom", "Nom", "Salaire annuel"]].copy()
+            salary_data["Nom complet"] = (
+                salary_data["Prénom"] + " " + salary_data["Nom"]
+            )
+            salary_data = salary_data.sort_values("Salaire annuel", ascending=False)
 
             st.bar_chart(
-                salary_data.set_index('Nom complet')['Salaire annuel'],
-                use_container_width=True
+                salary_data.set_index("Nom complet")["Salaire annuel"],
+                use_container_width=True,
             )
 
         st.success("✅ Rapport généré avec succès !")

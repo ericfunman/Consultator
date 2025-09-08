@@ -21,11 +21,8 @@ from .models import Practice
 
 # Configuration de la base de données
 DATABASE_PATH = os.path.join(
-    os.path.dirname(__file__),
-    '..',
-    '..',
-    'data',
-    'consultator.db')
+    os.path.dirname(__file__), "..", "..", "data", "consultator.db"
+)
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 
 # Variable globale pour le contrôle d'initialisation
@@ -39,12 +36,9 @@ def get_database_engine():
         DATABASE_URL,
         echo=False,
         poolclass=pool.StaticPool,
-        connect_args={
-            "check_same_thread": False,
-            "timeout": 30
-        },
+        connect_args={"check_same_thread": False, "timeout": 30},
         pool_pre_ping=True,
-        pool_recycle=3600
+        pool_recycle=3600,
     )
 
 
@@ -166,7 +160,7 @@ def get_database_info():
                 "consultants": consultant_count,
                 "competences": competence_count,
                 "missions": mission_count,
-                "practices": practice_count
+                "practices": practice_count,
             }
     except Exception as e:
         return {"exists": True, "error": str(e)}

@@ -11,7 +11,7 @@ import pytest
 
 # Ajouter les répertoires nécessaires au PYTHONPATH
 project_root = os.path.dirname(os.path.dirname(__file__))
-sys.path.insert(0, os.path.join(project_root, 'app'))
+sys.path.insert(0, os.path.join(project_root, "app"))
 sys.path.insert(0, project_root)
 
 # Configuration de base de données de test
@@ -33,7 +33,7 @@ def test_db():
         TEST_DATABASE_URL,
         echo=False,
         pool_pre_ping=True,  # Vérifier les connexions
-        pool_recycle=300     # Recycler les connexions
+        pool_recycle=300,  # Recycler les connexions
     )
     Base.metadata.create_all(engine)
 
@@ -77,6 +77,7 @@ def db_session(test_db):
 def sample_consultant_data():
     """Données de test pour un consultant avec email unique"""
     import uuid
+
     unique_id = uuid.uuid4().hex[:8]
     return {
         "nom": "Dupont",
@@ -85,7 +86,7 @@ def sample_consultant_data():
         "telephone": "0123456789",
         "disponibilite": True,
         "salaire_souhaite": 45000,
-        "experience_annees": 5
+        "experience_annees": 5,
     }
 
 
@@ -98,8 +99,9 @@ def sample_mission_data():
         "description": "Description de test",
         "duree_mois": 6,
         "tarif_jour": 450,
-        "statut": "En cours"
+        "statut": "En cours",
     }
+
 
 # Configuration Streamlit pour les tests
 

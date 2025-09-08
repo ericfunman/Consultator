@@ -1,7 +1,7 @@
 # 📊 Rapport de Qualité de Code - Consultator
 
-**Date d'analyse :** 21 août 2025  
-**Outil :** Analyse multi-outils (Pylint, Flake8, Bandit, Radon)  
+**Date d'analyse :** 21 août 2025
+**Outil :** Analyse multi-outils (Pylint, Flake8, Bandit, Radon)
 **Portée :** Application complète Consultator
 
 ---
@@ -77,7 +77,7 @@
 ### **Top 5 par pourcentage d'erreurs :**
 
 1. **`documents_functions.py`** - 76.67% erreurs
-2. **`consultants_fixed.py`** - 6.67% erreurs  
+2. **`consultants_fixed.py`** - 6.67% erreurs
 3. **`consultants_broken.py`** - 3.33% erreurs
 4. **`consultants_backup_20250819_153951.py`** - 3.33% erreurs
 5. **`consultant_service.py`** - 1.67% erreurs
@@ -147,7 +147,7 @@ flake8 app/ --select=W293     # Supprimer whitespace
 ## 🔗 Fichiers de Rapport
 
 - 📄 `reports/pylint-report.txt` - Rapport Pylint détaillé
-- 📄 `reports/flake8-summary.txt` - Rapport Flake8 complet  
+- 📄 `reports/flake8-summary.txt` - Rapport Flake8 complet
 - 📄 `reports/bandit-security.json` - Analyse de sécurité
 - 📄 `reports/radon-complexity.txt` - Métriques de complexité
 

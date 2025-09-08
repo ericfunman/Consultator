@@ -64,7 +64,9 @@ def show_consultant_info(consultant):
 
         with col2:
             st.markdown("#### 🏢 Affectation")
-            practice_name = consultant.practice.nom if consultant.practice else "Non affecté"
+            practice_name = (
+                consultant.practice.nom if consultant.practice else "Non affecté"
+            )
             st.write(f"**Practice :** {practice_name}")
 
             status = "✅ Disponible" if consultant.disponibilite else "🔴 En mission"
@@ -72,7 +74,8 @@ def show_consultant_info(consultant):
 
             if consultant.date_creation:
                 st.write(
-                    f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}")
+                    f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}"
+                )
 
         # Informations financières
         st.markdown("#### 💰 Informations financières")
@@ -104,7 +107,7 @@ def show_consultant_info(consultant):
                 value=consultant.notes,
                 height=100,
                 disabled=True,
-                key=f"notes_{consultant.id}"
+                key=f"notes_{consultant.id}",
             )
 
         # Actions
@@ -118,7 +121,9 @@ def show_consultant_info(consultant):
                 st.rerun()
 
         with col2:
-            if st.button("💰 Historique salaire", key=f"salary_history_{consultant.id}"):
+            if st.button(
+                "💰 Historique salaire", key=f"salary_history_{consultant.id}"
+            ):
                 st.session_state.show_salary_history = consultant.id
                 st.rerun()
 
@@ -127,11 +132,17 @@ def show_consultant_info(consultant):
                 generate_consultant_report(consultant)
 
         # Formulaire de modification (si activé)
-        if "edit_consultant_info" in st.session_state and st.session_state.edit_consultant_info == consultant.id:
+        if (
+            "edit_consultant_info" in st.session_state
+            and st.session_state.edit_consultant_info == consultant.id
+        ):
             show_edit_info_form(consultant)
 
         # Historique détaillé des salaires (si activé)
-        if "show_salary_history" in st.session_state and st.session_state.show_salary_history == consultant.id:
+        if (
+            "show_salary_history" in st.session_state
+            and st.session_state.show_salary_history == consultant.id
+        ):
             show_detailed_salary_history(consultant.id)
 
     except Exception as e:
@@ -144,11 +155,13 @@ def show_salary_history(consultant_id: int):
 
     try:
         with get_database_session() as session:
-            salaries = session.query(ConsultantSalaire)\
-                .filter(ConsultantSalaire.consultant_id == consultant_id)\
-                .order_by(ConsultantSalaire.date_debut.desc())\
-                .limit(5)\
+            salaries = (
+                session.query(ConsultantSalaire)
+                .filter(ConsultantSalaire.consultant_id == consultant_id)
+                .order_by(ConsultantSalaire.date_debut.desc())
+                .limit(5)
                 .all()
+            )
 
         if salaries:
             st.markdown("#### 📈 Évolution salariale récente")
@@ -156,13 +169,16 @@ def show_salary_history(consultant_id: int):
             # Créer un tableau simple
             salary_data = []
             for salary in salaries:
-                salary_data.append({
-                    'Date': salary.date_debut.strftime('%d/%m/%Y'),
-                    'Salaire': f"{salary.salaire:,}€",
-                    'Motif': salary.commentaire or "N/A"
-                })
+                salary_data.append(
+                    {
+                        "Date": salary.date_debut.strftime("%d/%m/%Y"),
+                        "Salaire": f"{salary.salaire:,}€",
+                        "Motif": salary.commentaire or "N/A",
+                    }
+                )
 
             import pandas as pd
+
             df = pd.DataFrame(salary_data)
             st.dataframe(df, use_container_width=True, hide_index=True)
 
@@ -177,10 +193,12 @@ def show_detailed_salary_history(consultant_id: int):
 
     try:
         with get_database_session() as session:
-            salaries = session.query(ConsultantSalaire)\
-                .filter(ConsultantSalaire.consultant_id == consultant_id)\
-                .order_by(ConsultantSalaire.date_debut.desc())\
+            salaries = (
+                session.query(ConsultantSalaire)
+                .filter(ConsultantSalaire.consultant_id == consultant_id)
+                .order_by(ConsultantSalaire.date_debut.desc())
                 .all()
+            )
 
         if not salaries:
             st.info("ℹ️ Aucun historique salarial trouvé")
@@ -204,25 +222,28 @@ def show_detailed_salary_history(consultant_id: int):
         # Tableau détaillé
         salary_data = []
         for salary in salaries:
-            salary_data.append({
-                'Date': salary.date_debut.strftime('%d/%m/%Y'),
-                'Salaire': salary.salaire,
-                'Motif': salary.commentaire or "N/A",
-                'Évolution': "N/A"  # Sera calculé après
-            })
+            salary_data.append(
+                {
+                    "Date": salary.date_debut.strftime("%d/%m/%Y"),
+                    "Salaire": salary.salaire,
+                    "Motif": salary.commentaire or "N/A",
+                    "Évolution": "N/A",  # Sera calculé après
+                }
+            )
 
         # Calculer les évolutions
         for i in range(len(salary_data) - 1):
-            current = salary_data[i]['Salaire']
-            previous = salary_data[i + 1]['Salaire']
+            current = salary_data[i]["Salaire"]
+            previous = salary_data[i + 1]["Salaire"]
             evolution = ((current - previous) / previous) * 100 if previous > 0 else 0
-            salary_data[i]['Évolution'] = f"{evolution:+.1f}%"
+            salary_data[i]["Évolution"] = f"{evolution:+.1f}%"
 
         import pandas as pd
+
         df = pd.DataFrame(salary_data)
 
         # Formater les colonnes
-        df['Salaire'] = df['Salaire'].apply(lambda x: f"{x:,}€")
+        df["Salaire"] = df["Salaire"].apply(lambda x: f"{x:,}€")
 
         st.dataframe(df, use_container_width=True, hide_index=True)
 
@@ -254,11 +275,11 @@ def show_edit_info_form(consultant):
                 "Salaire annuel (€)",
                 value=consultant.salaire_actuel or 0,
                 min_value=0,
-                step=1000
+                step=1000,
             )
             motif_changement = st.text_input(
                 "Commentaire du changement de salaire",
-                placeholder="Ex: Augmentation annuelle, Promotion..."
+                placeholder="Ex: Augmentation annuelle, Promotion...",
             )
 
         disponibilite = st.checkbox("Disponible", value=consultant.disponibilite)
@@ -277,16 +298,19 @@ def show_edit_info_form(consultant):
 
         if submitted:
             if validate_info_form(prenom, nom, email):
-                success = update_consultant_info(consultant.id, {
-                    'prenom': prenom,
-                    'nom': nom,
-                    'email': email,
-                    'telephone': telephone,
-                    'salaire_actuel': salaire_actuel,
-                    'disponibilite': disponibilite,
-                    'notes': notes,
-                    'commentaire': motif_changement
-                })
+                success = update_consultant_info(
+                    consultant.id,
+                    {
+                        "prenom": prenom,
+                        "nom": nom,
+                        "email": email,
+                        "telephone": telephone,
+                        "salaire_actuel": salaire_actuel,
+                        "disponibilite": disponibilite,
+                        "notes": notes,
+                        "commentaire": motif_changement,
+                    },
+                )
 
                 if success:
                     st.success("✅ Informations mises à jour !")
@@ -331,43 +355,49 @@ def update_consultant_info(consultant_id: int, data: dict) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = session.query(Consultant).filter(
-                Consultant.id == consultant_id).first()
+            consultant = (
+                session.query(Consultant).filter(Consultant.id == consultant_id).first()
+            )
 
             if not consultant:
                 st.error("❌ Consultant introuvable")
                 return False
 
             # Vérifier l'unicité de l'email
-            existing = session.query(Consultant) .filter(
-                Consultant.email == data['email'],
-                Consultant.id != consultant_id) .first()
+            existing = (
+                session.query(Consultant)
+                .filter(
+                    Consultant.email == data["email"], Consultant.id != consultant_id
+                )
+                .first()
+            )
             if existing:
                 st.error("❌ Cet email est déjà utilisé par un autre consultant")
                 return False
 
             # Sauvegarder l'ancien salaire si changé
             old_salary = consultant.salaire_actuel
-            new_salary = data['salaire_actuel']
+            new_salary = data["salaire_actuel"]
 
-            if old_salary != new_salary and data.get('commentaire'):
+            if old_salary != new_salary and data.get("commentaire"):
                 salary_history = ConsultantSalaire(
                     consultant_id=consultant_id,
                     salaire=old_salary,
                     date_debut=datetime.now(),
-                    commentaire=data['commentaire']
+                    commentaire=data["commentaire"],
                 )
                 session.add(salary_history)
 
             # Mettre à jour les informations
-            consultant.prenom = data['prenom'].strip()
-            consultant.nom = data['nom'].strip()
-            consultant.email = data['email'].strip().lower()
-            consultant.telephone = data['telephone'].strip(
-            ) if data['telephone'] else None
+            consultant.prenom = data["prenom"].strip()
+            consultant.nom = data["nom"].strip()
+            consultant.email = data["email"].strip().lower()
+            consultant.telephone = (
+                data["telephone"].strip() if data["telephone"] else None
+            )
             consultant.salaire_actuel = new_salary
-            consultant.disponibilite = data['disponibilite']
-            consultant.notes = data['notes'].strip() if data['notes'] else None
+            consultant.disponibilite = data["disponibilite"]
+            consultant.notes = data["notes"].strip() if data["notes"] else None
 
             session.commit()
 
@@ -389,9 +419,11 @@ def generate_consultant_report(consultant):
         st.write(f"**Nom complet :** {consultant.prenom} {consultant.nom}")
         st.write(f"**Email :** {consultant.email}")
         st.write(
-            f"**Practice :** {consultant.practice.nom if consultant.practice else 'Non affecté'}")
+            f"**Practice :** {consultant.practice.nom if consultant.practice else 'Non affecté'}"
+        )
         st.write(
-            f"**Statut :** {'Disponible' if consultant.disponibilite else 'En mission'}")
+            f"**Statut :** {'Disponible' if consultant.disponibilite else 'En mission'}"
+        )
 
         # Informations financières
         salaire = consultant.salaire_actuel or 0
@@ -402,13 +434,17 @@ def generate_consultant_report(consultant):
         # Statistiques des compétences (si disponibles)
         try:
             with get_database_session() as session:
-                competence_count = session.query(ConsultantCompetence)\
-                    .filter(ConsultantCompetence.consultant_id == consultant.id)\
+                competence_count = (
+                    session.query(ConsultantCompetence)
+                    .filter(ConsultantCompetence.consultant_id == consultant.id)
                     .count()
+                )
 
-                mission_count = session.query(Mission)\
-                    .filter(Mission.consultant_id == consultant.id)\
+                mission_count = (
+                    session.query(Mission)
+                    .filter(Mission.consultant_id == consultant.id)
                     .count()
+                )
 
             st.write(f"**Nombre de compétences :** {competence_count}")
             st.write(f"**Nombre de missions :** {mission_count}")

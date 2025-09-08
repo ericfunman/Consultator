@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 # Ajouter le chemin de l'app au Python path
-app_path = Path(__file__).parent / 'app'
+app_path = Path(__file__).parent / "app"
 sys.path.insert(0, str(app_path))
 
 
@@ -55,7 +55,8 @@ def check_test_data():
             if consultant_count == 0:
                 print("⚠️  Aucun consultant trouvé dans la base")
                 print(
-                    "💡 Conseil: Exécutez 'python scripts/populate_test_data.py' pour charger les données de test")
+                    "💡 Conseil: Exécutez 'python scripts/populate_test_data.py' pour charger les données de test"
+                )
                 return False
             else:
                 print(f"✅ {consultant_count} consultant(s) trouvé(s) dans la base")

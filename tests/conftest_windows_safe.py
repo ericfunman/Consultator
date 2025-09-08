@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker
 
 # Ajouter les répertoires nécessaires au PYTHONPATH
 project_root = os.path.dirname(os.path.dirname(__file__))
-sys.path.insert(0, os.path.join(project_root, 'app'))
+sys.path.insert(0, os.path.join(project_root, "app"))
 sys.path.insert(0, project_root)
 
 
@@ -32,6 +32,7 @@ def temp_db_dir():
             break
         except (OSError, PermissionError):
             import time
+
             time.sleep(0.1)  # Attendre 100ms puis retry
 
 
@@ -54,10 +55,10 @@ def test_db_with_file(temp_db_dir):
         pool_timeout=20,
         pool_recycle=300,
         connect_args={
-            'check_same_thread': False,  # Autoriser multi-threading
-            'timeout': 20,               # Timeout connexion
-            'isolation_level': None      # Autocommit mode
-        }
+            "check_same_thread": False,  # Autoriser multi-threading
+            "timeout": 20,  # Timeout connexion
+            "isolation_level": None,  # Autocommit mode
+        },
     )
 
     # Événement pour forcer la fermeture des connexions
@@ -65,9 +66,9 @@ def test_db_with_file(temp_db_dir):
     def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         # Optimisations SQLite pour tests
-        cursor.execute("PRAGMA journal_mode=WAL")     # Write-Ahead Logging
-        cursor.execute("PRAGMA synchronous=NORMAL")   # Synchronisation rapide
-        cursor.execute("PRAGMA temp_store=MEMORY")    # Temp en mémoire
+        cursor.execute("PRAGMA journal_mode=WAL")  # Write-Ahead Logging
+        cursor.execute("PRAGMA synchronous=NORMAL")  # Synchronisation rapide
+        cursor.execute("PRAGMA temp_store=MEMORY")  # Temp en mémoire
         cursor.execute("PRAGMA mmap_size=268435456")  # Memory mapping
         cursor.close()
 
@@ -79,7 +80,7 @@ def test_db_with_file(temp_db_dir):
         autocommit=False,
         autoflush=False,
         bind=engine,
-        expire_on_commit=False  # Éviter les accès DB après commit
+        expire_on_commit=False,  # Éviter les accès DB après commit
     )
 
     yield TestSessionLocal
@@ -97,6 +98,7 @@ def test_db_with_file(temp_db_dir):
                     break
             except (OSError, PermissionError):
                 import time
+
                 time.sleep(0.2)  # Attendre 200ms
                 if attempt == 4:
                     # Dernier recours : marquer pour suppression au redémarrage
@@ -123,14 +125,16 @@ def db_session_robust(test_db_with_file):
     finally:
         # Fermeture en 3 étapes
         try:
-            session.expunge_all()      # 1. Détacher objets
-            session.close()            # 2. Fermer session
+            session.expunge_all()  # 1. Détacher objets
+            session.close()  # 2. Fermer session
         except Exception:
             pass
 
         # 3. Force garbage collection
         import gc
+
         gc.collect()
+
 
 # Fixtures de données identiques
 
@@ -145,7 +149,7 @@ def sample_consultant_data():
         "telephone": "0123456789",
         "disponibilite": True,
         "salaire_souhaite": 45000,
-        "experience_annees": 5
+        "experience_annees": 5,
     }
 
 
@@ -158,8 +162,9 @@ def sample_mission_data():
         "description": "Description de test",
         "duree_mois": 6,
         "tarif_jour": 450,
-        "statut": "En cours"
+        "statut": "En cours",
     }
+
 
 # Configuration Streamlit pour les tests
 
