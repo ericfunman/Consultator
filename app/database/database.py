@@ -64,6 +64,9 @@ def get_database_session():
 # Alias pour compatibilité (certains fichiers peuvent avoir l'ancien nom)
 get_session = get_database_session
 
+# Pour compatibilité avec les tests
+SessionLocal = get_session_factory()
+
 
 @st.cache_data(ttl=300)  # Cache pendant 5 minutes
 def is_database_initialized():
