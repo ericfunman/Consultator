@@ -2,30 +2,71 @@
 Analyseur de CV simplifié et fonctionnel
 """
 import re
-from typing import Dict, List, Any
+from typing import Any
+from typing import Dict
+from typing import List
+
 import streamlit as st
 
 class SimpleDocumentAnalyzer:
     """Analyseur de CV simplifié"""
-    
+
     # Technologies communes
     TECHNOLOGIES = [
-        'Python', 'Java', 'JavaScript', 'TypeScript', 'C#', 'C++', 'PHP', 'Ruby', 'Go', 'Rust',
-        'SQL', 'PostgreSQL', 'MySQL', 'Oracle', 'MongoDB', 'Redis', 'Elasticsearch',
-        'React', 'Angular', 'Vue.js', 'Node.js', 'Express', 'Django', 'Flask', 'Spring',
-        'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP', 'Jenkins', 'GitLab', 'Git',
-        'Pandas', 'NumPy', 'TensorFlow', 'PyTorch', 'Scikit-learn', 'Jupyter',
-        'Power BI', 'Tableau', 'Excel', 'Talend', 'Informatica', 'SSIS'
-    ]
-    
+        'Python',
+        'Java',
+        'JavaScript',
+        'TypeScript',
+        'C#',
+        'C++',
+        'PHP',
+        'Ruby',
+        'Go',
+        'Rust',
+        'SQL',
+        'PostgreSQL',
+        'MySQL',
+        'Oracle',
+        'MongoDB',
+        'Redis',
+        'Elasticsearch',
+        'React',
+        'Angular',
+        'Vue.js',
+        'Node.js',
+        'Express',
+        'Django',
+        'Flask',
+        'Spring',
+        'Docker',
+        'Kubernetes',
+        'AWS',
+        'Azure',
+        'GCP',
+        'Jenkins',
+        'GitLab',
+        'Git',
+        'Pandas',
+        'NumPy',
+        'TensorFlow',
+        'PyTorch',
+        'Scikit-learn',
+        'Jupyter',
+        'Power BI',
+        'Tableau',
+        'Excel',
+        'Talend',
+        'Informatica',
+        'SSIS']
+
     # Clients communs
     CLIENTS = [
-        'BNP Paribas', 'BNPP', 'Société Générale', 'SG', 'SGCIB', 
+        'BNP Paribas', 'BNPP', 'Société Générale', 'SG', 'SGCIB',
         'Crédit Agricole', 'BPCE', 'Natixis', 'AXA', 'Generali',
         'Orange', 'SFR', 'Bouygues', 'Free', 'Capgemini', 'Accenture',
         'Sopra Steria', 'Atos', 'CGI', 'IBM', 'Quanteam'
     ]
-    
+
     @staticmethod
     def extract_text_from_file(file_path: str) -> str:
         """Extraction simple de texte depuis un fichier"""
@@ -42,7 +83,7 @@ class SimpleDocumentAnalyzer:
                         for page in reader.pages:
                             text += page.extract_text()
                         return text
-                except:
+                except BaseException:
                     return "Erreur lors de l'extraction PDF"
             elif file_path.lower().endswith('.docx'):
                 try:
@@ -52,7 +93,7 @@ class SimpleDocumentAnalyzer:
                     for paragraph in doc.paragraphs:
                         text.append(paragraph.text)
                     return '\n'.join(text)
-                except:
+                except BaseException:
                     return "Erreur lors de l'extraction DOCX"
             elif file_path.lower().endswith(('.pptx', '.ppt')):
                 try:
@@ -70,13 +111,13 @@ class SimpleDocumentAnalyzer:
                 return "Format de fichier non supporté"
         except Exception as e:
             return f"Erreur d'extraction: {str(e)}"
-    
+
     @staticmethod
     def analyze_cv_content(text: str, consultant_name: str = "") -> Dict[str, Any]:
         """Analyse simplifiée du contenu CV"""
-        
+
         st.info(f"🔍 Analyse en cours pour {consultant_name}...")
-        
+
         # Initialiser le résultat
         result = {
             "consultant": consultant_name,
@@ -86,18 +127,18 @@ class SimpleDocumentAnalyzer:
             "informations_generales": {},
             "texte_brut": text[:500] + "..." if len(text) > 500 else text
         }
-        
+
         try:
             # 1. Recherche des technologies
             technologies_found = []
             text_upper = text.upper()
-            
+
             for tech in SimpleDocumentAnalyzer.TECHNOLOGIES:
                 if tech.upper() in text_upper:
                     technologies_found.append(tech)
-            
+
             result["langages_techniques"] = technologies_found[:15]  # Top 15
-            
+
             # 2. Recherche des clients/missions
             missions = []
             for client in SimpleDocumentAnalyzer.CLIENTS:
@@ -111,9 +152,9 @@ class SimpleDocumentAnalyzer:
                         "duree": "Non spécifiée"
                     }
                     missions.append(mission)
-            
+
             result["missions"] = missions[:10]  # Top 10 missions
-            
+
             # 3. Compétences fonctionnelles basiques
             competences_func = []
             if "BI" in text_upper or "BUSINESS INTELLIGENCE" in text_upper:
@@ -124,9 +165,9 @@ class SimpleDocumentAnalyzer:
                 competences_func.append("Gestion de projet")
             if "CONSEIL" in text_upper or "CONSULTING" in text_upper:
                 competences_func.append("Conseil")
-            
+
             result["competences_fonctionnelles"] = competences_func
-            
+
             # 4. Informations générales
             result["informations_generales"] = {
                 "longueur_texte": len(text),
@@ -134,10 +175,13 @@ class SimpleDocumentAnalyzer:
                 "technologies_detectees": len(technologies_found),
                 "clients_detectes": len(missions)
             }
-            
-            st.success(f"✅ Analyse terminée: {len(missions)} missions, {len(technologies_found)} technologies")
-            
+
+            st.success(
+                f"✅ Analyse terminée: {
+                    len(missions)} missions, {
+                    len(technologies_found)} technologies")
+
         except Exception as e:
             st.error(f"❌ Erreur pendant l'analyse: {str(e)}")
-            
+
         return result

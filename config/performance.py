@@ -16,7 +16,7 @@ CACHE_CONFIG = {
     "default_ttl": 300,          # 5 minutes pour les données générales
     "stats_ttl": 600,            # 10 minutes pour les statistiques
     "search_ttl": 180,           # 3 minutes pour les recherches
-    "consultant_details_ttl": 300, # 5 minutes pour les détails consultant
+    "consultant_details_ttl": 300,  # 5 minutes pour les détails consultant
 }
 
 # Configuration de la base de données
@@ -36,7 +36,7 @@ DATABASE_CONFIG = {
 # Optimisations des requêtes
 QUERY_CONFIG = {
     "batch_size": 100,           # Taille des lots pour les opérations bulk
-    "max_bulk_operations": 1000, # Maximum d'opérations en une fois
+    "max_bulk_operations": 1000,  # Maximum d'opérations en une fois
     "use_lazy_loading": True,    # Chargement paresseux des relations
     "preload_relations": [       # Relations à charger systématiquement
         "practice",
@@ -86,8 +86,8 @@ OPTIMIZATION_MESSAGES = {
     "large_dataset_warning": "⚠️ Jeu de données important détecté. Utilisation d'optimisations automatiques.",
     "cache_warming": "🔄 Préchauffage du cache en cours...",
     "pagination_info": "📊 Affichage par pages pour optimiser les performances",
-    "search_optimization": "🔍 Recherche optimisée pour de gros volumes"
-}
+    "search_optimization": "🔍 Recherche optimisée pour de gros volumes"}
+
 
 def get_optimal_page_size(total_items: int) -> int:
     """Calcule la taille de page optimale selon le nombre total d'éléments"""
@@ -100,6 +100,7 @@ def get_optimal_page_size(total_items: int) -> int:
     else:
         return 200
 
+
 def should_use_cache(operation_type: str) -> bool:
     """Détermine si le cache doit être utilisé pour une opération"""
     cache_operations = [
@@ -111,6 +112,7 @@ def should_use_cache(operation_type: str) -> bool:
     ]
     return operation_type in cache_operations
 
+
 def get_cache_ttl(data_type: str) -> int:
     """Retourne le TTL approprié selon le type de données"""
     ttl_mapping = {
@@ -121,12 +123,13 @@ def get_cache_ttl(data_type: str) -> int:
     }
     return ttl_mapping.get(data_type, ttl_mapping['default'])
 
+
 # Configuration spécifique pour les gros volumes
 LARGE_DATASET_CONFIG = {
     "threshold_consultants": 500,    # Seuil pour considérer comme "gros volume"
     "threshold_missions": 2000,
     "threshold_competences": 100,
-    
+
     # Optimisations automatiques quand seuils dépassés
     "auto_optimizations": {
         "enable_lazy_loading": True,
@@ -136,6 +139,7 @@ LARGE_DATASET_CONFIG = {
         "enable_background_refresh": True
     }
 }
+
 
 def is_large_dataset() -> dict:
     """Vérifie si on est dans un contexte de gros volume de données"""

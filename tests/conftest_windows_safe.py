@@ -3,19 +3,22 @@ Configuration pytest alternative avec fichier temporaire Windows-safe
 Pour remplacer conftest.py si la solution in-memory ne convient pas
 """
 
-import pytest
-import sys
 import os
-import tempfile
 import shutil
+import sys
+import tempfile
 from pathlib import Path
-from sqlalchemy import create_engine, event
+
+import pytest
+from sqlalchemy import create_engine
+from sqlalchemy import event
 from sqlalchemy.orm import sessionmaker
 
 # Ajouter les répertoires nécessaires au PYTHONPATH
 project_root = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(project_root, 'app'))
 sys.path.insert(0, project_root)
+
 
 @pytest.fixture(scope="session")
 def temp_db_dir():
@@ -31,16 +34,18 @@ def temp_db_dir():
             import time
             time.sleep(0.1)  # Attendre 100ms puis retry
 
+
 @pytest.fixture(scope="session")
 def test_db_with_file(temp_db_dir):
     """Base de données de test avec fichier temporaire Windows-safe"""
-    from app.database.database import init_database, get_database_session
+    from app.database.database import get_database_session
+    from app.database.database import init_database
     from app.database.models import Base
-    
+
     # Fichier dans répertoire temporaire
     db_path = os.path.join(temp_db_dir, "test_consultator.db")
     TEST_DATABASE_URL = f"sqlite:///{db_path}"
-    
+
     # Configuration SQLite pour Windows
     engine = create_engine(
         TEST_DATABASE_URL,
@@ -54,7 +59,7 @@ def test_db_with_file(temp_db_dir):
             'isolation_level': None      # Autocommit mode
         }
     )
-    
+
     # Événement pour forcer la fermeture des connexions
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -65,25 +70,25 @@ def test_db_with_file(temp_db_dir):
         cursor.execute("PRAGMA temp_store=MEMORY")    # Temp en mémoire
         cursor.execute("PRAGMA mmap_size=268435456")  # Memory mapping
         cursor.close()
-    
+
     # Créer les tables
     Base.metadata.create_all(engine)
-    
+
     # Session de test
     TestSessionLocal = sessionmaker(
-        autocommit=False, 
-        autoflush=False, 
+        autocommit=False,
+        autoflush=False,
         bind=engine,
         expire_on_commit=False  # Éviter les accès DB après commit
     )
-    
+
     yield TestSessionLocal
-    
+
     # Cleanup robuste
     try:
         # Fermer toutes les connexions
         engine.dispose()
-        
+
         # Forcer la fermeture avec retry
         for attempt in range(5):
             try:
@@ -97,17 +102,18 @@ def test_db_with_file(temp_db_dir):
                     # Dernier recours : marquer pour suppression au redémarrage
                     try:
                         os.rename(db_path, f"{db_path}.delete_me")
-                    except:
+                    except BaseException:
                         pass
     except Exception:
         pass  # Ignore les erreurs de cleanup
+
 
 @pytest.fixture
 def db_session_robust(test_db_with_file):
     """Session de base de données robuste pour Windows"""
     session = test_db_with_file()
     transaction = session.begin()
-    
+
     try:
         yield session
         transaction.commit()
@@ -121,12 +127,14 @@ def db_session_robust(test_db_with_file):
             session.close()            # 2. Fermer session
         except Exception:
             pass
-        
+
         # 3. Force garbage collection
         import gc
         gc.collect()
 
 # Fixtures de données identiques
+
+
 @pytest.fixture
 def sample_consultant_data():
     """Données de test pour un consultant"""
@@ -139,6 +147,7 @@ def sample_consultant_data():
         "salaire_souhaite": 45000,
         "experience_annees": 5
     }
+
 
 @pytest.fixture
 def sample_mission_data():
@@ -153,17 +162,20 @@ def sample_mission_data():
     }
 
 # Configuration Streamlit pour les tests
+
+
 @pytest.fixture
 def streamlit_app():
     """Mock Streamlit pour les tests"""
-    import streamlit as st
     from unittest.mock import MagicMock
-    
+
+    import streamlit as st
+
     # Mock des fonctions Streamlit
     st.write = MagicMock()
     st.error = MagicMock()
     st.success = MagicMock()
     st.warning = MagicMock()
     st.info = MagicMock()
-    
+
     return st

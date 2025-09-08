@@ -15,8 +15,8 @@ freezegun>=1.2.0
 parameterized>=0.9.0
 
 # Database testing
-pytest-postgresql>=5.0.0
-sqlalchemy-utils>=0.40.0
+# pytest-postgresql>=5.0.0  # Supprimé car nécessite PostgreSQL
+# sqlalchemy-utils>=0.40.0  # Supprimé car nécessite PostgreSQL
 
 # Streamlit testing (unofficial)
-streamlit-testing>=0.1.0
+# streamlit-testing>=0.1.0  # Package inexistant, supprimé

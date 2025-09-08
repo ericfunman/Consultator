@@ -5,8 +5,12 @@ Fonctions pour afficher, ajouter et modifier les missions
 
 import os
 import sys
-from datetime import datetime, date
-from typing import List, Dict, Any, Optional
+from datetime import date
+from datetime import datetime
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
 import streamlit as st
 
@@ -23,10 +27,13 @@ Consultant = None
 imports_ok = False
 
 try:
-    from database.database import get_database_session
-    from database.models import Consultant, Mission, Client
-    from services.consultant_service import ConsultantService
     from sqlalchemy.orm import joinedload
+
+    from database.database import get_database_session
+    from database.models import Client
+    from database.models import Consultant
+    from database.models import Mission
+    from services.consultant_service import ConsultantService
 
     imports_ok = True
 except ImportError as e:
@@ -285,8 +292,7 @@ def show_add_mission_form(consultant_id: int):
             description = st.text_area(
                 "Description de la mission",
                 height=100,
-                help="Description détaillée de la mission, responsabilités, livrables..."
-            )
+                help="Description détaillée de la mission, responsabilités, livrables...")
 
             competences_requises = st.text_area(
                 "Compétences requises",
@@ -307,7 +313,8 @@ def show_add_mission_form(consultant_id: int):
                 pass
 
             if submitted:
-                if validate_mission_form(titre, client_id, date_debut, en_cours, date_fin):
+                if validate_mission_form(
+                        titre, client_id, date_debut, en_cours, date_fin):
                     success = create_mission(consultant_id, {
                         'titre': titre,
                         'client_id': client_id,
@@ -340,7 +347,12 @@ def show_add_mission_form(consultant_id: int):
         st.error(f"❌ Erreur lors du chargement du formulaire: {e}")
 
 
-def validate_mission_form(titre: str, client_id: int, date_debut: date, en_cours: bool, date_fin: Optional[date]) -> bool:
+def validate_mission_form(
+        titre: str,
+        client_id: int,
+        date_debut: date,
+        en_cours: bool,
+        date_fin: Optional[date]) -> bool:
     """Valide les données du formulaire de mission"""
 
     errors = []
@@ -378,10 +390,13 @@ def create_mission(consultant_id: int, data: Dict[str, Any]) -> bool:
                 date_fin=data['date_fin'] if not data['en_cours'] else None,
                 en_cours=data['en_cours'],
                 taux_journalier=data['taux_journalier'] if data['taux_journalier'] > 0 else None,
-                tjm=data['tjm'] if data['tjm'] > 0 else None,  # Nouveau champ TJM V1.2.2
+                # Nouveau champ TJM V1.2.2
+                tjm=data['tjm'] if data['tjm'] > 0 else None,
                 salaire_mensuel=data['salaire_mensuel'] if data['salaire_mensuel'] > 0 else None,
-                description=data['description'].strip() if data['description'] else None,
-                competences_requises=data['competences_requises'].strip() if data['competences_requises'] else None
+                description=data['description'].strip(
+                ) if data['description'] else None,
+                competences_requises=data['competences_requises'].strip(
+                ) if data['competences_requises'] else None
             )
 
             session.add(mission)
@@ -424,11 +439,13 @@ def show_edit_mission_form(mission_id: int):
 
             client_id = st.selectbox(
                 "Client *",
-                options=list(client_options.keys()),
+                options=list(
+                    client_options.keys()),
                 format_func=lambda x: client_options[x],
-                index=list(client_options.keys()).index(mission.client_id) if mission.client_id in client_options else 0,
-                help="Client pour lequel la mission est réalisée"
-            )
+                index=list(
+                    client_options.keys()).index(
+                    mission.client_id) if mission.client_id in client_options else 0,
+                help="Client pour lequel la mission est réalisée")
 
             col1, col2 = st.columns(2)
 
@@ -481,8 +498,7 @@ def show_edit_mission_form(mission_id: int):
                 "Description de la mission",
                 value=mission.description or "",
                 height=100,
-                help="Description détaillée de la mission, responsabilités, livrables..."
-            )
+                help="Description détaillée de la mission, responsabilités, livrables...")
 
             competences_requises = st.text_area(
                 "Compétences requises",
@@ -504,7 +520,8 @@ def show_edit_mission_form(mission_id: int):
                 delete = st.form_submit_button("🗑️ Supprimer", type="secondary")
 
             if submitted:
-                if validate_mission_form(titre, client_id, date_debut, en_cours, date_fin):
+                if validate_mission_form(
+                        titre, client_id, date_debut, en_cours, date_fin):
                     success = update_mission(mission_id, {
                         'titre': titre,
                         'client_id': client_id,
@@ -563,8 +580,10 @@ def update_mission(mission_id: int, data: Dict[str, Any]) -> bool:
             mission.en_cours = data['en_cours']
             mission.taux_journalier = data['taux_journalier'] if data['taux_journalier'] > 0 else None
             mission.salaire_mensuel = data['salaire_mensuel'] if data['salaire_mensuel'] > 0 else None
-            mission.description = data['description'].strip() if data['description'] else None
-            mission.competences_requises = data['competences_requises'].strip() if data['competences_requises'] else None
+            mission.description = data['description'].strip(
+            ) if data['description'] else None
+            mission.competences_requises = data['competences_requises'].strip(
+            ) if data['competences_requises'] else None
 
             session.commit()
 
@@ -621,12 +640,13 @@ def show_mission_full_details(mission):
             today = date.today()
             duration_days = (today - mission.date_debut).days
             duration_months = duration_days // 30
-            st.write(f"**Durée actuelle :** {duration_months} mois ({duration_days} jours)")
+            st.write(
+                f"**Durée actuelle :** {duration_months} mois ({duration_days} jours)")
             st.write("**Statut :** 🔄 En cours")
 
     with col2:
         st.markdown("#### 💰 Aspects financiers")
-        
+
         # Affichage TJM (nouveau champ V1.2.2)
         if mission.tjm:
             st.write(f"**TJM Mission :** {mission.tjm:,}€")
@@ -698,16 +718,17 @@ def show_missions_analysis(missions):
 
     # Analyse par statut
     status_counts = {
-        "En cours": sum(1 for m in missions if m.en_cours),
-        "Terminées": sum(1 for m in missions if m.date_fin and not m.en_cours),
-        "Planifiées": sum(1 for m in missions if not m.en_cours and not m.date_fin and m.date_debut > datetime.now().date())
-    }
+        "En cours": sum(
+            1 for m in missions if m.en_cours), "Terminées": sum(
+            1 for m in missions if m.date_fin and not m.en_cours), "Planifiées": sum(
+                1 for m in missions if not m.en_cours and not m.date_fin and m.date_debut > datetime.now().date())}
 
     col1, col2 = st.columns(2)
 
     with col1:
         st.markdown("#### 🏢 Répartition par client")
-        for client, count in sorted(client_counts.items(), key=lambda x: x[1], reverse=True):
+        for client, count in sorted(
+                client_counts.items(), key=lambda x: x[1], reverse=True):
             st.write(f"**{client} :** {count} mission(s)")
 
     with col2:
@@ -808,7 +829,8 @@ def show_missions_revenues(missions):
             st.metric("Total revenus", f"{total_revenue:,.0f}€")
 
         with col2:
-            avg_tjm = sum(m.taux_journalier for m in missions if m.taux_journalier) / len([m for m in missions if m.taux_journalier])
+            avg_tjm = sum(m.taux_journalier for m in missions if m.taux_journalier) / \
+                len([m for m in missions if m.taux_journalier])
             st.metric("TJM moyen", f"{avg_tjm:,.0f}€")
 
         with col3:

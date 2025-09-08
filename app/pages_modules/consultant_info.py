@@ -24,7 +24,10 @@ imports_ok = False
 
 try:
     from database.database import get_database_session
-    from database.models import Consultant, ConsultantSalaire, ConsultantCompetence, Mission
+    from database.models import Consultant
+    from database.models import ConsultantCompetence
+    from database.models import ConsultantSalaire
+    from database.models import Mission
     from services.consultant_service import ConsultantService
 
     imports_ok = True
@@ -68,7 +71,8 @@ def show_consultant_info(consultant):
             st.write(f"**Statut :** {status}")
 
             if consultant.date_creation:
-                st.write(f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}")
+                st.write(
+                    f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}")
 
         # Informations financières
         st.markdown("#### 💰 Informations financières")
@@ -327,16 +331,17 @@ def update_consultant_info(consultant_id: int, data: dict) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = session.query(Consultant).filter(Consultant.id == consultant_id).first()
+            consultant = session.query(Consultant).filter(
+                Consultant.id == consultant_id).first()
 
             if not consultant:
                 st.error("❌ Consultant introuvable")
                 return False
 
             # Vérifier l'unicité de l'email
-            existing = session.query(Consultant)\
-                .filter(Consultant.email == data['email'], Consultant.id != consultant_id)\
-                .first()
+            existing = session.query(Consultant) .filter(
+                Consultant.email == data['email'],
+                Consultant.id != consultant_id) .first()
             if existing:
                 st.error("❌ Cet email est déjà utilisé par un autre consultant")
                 return False
@@ -358,7 +363,8 @@ def update_consultant_info(consultant_id: int, data: dict) -> bool:
             consultant.prenom = data['prenom'].strip()
             consultant.nom = data['nom'].strip()
             consultant.email = data['email'].strip().lower()
-            consultant.telephone = data['telephone'].strip() if data['telephone'] else None
+            consultant.telephone = data['telephone'].strip(
+            ) if data['telephone'] else None
             consultant.salaire_actuel = new_salary
             consultant.disponibilite = data['disponibilite']
             consultant.notes = data['notes'].strip() if data['notes'] else None
@@ -382,8 +388,10 @@ def generate_consultant_report(consultant):
         # Informations de base
         st.write(f"**Nom complet :** {consultant.prenom} {consultant.nom}")
         st.write(f"**Email :** {consultant.email}")
-        st.write(f"**Practice :** {consultant.practice.nom if consultant.practice else 'Non affecté'}")
-        st.write(f"**Statut :** {'Disponible' if consultant.disponibilite else 'En mission'}")
+        st.write(
+            f"**Practice :** {consultant.practice.nom if consultant.practice else 'Non affecté'}")
+        st.write(
+            f"**Statut :** {'Disponible' if consultant.disponibilite else 'En mission'}")
 
         # Informations financières
         salaire = consultant.salaire_actuel or 0

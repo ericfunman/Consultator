@@ -4,21 +4,26 @@ Script pour peupler la base de données avec des données de test
 Usage: python scripts/populate_test_data.py
 """
 
-import sys
+from app.database.models import Mission
+from app.database.models import ConsultantCompetence
+from app.database.models import Consultant
+from app.database.models import Competence
+from app.database.database import init_database
+from app.database.database import get_session
+from datetime import timedelta
+from datetime import datetime
+from datetime import date
+import random
 import os
+import sys
 
 # Ajouter le répertoire parent au path pour les imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.database.database import init_database, get_session
-from app.database.models import Consultant, Competence, Mission, ConsultantCompetence
-from datetime import datetime, date, timedelta
-import random
-
 
 def create_test_consultants():
     """Crée des consultants de test"""
-    
+
     base_consultants = [
         {"nom": "Dupont", "prenom": "Jean", "notes": "Consultant senior avec expertise en développement web"},
         {"nom": "Martin", "prenom": "Marie", "notes": "Spécialiste en data science et machine learning"},
@@ -40,7 +45,19 @@ def create_test_consultants():
     consultants_data = []
     for i, base in enumerate(base_consultants):
         email = f"{base['prenom'].lower()}.{base['nom'].lower()}@email.com"
-        telephone = f"01.{random.randint(10,99)}.{random.randint(10,99)}.{random.randint(10,99)}.{random.randint(10,99)}"
+        telephone = f"01.{
+            random.randint(
+                10,
+                99)}.{
+            random.randint(
+                10,
+                99)}.{
+                    random.randint(
+                        10,
+                        99)}.{
+                            random.randint(
+                                10,
+                                99)}"
         salaire = float(random.randint(42000, 60000))
         disponibilite = random.choice([True, False])
         consultants_data.append({
@@ -52,10 +69,10 @@ def create_test_consultants():
             "disponibilite": disponibilite,
             "notes": base["notes"]
         })
-    
+
     session = get_session()
     consultants = []
-    
+
     try:
         for data in consultants_data:
             # Vérifier si le consultant existe déjà
@@ -64,14 +81,17 @@ def create_test_consultants():
                 consultant = Consultant(**data)
                 session.add(consultant)
                 consultants.append(consultant)
-        
+
         session.commit()
-        
+
         # Récupérer tous les consultants après commit pour avoir les IDs
         all_consultants = session.query(Consultant).all()
-        print(f"✅ {len(consultants)} nouveaux consultants créés ({len(all_consultants)} total)")
+        print(
+            f"✅ {
+                len(consultants)} nouveaux consultants créés ({
+                len(all_consultants)} total)")
         return all_consultants
-        
+
     except Exception as e:
         session.rollback()
         print(f"❌ Erreur lors de la création des consultants: {e}")
@@ -82,21 +102,52 @@ def create_test_consultants():
 
 def create_test_competences():
     """Crée des compétences de test"""
-    
-    competences_data = [
-        {"nom": "Python", "categorie": "Backend", "type_competence": "technique", "description": "Langage de programmation", "niveau_requis": "medior"},
-        {"nom": "JavaScript", "categorie": "Frontend", "type_competence": "technique", "description": "Langage web", "niveau_requis": "junior"},
-        {"nom": "React", "categorie": "Frontend", "type_competence": "technique", "description": "Framework JavaScript", "niveau_requis": "medior"},
-        {"nom": "SQL", "categorie": "Data", "type_competence": "technique", "description": "Base de données", "niveau_requis": "junior"},
-        {"nom": "Docker", "categorie": "DevOps", "type_competence": "technique", "description": "Conteneurisation", "niveau_requis": "medior"},
-        {"nom": "AWS", "categorie": "Cloud", "type_competence": "technique", "description": "Amazon Web Services", "niveau_requis": "senior"},
-        {"nom": "Agile Scrum", "categorie": "Méthodologie", "type_competence": "fonctionnelle", "description": "Méthode agile", "niveau_requis": "junior"},
-        {"nom": "Finance", "categorie": "Domaine", "type_competence": "fonctionnelle", "description": "Secteur financier", "niveau_requis": "senior"},
-    ]
-    
+
+    competences_data = [{"nom": "Python",
+                         "categorie": "Backend",
+                         "type_competence": "technique",
+                         "description": "Langage de programmation",
+                         "niveau_requis": "medior"},
+                        {"nom": "JavaScript",
+                         "categorie": "Frontend",
+                         "type_competence": "technique",
+                         "description": "Langage web",
+                         "niveau_requis": "junior"},
+                        {"nom": "React",
+                         "categorie": "Frontend",
+                         "type_competence": "technique",
+                         "description": "Framework JavaScript",
+                         "niveau_requis": "medior"},
+                        {"nom": "SQL",
+                         "categorie": "Data",
+                         "type_competence": "technique",
+                         "description": "Base de données",
+                         "niveau_requis": "junior"},
+                        {"nom": "Docker",
+                         "categorie": "DevOps",
+                         "type_competence": "technique",
+                         "description": "Conteneurisation",
+                         "niveau_requis": "medior"},
+                        {"nom": "AWS",
+                         "categorie": "Cloud",
+                         "type_competence": "technique",
+                         "description": "Amazon Web Services",
+                         "niveau_requis": "senior"},
+                        {"nom": "Agile Scrum",
+                         "categorie": "Méthodologie",
+                         "type_competence": "fonctionnelle",
+                         "description": "Méthode agile",
+                         "niveau_requis": "junior"},
+                        {"nom": "Finance",
+                         "categorie": "Domaine",
+                         "type_competence": "fonctionnelle",
+                         "description": "Secteur financier",
+                         "niveau_requis": "senior"},
+                        ]
+
     session = get_session()
     competences = []
-    
+
     try:
         for data in competences_data:
             # Vérifier si la compétence existe déjà
@@ -105,14 +156,17 @@ def create_test_competences():
                 competence = Competence(**data)
                 session.add(competence)
                 competences.append(competence)
-        
+
         session.commit()
-        
+
         # Récupérer toutes les compétences après commit
         all_competences = session.query(Competence).all()
-        print(f"✅ {len(competences)} nouvelles compétences créées ({len(all_competences)} total)")
+        print(
+            f"✅ {
+                len(competences)} nouvelles compétences créées ({
+                len(all_competences)} total)")
         return all_competences
-        
+
     except Exception as e:
         session.rollback()
         print(f"❌ Erreur lors de la création des compétences: {e}")
@@ -123,28 +177,39 @@ def create_test_competences():
 
 def create_test_missions(consultants):
     """Crée des missions de test pour les consultants"""
-    
+
     if not consultants:
         print("⚠️ Aucun consultant disponible pour créer des missions")
         return []
-    
-    entreprises = ["BNP Paribas", "Société Générale", "AXA", "Orange", "Airbus", "Renault"]
-    types_mission = ["Développement web", "Analyse de données", "Conseil stratégique", "Formation technique", "Audit sécurité"]
-    
+
+    entreprises = [
+        "BNP Paribas",
+        "Société Générale",
+        "AXA",
+        "Orange",
+        "Airbus",
+        "Renault"]
+    types_mission = [
+        "Développement web",
+        "Analyse de données",
+        "Conseil stratégique",
+        "Formation technique",
+        "Audit sécurité"]
+
     session = get_session()
     missions = []
-    
+
     try:
         for consultant in consultants:
             # Créer 1-2 missions par consultant
             nb_missions = random.randint(1, 2)
-            
+
             for i in range(nb_missions):
                 # Dates de mission
                 date_debut = date.today() - timedelta(days=random.randint(30, 365))
                 duree = random.randint(30, 180)  # 1-6 mois
                 date_fin = date_debut + timedelta(days=duree)
-                
+
                 # Déterminer le statut selon les dates
                 if date_fin < date.today():
                     statut = "terminee"
@@ -152,10 +217,10 @@ def create_test_missions(consultants):
                     statut = "en_cours"
                 else:
                     statut = "planifiee"
-                
+
                 mission_data = {
                     "consultant_id": consultant.id,
-                    "nom_mission": f"{random.choice(types_mission)} - Mission {i+1}",
+                    "nom_mission": f"{random.choice(types_mission)} - Mission {i + 1}",
                     "client": random.choice(entreprises),
                     "role": f"Consultant {random.choice(['Senior', 'Junior', 'Lead'])}",
                     "date_debut": date_debut,
@@ -166,15 +231,15 @@ def create_test_missions(consultants):
                     "technologies_utilisees": "Python, SQL, Docker",
                     "description": f"Mission de {random.choice(types_mission).lower()} pour {random.choice(entreprises)}"
                 }
-                
+
                 mission = Mission(**mission_data)
                 session.add(mission)
                 missions.append(mission)
-        
+
         session.commit()
         print(f"✅ {len(missions)} missions créées")
         return missions
-        
+
     except Exception as e:
         session.rollback()
         print(f"❌ Erreur lors de la création des missions: {e}")
@@ -185,20 +250,21 @@ def create_test_missions(consultants):
 
 def create_consultant_competences(consultants, competences):
     """Associe les consultants aux compétences"""
-    
+
     if not consultants or not competences:
         print("⚠️ Pas assez de données pour créer les associations consultant-compétences")
         return []
-    
+
     session = get_session()
     associations = []
-    
+
     try:
         for consultant in consultants:
             # Chaque consultant a 3-5 compétences
             nb_competences = random.randint(3, 5)
-            selected_competences = random.sample(competences, min(nb_competences, len(competences)))
-            
+            selected_competences = random.sample(
+                competences, min(nb_competences, len(competences)))
+
             for competence in selected_competences:
                 association_data = {
                     "consultant_id": consultant.id,
@@ -207,22 +273,22 @@ def create_consultant_competences(consultants, competences):
                     "niveau_maitrise": random.choice(["debutant", "intermediaire", "expert"]),
                     "projets_realises": f"Projet {random.randint(1, 10)}, Projet {random.randint(11, 20)}"
                 }
-                
+
                 # Vérifier si l'association existe déjà
                 existing = session.query(ConsultantCompetence).filter_by(
-                    consultant_id=consultant.id, 
+                    consultant_id=consultant.id,
                     competence_id=competence.id
                 ).first()
-                
+
                 if not existing:
                     association = ConsultantCompetence(**association_data)
                     session.add(association)
                     associations.append(association)
-        
+
         session.commit()
         print(f"✅ {len(associations)} associations consultant-compétence créées")
         return associations
-        
+
     except Exception as e:
         session.rollback()
         print(f"❌ Erreur lors de la création des associations: {e}")
@@ -234,23 +300,23 @@ def create_consultant_competences(consultants, competences):
 def main():
     """Fonction principale"""
     print("🚀 Initialisation des données de test...")
-    
+
     # Initialiser la base de données
     if not init_database():
         print("❌ Échec de l'initialisation de la base de données")
         return
-    
+
     # Créer les données de test
     print("\n📊 Création des données de test...")
-    
+
     consultants = create_test_consultants()
-    competences = create_test_competences() 
+    competences = create_test_competences()
     missions = create_test_missions(consultants)
     associations = create_consultant_competences(consultants, competences)
-    
+
     print(f"\n✅ Données de test créées avec succès !")
     print(f"   - {len(consultants)} consultants")
-    print(f"   - {len(competences)} compétences") 
+    print(f"   - {len(competences)} compétences")
     print(f"   - {len(missions)} missions")
     print(f"   - {len(associations)} associations consultant-compétence")
     print(f"\n🌐 Vous pouvez maintenant tester le chatbot !")

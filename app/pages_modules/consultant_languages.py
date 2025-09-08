@@ -5,7 +5,9 @@ Fonctions pour afficher, ajouter et modifier les langues
 
 import os
 import sys
-from typing import List, Dict, Any
+from typing import Any
+from typing import Dict
+from typing import List
 
 import streamlit as st
 
@@ -23,7 +25,9 @@ imports_ok = False
 
 try:
     from database.database import get_database_session
-    from database.models import Consultant, Langue, ConsultantLangue
+    from database.models import Consultant
+    from database.models import ConsultantLangue
+    from database.models import Langue
     from services.consultant_service import ConsultantService
 
     imports_ok = True
@@ -75,11 +79,14 @@ def show_consultant_languages(consultant):
         df = pd.DataFrame(language_data)
 
         # Afficher le tableau avec actions
-        st.dataframe(
-            df[['Langue', 'Niveau', 'Niveau écrit', 'Niveau parlé', 'Certification', 'Langue maternelle']],
-            use_container_width=True,
-            hide_index=True
-        )
+        st.dataframe(df[['Langue',
+                         'Niveau',
+                         'Niveau écrit',
+                         'Niveau parlé',
+                         'Certification',
+                         'Langue maternelle']],
+                     use_container_width=True,
+                     hide_index=True)
 
         # Actions sur chaque langue
         st.markdown("#### 🎯 Actions par langue")
@@ -185,7 +192,8 @@ def show_languages_statistics(consultant_langues):
         st.metric("Certifiées", certified_count)
 
     with col4:
-        avg_level = sum(cl.niveau for cl in consultant_langues) / len(consultant_langues)
+        avg_level = sum(cl.niveau for cl in consultant_langues) / \
+            len(consultant_langues)
         st.metric("Niveau moyen", f"{avg_level:.1f}/6")
 
 
@@ -208,7 +216,8 @@ def show_add_language_form(consultant_id: int):
                 .all()
 
         if not available_langues:
-            st.warning("⚠️ Toutes les langues existantes sont déjà associées à ce consultant")
+            st.warning(
+                "⚠️ Toutes les langues existantes sont déjà associées à ce consultant")
             return
 
         with st.form(f"add_language_form_{consultant_id}", clear_on_submit=True):
@@ -308,7 +317,7 @@ def add_language_to_consultant(consultant_id: int, data: Dict[str, Any]) -> bool
                 .filter(
                     ConsultantLangue.consultant_id == consultant_id,
                     ConsultantLangue.langue_id == data['langue_id']
-                )\
+            )\
                 .first()
 
             if existing:
@@ -513,7 +522,11 @@ def show_languages_analysis(consultant_langues):
     with col2:
         st.markdown("#### 🏆 Points forts")
         # Identifier les langues les plus maîtrisées
-        best_languages = sorted(consultant_langues, key=lambda x: x.niveau, reverse=True)[:3]
+        best_languages = sorted(
+            consultant_langues,
+            key=lambda x: x.niveau,
+            reverse=True)[
+            :3]
         for cl in best_languages:
             st.write(f"**{cl.langue.nom} :** {get_niveau_label(cl.niveau)}")
 
@@ -528,12 +541,14 @@ def show_languages_analysis(consultant_langues):
     # Langues maternelles
     native_languages = [cl for cl in consultant_langues if cl.langue_maternelle]
     if native_languages:
-        st.info(f"🏠 **Langues maternelles :** {', '.join([cl.langue.nom for cl in native_languages])}")
+        st.info(
+            f"🏠 **Langues maternelles :** {', '.join([cl.langue.nom for cl in native_languages])}")
 
     # Certifications
     certified_languages = [cl for cl in consultant_langues if cl.certification]
     if certified_languages:
-        st.success(f"📜 **Certifications :** {len(certified_languages)} langue(s) certifiée(s)")
+        st.success(
+            f"📜 **Certifications :** {len(certified_languages)} langue(s) certifiée(s)")
 
 
 def show_languages_comparison(consultant_id: int):
@@ -561,13 +576,14 @@ def show_languages_comparison(consultant_id: int):
                 func.avg(ConsultantLangue.niveau).label('avg_level'),
                 func.count(ConsultantLangue.id).label('count')
             )\
-            .join(Langue)\
-            .group_by(Langue.id, Langue.nom)\
-            .having(func.count(ConsultantLangue.id) > 1)\
-            .all()
+                .join(Langue)\
+                .group_by(Langue.id, Langue.nom)\
+                .having(func.count(ConsultantLangue.id) > 1)\
+                .all()
 
             # Créer un dictionnaire des moyennes
-            avg_dict = {lang.nom: (lang.avg_level, lang.count) for lang in language_averages}
+            avg_dict = {lang.nom: (lang.avg_level, lang.count)
+                        for lang in language_averages}
 
             # Comparer
             comparison_data = []
@@ -592,8 +608,12 @@ def show_languages_comparison(consultant_id: int):
                 st.dataframe(df, use_container_width=True, hide_index=True)
 
                 # Résumé
-                above_avg = sum(1 for item in comparison_data if float(item['Écart']) > 0)
-                below_avg = sum(1 for item in comparison_data if float(item['Écart']) < 0)
+                above_avg = sum(
+                    1 for item in comparison_data if float(
+                        item['Écart']) > 0)
+                below_avg = sum(
+                    1 for item in comparison_data if float(
+                        item['Écart']) < 0)
 
                 col1, col2 = st.columns(2)
 

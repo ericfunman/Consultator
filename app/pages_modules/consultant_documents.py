@@ -6,7 +6,10 @@ Fonctions pour afficher, uploader et analyser les documents
 import os
 import sys
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
 import streamlit as st
 
@@ -24,10 +27,11 @@ imports_ok = False
 
 try:
     from database.database import get_database_session
-    from database.models import Consultant, Document
+    from database.models import Consultant
+    from database.models import Document
     from services.consultant_service import ConsultantService
     from services.document_service import DocumentService
-    from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
+    from services.document_analyzer import DocumentAnalyzer
 
     imports_ok = True
 except ImportError as e:
@@ -138,7 +142,10 @@ def show_document_details(document, consultant):
                 st.write(f"**Compétences détectées :** {len(analysis['competences'])}")
 
             # Bouton pour voir l'analyse complète
-            if st.button("👁️ Voir analyse complète", key=f"view_analysis_{document.id}"):
+            if st.button(
+                "👁️ Voir analyse complète",
+                key=f"view_analysis_{
+                    document.id}"):
                 show_full_cv_analysis(analysis, document.nom_fichier, consultant)
 
         except Exception as e:
@@ -192,7 +199,11 @@ def show_documents_statistics(documents):
             doc_type = doc.type_document or "Autre"
             types[doc_type] = types.get(doc_type, 0) + 1
 
-        most_common_type = max(types.items(), key=lambda x: x[1]) if types else ("N/A", 0)
+        most_common_type = max(
+            types.items(),
+            key=lambda x: x[1]) if types else (
+            "N/A",
+            0)
         st.metric("Type principal", most_common_type[0])
 
     with col3:
@@ -296,7 +307,8 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         original_name = uploaded_file.name
         file_extension = os.path.splitext(original_name)[1]
-        unique_filename = f"{consultant_id}_{data['type_document']}_{timestamp}{file_extension}"
+        unique_filename = f"{consultant_id}_{
+            data['type_document']}_{timestamp}{file_extension}"
         file_path = os.path.join(upload_dir, unique_filename)
 
         # Sauvegarder le fichier
@@ -307,8 +319,15 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
         analysis_result = None
         if data['type_document'] == "CV":
             try:
-                analyzer = DocumentAnalyzer()
-                analysis_result = analyzer.analyze_document(file_path)
+                # Extraire le texte du fichier
+                extracted_text = DocumentAnalyzer.extract_text_from_file(file_path)
+                
+                # Analyser le contenu du CV
+                if extracted_text:
+                    analysis_result = DocumentAnalyzer.analyze_cv_content(
+                        extracted_text, 
+                        f"{consultant_id}"
+                    )
             except Exception as e:
                 st.warning(f"⚠️ Analyse CV non disponible: {e}")
 
@@ -319,12 +338,12 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
                 nom_fichier=original_name,
                 chemin_fichier=file_path,
                 type_document=data['type_document'],
-                taille_fichier=len(uploaded_file.getbuffer()),
+                taille_fichier=len(
+                    uploaded_file.getbuffer()),
                 mimetype=uploaded_file.type,
                 description=data['description'].strip() if data['description'] else None,
                 date_upload=datetime.now(),
-                analyse_cv=str(analysis_result) if analysis_result else None
-            )
+                analyse_cv=str(analysis_result) if analysis_result else None)
 
             session.add(document)
             session.commit()
@@ -364,7 +383,8 @@ def reanalyze_document(document_id: int, consultant) -> bool:
 
     try:
         with get_database_session() as session:
-            document = session.query(Document).filter(Document.id == document_id).first()
+            document = session.query(Document).filter(
+                Document.id == document_id).first()
 
             if not document:
                 st.error("❌ Document introuvable")
@@ -375,8 +395,14 @@ def reanalyze_document(document_id: int, consultant) -> bool:
                 return False
 
             # Réanalyser le document
-            analyzer = DocumentAnalyzer()
-            analysis_result = analyzer.analyze_document(document.chemin_fichier)
+            extracted_text = DocumentAnalyzer.extract_text_from_file(document.chemin_fichier)
+            if extracted_text:
+                analysis_result = DocumentAnalyzer.analyze_cv_content(
+                    extracted_text, 
+                    f"{consultant.prenom} {consultant.nom}"
+                )
+            else:
+                analysis_result = None
 
             # Mettre à jour la base de données
             document.analyse_cv = str(analysis_result) if analysis_result else None
@@ -397,7 +423,8 @@ def show_rename_document_form(document_id: int):
 
     try:
         with get_database_session() as session:
-            document = session.query(Document).filter(Document.id == document_id).first()
+            document = session.query(Document).filter(
+                Document.id == document_id).first()
 
             if not document:
                 st.error("❌ Document introuvable")
@@ -460,7 +487,8 @@ def rename_document(document_id: int, data: Dict[str, Any]) -> bool:
 
     try:
         with get_database_session() as session:
-            document = session.query(Document).filter(Document.id == document_id).first()
+            document = session.query(Document).filter(
+                Document.id == document_id).first()
 
             if not document:
                 st.error("❌ Document introuvable")
@@ -484,7 +512,8 @@ def delete_document(document_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            document = session.query(Document).filter(Document.id == document_id).first()
+            document = session.query(Document).filter(
+                Document.id == document_id).first()
 
             if not document:
                 st.error("❌ Document introuvable")
@@ -521,7 +550,7 @@ def analyze_consultant_cv(consultant):
                 .filter(
                     Document.consultant_id == consultant.id,
                     Document.type_document == "CV"
-                )\
+            )\
                 .order_by(Document.date_upload.desc())\
                 .first()
 
@@ -640,10 +669,12 @@ def generate_cv_report(analysis, consultant):
         st.download_button(
             label="📥 Télécharger le rapport",
             data=report,
-            file_name=f"rapport_cv_{consultant.prenom}_{consultant.nom}_{datetime.now().strftime('%Y%m%d')}.md",
+            file_name=f"rapport_cv_{
+                consultant.prenom}_{
+                consultant.nom}_{
+                datetime.now().strftime('%Y%m%d')}.md",
             mime="text/markdown",
-            key="download_cv_report"
-        )
+            key="download_cv_report")
 
         st.success("✅ Rapport généré avec succès !")
 
@@ -680,7 +711,7 @@ def show_documents_report(documents):
     with col2:
         st.markdown("#### 📊 Métriques")
         total_size = sum(doc.taille_fichier or 0 for doc in documents)
-        st.write(f"**Taille totale :** {total_size / (1024*1024):.2f} MB")
+        st.write(f"**Taille totale :** {total_size / (1024 * 1024):.2f} MB")
 
         analyzed_count = sum(1 for doc in documents if doc.analyse_cv)
         st.write(f"**Documents analysés :** {analyzed_count}/{len(documents)}")
@@ -689,9 +720,9 @@ def show_documents_report(documents):
         current_month = datetime.now().month
         current_year = datetime.now().year
         recent_docs = sum(1 for doc in documents
-                         if doc.date_upload and
-                         doc.date_upload.month == current_month and
-                         doc.date_upload.year == current_year)
+                          if doc.date_upload and
+                          doc.date_upload.month == current_month and
+                          doc.date_upload.year == current_year)
         st.write(f"**Documents ce mois :** {recent_docs}")
 
     # Liste détaillée

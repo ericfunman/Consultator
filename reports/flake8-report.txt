@@ -1,0 +1,2352 @@
+app/main_original_backup.py:163:1: C901 'main' is too complex (20)
+app/main_preloading.py:163:1: C901 'main' is too complex (20)
+app/pages_modules\business_managers.py:278:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:382:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:875:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\consultant_cv.py:22:1: E402 module level import not at top of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 22
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:329:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:103:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:324:1: W293 blank line contains whitespace
+app/pages_modules\consultant_documents.py:328:40: W291 trailing whitespace
+app/pages_modules\consultant_documents.py:401:36: W291 trailing whitespace
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:39:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:225:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:44:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:108:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:619:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:40:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:275:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:302:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:1030:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1034:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:2378:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2743:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:3025:1: F811 redefinition of unused 'show_cv_skills' from line 2759
+app/pages_modules\consultants.py:3051:1: F811 redefinition of unused 'show_cv_summary' from line 2831
+app/pages_modules\consultants.py:3087:1: F811 redefinition of unused 'show_cv_actions' from line 2866
+app/pages_modules\consultants_clean.py:380:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:487:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\documents_functions.py:179:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:188:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:194:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:200:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:324:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:329:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:297:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:302:30: F541 f-string is missing placeholders
+app/services\chatbot_service.py:37:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:105:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:252:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:312:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:436:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:551:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:567:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:587:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:856:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1008:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1401:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1652:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1690:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1706:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1784:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1785:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1910:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1959:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2002:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2047:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2147:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2152:33: F541 f-string is missing placeholders
+app/services\consultant_service.py:586:5: F811 redefinition of unused 'get_consultants_count' from line 196
+app/services\consultant_service.py:841:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:841:5: F811 redefinition of unused 'save_cv_analysis' from line 608
+app/services\consultant_service.py:960:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1003:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1031:28: F541 f-string is missing placeholders
+app/services\document_analyzer.py:515:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:684:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:519:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_service.py:231:5: F811 redefinition of unused 'extract_text_from_file' from line 109
+app/services\simple_analyzer.py:72:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+26    C901 'main' is too complex (20)
+1     E402 module level import not at top of file
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 22
+14    F841 local variable 'total_assignments' is assigned to but never used
+2     W291 trailing whitespace
+1     W293 blank line contains whitespace
+app/main_original_backup.py:163:1: C901 'main' is too complex (20)
+app/main_preloading.py:163:1: C901 'main' is too complex (20)
+app/pages_modules\business_managers.py:278:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:382:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:875:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\consultant_cv.py:22:1: E402 module level import not at top of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 22
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:329:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:103:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:324:1: W293 blank line contains whitespace
+app/pages_modules\consultant_documents.py:328:40: W291 trailing whitespace
+app/pages_modules\consultant_documents.py:401:36: W291 trailing whitespace
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:39:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:225:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:44:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:108:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:619:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:40:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:275:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:302:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:1030:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1034:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:2378:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2743:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:3025:1: F811 redefinition of unused 'show_cv_skills' from line 2759
+app/pages_modules\consultants.py:3051:1: F811 redefinition of unused 'show_cv_summary' from line 2831
+app/pages_modules\consultants.py:3087:1: F811 redefinition of unused 'show_cv_actions' from line 2866
+app/pages_modules\consultants_clean.py:380:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:487:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\documents_functions.py:179:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:188:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:194:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:200:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:324:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:329:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:297:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:302:30: F541 f-string is missing placeholders
+app/services\chatbot_service.py:37:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:105:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:252:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:312:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:436:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:551:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:567:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:587:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:856:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1008:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1401:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1652:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1690:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1706:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1784:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1785:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1910:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1959:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2002:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2047:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2147:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2152:33: F541 f-string is missing placeholders
+app/services\consultant_service.py:586:5: F811 redefinition of unused 'get_consultants_count' from line 196
+app/services\consultant_service.py:841:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:841:5: F811 redefinition of unused 'save_cv_analysis' from line 608
+app/services\consultant_service.py:960:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1003:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1031:28: F541 f-string is missing placeholders
+app/services\document_analyzer.py:515:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:684:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:519:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_service.py:231:5: F811 redefinition of unused 'extract_text_from_file' from line 109
+app/services\simple_analyzer.py:72:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+26    C901 'main' is too complex (20)
+1     E402 module level import not at top of file
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 22
+14    F841 local variable 'total_assignments' is assigned to but never used
+2     W291 trailing whitespace
+1     W293 blank line contains whitespace
+app/main_original_backup.py:163:1: C901 'main' is too complex (20)
+app/main_preloading.py:163:1: C901 'main' is too complex (20)
+app/pages_modules\business_managers.py:278:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:382:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:875:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\consultant_cv.py:22:1: E402 module level import not at top of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 22
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:329:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:103:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:324:1: W293 blank line contains whitespace
+app/pages_modules\consultant_documents.py:328:40: W291 trailing whitespace
+app/pages_modules\consultant_documents.py:401:36: W291 trailing whitespace
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:39:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:225:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:44:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:108:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:619:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:40:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:275:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:302:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:1030:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1034:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:2378:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2743:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:3025:1: F811 redefinition of unused 'show_cv_skills' from line 2759
+app/pages_modules\consultants.py:3051:1: F811 redefinition of unused 'show_cv_summary' from line 2831
+app/pages_modules\consultants.py:3087:1: F811 redefinition of unused 'show_cv_actions' from line 2866
+app/pages_modules\consultants_clean.py:380:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:487:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\documents_functions.py:179:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:188:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:194:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:200:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:324:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:329:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:297:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:302:30: F541 f-string is missing placeholders
+app/services\chatbot_service.py:37:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:105:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:252:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:312:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:436:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:551:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:567:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:587:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:856:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1008:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1401:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1652:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1690:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1706:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1784:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1785:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1910:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1959:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2002:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2047:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2147:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2152:33: F541 f-string is missing placeholders
+app/services\consultant_service.py:586:5: F811 redefinition of unused 'get_consultants_count' from line 196
+app/services\consultant_service.py:841:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:841:5: F811 redefinition of unused 'save_cv_analysis' from line 608
+app/services\consultant_service.py:960:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1003:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1031:28: F541 f-string is missing placeholders
+app/services\document_analyzer.py:515:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:684:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:519:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_service.py:231:5: F811 redefinition of unused 'extract_text_from_file' from line 109
+app/services\simple_analyzer.py:72:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+26    C901 'main' is too complex (20)
+1     E402 module level import not at top of file
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 22
+14    F841 local variable 'total_assignments' is assigned to but never used
+2     W291 trailing whitespace
+1     W293 blank line contains whitespace
+app/main_original_backup.py:163:1: C901 'main' is too complex (20)
+app/main_preloading.py:163:1: C901 'main' is too complex (20)
+app/pages_modules\business_managers.py:278:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:382:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:875:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\consultant_cv.py:22:1: E402 module level import not at top of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 22
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:329:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:103:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:324:1: W293 blank line contains whitespace
+app/pages_modules\consultant_documents.py:328:40: W291 trailing whitespace
+app/pages_modules\consultant_documents.py:401:36: W291 trailing whitespace
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:39:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:225:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:44:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:108:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:619:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:40:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:275:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:302:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:1030:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1034:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:2378:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2743:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:3025:1: F811 redefinition of unused 'show_cv_skills' from line 2759
+app/pages_modules\consultants.py:3051:1: F811 redefinition of unused 'show_cv_summary' from line 2831
+app/pages_modules\consultants.py:3087:1: F811 redefinition of unused 'show_cv_actions' from line 2866
+app/pages_modules\consultants_clean.py:380:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:487:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\documents_functions.py:179:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:188:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:194:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:200:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:324:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:329:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:297:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:302:30: F541 f-string is missing placeholders
+app/services\chatbot_service.py:37:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:105:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:252:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:312:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:436:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:551:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:567:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:587:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:856:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1008:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1401:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1652:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1690:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1706:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1784:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1785:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1910:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1959:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2002:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2047:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2147:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2152:33: F541 f-string is missing placeholders
+app/services\consultant_service.py:586:5: F811 redefinition of unused 'get_consultants_count' from line 196
+app/services\consultant_service.py:841:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:841:5: F811 redefinition of unused 'save_cv_analysis' from line 608
+app/services\consultant_service.py:960:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1003:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1031:28: F541 f-string is missing placeholders
+app/services\document_analyzer.py:515:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:684:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:519:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_service.py:231:5: F811 redefinition of unused 'extract_text_from_file' from line 109
+app/services\simple_analyzer.py:72:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+26    C901 'main' is too complex (20)
+1     E402 module level import not at top of file
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 22
+14    F841 local variable 'total_assignments' is assigned to but never used
+2     W291 trailing whitespace
+1     W293 blank line contains whitespace
+app/main_original_backup.py:163:1: C901 'main' is too complex (20)
+app/main_preloading.py:163:1: C901 'main' is too complex (20)
+app/pages_modules\business_managers.py:278:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:382:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:875:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\consultant_cv.py:22:1: E402 module level import not at top of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 22
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:329:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:103:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:324:1: W293 blank line contains whitespace
+app/pages_modules\consultant_documents.py:328:40: W291 trailing whitespace
+app/pages_modules\consultant_documents.py:401:36: W291 trailing whitespace
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:39:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:225:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:44:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:108:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:619:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:40:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:275:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:302:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:1030:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1034:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:2378:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2743:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:3025:1: F811 redefinition of unused 'show_cv_skills' from line 2759
+app/pages_modules\consultants.py:3051:1: F811 redefinition of unused 'show_cv_summary' from line 2831
+app/pages_modules\consultants.py:3087:1: F811 redefinition of unused 'show_cv_actions' from line 2866
+app/pages_modules\consultants_clean.py:380:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:487:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\documents_functions.py:179:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:188:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:194:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:200:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:324:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:329:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:297:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:302:30: F541 f-string is missing placeholders
+app/services\chatbot_service.py:37:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:105:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:252:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:312:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:436:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:551:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:567:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:587:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:856:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1008:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1401:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1652:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1690:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1706:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1784:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1785:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1910:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1959:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2002:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2047:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2147:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2152:33: F541 f-string is missing placeholders
+app/services\consultant_service.py:586:5: F811 redefinition of unused 'get_consultants_count' from line 196
+app/services\consultant_service.py:841:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:841:5: F811 redefinition of unused 'save_cv_analysis' from line 608
+app/services\consultant_service.py:960:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1003:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1031:28: F541 f-string is missing placeholders
+app/services\document_analyzer.py:515:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:684:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:519:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_service.py:231:5: F811 redefinition of unused 'extract_text_from_file' from line 109
+app/services\simple_analyzer.py:72:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+26    C901 'main' is too complex (20)
+1     E402 module level import not at top of file
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 22
+14    F841 local variable 'total_assignments' is assigned to but never used
+2     W291 trailing whitespace
+1     W293 blank line contains whitespace
+app/main_original_backup.py:163:1: C901 'main' is too complex (20)
+app/main_preloading.py:163:1: C901 'main' is too complex (20)
+app/pages_modules\business_managers.py:278:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:382:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:875:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\consultant_cv.py:22:1: E402 module level import not at top of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 22
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:329:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:103:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:324:1: W293 blank line contains whitespace
+app/pages_modules\consultant_documents.py:328:40: W291 trailing whitespace
+app/pages_modules\consultant_documents.py:401:36: W291 trailing whitespace
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:39:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:225:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:44:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:108:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:619:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:40:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:275:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:302:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:1031:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1035:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:2379:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2744:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:3026:1: F811 redefinition of unused 'show_cv_skills' from line 2760
+app/pages_modules\consultants.py:3052:1: F811 redefinition of unused 'show_cv_summary' from line 2832
+app/pages_modules\consultants.py:3088:1: F811 redefinition of unused 'show_cv_actions' from line 2867
+app/pages_modules\consultants_clean.py:379:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:486:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\documents_functions.py:179:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:188:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:194:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:200:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:324:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:329:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:297:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:302:30: F541 f-string is missing placeholders
+app/services\chatbot_service.py:37:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:105:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:252:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:312:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:436:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:551:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:567:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:587:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:856:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1008:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1401:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1652:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1690:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1706:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1784:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1785:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1910:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1959:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2002:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2047:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2147:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2152:33: F541 f-string is missing placeholders
+app/services\consultant_service.py:586:5: F811 redefinition of unused 'get_consultants_count' from line 196
+app/services\consultant_service.py:841:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:841:5: F811 redefinition of unused 'save_cv_analysis' from line 608
+app/services\consultant_service.py:960:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1003:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1031:28: F541 f-string is missing placeholders
+app/services\document_analyzer.py:516:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:685:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:520:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_service.py:231:5: F811 redefinition of unused 'extract_text_from_file' from line 109
+app/services\simple_analyzer.py:72:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+26    C901 'main' is too complex (20)
+1     E402 module level import not at top of file
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 22
+14    F841 local variable 'total_assignments' is assigned to but never used
+2     W291 trailing whitespace
+1     W293 blank line contains whitespace
+app/main_original_backup.py:163:1: C901 'main' is too complex (20)
+app/main_preloading.py:163:1: C901 'main' is too complex (20)
+app/pages_modules\business_managers.py:278:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:382:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:875:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 6
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:329:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:103:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:39:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:225:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:44:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:108:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:619:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:40:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:275:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:302:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:1031:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1035:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:2381:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2746:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:3028:1: F811 redefinition of unused 'show_cv_skills' from line 2762
+app/pages_modules\consultants.py:3054:1: F811 redefinition of unused 'show_cv_summary' from line 2834
+app/pages_modules\consultants.py:3090:1: F811 redefinition of unused 'show_cv_actions' from line 2869
+app/pages_modules\consultants_clean.py:379:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:486:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\documents_functions.py:179:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:188:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:194:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:200:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:324:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:329:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:297:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:302:30: F541 f-string is missing placeholders
+app/services\chatbot_service.py:37:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:105:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:252:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:312:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:436:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:551:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:567:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:587:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:856:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1008:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1401:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1652:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1690:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1706:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1792:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1793:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1918:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1967:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2010:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2055:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2155:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2160:33: F541 f-string is missing placeholders
+app/services\consultant_service.py:586:5: F811 redefinition of unused 'get_consultants_count' from line 196
+app/services\consultant_service.py:841:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:841:5: F811 redefinition of unused 'save_cv_analysis' from line 608
+app/services\consultant_service.py:960:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1003:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1031:28: F541 f-string is missing placeholders
+app/services\document_analyzer.py:517:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:686:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:521:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_service.py:231:5: F811 redefinition of unused 'extract_text_from_file' from line 109
+app/services\simple_analyzer.py:72:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+26    C901 'main' is too complex (20)
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 6
+14    F841 local variable 'total_assignments' is assigned to but never used
+app/components\technology_widget.py:14:1: E302 expected 2 blank lines, found 1
+app/components\technology_widget.py:126:1: E302 expected 2 blank lines, found 1
+app/database\database.py:34:1: E302 expected 2 blank lines, found 1
+app/database\database.py:49:1: E302 expected 2 blank lines, found 1
+app/database\database.py:55:1: E302 expected 2 blank lines, found 1
+app/database\database.py:61:1: E305 expected 2 blank lines after class or function definition, found 1
+app/database\database.py:63:1: E302 expected 2 blank lines, found 1
+app/database\database.py:75:1: E302 expected 2 blank lines, found 1
+app/database\database.py:107:1: E302 expected 2 blank lines, found 1
+app/database\database.py:134:1: E302 expected 2 blank lines, found 1
+app/database\database.py:138:1: E302 expected 2 blank lines, found 1
+app/database\models.py:24:1: E302 expected 2 blank lines, found 1
+app/database\models.py:46:1: E302 expected 2 blank lines, found 1
+app/database\models.py:174:1: E302 expected 2 blank lines, found 1
+app/database\models.py:198:1: E302 expected 2 blank lines, found 1
+app/database\models.py:222:1: E302 expected 2 blank lines, found 1
+app/database\models.py:265:1: E302 expected 2 blank lines, found 1
+app/database\models.py:286:1: E302 expected 2 blank lines, found 1
+app/database\models.py:302:1: E302 expected 2 blank lines, found 1
+app/database\models.py:320:1: E302 expected 2 blank lines, found 1
+app/database\models.py:335:1: E302 expected 2 blank lines, found 1
+app/database\models.py:370:1: E302 expected 2 blank lines, found 1
+app/database\models.py:411:1: E302 expected 2 blank lines, found 1
+app/main.py:24:1: E302 expected 2 blank lines, found 1
+app/main.py:54:1: E302 expected 2 blank lines, found 1
+app/main.py:100:1: E302 expected 2 blank lines, found 1
+app/main.py:139:1: E302 expected 2 blank lines, found 1
+app/main.py:159:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_new.py:24:1: E302 expected 2 blank lines, found 1
+app/main_new.py:54:1: E302 expected 2 blank lines, found 1
+app/main_new.py:100:1: E302 expected 2 blank lines, found 1
+app/main_new.py:139:1: E302 expected 2 blank lines, found 1
+app/main_new.py:159:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_optimized.py:62:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:92:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:105:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:120:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:217:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_optimized_simple.py:62:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:92:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:105:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:120:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:217:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_original_backup.py:50:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:90:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:113:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:141:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:152:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:157:1: C901 'main' is too complex (20)
+app/main_original_backup.py:157:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:286:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_preloading.py:50:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:90:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:113:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:141:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:152:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:157:1: C901 'main' is too complex (20)
+app/main_preloading.py:157:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:286:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\business_managers.py:14:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:39:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:121:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:172:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:252:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:272:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:272:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:375:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:561:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:630:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:786:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:854:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:864:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\business_managers_simple.py:10:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:23:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:144:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:191:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:259:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 6
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:85:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:134:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:177:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:210:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:274:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:295:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:322:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_cv.py:356:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:388:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:418:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:462:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:550:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:602:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:648:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:668:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:681:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:746:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:803:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:41:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:101:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:101:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:178:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:217:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:291:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:353:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:413:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:478:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:502:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:532:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:574:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:625:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:673:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_forms.py:45:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:165:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:195:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:234:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:374:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:414:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:38:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:140:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:234:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:300:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:323:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:38:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:38:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:156:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:169:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:196:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:221:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_languages.py:305:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:342:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:438:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:466:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:489:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:544:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:43:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_list.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:296:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:360:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:106:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:106:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:205:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:345:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:374:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:405:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:556:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:588:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:609:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_missions.py:609:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:693:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:762:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_profile.py:45:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:76:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:216:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:289:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:306:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:329:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:360:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:380:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:396:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:39:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultant_skills.py:39:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:162:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:174:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:202:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:299:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:336:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:416:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:443:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:466:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:521:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:48:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:74:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:147:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:271:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:271:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:298:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:618:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:640:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:723:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:778:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:794:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:835:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:876:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:926:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:944:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:998:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1017:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1021:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1066:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1095:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1113:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1190:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1240:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1330:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1383:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1518:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1669:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1700:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1719:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1749:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1795:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1842:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1921:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2008:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2021:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2062:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2077:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2103:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2128:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2152:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2179:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2211:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2251:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2289:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2339:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2339:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2522:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2590:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2605:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2639:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2700:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:2715:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2786:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2820:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2978:1: F811 redefinition of unused 'show_cv_skills' from line 2715
+app/pages_modules\consultants.py:2978:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3003:1: F811 redefinition of unused 'show_cv_summary' from line 2786
+app/pages_modules\consultants.py:3003:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3038:1: F811 redefinition of unused 'show_cv_actions' from line 2820
+app/pages_modules\consultants.py:3038:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3135:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3198:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3202:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3210:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3214:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3218:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3222:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:53:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:116:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:176:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:211:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:227:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:261:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:266:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:271:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:330:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:368:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:46:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:109:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:247:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:268:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:273:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:282:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:291:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:307:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:341:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:346:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:351:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:435:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:473:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants_optimized.py:40:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:52:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:82:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:100:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:137:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:268:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:311:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:346:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:412:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\documents_functions.py:6:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:74:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:118:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:176:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:185:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:191:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:197:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:30:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:68:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:92:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:78:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:153:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:232:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\practices.py:16:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:42:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:138:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:255:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:320:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:325:30: F541 f-string is missing placeholders
+app/pages_modules\practices.py:341:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:382:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:403:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:447:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:513:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:15:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:41:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:125:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:242:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:293:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:298:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:314:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:355:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:376:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:420:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:486:1: E302 expected 2 blank lines, found 1
+app/pages_modules\technologies.py:10:1: E302 expected 2 blank lines, found 1
+app/pages_modules\technologies.py:17:1: E305 expected 2 blank lines after class or function definition, found 1
+app/services\business_manager_service.py:20:1: E302 expected 2 blank lines, found 1
+app/services\chatbot_service.py:28:1: E302 expected 2 blank lines, found 1
+app/services\chatbot_service.py:36:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:104:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:251:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:311:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:435:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:550:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:566:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:586:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:855:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1007:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1400:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1651:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1689:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1705:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1791:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1792:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1917:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1966:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2009:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2054:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2154:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2159:33: F541 f-string is missing placeholders
+app/services\consultant_service.py:26:1: E302 expected 2 blank lines, found 1
+app/services\consultant_service.py:585:5: F811 redefinition of unused 'get_consultants_count' from line 195
+app/services\consultant_service.py:840:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:840:5: F811 redefinition of unused 'save_cv_analysis' from line 607
+app/services\consultant_service.py:959:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1002:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1030:28: F541 f-string is missing placeholders
+app/services\document_analyzer.py:19:1: E302 expected 2 blank lines, found 1
+app/services\document_analyzer.py:516:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:685:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:19:1: E302 expected 2 blank lines, found 1
+app/services\document_analyzer_clean.py:520:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_service.py:30:1: E302 expected 2 blank lines, found 1
+app/services\document_service.py:230:5: F811 redefinition of unused 'extract_text_from_file' from line 108
+app/services\practice_service.py:18:1: E302 expected 2 blank lines, found 1
+app/services\practice_service_optimized.py:25:1: E302 expected 2 blank lines, found 1
+app/services\simple_analyzer.py:11:1: E302 expected 2 blank lines, found 1
+app/services\simple_analyzer.py:71:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/services\technology_service.py:16:1: E302 expected 2 blank lines, found 1
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+app/utils\skill_categories.py:164:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:171:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:180:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:187:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:195:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:202:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:206:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:212:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:224:1: E305 expected 2 blank lines after class or function definition, found 1
+26    C901 'main' is too complex (20)
+293   E302 expected 2 blank lines, found 1
+12    E305 expected 2 blank lines after class or function definition, found 1
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 6
+14    F841 local variable 'total_assignments' is assigned to but never used
+app/components\technology_widget.py:14:1: E302 expected 2 blank lines, found 1
+app/components\technology_widget.py:126:1: E302 expected 2 blank lines, found 1
+app/components\technology_widget.py:205:66: W292 no newline at end of file
+app/database\database.py:34:1: E302 expected 2 blank lines, found 1
+app/database\database.py:49:1: E302 expected 2 blank lines, found 1
+app/database\database.py:55:1: E302 expected 2 blank lines, found 1
+app/database\database.py:61:1: E305 expected 2 blank lines after class or function definition, found 1
+app/database\database.py:63:1: E302 expected 2 blank lines, found 1
+app/database\database.py:75:1: E302 expected 2 blank lines, found 1
+app/database\database.py:107:1: E302 expected 2 blank lines, found 1
+app/database\database.py:134:1: E302 expected 2 blank lines, found 1
+app/database\database.py:138:1: E302 expected 2 blank lines, found 1
+app/database\database.py:160:49: W292 no newline at end of file
+app/database\models.py:24:1: E302 expected 2 blank lines, found 1
+app/database\models.py:46:1: E302 expected 2 blank lines, found 1
+app/database\models.py:174:1: E302 expected 2 blank lines, found 1
+app/database\models.py:198:1: E302 expected 2 blank lines, found 1
+app/database\models.py:222:1: E302 expected 2 blank lines, found 1
+app/database\models.py:265:1: E302 expected 2 blank lines, found 1
+app/database\models.py:286:1: E302 expected 2 blank lines, found 1
+app/database\models.py:302:1: E302 expected 2 blank lines, found 1
+app/database\models.py:320:1: E302 expected 2 blank lines, found 1
+app/database\models.py:335:1: E302 expected 2 blank lines, found 1
+app/database\models.py:370:1: E302 expected 2 blank lines, found 1
+app/database\models.py:411:1: E302 expected 2 blank lines, found 1
+app/database\models.py:447:59: W292 no newline at end of file
+app/main.py:24:1: E302 expected 2 blank lines, found 1
+app/main.py:54:1: E302 expected 2 blank lines, found 1
+app/main.py:100:1: E302 expected 2 blank lines, found 1
+app/main.py:139:1: E302 expected 2 blank lines, found 1
+app/main.py:159:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main.py:160:11: W292 no newline at end of file
+app/main_new.py:24:1: E302 expected 2 blank lines, found 1
+app/main_new.py:54:1: E302 expected 2 blank lines, found 1
+app/main_new.py:100:1: E302 expected 2 blank lines, found 1
+app/main_new.py:139:1: E302 expected 2 blank lines, found 1
+app/main_new.py:159:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_new.py:160:11: W292 no newline at end of file
+app/main_optimized.py:62:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:92:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:105:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:120:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:217:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_optimized.py:218:11: W292 no newline at end of file
+app/main_optimized_simple.py:62:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:92:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:105:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:120:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:217:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_optimized_simple.py:218:11: W292 no newline at end of file
+app/main_original_backup.py:50:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:90:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:113:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:141:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:152:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:157:1: C901 'main' is too complex (20)
+app/main_original_backup.py:157:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:286:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_original_backup.py:287:11: W292 no newline at end of file
+app/main_preloading.py:50:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:90:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:113:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:141:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:152:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:157:1: C901 'main' is too complex (20)
+app/main_preloading.py:157:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:286:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_preloading.py:287:11: W292 no newline at end of file
+app/main_test.py:17:44: W292 no newline at end of file
+app/pages_modules\__init__.py:53:15: W292 no newline at end of file
+app/pages_modules\business_managers.py:14:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:39:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:121:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:172:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:252:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:272:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:272:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:375:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:561:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:630:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:786:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:854:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:864:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\business_managers.py:943:68: W292 no newline at end of file
+app/pages_modules\business_managers_simple.py:10:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers_simple.py:77:40: W292 no newline at end of file
+app/pages_modules\chatbot.py:23:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:144:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:191:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:259:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\chatbot.py:260:11: W292 no newline at end of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 6
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:85:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:134:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:177:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:210:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:274:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:295:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:322:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_cv.py:356:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:388:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:418:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:462:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:550:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:602:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:648:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:668:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:681:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:746:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:803:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:865:69: W292 no newline at end of file
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:41:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:101:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:101:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:178:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:217:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:291:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:353:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:413:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:478:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:502:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:532:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:574:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:625:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:673:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:731:64: W292 no newline at end of file
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_forms.py:45:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:165:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:195:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:234:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:374:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:414:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:436:21: W292 no newline at end of file
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:38:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:140:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:234:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:300:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:323:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:415:68: W292 no newline at end of file
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:38:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:38:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:156:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:169:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:196:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:221:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_languages.py:305:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:342:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:438:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:466:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:489:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:544:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:619:58: W292 no newline at end of file
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:43:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_list.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:296:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:360:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:410:68: W292 no newline at end of file
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:106:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:106:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:205:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:345:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:374:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:405:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:556:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:588:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:609:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_missions.py:609:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:693:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:762:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:829:58: W292 no newline at end of file
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_profile.py:45:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:76:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:216:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:289:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:306:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:329:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:360:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:380:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:396:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:428:27: W292 no newline at end of file
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:39:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultant_skills.py:39:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:162:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:174:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:202:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:299:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:336:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:416:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:443:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:466:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:521:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:567:68: W292 no newline at end of file
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:48:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:74:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:147:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:271:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:271:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:298:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:618:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:640:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:723:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:778:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:794:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:835:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:876:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:926:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:944:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:998:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1017:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1021:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1066:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1095:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1113:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1190:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1240:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1330:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1383:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1518:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1669:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1700:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1719:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1749:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1795:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1842:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1921:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2008:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2021:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2062:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2077:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2103:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2128:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2152:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2179:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2211:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2251:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2289:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2339:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2339:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2522:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2590:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2605:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2639:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2700:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:2715:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2786:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2820:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2978:1: F811 redefinition of unused 'show_cv_skills' from line 2715
+app/pages_modules\consultants.py:2978:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3003:1: F811 redefinition of unused 'show_cv_summary' from line 2786
+app/pages_modules\consultants.py:3003:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3038:1: F811 redefinition of unused 'show_cv_actions' from line 2820
+app/pages_modules\consultants.py:3038:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3135:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3198:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3202:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3210:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3214:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3218:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3222:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3224:42: W292 no newline at end of file
+app/pages_modules\consultants_clean.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:53:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:116:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:176:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:211:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:227:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:261:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:266:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:271:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:330:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:368:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_clean.py:374:67: W292 no newline at end of file
+app/pages_modules\consultants_final.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:46:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:109:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:247:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:268:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:273:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:282:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:291:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:307:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:341:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:346:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:351:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:435:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:473:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:479:67: W292 no newline at end of file
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants_optimized.py:40:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:52:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:82:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:100:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:137:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:268:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:311:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:346:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:412:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\consultants_optimized.py:413:11: W292 no newline at end of file
+app/pages_modules\documents_functions.py:6:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:74:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:118:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:176:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:185:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:191:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:197:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:217:57: W292 no newline at end of file
+app/pages_modules\documents_upload.py:30:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:68:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:92:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:102:35: W292 no newline at end of file
+app/pages_modules\home.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:78:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:153:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:232:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\home.py:233:11: W292 no newline at end of file
+app/pages_modules\missions.py:3:4: W292 no newline at end of file
+app/pages_modules\practices.py:16:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:42:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:138:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:255:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:320:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:325:30: F541 f-string is missing placeholders
+app/pages_modules\practices.py:341:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:382:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:403:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:447:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:513:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:603:73: W292 no newline at end of file
+app/pages_modules\practices_optimized.py:15:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:41:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:125:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:242:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:293:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:298:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:314:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:355:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:376:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:420:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:486:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:538:27: W292 no newline at end of file
+app/pages_modules\skills.py:3:4: W292 no newline at end of file
+app/pages_modules\technologies.py:10:1: E302 expected 2 blank lines, found 1
+app/pages_modules\technologies.py:17:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\technologies.py:18:11: W292 no newline at end of file
+app/services\business_manager_service.py:20:1: E302 expected 2 blank lines, found 1
+app/services\business_manager_service.py:123:24: W292 no newline at end of file
+app/services\chatbot_service.py:28:1: E302 expected 2 blank lines, found 1
+app/services\chatbot_service.py:36:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:104:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:251:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:311:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:435:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:550:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:566:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:586:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:855:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1007:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1400:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1651:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1689:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1705:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1791:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1792:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1917:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1966:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2009:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2054:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2154:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2159:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2213:33: W292 no newline at end of file
+app/services\consultant_service.py:26:1: E302 expected 2 blank lines, found 1
+app/services\consultant_service.py:585:5: F811 redefinition of unused 'get_consultants_count' from line 195
+app/services\consultant_service.py:840:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:840:5: F811 redefinition of unused 'save_cv_analysis' from line 607
+app/services\consultant_service.py:959:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1002:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1030:28: F541 f-string is missing placeholders
+app/services\consultant_service.py:1041:25: W292 no newline at end of file
+app/services\document_analyzer.py:19:1: E302 expected 2 blank lines, found 1
+app/services\document_analyzer.py:516:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:685:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer.py:1377:24: W292 no newline at end of file
+app/services\document_analyzer_clean.py:19:1: E302 expected 2 blank lines, found 1
+app/services\document_analyzer_clean.py:520:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:812:22: W292 no newline at end of file
+app/services\document_service.py:30:1: E302 expected 2 blank lines, found 1
+app/services\document_service.py:230:5: F811 redefinition of unused 'extract_text_from_file' from line 108
+app/services\document_service.py:453:22: W292 no newline at end of file
+app/services\practice_service.py:18:1: E302 expected 2 blank lines, found 1
+app/services\practice_service.py:310:28: W292 no newline at end of file
+app/services\practice_service_optimized.py:25:1: E302 expected 2 blank lines, found 1
+app/services\practice_service_optimized.py:298:62: W292 no newline at end of file
+app/services\simple_analyzer.py:11:1: E302 expected 2 blank lines, found 1
+app/services\simple_analyzer.py:71:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/services\simple_analyzer.py:187:22: W292 no newline at end of file
+app/services\technology_service.py:16:1: E302 expected 2 blank lines, found 1
+app/services\technology_service.py:133:28: W292 no newline at end of file
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+app/test_streamlit_debug.py:77:36: W292 no newline at end of file
+app/utils\skill_categories.py:164:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:171:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:180:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:187:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:203:19: W292 no newline at end of file
+app/utils\technologies_referentiel.py:195:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:202:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:206:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:212:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:224:1: E305 expected 2 blank lines after class or function definition, found 1
+app/utils\technologies_referentiel.py:230:2: W292 no newline at end of file
+26    C901 'main' is too complex (20)
+293   E302 expected 2 blank lines, found 1
+12    E305 expected 2 blank lines after class or function definition, found 1
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 6
+14    F841 local variable 'total_assignments' is assigned to but never used
+48    W292 no newline at end of file
+app/components\technology_widget.py:14:1: E302 expected 2 blank lines, found 1
+app/components\technology_widget.py:126:1: E302 expected 2 blank lines, found 1
+app/components\technology_widget.py:205:66: W292 no newline at end of file
+app/database\database.py:34:1: E302 expected 2 blank lines, found 1
+app/database\database.py:49:1: E302 expected 2 blank lines, found 1
+app/database\database.py:55:1: E302 expected 2 blank lines, found 1
+app/database\database.py:61:1: E305 expected 2 blank lines after class or function definition, found 1
+app/database\database.py:63:1: E302 expected 2 blank lines, found 1
+app/database\database.py:75:1: E302 expected 2 blank lines, found 1
+app/database\database.py:107:1: E302 expected 2 blank lines, found 1
+app/database\database.py:134:1: E302 expected 2 blank lines, found 1
+app/database\database.py:138:1: E302 expected 2 blank lines, found 1
+app/database\database.py:160:49: W292 no newline at end of file
+app/database\models.py:24:1: E302 expected 2 blank lines, found 1
+app/database\models.py:46:1: E302 expected 2 blank lines, found 1
+app/database\models.py:174:1: E302 expected 2 blank lines, found 1
+app/database\models.py:198:1: E302 expected 2 blank lines, found 1
+app/database\models.py:222:1: E302 expected 2 blank lines, found 1
+app/database\models.py:265:1: E302 expected 2 blank lines, found 1
+app/database\models.py:286:1: E302 expected 2 blank lines, found 1
+app/database\models.py:302:1: E302 expected 2 blank lines, found 1
+app/database\models.py:320:1: E302 expected 2 blank lines, found 1
+app/database\models.py:335:1: E302 expected 2 blank lines, found 1
+app/database\models.py:370:1: E302 expected 2 blank lines, found 1
+app/database\models.py:411:1: E302 expected 2 blank lines, found 1
+app/database\models.py:447:59: W292 no newline at end of file
+app/main.py:24:1: E302 expected 2 blank lines, found 1
+app/main.py:54:1: E302 expected 2 blank lines, found 1
+app/main.py:100:1: E302 expected 2 blank lines, found 1
+app/main.py:139:1: E302 expected 2 blank lines, found 1
+app/main.py:159:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main.py:160:11: W292 no newline at end of file
+app/main_new.py:24:1: E302 expected 2 blank lines, found 1
+app/main_new.py:54:1: E302 expected 2 blank lines, found 1
+app/main_new.py:100:1: E302 expected 2 blank lines, found 1
+app/main_new.py:139:1: E302 expected 2 blank lines, found 1
+app/main_new.py:159:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_new.py:160:11: W292 no newline at end of file
+app/main_optimized.py:62:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:92:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:105:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:120:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:217:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_optimized.py:218:11: W292 no newline at end of file
+app/main_optimized_simple.py:62:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:92:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:105:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:120:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:217:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_optimized_simple.py:218:11: W292 no newline at end of file
+app/main_original_backup.py:50:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:90:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:113:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:141:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:152:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:157:1: C901 'main' is too complex (20)
+app/main_original_backup.py:157:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:286:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_original_backup.py:287:11: W292 no newline at end of file
+app/main_preloading.py:50:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:90:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:113:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:141:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:152:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:157:1: C901 'main' is too complex (20)
+app/main_preloading.py:157:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:286:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_preloading.py:287:11: W292 no newline at end of file
+app/main_test.py:17:44: W292 no newline at end of file
+app/pages_modules\__init__.py:53:15: W292 no newline at end of file
+app/pages_modules\business_managers.py:14:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:39:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:121:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:172:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:252:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:272:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:272:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:375:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:561:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:630:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:786:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:854:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:864:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\business_managers.py:943:68: W292 no newline at end of file
+app/pages_modules\business_managers_simple.py:10:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers_simple.py:77:40: W292 no newline at end of file
+app/pages_modules\chatbot.py:23:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:144:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:191:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:259:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\chatbot.py:260:11: W292 no newline at end of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 6
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:85:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:134:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:177:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:210:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:274:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:295:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:322:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_cv.py:356:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:388:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:418:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:462:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:550:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:602:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:648:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:668:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:681:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:746:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:803:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:865:69: W292 no newline at end of file
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:41:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:101:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:101:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:178:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:217:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:291:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:353:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:413:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:478:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:502:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:532:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:574:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:625:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:673:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:731:64: W292 no newline at end of file
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_forms.py:45:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:165:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:195:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:234:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:374:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:414:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:436:21: W292 no newline at end of file
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:38:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:140:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:234:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:300:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:323:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:415:68: W292 no newline at end of file
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:38:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:38:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:156:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:169:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:196:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:221:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_languages.py:305:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:342:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:438:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:466:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:489:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:544:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:619:58: W292 no newline at end of file
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:43:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_list.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:296:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:360:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:410:68: W292 no newline at end of file
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:106:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:106:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:205:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:345:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:374:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:405:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:556:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:588:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:609:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_missions.py:609:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:693:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:762:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:829:58: W292 no newline at end of file
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_profile.py:45:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:76:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:216:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:289:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:306:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:329:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:360:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:380:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:396:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:428:27: W292 no newline at end of file
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:39:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultant_skills.py:39:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:162:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:174:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:202:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:299:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:336:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:416:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:443:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:466:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:521:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:567:68: W292 no newline at end of file
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:48:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:74:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:147:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:271:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:271:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:298:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:618:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:640:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:723:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:778:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:794:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:835:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:876:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:926:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:944:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:998:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1017:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1021:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1066:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1095:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1113:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1190:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1240:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1330:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1383:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1518:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1669:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1700:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1719:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1749:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1795:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1842:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1921:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2008:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2021:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2062:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2077:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2103:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2128:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2152:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2179:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2211:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2251:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2289:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2339:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2339:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2522:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2590:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2605:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2639:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2700:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:2715:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2786:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2820:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2978:1: F811 redefinition of unused 'show_cv_skills' from line 2715
+app/pages_modules\consultants.py:2978:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3003:1: F811 redefinition of unused 'show_cv_summary' from line 2786
+app/pages_modules\consultants.py:3003:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3038:1: F811 redefinition of unused 'show_cv_actions' from line 2820
+app/pages_modules\consultants.py:3038:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3135:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3198:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3202:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3210:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3214:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3218:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3222:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3224:42: W292 no newline at end of file
+app/pages_modules\consultants_clean.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:53:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:116:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:176:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:211:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:227:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:261:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:266:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:271:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:330:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:368:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_clean.py:374:67: W292 no newline at end of file
+app/pages_modules\consultants_final.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:46:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:109:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:247:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:268:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:273:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:282:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:291:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:307:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:341:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:346:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:351:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:435:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:473:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:479:67: W292 no newline at end of file
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants_optimized.py:40:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:52:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:82:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:100:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:137:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:268:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:311:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:346:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:412:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\consultants_optimized.py:413:11: W292 no newline at end of file
+app/pages_modules\documents_functions.py:6:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:74:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:118:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:176:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:185:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:191:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:197:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:217:57: W292 no newline at end of file
+app/pages_modules\documents_upload.py:30:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:68:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:92:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:102:35: W292 no newline at end of file
+app/pages_modules\home.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:78:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:153:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:232:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\home.py:233:11: W292 no newline at end of file
+app/pages_modules\missions.py:3:4: W292 no newline at end of file
+app/pages_modules\practices.py:16:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:42:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:138:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:255:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:320:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:325:30: F541 f-string is missing placeholders
+app/pages_modules\practices.py:341:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:382:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:403:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:447:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:513:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:603:73: W292 no newline at end of file
+app/pages_modules\practices_optimized.py:15:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:41:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:125:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:242:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:293:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:298:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:314:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:355:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:376:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:420:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:486:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:538:27: W292 no newline at end of file
+app/pages_modules\skills.py:3:4: W292 no newline at end of file
+app/pages_modules\technologies.py:10:1: E302 expected 2 blank lines, found 1
+app/pages_modules\technologies.py:17:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\technologies.py:18:11: W292 no newline at end of file
+app/services\business_manager_service.py:20:1: E302 expected 2 blank lines, found 1
+app/services\business_manager_service.py:123:24: W292 no newline at end of file
+app/services\chatbot_service.py:28:1: E302 expected 2 blank lines, found 1
+app/services\chatbot_service.py:36:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:104:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:251:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:311:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:435:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:550:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:566:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:586:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:855:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1007:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1400:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1651:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1689:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1705:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1791:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1792:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1917:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1966:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2009:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2054:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2154:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2159:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2213:33: W292 no newline at end of file
+app/services\consultant_service.py:26:1: E302 expected 2 blank lines, found 1
+app/services\consultant_service.py:585:5: F811 redefinition of unused 'get_consultants_count' from line 195
+app/services\consultant_service.py:840:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:840:5: F811 redefinition of unused 'save_cv_analysis' from line 607
+app/services\consultant_service.py:959:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1002:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1030:28: F541 f-string is missing placeholders
+app/services\consultant_service.py:1041:25: W292 no newline at end of file
+app/services\document_analyzer.py:19:1: E302 expected 2 blank lines, found 1
+app/services\document_analyzer.py:516:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:685:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer.py:1377:24: W292 no newline at end of file
+app/services\document_analyzer_clean.py:19:1: E302 expected 2 blank lines, found 1
+app/services\document_analyzer_clean.py:520:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:812:22: W292 no newline at end of file
+app/services\document_service.py:30:1: E302 expected 2 blank lines, found 1
+app/services\document_service.py:230:5: F811 redefinition of unused 'extract_text_from_file' from line 108
+app/services\document_service.py:453:22: W292 no newline at end of file
+app/services\practice_service.py:18:1: E302 expected 2 blank lines, found 1
+app/services\practice_service.py:310:28: W292 no newline at end of file
+app/services\practice_service_optimized.py:25:1: E302 expected 2 blank lines, found 1
+app/services\practice_service_optimized.py:298:62: W292 no newline at end of file
+app/services\simple_analyzer.py:11:1: E302 expected 2 blank lines, found 1
+app/services\simple_analyzer.py:71:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/services\simple_analyzer.py:187:22: W292 no newline at end of file
+app/services\technology_service.py:16:1: E302 expected 2 blank lines, found 1
+app/services\technology_service.py:133:28: W292 no newline at end of file
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+app/test_streamlit_debug.py:77:36: W292 no newline at end of file
+app/utils\skill_categories.py:164:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:171:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:180:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:187:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:203:19: W292 no newline at end of file
+app/utils\technologies_referentiel.py:195:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:202:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:206:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:212:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:224:1: E305 expected 2 blank lines after class or function definition, found 1
+app/utils\technologies_referentiel.py:230:2: W292 no newline at end of file
+26    C901 'main' is too complex (20)
+293   E302 expected 2 blank lines, found 1
+12    E305 expected 2 blank lines after class or function definition, found 1
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 6
+14    F841 local variable 'total_assignments' is assigned to but never used
+48    W292 no newline at end of file
+app/components\technology_widget.py:14:1: E302 expected 2 blank lines, found 1
+app/components\technology_widget.py:126:1: E302 expected 2 blank lines, found 1
+app/components\technology_widget.py:205:66: W292 no newline at end of file
+app/database\database.py:34:1: E302 expected 2 blank lines, found 1
+app/database\database.py:49:1: E302 expected 2 blank lines, found 1
+app/database\database.py:55:1: E302 expected 2 blank lines, found 1
+app/database\database.py:61:1: E305 expected 2 blank lines after class or function definition, found 1
+app/database\database.py:63:1: E302 expected 2 blank lines, found 1
+app/database\database.py:75:1: E302 expected 2 blank lines, found 1
+app/database\database.py:107:1: E302 expected 2 blank lines, found 1
+app/database\database.py:134:1: E302 expected 2 blank lines, found 1
+app/database\database.py:138:1: E302 expected 2 blank lines, found 1
+app/database\database.py:160:49: W292 no newline at end of file
+app/database\models.py:24:1: E302 expected 2 blank lines, found 1
+app/database\models.py:46:1: E302 expected 2 blank lines, found 1
+app/database\models.py:174:1: E302 expected 2 blank lines, found 1
+app/database\models.py:198:1: E302 expected 2 blank lines, found 1
+app/database\models.py:222:1: E302 expected 2 blank lines, found 1
+app/database\models.py:265:1: E302 expected 2 blank lines, found 1
+app/database\models.py:286:1: E302 expected 2 blank lines, found 1
+app/database\models.py:302:1: E302 expected 2 blank lines, found 1
+app/database\models.py:320:1: E302 expected 2 blank lines, found 1
+app/database\models.py:335:1: E302 expected 2 blank lines, found 1
+app/database\models.py:370:1: E302 expected 2 blank lines, found 1
+app/database\models.py:411:1: E302 expected 2 blank lines, found 1
+app/database\models.py:447:59: W292 no newline at end of file
+app/main.py:24:1: E302 expected 2 blank lines, found 1
+app/main.py:54:1: E302 expected 2 blank lines, found 1
+app/main.py:100:1: E302 expected 2 blank lines, found 1
+app/main.py:139:1: E302 expected 2 blank lines, found 1
+app/main.py:159:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main.py:160:11: W292 no newline at end of file
+app/main_new.py:24:1: E302 expected 2 blank lines, found 1
+app/main_new.py:54:1: E302 expected 2 blank lines, found 1
+app/main_new.py:100:1: E302 expected 2 blank lines, found 1
+app/main_new.py:139:1: E302 expected 2 blank lines, found 1
+app/main_new.py:159:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_new.py:160:11: W292 no newline at end of file
+app/main_optimized.py:62:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:92:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:105:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:120:1: E302 expected 2 blank lines, found 1
+app/main_optimized.py:217:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_optimized.py:218:11: W292 no newline at end of file
+app/main_optimized_simple.py:62:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:92:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:105:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:120:1: E302 expected 2 blank lines, found 1
+app/main_optimized_simple.py:217:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_optimized_simple.py:218:11: W292 no newline at end of file
+app/main_original_backup.py:50:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:90:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:113:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:141:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:152:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:157:1: C901 'main' is too complex (20)
+app/main_original_backup.py:157:1: E302 expected 2 blank lines, found 1
+app/main_original_backup.py:286:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_original_backup.py:287:11: W292 no newline at end of file
+app/main_preloading.py:50:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:90:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:113:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:141:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:152:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:157:1: C901 'main' is too complex (20)
+app/main_preloading.py:157:1: E302 expected 2 blank lines, found 1
+app/main_preloading.py:286:1: E305 expected 2 blank lines after class or function definition, found 1
+app/main_preloading.py:287:11: W292 no newline at end of file
+app/main_test.py:17:44: W292 no newline at end of file
+app/pages_modules\__init__.py:53:15: W292 no newline at end of file
+app/pages_modules\business_managers.py:14:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:39:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:121:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:172:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:252:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:272:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:272:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:375:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:561:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:630:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:786:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:854:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers.py:864:13: F841 local variable 'total_assignments' is assigned to but never used
+app/pages_modules\business_managers.py:943:68: W292 no newline at end of file
+app/pages_modules\business_managers_simple.py:10:1: E302 expected 2 blank lines, found 1
+app/pages_modules\business_managers_simple.py:77:40: W292 no newline at end of file
+app/pages_modules\chatbot.py:23:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:144:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:191:1: E302 expected 2 blank lines, found 1
+app/pages_modules\chatbot.py:259:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\chatbot.py:260:11: W292 no newline at end of file
+app/pages_modules\consultant_cv.py:32:5: F811 redefinition of unused 'Client' from line 6
+app/pages_modules\consultant_cv.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_cv.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:85:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:134:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:177:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:210:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:274:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:295:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:322:33: F541 f-string is missing placeholders
+app/pages_modules\consultant_cv.py:356:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:388:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:418:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:462:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:550:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:602:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:648:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:668:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:681:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:746:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:803:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_cv.py:865:69: W292 no newline at end of file
+app/pages_modules\consultant_documents.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_documents.py:41:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:101:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_documents.py:101:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:178:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:217:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:291:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:353:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:413:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:478:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:502:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:532:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:574:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:625:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:673:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_documents.py:731:64: W292 no newline at end of file
+app/pages_modules\consultant_forms.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_forms.py:45:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:165:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:195:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:234:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:374:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:414:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_forms.py:436:21: W292 no newline at end of file
+app/pages_modules\consultant_info.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_info.py:38:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:140:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:234:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:300:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:323:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:375:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_info.py:415:68: W292 no newline at end of file
+app/pages_modules\consultant_languages.py:34:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_languages.py:38:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_languages.py:38:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:156:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:169:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:196:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:221:45: E741 ambiguous variable name 'l'
+app/pages_modules\consultant_languages.py:305:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:342:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:438:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:466:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:489:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:544:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_languages.py:619:58: W292 no newline at end of file
+app/pages_modules\consultant_list.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_list.py:43:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_list.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:296:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:360:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_list.py:410:68: W292 no newline at end of file
+app/pages_modules\consultant_missions.py:39:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_missions.py:43:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:106:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:106:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:205:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:345:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:374:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:405:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:556:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:588:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:609:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_missions.py:609:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:693:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:762:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_missions.py:829:58: W292 no newline at end of file
+app/pages_modules\consultant_profile.py:41:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_profile.py:45:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:76:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:216:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:289:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:306:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:329:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:360:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:380:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:396:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_profile.py:428:27: W292 no newline at end of file
+app/pages_modules\consultant_skills.py:35:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultant_skills.py:39:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultant_skills.py:39:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:162:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:174:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:202:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:299:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:336:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:416:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:443:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:466:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:521:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultant_skills.py:567:68: W292 no newline at end of file
+app/pages_modules\consultants.py:44:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants.py:48:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:74:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:147:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:271:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:271:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:298:5: F811 redefinition of unused 'ConsultantSalaire' from line 34
+app/pages_modules\consultants.py:618:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:640:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:723:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:778:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:794:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:835:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:876:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:926:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:944:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:998:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1017:47: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1021:27: E741 ambiguous variable name 'l'
+app/pages_modules\consultants.py:1066:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1095:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1113:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1190:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1240:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1330:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1383:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1518:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1669:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1700:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1719:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1749:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1795:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1842:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:1921:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2008:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2021:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2062:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2077:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2103:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2128:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2152:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2179:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2211:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2251:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2289:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2339:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2339:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2522:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2590:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2605:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2639:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2700:30: F541 f-string is missing placeholders
+app/pages_modules\consultants.py:2715:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2786:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2820:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:2978:1: F811 redefinition of unused 'show_cv_skills' from line 2715
+app/pages_modules\consultants.py:2978:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3003:1: F811 redefinition of unused 'show_cv_summary' from line 2786
+app/pages_modules\consultants.py:3003:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3038:1: F811 redefinition of unused 'show_cv_actions' from line 2820
+app/pages_modules\consultants.py:3038:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3135:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3170:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3198:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3202:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3210:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3214:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3218:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3222:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants.py:3224:42: W292 no newline at end of file
+app/pages_modules\consultants_clean.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:53:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:116:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:176:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:211:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:227:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:261:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:266:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:271:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:330:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_clean.py:368:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_clean.py:374:67: W292 no newline at end of file
+app/pages_modules\consultants_final.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:46:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:109:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:247:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:268:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:273:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:282:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:291:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:307:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:341:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:346:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:351:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:435:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_final.py:473:21: F841 local variable 'nouveau_consultant' is assigned to but never used
+app/pages_modules\consultants_final.py:479:67: W292 no newline at end of file
+app/pages_modules\consultants_optimized.py:37:1: F841 local variable 'e' is assigned to but never used
+app/pages_modules\consultants_optimized.py:40:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:52:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:82:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:100:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:137:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:268:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:311:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:346:1: E302 expected 2 blank lines, found 1
+app/pages_modules\consultants_optimized.py:412:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\consultants_optimized.py:413:11: W292 no newline at end of file
+app/pages_modules\documents_functions.py:6:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:74:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:118:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:176:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:185:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:191:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:197:25: F541 f-string is missing placeholders
+app/pages_modules\documents_functions.py:206:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_functions.py:217:57: W292 no newline at end of file
+app/pages_modules\documents_upload.py:30:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:68:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:92:1: E302 expected 2 blank lines, found 1
+app/pages_modules\documents_upload.py:102:35: W292 no newline at end of file
+app/pages_modules\home.py:26:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:78:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:153:1: E302 expected 2 blank lines, found 1
+app/pages_modules\home.py:232:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\home.py:233:11: W292 no newline at end of file
+app/pages_modules\missions.py:3:4: W292 no newline at end of file
+app/pages_modules\practices.py:16:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:42:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:138:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:255:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:320:25: F541 f-string is missing placeholders
+app/pages_modules\practices.py:325:30: F541 f-string is missing placeholders
+app/pages_modules\practices.py:341:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:382:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:403:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:447:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:513:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices.py:603:73: W292 no newline at end of file
+app/pages_modules\practices_optimized.py:15:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:41:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:125:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:242:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:293:25: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:298:30: F541 f-string is missing placeholders
+app/pages_modules\practices_optimized.py:314:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:355:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:376:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:420:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:486:1: E302 expected 2 blank lines, found 1
+app/pages_modules\practices_optimized.py:538:27: W292 no newline at end of file
+app/pages_modules\skills.py:3:4: W292 no newline at end of file
+app/pages_modules\technologies.py:10:1: E302 expected 2 blank lines, found 1
+app/pages_modules\technologies.py:17:1: E305 expected 2 blank lines after class or function definition, found 1
+app/pages_modules\technologies.py:18:11: W292 no newline at end of file
+app/services\business_manager_service.py:20:1: E302 expected 2 blank lines, found 1
+app/services\business_manager_service.py:123:24: W292 no newline at end of file
+app/services\chatbot_service.py:28:1: E302 expected 2 blank lines, found 1
+app/services\chatbot_service.py:36:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:104:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:251:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:311:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:435:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:550:36: F541 f-string is missing placeholders
+app/services\chatbot_service.py:566:37: F541 f-string is missing placeholders
+app/services\chatbot_service.py:586:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:855:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1007:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:1400:42: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:1651:41: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1689:24: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1705:29: F541 f-string is missing placeholders
+app/services\chatbot_service.py:1791:9: F811 redefinition of unused 'ConsultantLangue' from line 24
+app/services\chatbot_service.py:1792:9: F811 redefinition of unused 'Langue' from line 25
+app/services\chatbot_service.py:1917:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:1966:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2009:46: E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+app/services\chatbot_service.py:2054:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2154:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2159:33: F541 f-string is missing placeholders
+app/services\chatbot_service.py:2213:33: W292 no newline at end of file
+app/services\consultant_service.py:26:1: E302 expected 2 blank lines, found 1
+app/services\consultant_service.py:585:5: F811 redefinition of unused 'get_consultants_count' from line 195
+app/services\consultant_service.py:840:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\consultant_service.py:840:5: F811 redefinition of unused 'save_cv_analysis' from line 607
+app/services\consultant_service.py:959:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1002:41: F541 f-string is missing placeholders
+app/services\consultant_service.py:1030:28: F541 f-string is missing placeholders
+app/services\consultant_service.py:1041:25: W292 no newline at end of file
+app/services\document_analyzer.py:19:1: E302 expected 2 blank lines, found 1
+app/services\document_analyzer.py:516:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:685:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer.py:1377:24: W292 no newline at end of file
+app/services\document_analyzer_clean.py:19:1: E302 expected 2 blank lines, found 1
+app/services\document_analyzer_clean.py:520:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:812:22: W292 no newline at end of file
+app/services\document_service.py:30:1: E302 expected 2 blank lines, found 1
+app/services\document_service.py:230:5: F811 redefinition of unused 'extract_text_from_file' from line 108
+app/services\document_service.py:453:22: W292 no newline at end of file
+app/services\practice_service.py:18:1: E302 expected 2 blank lines, found 1
+app/services\practice_service.py:310:28: W292 no newline at end of file
+app/services\practice_service_optimized.py:25:1: E302 expected 2 blank lines, found 1
+app/services\practice_service_optimized.py:298:62: W292 no newline at end of file
+app/services\simple_analyzer.py:11:1: E302 expected 2 blank lines, found 1
+app/services\simple_analyzer.py:71:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/services\simple_analyzer.py:187:22: W292 no newline at end of file
+app/services\technology_service.py:16:1: E302 expected 2 blank lines, found 1
+app/services\technology_service.py:133:28: W292 no newline at end of file
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+app/test_streamlit_debug.py:77:36: W292 no newline at end of file
+app/utils\skill_categories.py:164:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:171:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:180:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:187:1: E302 expected 2 blank lines, found 1
+app/utils\skill_categories.py:203:19: W292 no newline at end of file
+app/utils\technologies_referentiel.py:195:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:202:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:206:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:212:1: E302 expected 2 blank lines, found 1
+app/utils\technologies_referentiel.py:224:1: E305 expected 2 blank lines after class or function definition, found 1
+app/utils\technologies_referentiel.py:230:2: W292 no newline at end of file
+26    C901 'main' is too complex (20)
+293   E302 expected 2 blank lines, found 1
+12    E305 expected 2 blank lines after class or function definition, found 1
+2     E712 comparison to False should be 'if cond is False:' or 'if not cond:'
+3     E741 ambiguous variable name 'l'
+21    F541 f-string is missing placeholders
+13    F811 redefinition of unused 'Client' from line 6
+14    F841 local variable 'total_assignments' is assigned to but never used
+48    W292 no newline at end of file

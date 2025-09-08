@@ -1,4 +1,4 @@
-﻿"""
+"""
 Module d'upload et gestion des documents pour les consultants
 Permet l'upload de CV, documents et l'association aux profils consultants
 """
@@ -27,7 +27,6 @@ try:
 except ImportError as e:
     st.error(f" Erreur d'import: {e}")
 
-
 def show_document_upload_section(consultant_id=None):
     """Affiche la section d'upload de documents"""
 
@@ -55,7 +54,7 @@ def show_document_upload_section(consultant_id=None):
         with col2:
             file_size = uploaded_file.size / 1024  # en KB
             if file_size > 1024:
-                size_display = f"{file_size/1024:.1f} MB"
+                size_display = f"{file_size / 1024:.1f} MB"
             else:
                 size_display = f"{file_size:.1f} KB"
             st.metric(" Taille", size_display)
@@ -65,7 +64,6 @@ def show_document_upload_section(consultant_id=None):
             " Sauvegarder document", type="primary", key="save_document"
         ):
             save_uploaded_document(uploaded_file)
-
 
 def save_uploaded_document(uploaded_file):
     """Sauvegarde le document uploadé"""
@@ -90,7 +88,6 @@ def save_uploaded_document(uploaded_file):
 
     except Exception as e:
         st.error(f" Erreur lors de la sauvegarde: {e}")
-
 
 def show():
     """Point d'entrée principal pour la page de gestion des documents"""

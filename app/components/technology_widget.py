@@ -1,16 +1,22 @@
-
 """
 Widget de sélection de technologies avec référentiel
 """
-import streamlit as st
-import sys
 import os
+import sys
 from typing import List
+
+import streamlit as st
+
 from services.technology_service import TechnologyService
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
-def technology_multiselect(label: str, current_technologies: str = "", key: str = None, help_text: str = None) -> str:
+def technology_multiselect(
+        label: str,
+        current_technologies: str = "",
+        key: str = None,
+        help_text: str = None) -> str:
     """
     Widget de sélection multiple de technologies avec possibilité d'ajout
 
@@ -30,9 +36,11 @@ def technology_multiselect(label: str, current_technologies: str = "", key: str 
     # Parser les technologies actuelles
     current_techs = []
     if current_technologies:
-        current_techs_raw = [tech.strip() for tech in current_technologies.split(',') if tech.strip()]
+        current_techs_raw = [tech.strip()
+                             for tech in current_technologies.split(',') if tech.strip()]
 
-        # Matcher les technologies actuelles avec celles disponibles (insensible à la casse)
+        # Matcher les technologies actuelles avec celles disponibles (insensible à
+        # la casse)
         all_techs_lower = {tech.lower(): tech for tech in all_techs}
 
         for tech in current_techs_raw:
@@ -49,11 +57,12 @@ def technology_multiselect(label: str, current_technologies: str = "", key: str 
                     current_techs.append(tech)
                     # Recharger la liste des technologies
                     all_techs = TechnologyService.get_all_available_technologies()
-    
+
     # Colonnes pour le layout
     col_main, col_add = st.columns([4, 1])
     with col_main:
-        # Multiselect principal - s'assurer que les valeurs par défaut sont dans les options
+        # Multiselect principal - s'assurer que les valeurs par défaut sont dans
+        # les options
         valid_current_techs = [tech for tech in current_techs if tech in all_techs]
 
         selected_techs = st.multiselect(
@@ -63,6 +72,7 @@ def technology_multiselect(label: str, current_technologies: str = "", key: str 
             key=key,
             help=help_text or "Sélectionnez les technologies utilisées"
         )
+
         def show_technologies_referentiel():
             """Page de gestion du référentiel de technologies"""
         st.markdown("<br>", unsafe_allow_html=True)  # Espacement
@@ -72,7 +82,9 @@ def technology_multiselect(label: str, current_technologies: str = "", key: str 
     # Formulaire d'ajout de technologie personnalisée
     if st.session_state.get(f'show_add_tech_{key}', False):
         with st.expander("➕ Ajouter une technologie personnalisée", expanded=True):
-            new_tech_name = st.text_input("Nom de la technologie", key=f"{key}_new_tech_name")
+            new_tech_name = st.text_input(
+                "Nom de la technologie",
+                key=f"{key}_new_tech_name")
             new_tech_category = st.selectbox(
                 "Catégorie",
                 [
@@ -95,7 +107,8 @@ def technology_multiselect(label: str, current_technologies: str = "", key: str 
             with col_add_btn:
                 if st.button("Ajouter", key=f"{key}_confirm_add", type="primary"):
                     if new_tech_name:
-                        if TechnologyService.add_custom_technology(new_tech_name, new_tech_category):
+                        if TechnologyService.add_custom_technology(
+                                new_tech_name, new_tech_category):
                             st.success(f"✅ Technologie '{new_tech_name}' ajoutée !")
                             st.session_state[f'show_add_tech_{key}'] = False
                             st.rerun()
@@ -112,15 +125,17 @@ def technology_multiselect(label: str, current_technologies: str = "", key: str 
     return ', '.join(selected_techs)
 
 
-  
 def show_technologies_referentiel():
     """Page de gestion du référentiel de technologies"""
     st.subheader("🛠️ Référentiel des Technologies")
-    tab1, tab2 = st.tabs(["📋 Technologies disponibles", "➕ Gérer les technologies personnalisées"])
+    tab1, tab2 = st.tabs(["📋 Technologies disponibles",
+                         "➕ Gérer les technologies personnalisées"])
     with tab1:
         # Affichage du référentiel par catégorie
         technologies_by_cat = TechnologyService.get_technologies_by_category()
-        search_query = st.text_input("🔍 Rechercher une technologie", placeholder="Ex: Python, React, Docker...")
+        search_query = st.text_input(
+            "🔍 Rechercher une technologie",
+            placeholder="Ex: Python, React, Docker...")
         if search_query:
             # Recherche
             found_techs = TechnologyService.search_technologies(search_query)
@@ -164,7 +179,8 @@ def show_technologies_referentiel():
             st.text_area("Description (optionnel)")
             if st.form_submit_button("➕ Ajouter la technologie", type="primary"):
                 if tech_name:
-                    if TechnologyService.add_custom_technology(tech_name, tech_category):
+                    if TechnologyService.add_custom_technology(
+                            tech_name, tech_category):
                         st.success(f"✅ Technologie '{tech_name}' ajoutée avec succès !")
                         st.rerun()
                     else:

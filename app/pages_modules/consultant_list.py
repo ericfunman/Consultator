@@ -6,10 +6,11 @@ Fonctions pour afficher, filtrer et rechercher les consultants
 import os
 import sys
 from datetime import datetime
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
 # Ajouter les chemins nécessaires
 current_dir = os.path.dirname(__file__)
@@ -24,10 +25,15 @@ Consultant = None
 imports_ok = False
 
 try:
-    from database.database import get_database_session
-    from database.models import Consultant, Competence, ConsultantCompetence, Mission, ConsultantSalaire
-    from services.consultant_service import ConsultantService
     from sqlalchemy.orm import joinedload
+
+    from database.database import get_database_session
+    from database.models import Competence
+    from database.models import Consultant
+    from database.models import ConsultantCompetence
+    from database.models import ConsultantSalaire
+    from database.models import Mission
+    from services.consultant_service import ConsultantService
 
     imports_ok = True
 except ImportError as e:
@@ -119,7 +125,8 @@ def show_consultants_list():
                 "Disponible": "✅ Disponible",
                 "En mission": "🔴 En mission"
             }
-            filtered_df = filtered_df[filtered_df['Disponibilité'] == status_map[availability_filter]]
+            filtered_df = filtered_df[filtered_df['Disponibilité']
+                                      == status_map[availability_filter]]
 
         # Statistiques
         col1, col2, col3, col4 = st.columns(4)
@@ -129,11 +136,13 @@ def show_consultants_list():
             st.metric("👥 Total consultants", total_consultants)
 
         with col2:
-            available_count = len(filtered_df[filtered_df['Disponibilité'] == "✅ Disponible"])
+            available_count = len(
+                filtered_df[filtered_df['Disponibilité'] == "✅ Disponible"])
             st.metric("✅ Disponibles", available_count)
 
         with col3:
-            busy_count = len(filtered_df[filtered_df['Disponibilité'] == "🔴 En mission"])
+            busy_count = len(
+                filtered_df[filtered_df['Disponibilité'] == "🔴 En mission"])
             st.metric("🔴 En mission", busy_count)
 
         with col4:
@@ -147,9 +156,18 @@ def show_consultants_list():
             st.info("ℹ️ Aucun consultant ne correspond aux critères de recherche")
         else:
             # Configuration des colonnes à afficher
-            display_columns = ['Prénom', 'Nom', 'Email', 'Disponibilité', 'Date disponibilité', 'Grade', 'Type contrat', 'Practice']
+            display_columns = [
+                'Prénom',
+                'Nom',
+                'Email',
+                'Disponibilité',
+                'Date disponibilité',
+                'Grade',
+                'Type contrat',
+                'Practice']
 
-            # Afficher le DataFrame avec sélection interactive (comme dans business managers)
+            # Afficher le DataFrame avec sélection interactive (comme dans business
+            # managers)
             event = st.dataframe(
                 filtered_df[display_columns],
                 use_container_width=True,
@@ -157,26 +175,44 @@ def show_consultants_list():
                 on_select="rerun",
                 selection_mode="single-row",
                 column_config={
-                    "Prénom": st.column_config.TextColumn("Prénom", width="small"),
-                    "Nom": st.column_config.TextColumn("Nom", width="small"),
-                    "Email": st.column_config.TextColumn("Email", width="large"),
-                    "Disponibilité": st.column_config.TextColumn("Disponibilité", width="small"),
-                    "Date disponibilité": st.column_config.TextColumn("Date disponibilité", width="small"),
-                    "Grade": st.column_config.TextColumn("Grade", width="small"),
-                    "Type contrat": st.column_config.TextColumn("Type contrat", width="small"),
-                    "Practice": st.column_config.TextColumn("Practice", width="medium")
-                }
-            )
+                    "Prénom": st.column_config.TextColumn(
+                        "Prénom",
+                        width="small"),
+                    "Nom": st.column_config.TextColumn(
+                        "Nom",
+                        width="small"),
+                    "Email": st.column_config.TextColumn(
+                        "Email",
+                        width="large"),
+                    "Disponibilité": st.column_config.TextColumn(
+                        "Disponibilité",
+                        width="small"),
+                    "Date disponibilité": st.column_config.TextColumn(
+                        "Date disponibilité",
+                        width="small"),
+                    "Grade": st.column_config.TextColumn(
+                        "Grade",
+                        width="small"),
+                    "Type contrat": st.column_config.TextColumn(
+                        "Type contrat",
+                        width="small"),
+                    "Practice": st.column_config.TextColumn(
+                        "Practice",
+                        width="medium")})
 
             # Actions sur sélection (comme dans business managers)
             if event.selection.rows:
                 selected_row = event.selection.rows[0]
                 # Récupérer les données depuis le DataFrame filtré
                 selected_consultant_data = filtered_df.iloc[selected_row]
-                selected_id = int(selected_consultant_data['ID'])  # S'assurer que c'est un int
-                selected_name = f"{selected_consultant_data['Prénom']} {selected_consultant_data['Nom']}"
+                # S'assurer que c'est un int
+                selected_id = int(selected_consultant_data['ID'])
+                selected_name = f"{
+                    selected_consultant_data['Prénom']} {
+                    selected_consultant_data['Nom']}"
 
-                st.success(f"✅ Consultant sélectionné : **{selected_name}** (ID: {selected_id})")
+                st.success(
+                    f"✅ Consultant sélectionné : **{selected_name}** (ID: {selected_id})")
 
                 col1, col2, col3 = st.columns(3)
 
@@ -207,7 +243,8 @@ def show_consultants_list():
                         use_container_width=True,
                         key=f"delete_profile_{selected_id}",
                     ):
-                        # Pour l'instant, on redirige vers le profil avec mode suppression
+                        # Pour l'instant, on redirige vers le profil avec mode
+                        # suppression
                         st.session_state.view_consultant_profile = selected_id
                         st.session_state.delete_consultant_mode = True
                         st.rerun()
@@ -230,7 +267,9 @@ def show_consultants_list():
                 if match:
                     consultant_id = int(match.group(1))
 
-                    if st.button("👁️ Voir le profil détaillé", key=f"view_profile_alt_{consultant_id}"):
+                    if st.button(
+                        "👁️ Voir le profil détaillé",
+                            key=f"view_profile_alt_{consultant_id}"):
                         st.session_state.view_consultant_profile = consultant_id
                         st.rerun()
 
@@ -238,7 +277,8 @@ def show_consultants_list():
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("📊 Exporter en Excel", help="Télécharger la liste au format Excel"):
+                if st.button("📊 Exporter en Excel",
+                             help="Télécharger la liste au format Excel"):
                     export_to_excel(filtered_df)
 
             with col2:
@@ -260,8 +300,10 @@ def export_to_excel(df: pd.DataFrame):
     try:
         # Créer un buffer pour le fichier Excel
         from io import BytesIO
+
         import openpyxl
-        from openpyxl.styles import Font, PatternFill
+        from openpyxl.styles import Font
+        from openpyxl.styles import PatternFill
 
         # Créer le workbook
         wb = openpyxl.Workbook()
@@ -273,7 +315,10 @@ def export_to_excel(df: pd.DataFrame):
         for col_num, header in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col_num, value=header)
             cell.font = Font(bold=True)
-            cell.fill = PatternFill(start_color="1f77b4", end_color="1f77b4", fill_type="solid")
+            cell.fill = PatternFill(
+                start_color="1f77b4",
+                end_color="1f77b4",
+                fill_type="solid")
 
         # Données
         for row_num, row in enumerate(df.itertuples(index=False), 2):
@@ -288,7 +333,7 @@ def export_to_excel(df: pd.DataFrame):
                 try:
                     if len(str(cell.value)) > max_length:
                         max_length = len(str(cell.value))
-                except:
+                except BaseException:
                     pass
             adjusted_width = min(max_length + 2, 50)  # Largeur max de 50
             ws.column_dimensions[column_letter].width = adjusted_width
@@ -327,7 +372,7 @@ def generate_consultants_report(df: pd.DataFrame):
             st.subheader("👥 Effectif")
             st.metric("Total", len(df))
             available = len(df[df['Disponibilité'] == "✅ Disponible"])
-            st.metric("Disponibles", f"{available} ({available/len(df)*100:.1f}%)")
+            st.metric("Disponibles", f"{available} ({available / len(df) * 100:.1f}%)")
 
         with col2:
             st.subheader("💰 Rémunération")
@@ -352,7 +397,8 @@ def generate_consultants_report(df: pd.DataFrame):
         # Distribution des salaires
         if len(df) > 1:
             salary_data = df[['Prénom', 'Nom', 'Salaire annuel']].copy()
-            salary_data['Nom complet'] = salary_data['Prénom'] + ' ' + salary_data['Nom']
+            salary_data['Nom complet'] = salary_data['Prénom'] + \
+                ' ' + salary_data['Nom']
             salary_data = salary_data.sort_values('Salaire annuel', ascending=False)
 
             st.bar_chart(

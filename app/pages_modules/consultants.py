@@ -1,4 +1,4 @@
-﻿"""
+"""
 Page de gestion des consultants - Version fonctionnelle
 CRUD complet pour les consultants avec formulaires, tableaux et gestion des missions
 """
@@ -23,12 +23,22 @@ Mission = None
 imports_ok = False
 
 try:
-    from database.database import get_database_session
-    from database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire, Langue, ConsultantLangue, BusinessManager
-    from services.consultant_service import ConsultantService
-    from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
-    from services.document_service import DocumentService
     from sqlalchemy.orm import joinedload
+
+    from database.database import get_database_session
+    from database.models import BusinessManager
+    from database.models import Competence
+    from database.models import Consultant
+    from database.models import ConsultantCompetence
+    from database.models import ConsultantLangue
+    from database.models import ConsultantSalaire
+    from database.models import Langue
+    from database.models import Mission
+    from services.consultant_service import ConsultantService
+    from services.document_service import DocumentService
+    from services.simple_analyzer import (
+        SimpleDocumentAnalyzer as DocumentAnalyzer,
+    )
 
     imports_ok = True
 except ImportError as e:
@@ -65,15 +75,15 @@ def show():
 
 def show_cv_analysis_fullwidth():
     """Affiche l'analyse CV en pleine largeur au-dessus des onglets"""
-    
+
     if 'cv_analysis' not in st.session_state:
         return
-    
+
     cv_data = st.session_state.cv_analysis
     analysis = cv_data['analysis']
     consultant = cv_data['consultant']
     file_name = cv_data['file_name']
-    
+
     # CSS pour forcer la pleine largeur
     st.markdown("""
     <style>
@@ -95,28 +105,28 @@ def show_cv_analysis_fullwidth():
     }
     </style>
     """, unsafe_allow_html=True)
-    
+
     # En-tête de l'analyse
     col_header1, col_header2, col_header3 = st.columns([6, 1, 1])
-    
+
     with col_header1:
         st.markdown(f"### 🔍 Analyse CV : {file_name}")
         st.markdown(f"**Consultant :** {consultant.prenom} {consultant.nom}")
-    
+
     with col_header2:
         if st.button("🔄 Réanalyser", help="Lancer une nouvelle analyse"):
             del st.session_state.cv_analysis
             st.rerun()
-    
+
     with col_header3:
         if st.button("❌ Fermer", help="Fermer l'analyse"):
             del st.session_state.cv_analysis
             st.rerun()
-    
+
     # Container principal en pleine largeur
     with st.container():
         st.markdown('<div class="cv-analysis-container">', unsafe_allow_html=True)
-        
+
         # Onglets pour les résultats - mais EN PLEINE LARGEUR
         tab1, tab2, tab3, tab4 = st.tabs(
             ["📋 Missions", "🛠️ Compétences", "📊 Résumé", "💾 Actions"]
@@ -133,7 +143,7 @@ def show_cv_analysis_fullwidth():
 
         with tab4:
             show_cv_actions(analysis, consultant)
-        
+
         st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -141,15 +151,16 @@ def show_consultant_profile():
     """Affiche le profil détaillé d'un consultant avec gestion d'erreurs améliorée"""
 
     consultant_id = st.session_state.view_consultant_profile
-    
+
     try:
-        # Charger le consultant avec toutes les relations nécessaires dans la même session
+        # Charger le consultant avec toutes les relations nécessaires dans la même
+        # session
         with get_database_session() as session:
             consultant = session.query(Consultant)\
                 .options(joinedload(Consultant.practice))\
                 .filter(Consultant.id == consultant_id)\
                 .first()
-            
+
             if not consultant:
                 st.error("❌ Consultant introuvable")
                 if st.button("← Retour à la liste", key="back_to_list_error"):
@@ -159,7 +170,7 @@ def show_consultant_profile():
 
             # Charger toutes les données nécessaires dans la session
             practice_name = consultant.practice.nom if consultant.practice else "Non affecté"
-            
+
             # Créer un dictionnaire avec toutes les données nécessaires
             consultant_data = {
                 'id': consultant.id,
@@ -173,12 +184,15 @@ def show_consultant_profile():
                 'date_creation': consultant.date_creation,
                 'practice_name': practice_name
             }
-        
+
         # En-tête avec bouton retour
         col1, col2 = st.columns([6, 1])
 
         with col1:
-            st.title(f"👤 Profil de {consultant_data['prenom']} {consultant_data['nom']}")
+            st.title(
+                f"👤 Profil de {
+                    consultant_data['prenom']} {
+                    consultant_data['nom']}")
 
         with col2:
             if st.button("← Retour", key="back_to_list"):
@@ -225,8 +239,9 @@ def show_consultant_profile():
 
         # Pour les onglets, on va récupérer l'objet consultant avec une nouvelle session
         with get_database_session() as session:
-            consultant_obj = session.query(Consultant).filter(Consultant.id == consultant_id).first()
-            
+            consultant_obj = session.query(Consultant).filter(
+                Consultant.id == consultant_id).first()
+
             # Onglets de détail
             tab1, tab2, tab3, tab4, tab5 = st.tabs(
                 ["📋 Informations", "💼 Compétences", "🌍 Langues", "🚀 Missions", "📁 Documents"]
@@ -246,11 +261,11 @@ def show_consultant_profile():
 
             with tab5:
                 show_consultant_documents(consultant_obj)
-    
+
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du profil consultant: {e}")
         st.code(str(e))
-        
+
         # Bouton manuel pour retourner à la liste
         if st.button("← Retour à la liste", key="back_to_list_exception"):
             del st.session_state.view_consultant_profile
@@ -262,24 +277,30 @@ def show_consultant_info(consultant):
 
     st.subheader("📋 Informations personnelles")
 
-    from database.models import Practice, Consultant
     from sqlalchemy.orm import joinedload
-    # Recharger le consultant avec la relation practice pour éviter DetachedInstanceError
+
+    from database.models import Consultant
+    from database.models import Practice
+
+    # Recharger le consultant avec la relation practice pour éviter
+    # DetachedInstanceError
     with get_database_session() as session:
         consultant_db = session.query(Consultant)\
             .options(joinedload(Consultant.practice))\
             .options(joinedload(Consultant.business_manager_gestions))\
             .filter(Consultant.id == consultant.id).first()
-        practices = session.query(Practice).filter(Practice.actif == True).all()
-        
+        practices = session.query(Practice).filter(Practice.actif).all()
+
         # Charger le BM actuel dans la même session pour éviter les erreurs de session
         bm_actuel = consultant_db.business_manager_actuel
         bm_nom_complet = bm_actuel.nom_complet if bm_actuel else None
         bm_email = bm_actuel.email if bm_actuel else None
     practice_options = {p.nom: p.id for p in practices}
-    current_practice_id = consultant_db.practice_id if hasattr(consultant_db, 'practice_id') else None
+    current_practice_id = consultant_db.practice_id if hasattr(
+        consultant_db, 'practice_id') else None
 
     from database.models import ConsultantSalaire
+
     # Formulaire principal infos consultant
     with st.form(f"edit_consultant_{consultant.id}"):
         col1, col2 = st.columns(2)
@@ -299,27 +320,30 @@ def show_consultant_info(consultant):
                 value=int(consultant_db.salaire_actuel or 0),
                 step=1000,
             )
-            
+
             # Affichage du CJM calculé en temps réel
             cjm_calcule = (salaire * 1.8 / 216) if salaire > 0 else 0
             st.info(f"📈 CJM calculé : **{cjm_calcule:,.0f} €** (salaire×1.8÷216)")
-            
+
             # Sélection de la practice
             practice_label = st.selectbox(
                 "🏢 Practice",
-                options=["Non affecté"] + list(practice_options.keys()),
-                index=(list(practice_options.values()).index(current_practice_id) + 1) if current_practice_id in practice_options.values() else 0
-            )
+                options=["Non affecté"] +
+                list(
+                    practice_options.keys()),
+                index=(
+                    list(
+                        practice_options.values()).index(current_practice_id) +
+                    1) if current_practice_id in practice_options.values() else 0)
             selected_practice_id = practice_options.get(practice_label)
-            
+
             # Affichage du Business Manager (lecture seule)
             if bm_nom_complet and bm_email:
                 st.text_input(
                     "👨‍💼 Business Manager",
                     value=f"{bm_nom_complet} ({bm_email})",
                     disabled=True,
-                    help="Le Business Manager ne peut être modifié que depuis la page BM"
-                )
+                    help="Le Business Manager ne peut être modifié que depuis la page BM")
             else:
                 st.text_input(
                     "👨‍💼 Business Manager",
@@ -352,9 +376,9 @@ def show_consultant_info(consultant):
         # Section historique société (nouveaux champs V1.2)
         st.markdown("---")
         st.markdown("### 🏢 Historique Société")
-        
+
         col3, col4 = st.columns(2)
-        
+
         with col3:
             societe = st.selectbox(
                 "🏢 Société",
@@ -366,7 +390,7 @@ def show_consultant_info(consultant):
                 value=consultant_db.date_entree_societe,
                 help="Date d'entrée dans la société"
             )
-            
+
         with col4:
             date_sortie = st.date_input(
                 "📅 Date de sortie société (optionnel)",
@@ -382,43 +406,49 @@ def show_consultant_info(consultant):
         # Section profil professionnel (nouveaux champs V1.2.1)
         st.markdown("---")
         st.markdown("### 👔 Profil Professionnel")
-        
+
         col5, col6 = st.columns(2)
-        
+
         with col5:
-            grade_options = ["Junior", "Confirmé", "Consultant Manager", "Directeur de Practice"]
+            grade_options = [
+                "Junior",
+                "Confirmé",
+                "Consultant Manager",
+                "Directeur de Practice"]
             current_grade = consultant_db.grade or 'Junior'
-            grade_index = grade_options.index(current_grade) if current_grade in grade_options else 0
+            grade_index = grade_options.index(
+                current_grade) if current_grade in grade_options else 0
             grade = st.selectbox(
                 "🎯 Grade",
                 options=grade_options,
                 index=grade_index,
                 help="Niveau d'expérience du consultant"
             )
-            
+
         with col6:
             contrat_options = ["CDI", "CDD", "Stagiaire", "Alternant", "Indépendant"]
             current_contrat = consultant_db.type_contrat or 'CDI'
-            contrat_index = contrat_options.index(current_contrat) if current_contrat in contrat_options else 0
+            contrat_index = contrat_options.index(
+                current_contrat) if current_contrat in contrat_options else 0
             type_contrat = st.selectbox(
                 "📋 Type de contrat",
                 options=contrat_options,
                 index=contrat_index,
                 help="Type de contrat de travail"
             )
-            
+
         st.markdown("---")
-            
+
         # Affichage de l'expérience calculée
         if consultant_db.date_premiere_mission:
             try:
                 experience = consultant_db.experience_annees
                 st.info(f"📊 **Expérience calculée :** {experience} années")
-            except:
+            except BaseException:
                 st.info("📊 **Expérience :** Calcul en cours...")
         else:
             st.info("📊 **Expérience :** Non calculée (date première mission manquante)")
-            
+
         # Statut société
         try:
             statut = consultant_db.statut_societe
@@ -428,7 +458,7 @@ def show_consultant_info(consultant):
                 st.warning(f"⚠️ **Statut :** {statut}")
             else:
                 st.error(f"❌ **Statut :** {statut}")
-        except:
+        except BaseException:
             st.info("📊 **Statut :** En cours de calcul...")
 
         # Bouton de sauvegarde
@@ -491,9 +521,13 @@ def show_consultant_info(consultant):
     st.subheader("📈 Historique des salaires")
     from datetime import date
     with get_database_session() as session:
-        salaires = session.query(ConsultantSalaire).filter(ConsultantSalaire.consultant_id == consultant.id).order_by(ConsultantSalaire.date_debut.desc()).all()
-        # Ajout automatique d'une entrée historique si salaire_actuel existe mais pas d'entrée pour l'année en cours
-        if consultant.salaire_actuel and not any(s.date_debut.year == date.today().year for s in salaires):
+        salaires = session.query(ConsultantSalaire).filter(
+            ConsultantSalaire.consultant_id == consultant.id).order_by(
+            ConsultantSalaire.date_debut.desc()).all()
+        # Ajout automatique d'une entrée historique si salaire_actuel existe mais
+        # pas d'entrée pour l'année en cours
+        if consultant.salaire_actuel and not any(
+                s.date_debut.year == date.today().year for s in salaires):
             salaire_init = ConsultantSalaire(
                 consultant_id=consultant.id,
                 salaire=consultant.salaire_actuel,
@@ -503,31 +537,49 @@ def show_consultant_info(consultant):
             session.add(salaire_init)
             session.commit()
             # Recharge la liste depuis la base pour éviter DetachedInstanceError
-            salaires = session.query(ConsultantSalaire).filter(ConsultantSalaire.consultant_id == consultant.id).order_by(ConsultantSalaire.date_debut.desc()).all()
+            salaires = session.query(ConsultantSalaire).filter(
+                ConsultantSalaire.consultant_id == consultant.id).order_by(
+                ConsultantSalaire.date_debut.desc()).all()
     if salaires:
         # Trier par date_debut croissante pour le graphique
         salaires_sorted = sorted(salaires, key=lambda s: s.date_debut)
         # Affichage textuel (salaire le plus récent en haut)
         for salaire in salaires:
-            st.write(f"- **{salaire.salaire:,.0f} €** du {salaire.date_debut.strftime('%d/%m/%Y')} " + (f"au {salaire.date_fin.strftime('%d/%m/%Y')}" if salaire.date_fin else "(en cours)") + (f" — {salaire.commentaire}" if salaire.commentaire else ""))
+            st.write(f"- **{salaire.salaire:,.0f} €** du {salaire.date_debut.strftime('%d/%m/%Y')} " +
+                     (f"au {salaire.date_fin.strftime('%d/%m/%Y')}" if salaire.date_fin else "(en cours)") +
+                     (f" — {salaire.commentaire}" if salaire.commentaire else ""))
         # Met à jour le salaire actuel du consultant si besoin
         salaire_max = max(salaires, key=lambda s: s.date_debut)
         if consultant.salaire_actuel != salaire_max.salaire:
             try:
                 with get_database_session() as session:
-                    c = session.query(Consultant).filter(Consultant.id == consultant.id).first()
+                    c = session.query(Consultant).filter(
+                        Consultant.id == consultant.id).first()
                     c.salaire_actuel = salaire_max.salaire
                     session.commit()
-            except Exception:
-                pass
+            except Exception as e:
+                st.warning(f"⚠️ Erreur lors de la mise à jour du salaire: {e}")
+                # Ne pas interrompre le processus pour une erreur mineure
         # Affichage du graphique
         import plotly.graph_objects as go
-        if st.button("📈 Afficher l'évolution des salaires", key=f"show_salary_graph_{consultant.id}"):
+        if st.button(
+            "📈 Afficher l'évolution des salaires",
+            key=f"show_salary_graph_{
+                consultant.id}"):
             dates = [s.date_debut for s in salaires_sorted]
             values = [s.salaire for s in salaires_sorted]
             fig = go.Figure()
-            fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Salaire'))
-            fig.update_layout(title="Évolution des salaires", xaxis_title="Date", yaxis_title="Salaire (€)", template="plotly_white")
+            fig.add_trace(
+                go.Scatter(
+                    x=dates,
+                    y=values,
+                    mode='lines+markers',
+                    name='Salaire'))
+            fig.update_layout(
+                title="Évolution des salaires",
+                xaxis_title="Date",
+                yaxis_title="Salaire (€)",
+                template="plotly_white")
             st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("Aucune évolution de salaire enregistrée.")
@@ -535,10 +587,22 @@ def show_consultant_info(consultant):
     # Ajout d'une évolution de salaire (hors formulaire principal)
     with st.expander("➕ Ajouter une évolution de salaire"):
         with st.form(f"add_salary_form_{consultant.id}"):
-            new_salaire = st.number_input("Nouveau salaire (€)", min_value=0, step=1000, key=f"salaire_{consultant.id}")
-            new_date_debut = st.date_input("Date de début", value=datetime.today(), key=f"date_debut_{consultant.id}")
-            new_commentaire = st.text_input("Commentaire", value="", key=f"commentaire_{consultant.id}")
-            add_salary_submitted = st.form_submit_button("Ajouter l'évolution de salaire")
+            new_salaire = st.number_input(
+                "Nouveau salaire (€)",
+                min_value=0,
+                step=1000,
+                key=f"salaire_{
+                    consultant.id}")
+            new_date_debut = st.date_input(
+                "Date de début",
+                value=datetime.today(),
+                key=f"date_debut_{
+                    consultant.id}")
+            new_commentaire = st.text_input(
+                "Commentaire", value="", key=f"commentaire_{
+                    consultant.id}")
+            add_salary_submitted = st.form_submit_button(
+                "Ajouter l'évolution de salaire")
             if add_salary_submitted:
                 try:
                     with get_database_session() as session:
@@ -561,8 +625,8 @@ def show_consultant_skills(consultant):
 
     # Onglets pour organiser les types de compétences
     tab1, tab2, tab3 = st.tabs([
-        "🛠️ Compétences Techniques", 
-        "🏦 Compétences Fonctionnelles", 
+        "🛠️ Compétences Techniques",
+        "🏦 Compétences Fonctionnelles",
         "➕ Ajouter Compétences"
     ])
 
@@ -615,20 +679,20 @@ def _show_technical_skills(consultant):
         # Affichage des compétences enregistrées
         if competences_tech:
             st.write("**📋 Compétences techniques enregistrées**")
-            
+
             for consultant_comp, competence in competences_tech:
                 col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
-                
+
                 with col1:
                     st.write(f"**{competence.nom}**")
                     st.caption(f"Catégorie: {competence.categorie}")
-                
+
                 with col2:
                     st.write(f"📊 {consultant_comp.niveau_maitrise}")
-                
+
                 with col3:
                     st.write(f"⏱️ {consultant_comp.annees_experience} ans")
-                
+
                 with col4:
                     if st.button("🗑️", key=f"del_tech_{consultant_comp.id}"):
                         _delete_consultant_competence(consultant_comp.id)
@@ -641,7 +705,7 @@ def _show_technical_skills(consultant):
         # Technologies extraites des missions
         if technologies_missions:
             st.write("**🏷️ Technologies des missions**")
-            
+
             cols = st.columns(4)
             tech_list = sorted(list(technologies_missions))
 
@@ -649,7 +713,7 @@ def _show_technical_skills(consultant):
                 with cols[i % 4]:
                     st.markdown(
                         f"""
-                    <div style="padding: 8px; margin: 3px; border: 2px solid #28a745; 
+                    <div style="padding: 8px; margin: 3px; border: 2px solid #28a745;
                                 border-radius: 5px; text-align: center; background-color: #d4edda;">
                         <strong>{tech}</strong>
                     </div>
@@ -680,7 +744,7 @@ def _show_functional_skills(consultant):
 
         if competences_func:
             st.write("**🏦 Compétences fonctionnelles enregistrées**")
-            
+
             # Grouper par catégorie
             categories = {}
             for consultant_comp, competence in competences_func:
@@ -692,16 +756,16 @@ def _show_functional_skills(consultant):
                 with st.expander(f"📂 {categorie} ({len(comps)} compétences)"):
                     for consultant_comp, competence in comps:
                         col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
-                        
+
                         with col1:
                             st.write(f"**{competence.nom}**")
-                        
+
                         with col2:
                             st.write(f"📊 {consultant_comp.niveau_maitrise}")
-                        
+
                         with col3:
                             st.write(f"⏱️ {consultant_comp.annees_experience} ans")
-                        
+
                         with col4:
                             if st.button("🗑️", key=f"del_func_{consultant_comp.id}"):
                                 _delete_consultant_competence(consultant_comp.id)
@@ -712,7 +776,8 @@ def _show_functional_skills(consultant):
             st.metric("🏦 Total compétences fonctionnelles", total_competences)
         else:
             st.info("📝 Aucune compétence fonctionnelle enregistrée")
-            st.write("Utilisez l'onglet **'Ajouter Compétences'** pour ajouter des compétences bancaires/assurance.")
+            st.write(
+                "Utilisez l'onglet **'Ajouter Compétences'** pour ajouter des compétences bancaires/assurance.")
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement des compétences fonctionnelles: {e}")
@@ -720,7 +785,7 @@ def _show_functional_skills(consultant):
 
 def _add_skills_form(consultant):
     """Formulaire d'ajout de compétences"""
-    
+
     # Choix du type de compétence
     type_competence = st.radio(
         "Type de compétence à ajouter:",
@@ -738,15 +803,15 @@ def _add_skills_form(consultant):
 def _add_technical_skill_form(consultant):
     """Formulaire pour ajouter une compétence technique"""
     from utils.skill_categories import COMPETENCES_TECHNIQUES
-    
+
     # Sélection de la catégorie
     categories_tech = list(COMPETENCES_TECHNIQUES.keys())
     categorie = st.selectbox("📂 Catégorie technique", categories_tech)
-    
+
     # Sélection de la compétence
     competences_list = COMPETENCES_TECHNIQUES[categorie]
     competence_nom = st.selectbox("🛠️ Compétence", competences_list)
-    
+
     # Niveau et expérience
     col1, col2 = st.columns(2)
     with col1:
@@ -754,22 +819,22 @@ def _add_technical_skill_form(consultant):
             "📊 Niveau de maîtrise",
             ["Débutant", "Intermédiaire", "Avancé", "Expert"]
         )
-    
+
     with col2:
         experience = st.number_input(
-            "⏱️ Années d'expérience", 
-            min_value=0.0, 
-            max_value=50.0, 
-            value=1.0, 
+            "⏱️ Années d'expérience",
+            min_value=0.0,
+            max_value=50.0,
+            value=1.0,
             step=0.5
         )
-    
+
     # Champs optionnels
     certifications = st.text_input("🏆 Certifications (optionnel)")
     projets = st.text_area("💼 Projets réalisés (optionnel)")
-    
+
     submitted = st.form_submit_button("➕ Ajouter la compétence technique")
-    
+
     if submitted:
         _save_consultant_competence(
             consultant.id, competence_nom, categorie, 'technique',
@@ -780,15 +845,15 @@ def _add_technical_skill_form(consultant):
 def _add_functional_skill_form(consultant):
     """Formulaire pour ajouter une compétence fonctionnelle"""
     from utils.skill_categories import COMPETENCES_FONCTIONNELLES
-    
+
     # Sélection de la catégorie
     categories_func = list(COMPETENCES_FONCTIONNELLES.keys())
     categorie = st.selectbox("📂 Catégorie fonctionnelle", categories_func)
-    
+
     # Sélection de la compétence
     competences_list = COMPETENCES_FONCTIONNELLES[categorie]
     competence_nom = st.selectbox("🏦 Compétence", competences_list)
-    
+
     # Niveau et expérience
     col1, col2 = st.columns(2)
     with col1:
@@ -796,22 +861,22 @@ def _add_functional_skill_form(consultant):
             "📊 Niveau de maîtrise",
             ["Débutant", "Intermédiaire", "Avancé", "Expert"]
         )
-    
+
     with col2:
         experience = st.number_input(
-            "⏱️ Années d'expérience", 
-            min_value=0.0, 
-            max_value=50.0, 
-            value=1.0, 
+            "⏱️ Années d'expérience",
+            min_value=0.0,
+            max_value=50.0,
+            value=1.0,
             step=0.5
         )
-    
+
     # Champs optionnels
     certifications = st.text_input("🏆 Certifications (optionnel)")
     projets = st.text_area("� Projets/missions réalisés (optionnel)")
-    
+
     submitted = st.form_submit_button("➕ Ajouter la compétence fonctionnelle")
-    
+
     if submitted:
         _save_consultant_competence(
             consultant.id, competence_nom, categorie, 'fonctionnelle',
@@ -819,8 +884,8 @@ def _add_functional_skill_form(consultant):
         )
 
 
-def _save_consultant_competence(consultant_id, competence_nom, categorie, type_comp, 
-                               niveau, experience, certifications, projets):
+def _save_consultant_competence(consultant_id, competence_nom, categorie, type_comp,
+                                niveau, experience, certifications, projets):
     """Sauvegarde une compétence pour un consultant"""
     try:
         with get_database_session() as session:
@@ -829,7 +894,7 @@ def _save_consultant_competence(consultant_id, competence_nom, categorie, type_c
                 Competence.nom == competence_nom,
                 Competence.type_competence == type_comp
             ).first()
-            
+
             if not competence:
                 competence = Competence(
                     nom=competence_nom,
@@ -877,7 +942,7 @@ def _delete_consultant_competence(consultant_competence_id):
             consultant_comp = session.query(ConsultantCompetence).filter(
                 ConsultantCompetence.id == consultant_competence_id
             ).first()
-            
+
             if consultant_comp:
                 session.delete(consultant_comp)
                 session.commit()
@@ -892,7 +957,7 @@ def _delete_consultant_competence(consultant_competence_id):
 def show_consultant_languages(consultant):
     """Affiche et gère les langues du consultant"""
     st.subheader("🌍 Langues parlées")
-    
+
     try:
         with get_database_session() as session:
             # Récupérer les langues du consultant
@@ -902,12 +967,12 @@ def show_consultant_languages(consultant):
                 .filter(ConsultantLangue.consultant_id == consultant.id)
                 .all()
             )
-            
+
             if consultant_langues:
                 # Affichage des langues existantes
                 for cl in consultant_langues:
                     col1, col2, col3, col4 = st.columns([3, 2, 3, 1])
-                    
+
                     with col1:
                         flag_emoji = {
                             'FR': '🇫🇷', 'EN': '🇬🇧', 'ES': '🇪🇸', 'DE': '🇩🇪', 'IT': '🇮🇹',
@@ -916,28 +981,30 @@ def show_consultant_languages(consultant):
                         }
                         emoji = flag_emoji.get(cl.langue.code_iso, '🌍')
                         st.write(f"{emoji} **{cl.langue.nom}**")
-                    
+
                     with col2:
                         niveau_colors = {1: "🔴", 2: "🟠", 3: "🟡", 4: "🟢", 5: "🔵"}
-                        st.write(f"{niveau_colors.get(cl.niveau, '⚪')} {cl.niveau_label}")
-                    
+                        st.write(
+                            f"{niveau_colors.get(cl.niveau, '⚪')} {cl.niveau_label}")
+
                     with col3:
                         if cl.commentaire:
-                            st.caption(cl.commentaire[:50] + "..." if len(cl.commentaire) > 50 else cl.commentaire)
-                    
+                            st.caption(
+                                cl.commentaire[:50] + "..." if len(cl.commentaire) > 50 else cl.commentaire)
+
                     with col4:
                         if st.button("🗑️", key=f"del_lang_{cl.id}", help="Supprimer"):
                             _delete_consultant_language(cl.id)
                             st.rerun()
-                
+
                 st.write("---")
             else:
                 st.info("🔍 Aucune langue enregistrée")
-            
+
             # Formulaire d'ajout de langue
             with st.expander("➕ Ajouter une langue"):
                 _add_language_form(consultant)
-                
+
     except Exception as e:
         st.error(f"❌ Erreur lors de l'affichage des langues: {e}")
 
@@ -949,11 +1016,12 @@ def _add_language_form(consultant):
         try:
             with get_database_session() as session:
                 langues_disponibles = session.query(Langue).order_by(Langue.nom).all()
-                
+
                 if not langues_disponibles:
-                    st.warning("⚠️ Aucune langue disponible. Veuillez d'abord initialiser les langues.")
+                    st.warning(
+                        "⚠️ Aucune langue disponible. Veuillez d'abord initialiser les langues.")
                     return
-                
+
                 # Récupérer les langues déjà assignées
                 langues_consultant = (
                     session.query(ConsultantLangue.langue_id)
@@ -961,24 +1029,25 @@ def _add_language_form(consultant):
                     .all()
                 )
                 langues_assignees = [l[0] for l in langues_consultant]
-                
+
                 # Filtrer les langues non assignées
-                langues_libres = [l for l in langues_disponibles if l.id not in langues_assignees]
-                
+                langues_libres = [
+                    l for l in langues_disponibles if l.id not in langues_assignees]
+
                 if not langues_libres:
                     st.info("✅ Toutes les langues disponibles sont déjà assignées")
                     return
-                
+
                 # Formulaire
                 col1, col2 = st.columns(2)
-                
+
                 with col1:
                     langue_selectionnee = st.selectbox(
                         "🌍 Langue",
                         langues_libres,
                         format_func=lambda x: f"{x.nom} ({x.code_iso})"
                     )
-                
+
                 with col2:
                     niveau = st.selectbox(
                         "📊 Niveau",
@@ -991,19 +1060,20 @@ def _add_language_form(consultant):
                             5: "5 - Natif (C2)"
                         }[x]
                     )
-                
+
                 commentaire = st.text_area(
                     "💬 Commentaire (optionnel)",
                     placeholder="Ex: TOEIC 850, Certification, Langue maternelle...",
                     max_chars=200
                 )
-                
+
                 submitted = st.form_submit_button("➕ Ajouter la langue")
-                
+
                 if submitted and langue_selectionnee:
-                    _save_consultant_language(consultant.id, langue_selectionnee.id, niveau, commentaire)
+                    _save_consultant_language(
+                        consultant.id, langue_selectionnee.id, niveau, commentaire)
                     st.rerun()
-                    
+
         except Exception as e:
             st.error(f"❌ Erreur lors de la préparation du formulaire: {e}")
 
@@ -1017,11 +1087,11 @@ def _save_consultant_language(consultant_id, langue_id, niveau, commentaire):
                 ConsultantLangue.consultant_id == consultant_id,
                 ConsultantLangue.langue_id == langue_id
             ).first()
-            
+
             if existing:
                 st.warning("⚠️ Cette langue est déjà assignée à ce consultant")
                 return
-            
+
             # Créer la nouvelle langue
             nouvelle_langue = ConsultantLangue(
                 consultant_id=consultant_id,
@@ -1029,11 +1099,11 @@ def _save_consultant_language(consultant_id, langue_id, niveau, commentaire):
                 niveau=niveau,
                 commentaire=commentaire.strip() if commentaire else None
             )
-            
+
             session.add(nouvelle_langue)
             session.commit()
             st.success("✅ Langue ajoutée avec succès!")
-            
+
     except Exception as e:
         st.error(f"❌ Erreur lors de l'ajout de la langue: {e}")
 
@@ -1045,7 +1115,7 @@ def _delete_consultant_language(consultant_langue_id):
             consultant_langue = session.query(ConsultantLangue).filter(
                 ConsultantLangue.id == consultant_langue_id
             ).first()
-            
+
             if consultant_langue:
                 session.delete(consultant_langue)
                 session.commit()
@@ -1145,13 +1215,13 @@ def show_mission_readonly(mission):
         st.write(
             f"**📅 Début**: {mission.date_debut.strftime('%Y-%m-%d') if mission.date_debut else 'N/A'}"
         )
-        
+
         # Affichage TJM (nouveau champ V1.2.2)
         if mission.tjm:
             st.write(f"**💰 TJM Mission**: {mission.tjm:,}€")
         elif mission.taux_journalier:
             st.write(f"**💰 TJM (ancien)**: {mission.taux_journalier:,}€")
-        
+
         st.write(f"**💰 Revenus**: {mission.revenus_generes or 0:,}€")
 
     with col2:
@@ -1334,7 +1404,7 @@ def show_consultants_list():
 
     # Champ de recherche en temps réel
     search_term = st.text_input(
-        "🔍 Rechercher un consultant", 
+        "🔍 Rechercher un consultant",
         placeholder="Tapez un prénom, nom ou email pour filtrer...",
         help="La liste se filtre automatiquement pendant que vous tapez",
         key="consultant_search"
@@ -1343,9 +1413,12 @@ def show_consultants_list():
     try:
         # Utiliser les nouvelles méthodes optimisées
         if search_term and search_term.strip():
-            consultants = ConsultantService.search_consultants_optimized(search_term.strip())
+            consultants = ConsultantService.search_consultants_optimized(
+                search_term.strip())
             if consultants:
-                st.info(f"🔍 {len(consultants)} consultant(s) trouvé(s) pour '{search_term}'")
+                st.info(
+                    f"🔍 {
+                        len(consultants)} consultant(s) trouvé(s) pour '{search_term}'")
             else:
                 st.warning(f"❌ Aucun consultant trouvé pour '{search_term}'")
         else:
@@ -1388,7 +1461,9 @@ def show_consultants_list():
             if event.selection.rows:
                 selected_row = event.selection.rows[0]
                 selected_id = consultants_data[selected_row]["ID"]
-                selected_name = f"{consultants_data[selected_row]['Prénom']} {consultants_data[selected_row]['Nom']}"
+                selected_name = f"{
+                    consultants_data[selected_row]['Prénom']} {
+                    consultants_data[selected_row]['Nom']}"
 
                 st.success(f"✅ Consultant sélectionné : **{selected_name}**")
 
@@ -1433,7 +1508,8 @@ def show_consultants_list():
                 st.metric("👥 Total consultants", len(consultants))
 
             with col2:
-                disponibles = len([c for c in consultants if c.get('disponibilite', False)])
+                disponibles = len(
+                    [c for c in consultants if c.get('disponibilite', False)])
                 st.metric("✅ Disponibles", disponibles)
 
             with col3:
@@ -1466,7 +1542,7 @@ def show_add_consultant_form():
 
     from database.models import Practice
     with get_database_session() as session:
-        practices = session.query(Practice).filter(Practice.actif == True).all()
+        practices = session.query(Practice).filter(Practice.actif).all()
     practice_options = {p.nom: p.id for p in practices}
 
     with st.form("add_consultant_form"):
@@ -1498,9 +1574,9 @@ def show_add_consultant_form():
         # Section historique société (nouveaux champs V1.2)
         st.markdown("---")
         st.markdown("### 🏢 Historique Société")
-        
+
         col3, col4 = st.columns(2)
-        
+
         with col3:
             societe = st.selectbox(
                 "🏢 Société",
@@ -1511,7 +1587,7 @@ def show_add_consultant_form():
                 "📅 Date d'entrée société",
                 help="Date d'entrée dans la société"
             )
-            
+
         with col4:
             date_sortie = st.date_input(
                 "📅 Date de sortie société (optionnel)",
@@ -1527,17 +1603,20 @@ def show_add_consultant_form():
         # Section profil professionnel (nouveaux champs V1.2.1)
         st.markdown("---")
         st.markdown("### 👔 Profil Professionnel")
-        
+
         col5, col6 = st.columns(2)
-        
+
         with col5:
             grade = st.selectbox(
                 "🎯 Grade",
-                options=["Junior", "Confirmé", "Consultant Manager", "Directeur de Practice"],
+                options=[
+                    "Junior",
+                    "Confirmé",
+                    "Consultant Manager",
+                    "Directeur de Practice"],
                 index=0,
-                help="Niveau d'expérience du consultant"
-            )
-            
+                help="Niveau d'expérience du consultant")
+
         with col6:
             type_contrat = st.selectbox(
                 "📋 Type de contrat",
@@ -1715,7 +1794,7 @@ def show_consultant_documents(consultant):
         with col2:
             file_size = uploaded_file.size / 1024  # en KB
             if file_size > 1024:
-                size_display = f"{file_size/1024:.1f} MB"
+                size_display = f"{file_size / 1024:.1f} MB"
             else:
                 size_display = f"{file_size:.1f} KB"
             st.metric("📊 Taille", size_display)
@@ -1758,7 +1837,9 @@ def save_consultant_document(
         file_extension = DocumentService.get_file_extension(uploaded_file.name)
 
         # Nom du fichier: consultant_nom_type_timestamp.extension
-        safe_name = f"{consultant.prenom}_{consultant.nom}_{document_type}_{timestamp}.{file_extension}"
+        safe_name = f"{
+            consultant.prenom}_{
+            consultant.nom}_{document_type}_{timestamp}.{file_extension}"
         safe_name = safe_name.replace(" ", "_").replace("-", "_")
 
         file_path = upload_dir / safe_name
@@ -1805,10 +1886,16 @@ def save_consultant_document_simple(uploaded_file, consultant):
         if len(name_parts) == 2:
             name, extension = name_parts
             # Nom final: ID_Nom_Prenom_FichierOriginal_Timestamp.extension
-            safe_name = f"{consultant.id}_{consultant.prenom}_{consultant.nom}_{name}_{timestamp}.{extension}"
+            safe_name = f"{
+                consultant.id}_{
+                consultant.prenom}_{
+                consultant.nom}_{name}_{timestamp}.{extension}"
         else:
             # Pas d'extension
-            safe_name = f"{consultant.id}_{consultant.prenom}_{consultant.nom}_{original_name}_{timestamp}"
+            safe_name = f"{
+                consultant.id}_{
+                consultant.prenom}_{
+                consultant.nom}_{original_name}_{timestamp}"
 
         # Nettoyer le nom de fichier
         safe_name = safe_name.replace(" ", "_").replace("-", "_")
@@ -1890,7 +1977,7 @@ def show_existing_documents(consultant):
             file_stats = file_path.stat()
             file_size = file_stats.st_size / 1024  # KB
             if file_size > 1024:
-                size_display = f"{file_size/1024:.1f} MB"
+                size_display = f"{file_size / 1024:.1f} MB"
             else:
                 size_display = f"{file_size:.1f} KB"
 
@@ -1909,8 +1996,8 @@ def show_existing_documents(consultant):
             with col1:
                 st.write(f"� **{display_name}**")
                 st.caption(
-                    f"{doc_type} • {size_display} • {modified_time.strftime('%d/%m/%Y')}"
-                )
+                    f"{doc_type} • {size_display} • {
+                        modified_time.strftime('%d/%m/%Y')}")
 
             with col2:
                 # Bouton téléchargement direct
@@ -1928,9 +2015,9 @@ def show_existing_documents(consultant):
                     "🔍",
                     key=f"analyze_{file_path.name}",
                     help="Analyser comme CV",
-                    ):
-                        # st.write(f"🎯 **BOUTON CLIQUÉ** pour {file_path.name}")  # Debug
-                        analyze_cv_document(file_path, consultant)
+                ):
+                    # st.write(f"🎯 **BOUTON CLIQUÉ** pour {file_path.name}")  # Debug
+                    analyze_cv_document(file_path, consultant)
 
             with col5:
                 if st.button(
@@ -2142,9 +2229,9 @@ def preview_pdf(file_path):
 
         # Affichage du PDF
         pdf_display = f"""
-        <iframe src="data:application/pdf;base64,{b64_pdf}" 
+        <iframe src="data:application/pdf;base64,{b64_pdf}"
                 width="100%" height="600" type="application/pdf">
-            <p>Votre navigateur ne supporte pas l'affichage PDF. 
+            <p>Votre navigateur ne supporte pas l'affichage PDF.
                <a href="data:application/pdf;base64,{b64_pdf}" target="_blank">
                Cliquez ici pour ouvrir dans un nouvel onglet</a>
             </p>
@@ -2169,7 +2256,7 @@ def preview_word(file_path):
         file_stats = file_path.stat()
         file_size = file_stats.st_size / 1024
         if file_size > 1024:
-            size_display = f"{file_size/1024:.1f} MB"
+            size_display = f"{file_size / 1024:.1f} MB"
         else:
             size_display = f"{file_size:.1f} KB"
 
@@ -2210,7 +2297,7 @@ def preview_powerpoint(file_path):
         file_stats = file_path.stat()
         file_size = file_stats.st_size / 1024
         if file_size > 1024:
-            size_display = f"{file_size/1024:.1f} MB"
+            size_display = f"{file_size / 1024:.1f} MB"
         else:
             size_display = f"{file_size:.1f} KB"
 
@@ -2240,7 +2327,7 @@ def preview_powerpoint(file_path):
 
 def analyze_cv_document(file_path, consultant):
     """Analyse un CV et stocke les résultats dans le session state pour affichage pleine largeur"""
-    
+
     try:
         st.info(f"🔍 Analyse du fichier: {file_path.name}")
 
@@ -2279,8 +2366,9 @@ def analyze_cv_document(file_path, consultant):
                 'file_name': file_path.name,
                 'text_length': len(text)
             }
-            
-            st.success("✅ Analyse terminée ! Résultats affichés ci-dessus en pleine largeur.")
+
+            st.success(
+                "✅ Analyse terminée ! Résultats affichés ci-dessus en pleine largeur.")
             st.rerun()  # Recharger pour afficher les résultats
 
     except Exception as e:
@@ -2310,75 +2398,82 @@ def show_cv_missions(missions, consultant):
 
     # En-tête avec métriques
     st.markdown(f"### 📋 {len(missions)} mission(s) détectée(s) dans le CV")
-    
+
     # Bouton global en pleine largeur avec validation globale
-    if st.button("💾 Sauvegarder TOUTES les missions", type="primary", use_container_width=True):
+    if st.button(
+        "💾 Sauvegarder TOUTES les missions",
+        type="primary",
+            use_container_width=True):
         # Validation globale de toutes les missions
         all_valid = True
         for i, mission in enumerate(missions, 1):
             client = mission.get('client', '')
             titre = mission.get('titre', '')
-            
+
             if not client or not titre:
                 all_valid = False
                 st.error(f"❌ Mission {i}: Client et titre sont obligatoires")
-        
+
         if all_valid:
             save_all_missions_to_consultant(missions, consultant)
         else:
-            st.warning("⚠️ Veuillez corriger les missions ci-dessous avant de sauvegarder toutes les missions.")
-            st.info("💡 Conseil: Utilisez les boutons de sauvegarde individuels pour voir les erreurs détaillées.")
-    
+            st.warning(
+                "⚠️ Veuillez corriger les missions ci-dessous avant de sauvegarder toutes les missions.")
+            st.info(
+                "💡 Conseil: Utilisez les boutons de sauvegarde individuels pour voir les erreurs détaillées.")
+
     st.markdown("---")
-    
+
     # Afficher chaque mission individuellement - PLEINE LARGEUR
     for i, mission in enumerate(missions, 1):
         # Container pleine largeur pour chaque mission
         with st.container():
             client_name = mission.get('client', 'Client inconnu')
             st.markdown(f"### 🏢 Mission {i}: {client_name}")
-            
+
             # Champs principaux - layout optimisé avec validation visuelle
-            
+
             # Initialiser la validation dans session_state si nécessaire
             if f"validation_errors_{i}" not in st.session_state:
                 st.session_state[f"validation_errors_{i}"] = []
-            
+
             validation_errors = st.session_state.get(f"validation_errors_{i}", [])
-            
+
             # Client avec validation visuelle
             client_error = f"mission_{i}_client" in validation_errors
             if client_error:
                 st.markdown("**🚨 Client requis**", help="Ce champ est obligatoire")
-            
+
             client = st.text_input(
-                "🏢 Client *" + (" 🚨" if client_error else ""), 
+                "🏢 Client *" + (" 🚨" if client_error else ""),
                 value=mission.get('client', ''),
                 key=f"mission_{i}_client",
                 help="Nom du client pour cette mission (OBLIGATOIRE)",
                 placeholder="Exemple: Société Générale, BNP Paribas..."
             )
-            
+
             # Titre avec validation visuelle
             titre_error = f"mission_{i}_titre" in validation_errors
             if titre_error:
                 st.markdown("**🚨 Rôle/Titre requis**", help="Ce champ est obligatoire")
-            
+
             titre = st.text_input(
-                "👤 Rôle/Titre *" + (" 🚨" if titre_error else ""), 
+                "👤 Rôle/Titre *" + (" 🚨" if titre_error else ""),
                 value=mission.get('titre', ''),
                 key=f"mission_{i}_titre",
                 help="Votre rôle ou titre dans cette mission (OBLIGATOIRE)",
                 placeholder="Exemple: Développeur Full Stack, Consultant..."
             )
-            
+
             # Dates côte à côte mais dans un layout flexible
             col_date1, col_date2 = st.columns(2)
             with col_date1:
                 date_error = f"mission_{i}_debut" in validation_errors
                 if date_error:
-                    st.markdown("**🚨 Date de début requise**", help="Ce champ est obligatoire")
-                
+                    st.markdown(
+                        "**🚨 Date de début requise**",
+                        help="Ce champ est obligatoire")
+
                 date_debut = st.date_input(
                     "📅 Date de début *" + (" 🚨" if date_error else ""),
                     value=None,
@@ -2392,7 +2487,7 @@ def show_cv_missions(missions, consultant):
                     key=f"mission_{i}_fin",
                     help="Date de fin (laisser vide si en cours)"
                 )
-            
+
             # Description en pleine largeur
             description = st.text_area(
                 "📝 Description de la mission",
@@ -2401,7 +2496,7 @@ def show_cv_missions(missions, consultant):
                 key=f"mission_{i}_description",
                 help="Description détaillée de vos activités et responsabilités"
             )
-            
+
             # Technologies en pleine largeur
             technologies_text = ", ".join(mission.get('langages_techniques', []))
             technologies = st.text_area(
@@ -2411,19 +2506,20 @@ def show_cv_missions(missions, consultant):
                 key=f"mission_{i}_technologies",
                 help="Technologies, langages, outils séparés par des virgules (ex: Python, React, AWS, Docker)"
             )
-            
+
             # Bouton de sauvegarde en pleine largeur avec validation
             if st.button(
-                f"💾 Sauvegarder Mission {i}", 
+                f"💾 Sauvegarder Mission {i}",
                 key=f"save_mission_{i}",
                 type="primary",
                 use_container_width=True,
                 help="Ajouter cette mission au profil du consultant"
             ):
                 # Validation avant sauvegarde
-                validation_errors = validate_mission_fields(client, titre, date_debut, i)
+                validation_errors = validate_mission_fields(
+                    client, titre, date_debut, i)
                 st.session_state[f"validation_errors_{i}"] = validation_errors
-                
+
                 if validation_errors:
                     # Afficher les erreurs et rerun pour mettre à jour l'affichage
                     show_validation_errors(validation_errors, i)
@@ -2431,27 +2527,33 @@ def show_cv_missions(missions, consultant):
                 else:
                     # Nettoyer les erreurs précédentes
                     st.session_state[f"validation_errors_{i}"] = []
-                    
+
                     # Sauvegarder la mission
                     success = save_mission_to_consultant(
-                        consultant, client, titre, date_debut, date_fin, 
+                        consultant, client, titre, date_debut, date_fin,
                         description, technologies, i
                     )
-                    
+
                     if success:
                         # Optionnel: nettoyer le formulaire après succès
-                        st.success("Mission sauvegardée ! Vous pouvez maintenant remplir la mission suivante.")
-            
+                        st.success(
+                            "Mission sauvegardée ! Vous pouvez maintenant remplir la mission suivante.")
+
             # Afficher un aperçu rapide de ce qui sera sauvegardé
             if client and titre and date_debut:
-                st.info(f"✅ Prêt à sauvegarder: {titre} chez {client} (début: {date_debut.strftime('%d/%m/%Y')})")
+                st.info(
+                    f"✅ Prêt à sauvegarder: {titre} chez {client} (début: {
+                        date_debut.strftime('%d/%m/%Y')})")
             else:
                 missing = []
-                if not client: missing.append("Client")
-                if not titre: missing.append("Rôle/Titre") 
-                if not date_debut: missing.append("Date de début")
+                if not client:
+                    missing.append("Client")
+                if not titre:
+                    missing.append("Rôle/Titre")
+                if not date_debut:
+                    missing.append("Date de début")
                 st.warning(f"⚠️ Champs manquants: {', '.join(missing)}")
-            
+
             # Séparateur entre les missions
             if i < len(missions):
                 st.markdown("---")
@@ -2460,36 +2562,37 @@ def show_cv_missions(missions, consultant):
 
 def save_all_missions_to_consultant(missions, consultant):
     """Sauvegarde toutes les missions extraites du CV dans la base de données"""
-    
+
     try:
         if not missions:
             st.warning("⚠️ Aucune mission à sauvegarder")
             return
-        
+
         success_count = 0
         error_count = 0
-        
+
         with get_database_session() as session:
             # Récupérer le consultant depuis la DB pour éviter les problèmes de session
-            consultant_fresh = session.query(Consultant).filter(Consultant.id == consultant.id).first()
-            
+            consultant_fresh = session.query(Consultant).filter(
+                Consultant.id == consultant.id).first()
+
             if not consultant_fresh:
                 st.error(f"❌ Consultant avec ID {consultant.id} introuvable")
                 return
-            
+
             for i, mission in enumerate(missions, 1):
                 try:
                     client = mission.get('client', f'Client Mission {i}')
                     titre = mission.get('titre', f'Mission {i}')
-                    
+
                     if not client or not titre:
                         error_count += 1
                         continue
-                    
+
                     # Convertir les technologies en string
                     tech_list = mission.get('langages_techniques', [])
                     technologies_str = ', '.join(tech_list) if tech_list else None
-                    
+
                     # Créer la nouvelle mission
                     nouvelle_mission = Mission(
                         consultant_id=consultant_fresh.id,
@@ -2500,43 +2603,45 @@ def save_all_missions_to_consultant(missions, consultant):
                         technologies_utilisees=technologies_str,
                         statut='terminee'  # Par défaut terminée pour CV
                     )
-                    
+
                     session.add(nouvelle_mission)
                     success_count += 1
-                    
+
                 except Exception as e:
                     error_count += 1
                     st.error(f"❌ Erreur mission {i}: {str(e)}")
-            
+
             if success_count > 0:
                 session.commit()
                 st.success(f"✅ {success_count} mission(s) sauvegardée(s) avec succès!")
                 if error_count > 0:
-                    st.warning(f"⚠️ {error_count} mission(s) n'ont pas pu être sauvegardées")
-                st.info("💡 Consultez l'onglet 'Missions' du profil pour voir les missions ajoutées")
+                    st.warning(
+                        f"⚠️ {error_count} mission(s) n'ont pas pu être sauvegardées")
+                st.info(
+                    "💡 Consultez l'onglet 'Missions' du profil pour voir les missions ajoutées")
                 st.balloons()
             else:
                 st.error("❌ Aucune mission n'a pu être sauvegardée")
-                
+
     except Exception as e:
         st.error(f"❌ Erreur générale lors de la sauvegarde : {e}")
-        
+
         # Debug info supprimé pour la production
 
 
 def validate_mission_fields(client, titre, date_debut, mission_num):
     """Valide les champs d'une mission et retourne les erreurs"""
     errors = []
-    
+
     if not client or client.strip() == "":
         errors.append(f"mission_{mission_num}_client")
-    
+
     if not titre or titre.strip() == "":
         errors.append(f"mission_{mission_num}_titre")
-    
+
     if not date_debut:
         errors.append(f"mission_{mission_num}_debut")
-    
+
     return errors
 
 
@@ -2555,43 +2660,59 @@ def show_validation_errors(errors, mission_num):
         <p style="margin: 5px 0;">Veuillez remplir les champs suivants :</p>
         <ul style="margin: 5px 0; color: #d00;">
         """, unsafe_allow_html=True)
-        
+
         for error in errors:
             if "client" in error:
-                st.markdown("<li><strong>🏢 Client</strong> (obligatoire)</li>", unsafe_allow_html=True)
+                st.markdown(
+                    "<li><strong>🏢 Client</strong> (obligatoire)</li>",
+                    unsafe_allow_html=True)
             elif "titre" in error:
-                st.markdown("<li><strong>👤 Rôle/Titre</strong> (obligatoire)</li>", unsafe_allow_html=True)
+                st.markdown(
+                    "<li><strong>👤 Rôle/Titre</strong> (obligatoire)</li>",
+                    unsafe_allow_html=True)
             elif "debut" in error:
-                st.markdown("<li><strong>📅 Date de début</strong> (obligatoire)</li>", unsafe_allow_html=True)
-        
+                st.markdown(
+                    "<li><strong>📅 Date de début</strong> (obligatoire)</li>",
+                    unsafe_allow_html=True)
+
         st.markdown("</ul></div>", unsafe_allow_html=True)
         return True
     return False
 
 
-def save_mission_to_consultant(consultant, client, titre, date_debut, date_fin, description, technologies, mission_num):
+def save_mission_to_consultant(
+        consultant,
+        client,
+        titre,
+        date_debut,
+        date_fin,
+        description,
+        technologies,
+        mission_num):
     """Sauvegarde une mission dans la base de données avec validation améliorée"""
-    
+
     try:
         # Validation des champs obligatoires
-        validation_errors = validate_mission_fields(client, titre, date_debut, mission_num)
-        
+        validation_errors = validate_mission_fields(
+            client, titre, date_debut, mission_num)
+
         if validation_errors:
             show_validation_errors(validation_errors, mission_num)
             return False  # Echec de la validation
-        
+
         # Convertir les technologies en liste
         tech_list = [tech.strip() for tech in technologies.split(',') if tech.strip()]
-        
+
         # Utiliser la session de base de données
         with get_database_session() as session:
             # Récupérer le consultant depuis la DB pour éviter les problèmes de session
-            consultant_fresh = session.query(Consultant).filter(Consultant.id == consultant.id).first()
-            
+            consultant_fresh = session.query(Consultant).filter(
+                Consultant.id == consultant.id).first()
+
             if not consultant_fresh:
                 st.error(f"❌ Consultant avec ID {consultant.id} introuvable")
                 return False
-            
+
             # Créer la nouvelle mission
             nouvelle_mission = Mission(
                 consultant_id=consultant_fresh.id,
@@ -2604,13 +2725,14 @@ def save_mission_to_consultant(consultant, client, titre, date_debut, date_fin, 
                 technologies_utilisees=', '.join(tech_list) if tech_list else None,
                 statut='terminee' if date_fin else 'en_cours'
             )
-            
+
             session.add(nouvelle_mission)
             session.commit()
-            
+
             # Succès !
-            st.success(f"✅ Mission {mission_num} '{titre}' chez {client} sauvegardée avec succès !")
-            
+            st.success(
+                f"✅ Mission {mission_num} '{titre}' chez {client} sauvegardée avec succès !")
+
             # Afficher un résumé de la mission sauvegardée
             with st.expander("📋 Mission ajoutée au profil", expanded=False):
                 st.write(f"**Client:** {client}")
@@ -2624,12 +2746,12 @@ def save_mission_to_consultant(consultant, client, titre, date_debut, date_fin, 
                     st.write(f"**Description:** {description}")
                 if tech_list:
                     st.write(f"**Technologies:** {', '.join(tech_list)}")
-            
+
             # Suggestion de rafraîchir la page missions
             st.info("💡 Allez dans l'onglet 'Missions' du profil pour voir la mission ajoutée")
             st.balloons()
             return True  # Succès
-        
+
     except Exception as e:
         st.error(f"❌ Erreur lors de la sauvegarde de la mission {mission_num}: {e}")
         return False
@@ -2637,12 +2759,12 @@ def save_mission_to_consultant(consultant, client, titre, date_debut, date_fin, 
 
 def show_cv_skills(analysis):
     """Affiche les compétences extraites du CV avec une présentation améliorée"""
-    
+
     st.write("**Compétences détectées dans le CV :**")
     st.markdown("---")
-    
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.subheader("🛠️ Technologies & Outils")
         technologies = analysis.get("langages_techniques", [])
@@ -2652,12 +2774,12 @@ def show_cv_skills(analysis):
             for tech in technologies:
                 tech_html += f'<span style="display: inline-block; background-color: #e1f5fe; color: #01579b; padding: 4px 12px; margin: 2px; border-radius: 20px; font-size: 0.85em;">{tech}</span>'
             st.markdown(tech_html, unsafe_allow_html=True)
-            
+
             st.markdown("")  # Espace
             st.info(f"💡 {len(technologies)} technologie(s) détectée(s)")
         else:
             st.info("Aucune technologie spécifique détectée")
-    
+
     with col2:
         st.subheader("💼 Compétences Fonctionnelles")
         competences = analysis.get("competences_fonctionnelles", [])
@@ -2665,78 +2787,95 @@ def show_cv_skills(analysis):
             # Affichage en liste avec icônes
             for comp in competences:
                 st.write(f"✅ {comp}")
-            
+
             st.markdown("")  # Espace
             st.info(f"💡 {len(competences)} compétence(s) fonctionnelle(s) détectée(s)")
         else:
             st.info("Aucune compétence fonctionnelle spécifique détectée")
-    
+
     # Section d'actions pour les compétences
     st.markdown("---")
     st.subheader("💾 Actions pour les compétences")
-    
+
     col_action1, col_action2 = st.columns(2)
-    
+
     with col_action1:
-        if st.button("🛠️ Ajouter toutes les technologies au profil", type="primary", use_container_width=True):
+        if st.button(
+            "🛠️ Ajouter toutes les technologies au profil",
+            type="primary",
+                use_container_width=True):
             if technologies:
-                st.success(f"✅ {len(technologies)} technologie(s) prête(s) à être ajoutée(s)")
-                st.info("🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement")
+                st.success(
+                    f"✅ {
+                        len(technologies)} technologie(s) prête(s) à être ajoutée(s)")
+                st.info(
+                    "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement")
                 # TODO: Implémenter l'ajout automatique des compétences
             else:
                 st.warning("⚠️ Aucune technologie à ajouter")
-    
+
     with col_action2:
-        if st.button("💼 Ajouter les compétences fonctionnelles", use_container_width=True):
+        if st.button(
+            "💼 Ajouter les compétences fonctionnelles",
+                use_container_width=True):
             if competences:
-                st.success(f"✅ {len(competences)} compétence(s) prête(s) à être ajoutée(s)")
-                st.info("🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement")
+                st.success(
+                    f"✅ {
+                        len(competences)} compétence(s) prête(s) à être ajoutée(s)")
+                st.info(
+                    "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement")
                 # TODO: Implémenter l'ajout automatique des compétences
             else:
                 st.warning("⚠️ Aucune compétence fonctionnelle à ajouter")
 
+
 def show_cv_summary(analysis, consultant):
     """Affiche un résumé de l'analyse"""
-    
+
     st.subheader("📊 Résumé de l'analyse")
-    
+
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
         missions_count = len(analysis.get("missions", []))
         st.metric("🏢 Missions", missions_count)
-    
+
     with col2:
         tech_count = len(analysis.get("langages_techniques", []))
         st.metric("🛠️ Technologies", tech_count)
-    
+
     with col3:
         comp_count = len(analysis.get("competences_fonctionnelles", []))
         st.metric("💼 Compétences", comp_count)
-    
+
     with col4:
         info_general = analysis.get("informations_generales", {})
         word_count = info_general.get("nombre_mots", 0)
         st.metric("📝 Mots", word_count)
-    
+
     # Affichage du texte brut (aperçu)
     if st.checkbox("🔍 Voir l'aperçu du texte analysé"):
         texte_brut = analysis.get("texte_brut", "")
         if texte_brut:
-            st.text_area("Aperçu du contenu analysé", texte_brut, height=200, disabled=True)
+            st.text_area(
+                "Aperçu du contenu analysé",
+                texte_brut,
+                height=200,
+                disabled=True)
+
 
 def show_cv_actions(analysis, consultant):
     """Affiche les actions possibles après analyse avec une interface améliorée"""
-    
+
     st.subheader("💾 Actions globales")
     st.write("Effectuez des actions sur l'ensemble des données analysées.")
     st.markdown("---")
-    
+
     # Statistiques rapides
     missions = analysis.get("missions", [])
     technologies = analysis.get("langages_techniques", [])
     competences = analysis.get("competences_fonctionnelles", [])
-    
+
     col_stat1, col_stat2, col_stat3 = st.columns(3)
     with col_stat1:
         st.metric("🏢 Missions détectées", len(missions))
@@ -2744,45 +2883,53 @@ def show_cv_actions(analysis, consultant):
         st.metric("🛠️ Technologies", len(technologies))
     with col_stat3:
         st.metric("💼 Compétences", len(competences))
-    
+
     st.markdown("---")
-    
+
     # Actions principales
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.write("**📋 Gestion des missions**")
-        if st.button("📋 Ajouter toutes les missions au profil", type="primary", use_container_width=True):
+        if st.button(
+            "📋 Ajouter toutes les missions au profil",
+            type="primary",
+                use_container_width=True):
             if missions:
                 added_count = 0
                 for i, mission in enumerate(missions, 1):
                     # Logique d'ajout automatique simplifié
                     client = mission.get('client', f'Client Mission {i}')
                     titre = mission.get('titre', f'Mission {i}')
-                    
+
                     if client and titre:  # Validation minimale
                         try:
                             # Simulation d'ajout (remplacer par la vraie logique)
                             added_count += 1
-                        except:
+                        except BaseException:
                             pass
-                
+
                 if added_count > 0:
                     st.success(f"✅ {added_count} mission(s) ajoutée(s) avec succès!")
                     st.info("💡 Consultez l'onglet 'Missions' du profil pour voir les ajouts")
                 else:
                     st.warning("⚠️ Aucune mission n'a pu être ajoutée automatiquement")
-                    st.info("� Utilisez l'onglet 'Missions' ci-dessus pour les ajouter manuellement")
+                    st.info(
+                        "� Utilisez l'onglet 'Missions' ci-dessus pour les ajouter manuellement")
             else:
                 st.warning("⚠️ Aucune mission à ajouter")
-        
+
         st.markdown("")
         if missions:
-            st.info(f"💡 {len(missions)} mission(s) peuvent être ajoutée(s) individuellement dans l'onglet 'Missions'")
-    
+            st.info(
+                f"💡 {
+                    len(missions)} mission(s) peuvent être ajoutée(s) individuellement dans l'onglet 'Missions'")
+
     with col2:
         st.write("**🛠️ Gestion des compétences**")
-        if st.button("🛠️ Ajouter toutes les compétences au profil", use_container_width=True):
+        if st.button(
+            "🛠️ Ajouter toutes les compétences au profil",
+                use_container_width=True):
             total_skills = len(technologies) + len(competences)
             if total_skills > 0:
                 st.success(f"✅ {total_skills} compétence(s) identifiée(s)")
@@ -2791,20 +2938,22 @@ def show_cv_actions(analysis, consultant):
                 for tech in technologies[:5]:  # Limiter l'affichage
                     st.write(f"• {tech}")
                 if len(technologies) > 5:
-                    st.write(f"• ... et {len(technologies)-5} autres")
+                    st.write(f"• ... et {len(technologies) - 5} autres")
             else:
                 st.warning("⚠️ Aucune compétence à ajouter")
-        
+
         st.markdown("")
         if technologies:
-            st.info(f"💡 {len(technologies)} technologie(s) peuvent être ajoutée(s) manuellement")
-    
+            st.info(
+                f"💡 {
+                    len(technologies)} technologie(s) peuvent être ajoutée(s) manuellement")
+
     # Export et outils avancés
     st.markdown("---")
     st.subheader("📤 Export et outils")
-    
+
     col_exp1, col_exp2, col_exp3 = st.columns(3)
-    
+
     with col_exp1:
         if st.button("📄 Export JSON", use_container_width=True):
             import json
@@ -2817,7 +2966,7 @@ def show_cv_actions(analysis, consultant):
             }
             st.json(export_data)
             st.success("✅ Données exportées au format JSON")
-    
+
     with col_exp2:
         if st.button("📊 Résumé formaté", use_container_width=True):
             resume_text = f"""
@@ -2834,10 +2983,11 @@ def show_cv_actions(analysis, consultant):
             """
             st.text_area("Résumé de l'analyse", resume_text, height=300)
             st.success("✅ Résumé généré")
-    
+
     with col_exp3:
         if st.button("� Nouvelle analyse", use_container_width=True):
-            st.info("� Uploadez un nouveau document dans l'onglet 'Documents' pour une nouvelle analyse")
+            st.info(
+                "� Uploadez un nouveau document dans l'onglet 'Documents' pour une nouvelle analyse")
             st.info("🔄 Ou rafraîchissez la page pour réanalyser le même document")
 
     st.subheader(f"🚀 Missions détectées ({len(missions)})")
@@ -2886,7 +3036,7 @@ def show_cv_skills(analysis):
             with cols[i % 4]:
                 st.markdown(
                     f"""
-                <div style="padding: 8px; margin: 3px; border: 2px solid #1f77b4; 
+                <div style="padding: 8px; margin: 3px; border: 2px solid #1f77b4;
                             border-radius: 5px; text-align: center; background-color: #e8f4fd;">
                     <strong>{skill}</strong>
                 </div>
@@ -2949,7 +3099,7 @@ def show_cv_actions(analysis, consultant):
             for i, mission in enumerate(
                 missions[:3]
             ):  # Afficher les 3 premières
-                st.write(f"**Mission {i+1}:**")
+                st.write(f"**Mission {i + 1}:**")
                 st.write(f"- Client: {mission.get('client', 'Non spécifié')}")
                 st.write(f"- Rôle: {mission.get('role', 'Non spécifié')}")
                 if mission.get("langages_techniques"):
@@ -2979,7 +3129,7 @@ def show_cv_actions(analysis, consultant):
 
             for i, mission in enumerate(missions):
                 with st.expander(
-                    f"Mission {i+1}: {mission.get('client', 'Client non spécifié')}",
+                    f"Mission {i + 1}: {mission.get('client', 'Client non spécifié')}",
                     expanded=False,
                 ):
                     col1, col2 = st.columns([3, 1])

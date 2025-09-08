@@ -5,7 +5,10 @@ Fonctions pour analyser et afficher les résultats d'analyse de CV
 
 import os
 import sys
-from typing import List, Dict, Any, Optional
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
 import streamlit as st
 
@@ -15,6 +18,9 @@ parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
+# Imports des modèles
+from database.models import Client
+
 # Variables pour les imports
 ConsultantService = None
 get_database_session = None
@@ -23,7 +29,10 @@ imports_ok = False
 
 try:
     from database.database import get_database_session
-    from database.models import Consultant, Competence, ConsultantCompetence, Client
+    from database.models import Client
+    from database.models import Competence
+    from database.models import Consultant
+    from database.models import ConsultantCompetence
     from services.consultant_service import ConsultantService
 
     imports_ok = True
@@ -60,7 +69,10 @@ def show_cv_missions(missions: List[Dict], consultant):
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("➕ Créer mission", key=f"create_mission_{i}_{consultant.id}"):
+                if st.button(
+                    "➕ Créer mission",
+                    key=f"create_mission_{i}_{
+                        consultant.id}"):
                     create_mission_from_cv(mission, consultant)
 
             with col2:
@@ -102,13 +114,19 @@ def show_cv_skills(analysis: Dict):
         for i, skill in enumerate(skills):
             with cols[i % len(cols)]:
                 # Vérifier si la compétence existe déjà pour le consultant
-                existing = check_existing_skill(skill, st.session_state.get('view_consultant_profile'))
+                existing = check_existing_skill(
+                    skill, st.session_state.get('view_consultant_profile'))
                 status = "✅ Existe" if existing else "➕ Nouveau"
 
-                if st.button(f"{skill} ({status})",
-                           key=f"skill_{category}_{i}_{st.session_state.get('view_consultant_profile', 0)}"):
+                if st.button(
+                    f"{skill} ({status})",
+                    key=f"skill_{category}_{i}_{
+                        st.session_state.get(
+                            'view_consultant_profile',
+                            0)}"):
                     if not existing:
-                        add_skill_from_cv(skill, st.session_state.get('view_consultant_profile'))
+                        add_skill_from_cv(
+                            skill, st.session_state.get('view_consultant_profile'))
                     else:
                         st.info(f"📋 La compétence '{skill}' existe déjà")
 
@@ -200,15 +218,49 @@ def categorize_skill(skill: str) -> str:
     skill_lower = skill.lower()
 
     # Technologies
-    tech_keywords = ['python', 'java', 'javascript', 'react', 'angular', 'vue', 'node', 'django', 'flask',
-                    'spring', 'hibernate', 'sql', 'mysql', 'postgresql', 'mongodb', 'docker', 'kubernetes',
-                    'aws', 'azure', 'git', 'linux', 'windows']
+    tech_keywords = [
+        'python',
+        'java',
+        'javascript',
+        'react',
+        'angular',
+        'vue',
+        'node',
+        'django',
+        'flask',
+        'spring',
+        'hibernate',
+        'sql',
+        'mysql',
+        'postgresql',
+        'mongodb',
+        'docker',
+        'kubernetes',
+        'aws',
+        'azure',
+        'git',
+        'linux',
+        'windows']
 
     # Méthodologies
-    method_keywords = ['agile', 'scrum', 'kanban', 'devops', 'ci/cd', 'tdd', 'bdd', 'uml']
+    method_keywords = [
+        'agile',
+        'scrum',
+        'kanban',
+        'devops',
+        'ci/cd',
+        'tdd',
+        'bdd',
+        'uml']
 
     # Soft skills
-    soft_keywords = ['management', 'leadership', 'communication', 'présentation', 'anglais', 'français']
+    soft_keywords = [
+        'management',
+        'leadership',
+        'communication',
+        'présentation',
+        'anglais',
+        'français']
 
     for keyword in tech_keywords:
         if keyword in skill_lower:
@@ -238,7 +290,7 @@ def check_existing_skill(skill_name: str, consultant_id: Optional[int]) -> bool:
                 .filter(
                     ConsultantCompetence.consultant_id == consultant_id,
                     Competence.nom.ilike(f"%{skill_name}%")
-                )\
+            )\
                 .first()
 
             return existing is not None
@@ -265,9 +317,16 @@ def add_skill_from_cv(skill_name: str, consultant_id: Optional[int]):
                 # Créer une nouvelle compétence
                 competence = Competence(
                     nom=skill_name,
-                    categorie=categorize_skill(skill_name).replace("🛠️ ", "").replace("📋 ", "").replace("🤝 ", "").replace("📚 ", ""),
-                    description=f"Compétence extraite du CV"
-                )
+                    categorie=categorize_skill(skill_name).replace(
+                        "🛠️ ",
+                        "").replace(
+                        "📋 ",
+                        "").replace(
+                        "🤝 ",
+                        "").replace(
+                        "📚 ",
+                        ""),
+                    description=f"Compétence extraite du CV")
                 session.add(competence)
                 session.flush()
 
@@ -276,7 +335,7 @@ def add_skill_from_cv(skill_name: str, consultant_id: Optional[int]):
                 .filter(
                     ConsultantCompetence.consultant_id == consultant_id,
                     ConsultantCompetence.competence_id == competence.id
-                )\
+            )\
                 .first()
 
             if existing_assoc:
@@ -322,7 +381,11 @@ def show_cv_skills_statistics(competences: List[str]):
             category = categorize_skill(skill)
             categories[category] = categories.get(category, 0) + 1
 
-        main_category = max(categories.items(), key=lambda x: x[1]) if categories else ("N/A", 0)
+        main_category = max(
+            categories.items(),
+            key=lambda x: x[1]) if categories else (
+            "N/A",
+            0)
         st.metric("Catégorie principale", main_category[0])
 
     with col3:
@@ -372,7 +435,8 @@ def show_cv_recommendations(analysis: Dict, consultant=None):
     # Vérifier les missions
     missions = analysis.get("missions", [])
     if len(missions) < 3:
-        recommendations.append("⚠️ Ajouter plus de missions dans le CV pour montrer l'expérience")
+        recommendations.append(
+            "⚠️ Ajouter plus de missions dans le CV pour montrer l'expérience")
 
     # Vérifier les compétences
     competences = analysis.get("competences", [])
@@ -395,7 +459,8 @@ def show_cv_recommendations(analysis: Dict, consultant=None):
             categories[category] = categories.get(category, 0) + 1
 
         if len(categories) < 2:
-            recommendations.append("📚 Diversifier les compétences (techniques, méthodologiques, soft skills)")
+            recommendations.append(
+                "📚 Diversifier les compétences (techniques, méthodologiques, soft skills)")
 
     # Afficher les recommandations
     if recommendations:
@@ -521,8 +586,9 @@ def save_mission_from_cv(data: Dict, consultant_id: int) -> bool:
                     client_id = new_client.id
 
             # Créer la mission
-            from database.models import Mission
             from datetime import datetime
+
+            from database.models import Mission
 
             mission = Mission(
                 consultant_id=consultant_id,
@@ -530,11 +596,11 @@ def save_mission_from_cv(data: Dict, consultant_id: int) -> bool:
                 client_id=client_id,
                 date_debut=data['date_debut'],
                 date_fin=data['date_fin'],
-                en_cours=not bool(data['date_fin']),
+                en_cours=not bool(
+                    data['date_fin']),
                 taux_journalier=data['taux_journalier'] if data['taux_journalier'] > 0 else None,
                 description=data['description'],
-                competences_requises=data['technologies']
-            )
+                competences_requises=data['technologies'])
 
             session.add(mission)
             session.commit()
@@ -582,7 +648,12 @@ def analyze_mission_details(mission_data: Dict):
         st.write(f"**Longueur description :** {word_count} mots")
 
         # Détecter des mots-clés
-        keywords = ['responsable', 'développement', 'conception', 'maintenance', 'migration']
+        keywords = [
+            'responsable',
+            'développement',
+            'conception',
+            'maintenance',
+            'migration']
         found_keywords = [kw for kw in keywords if kw in description.lower()]
         if found_keywords:
             st.write(f"**Mots-clés détectés :** {', '.join(found_keywords)}")
@@ -613,7 +684,8 @@ def save_cv_analysis_to_profile(analysis: Dict, consultant):
     """Sauvegarde l'analyse CV dans le profil du consultant"""
 
     try:
-        # Cette fonction pourrait mettre à jour le profil avec les informations extraites
+        # Cette fonction pourrait mettre à jour le profil avec les informations
+        # extraites
         st.success("✅ Analyse sauvegardée dans le profil (fonctionnalité à implémenter)")
 
         # TODO: Implémenter la sauvegarde effective des données extraites
@@ -675,10 +747,12 @@ def generate_cv_analysis_report(analysis: Dict, consultant):
         st.download_button(
             label="📥 Télécharger le rapport",
             data=report,
-            file_name=f"analyse_cv_{consultant.prenom}_{consultant.nom}_{datetime.now().strftime('%Y%m%d')}.md",
+            file_name=f"analyse_cv_{
+                consultant.prenom}_{
+                consultant.nom}_{
+                datetime.now().strftime('%Y%m%d')}.md",
             mime="text/markdown",
-            key="download_analysis_report"
-        )
+            key="download_analysis_report")
 
         st.success("✅ Rapport généré avec succès !")
 
@@ -759,20 +833,27 @@ def show_career_suggestions(analysis: Dict, consultant):
         # Suggestions basées sur les compétences
         if competences:
             # Détecter le domaine principal
-            tech_count = sum(1 for skill in competences if categorize_skill(skill) == "🛠️ Technologies")
-            method_count = sum(1 for skill in competences if categorize_skill(skill) == "📋 Méthodologies")
+            tech_count = sum(
+                1 for skill in competences if categorize_skill(skill) == "🛠️ Technologies")
+            method_count = sum(
+                1 for skill in competences if categorize_skill(skill) == "📋 Méthodologies")
 
             if tech_count > method_count:
-                suggestions.append("💡 Focus sur les aspects techniques - considérer une certification architecte")
+                suggestions.append(
+                    "💡 Focus sur les aspects techniques - considérer une certification architecte")
             elif method_count > tech_count:
-                suggestions.append("💡 Orientation management - formation en leadership d'équipe")
+                suggestions.append(
+                    "💡 Orientation management - formation en leadership d'équipe")
 
             # Détecter des lacunes
-            has_cloud = any('aws' in skill.lower() or 'azure' in skill.lower() for skill in competences)
-            has_devops = any('docker' in skill.lower() or 'kubernetes' in skill.lower() for skill in competences)
+            has_cloud = any('aws' in skill.lower() or 'azure' in skill.lower()
+                            for skill in competences)
+            has_devops = any('docker' in skill.lower()
+                             or 'kubernetes' in skill.lower() for skill in competences)
 
             if not has_cloud:
-                suggestions.append("☁️ Acquérir des compétences cloud (AWS, Azure, GCP)")
+                suggestions.append(
+                    "☁️ Acquérir des compétences cloud (AWS, Azure, GCP)")
 
             if not has_devops:
                 suggestions.append("🔄 Se former aux pratiques DevOps et CI/CD")
@@ -781,7 +862,8 @@ def show_career_suggestions(analysis: Dict, consultant):
         if missions:
             avg_mission_length = len(missions)
             if avg_mission_length < 3:
-                suggestions.append("📈 Accumuler plus d'expérience sur différents projets")
+                suggestions.append(
+                    "📈 Accumuler plus d'expérience sur différents projets")
 
         # Suggestions générales
         suggestions.extend([
@@ -794,7 +876,8 @@ def show_career_suggestions(analysis: Dict, consultant):
         for suggestion in suggestions:
             st.write(f"• {suggestion}")
 
-        st.info("💡 Ces suggestions sont basées sur l'analyse de votre CV et peuvent être adaptées à vos objectifs")
+        st.info(
+            "💡 Ces suggestions sont basées sur l'analyse de votre CV et peuvent être adaptées à vos objectifs")
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'analyse des suggestions: {e}")

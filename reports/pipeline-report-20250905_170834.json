@@ -1,0 +1,46 @@
+{
+  "timestamp": "2025-09-05T17:08:34.730087",
+  "project": "Consultator",
+  "pipeline_results": {
+    "startup_test": {
+      "success": true,
+      "output": "Streamlit OK\nApp import OK\n"
+    },
+    "database_test": {
+      "success": true,
+      "output": "DB OK\n"
+    },
+    "unit_tests": {
+      "success": true,
+      "exit_code": 0,
+      "output": "DEMARRAGE DES TESTS SIMPLES\n========================================\nTest des imports...\nImport database OK\nImport models OK\nImport services OK\nTest de la base de données...\nInit database OK\nSession database OK\nTest des services...\nService creation OK\n\n========================================\nRESULTATS:\n  Imports: PASS\n  Database: PASS\n  Services: PASS\n\n3/3 tests reussis\nTous les tests passent !\n"
+    },
+    "smoke_tests": {
+      "success": true,
+      "output": "DEMARRAGE DES TESTS SIMPLES\n========================================\nTest des imports...\nImport database OK\nImport models OK\nImport services OK\nTest de la base de données...\nInit database OK\nSession database OK\nTest des services...\nService creation OK\n\n========================================\nRESULTATS:\n  Imports: PASS\n  Database: PASS\n  Services: PASS\n\n3/3 tests reussis\nTous les tests passent !\n"
+    },
+    "regression_tests": {
+      "success": false,
+      "exit_code": 5
+    },
+    "linting": {
+      "pylint": {
+        "score": 8.04,
+        "success": true
+      },
+      "flake8": {
+        "issues": 1029,
+        "success": false
+      },
+      "bandit": {
+        "security_issues": 0,
+        "success": true
+      }
+    }
+  },
+  "overall_success": true,
+  "recommendations": [
+    "⚠️ Vérifier les régressions détectées",
+    "🔧 Corriger les 1029 problèmes Flake8"
+  ]
+}

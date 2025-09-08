@@ -1,4 +1,10 @@
-﻿def show_consultant_documents(consultant):
+import streamlit as st
+from datetime import datetime
+
+from services.document_service import DocumentService
+
+
+def show_consultant_documents(consultant):
     """Affiche et gere les documents du consultant"""
 
     st.subheader(f" Documents de {consultant.prenom} {consultant.nom}")
@@ -22,7 +28,7 @@
             with col2:
                 file_size = uploaded_file.size / 1024  # en KB
                 if file_size > 1024:
-                    size_display = f"{file_size/1024:.1f} MB"
+                    size_display = f"{file_size / 1024:.1f} MB"
                 else:
                     size_display = f"{file_size:.1f} KB"
                 st.metric(" Taille", size_display)
@@ -86,7 +92,9 @@ def save_consultant_document(
         file_extension = DocumentService.get_file_extension(uploaded_file.name)
 
         # Nom du fichier: consultant_nom_type_timestamp.extension
-        safe_name = f"{consultant.prenom}_{consultant.nom}_{document_type}_{timestamp}.{file_extension}"
+        safe_name = f"{
+            consultant.prenom}_{
+            consultant.nom}_{document_type}_{timestamp}.{file_extension}"
         safe_name = safe_name.replace(" ", "_").replace("-", "_")
 
         file_path = upload_dir / safe_name
@@ -133,7 +141,7 @@ def show_existing_documents(consultant):
             file_stats = file_path.stat()
             file_size = file_stats.st_size / 1024  # KB
             if file_size > 1024:
-                size_display = f"{file_size/1024:.1f} MB"
+                size_display = f"{file_size / 1024:.1f} MB"
             else:
                 size_display = f"{file_size:.1f} KB"
 

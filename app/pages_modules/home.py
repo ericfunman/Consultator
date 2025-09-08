@@ -3,6 +3,7 @@ Page d'accueil de Consultator
 Dashboard principal avec statistiques et vue d'ensemble
 """
 
+from database.database import get_database_info
 import os
 import sys
 import warnings
@@ -11,19 +12,17 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-# Supprimer les FutureWarnings de pandas 
+# Supprimer les FutureWarnings de pandas
 warnings.filterwarnings('ignore', category=FutureWarning, message=".*deprecated.*")
 
+
 # Import des services
-import sys
-import os
+
 # Ajouter le répertoire parent au path pour les imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
-
-from database.database import get_database_info
 
 
 def show():
@@ -90,25 +89,26 @@ def show_dashboard_charts():
         st.subheader("💰 Évolution des revenus")
 
         # Données de démonstration - éviter pandas.date_range
-        from datetime import datetime, timedelta
         import calendar
-        
+        from datetime import datetime
+        from datetime import timedelta
+
         # Créer les dates manuellement pour éviter le warning pandas
         start_date = datetime(2024, 1, 1)
         dates = []
         current = start_date
-        
+
         for i in range(12):
             # Dernier jour du mois
             if current.month == 12:
                 next_month = current.replace(year=current.year + 1, month=1)
             else:
                 next_month = current.replace(month=current.month + 1)
-            
+
             last_day = next_month - timedelta(days=1)
             dates.append(last_day)
             current = next_month
-        
+
         revenus = [
             50000 + i * 5000 + (i % 3) * 2000 for i in range(len(dates))
         ]
@@ -211,8 +211,6 @@ def show_getting_started():
         if st.button("➕ Ajouter un consultant", type="primary"):
             st.switch_page("pages/consultants.py")
 
-
-
     # Bloc col2 supprimé car vide
 
     # Conseils et astuces
@@ -221,12 +219,12 @@ def show_getting_started():
         st.markdown(
             """
         **📋 Checklist de démarrage :**
-        
+
         1. **Importez vos données existantes** : Si vous avez des données dans Excel ou CSV, vous pourrez bientôt les importer
         2. **Standardisez les compétences** : Utilisez le référentiel prédéfini pour une cohérence optimale
         3. **Documentez les missions** : Plus vous ajoutez de détails, plus les analyses seront précises
         4. **Mettez à jour régulièrement** : Gardez les informations à jour pour des métriques fiables
-        
+
         **🎯 Fonctionnalités à venir :**
         - Import/Export Excel et CSV
         - Chatbot IA pour recherche avancée

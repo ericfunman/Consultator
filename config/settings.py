@@ -63,7 +63,7 @@ CUSTOM_CSS = """
         text-align: center;
         margin-bottom: 2rem;
     }
-    
+
     .metric-card {
         background-color: white;
         padding: 1rem;
@@ -71,7 +71,7 @@ CUSTOM_CSS = """
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin: 0.5rem 0;
     }
-    
+
     .success-box {
         padding: 20px;
         border: 2px solid #2ca02c;
@@ -79,7 +79,7 @@ CUSTOM_CSS = """
         background-color: #f0fff0;
         text-align: center;
     }
-    
+
     .warning-box {
         padding: 20px;
         border: 2px solid #ff7f0e;
@@ -87,7 +87,7 @@ CUSTOM_CSS = """
         background-color: #fff8e1;
         text-align: center;
     }
-    
+
     .info-box {
         padding: 20px;
         border: 2px solid #1f77b4;
@@ -98,12 +98,14 @@ CUSTOM_CSS = """
 </style>
 """
 
+
 def create_directories():
     """Crée les répertoires nécessaires s'ils n'existent pas"""
     directories = [DATA_DIR, UPLOADS_DIR]
-    
+
     for directory in directories:
         directory.mkdir(parents=True, exist_ok=True)
+
 
 def get_app_info():
     """Retourne les informations de l'application"""

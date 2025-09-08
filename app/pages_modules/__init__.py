@@ -44,4 +44,10 @@ try:
 except Exception as e:
     print(f"Erreur import chatbot: {e}")
 
-__all__ = ['home', 'consultants', 'technologies', 'practices', 'business_managers', 'chatbot']
+__all__ = [
+    'home',
+    'consultants',
+    'technologies',
+    'practices',
+    'business_managers',
+    'chatbot']

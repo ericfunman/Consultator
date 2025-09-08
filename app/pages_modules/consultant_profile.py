@@ -22,12 +22,20 @@ Mission = None
 imports_ok = False
 
 try:
-    from database.database import get_database_session
-    from database.models import Mission, Competence, ConsultantCompetence, Consultant, ConsultantSalaire, Langue, ConsultantLangue, BusinessManager
-    from services.consultant_service import ConsultantService
-    from services.simple_analyzer import SimpleDocumentAnalyzer as DocumentAnalyzer
-    from services.document_service import DocumentService
     from sqlalchemy.orm import joinedload
+
+    from database.database import get_database_session
+    from database.models import BusinessManager
+    from database.models import Competence
+    from database.models import Consultant
+    from database.models import ConsultantCompetence
+    from database.models import ConsultantLangue
+    from database.models import ConsultantSalaire
+    from database.models import Langue
+    from database.models import Mission
+    from services.consultant_service import ConsultantService
+    from services.document_service import DocumentService
+    from services.document_analyzer import DocumentAnalyzer
 
     imports_ok = True
 except ImportError as e:
@@ -73,7 +81,8 @@ def show_consultant_profile():
     consultant_id = st.session_state.view_consultant_profile
 
     try:
-        # Charger le consultant avec toutes les relations nécessaires dans la même session
+        # Charger le consultant avec toutes les relations nécessaires dans la même
+        # session
         with get_database_session() as session:
             consultant = session.query(Consultant)\
                 .options(joinedload(Consultant.practice))\
@@ -82,7 +91,8 @@ def show_consultant_profile():
 
             if not consultant:
                 st.error(f"❌ Consultant introuvable (ID: {consultant_id})")
-                st.warning("💡 Vérifiez que l'ID est correct et que le consultant existe dans la base de données")
+                st.warning(
+                    "💡 Vérifiez que l'ID est correct et que le consultant existe dans la base de données")
 
                 # Debug: Lister tous les consultants pour voir lesquels existent
                 all_consultants = session.query(Consultant).all()
@@ -118,7 +128,10 @@ def show_consultant_profile():
         col1, col2 = st.columns([6, 1])
 
         with col1:
-            st.title(f"👤 Profil de {consultant_data['prenom']} {consultant_data['nom']}")
+            st.title(
+                f"👤 Profil de {
+                    consultant_data['prenom']} {
+                    consultant_data['nom']}")
 
         with col2:
             if st.button("← Retour", key="back_to_list"):
@@ -165,7 +178,8 @@ def show_consultant_profile():
 
         # Pour les onglets, on va récupérer l'objet consultant avec une nouvelle session
         with get_database_session() as session:
-            consultant_obj = session.query(Consultant).filter(Consultant.id == consultant_id).first()
+            consultant_obj = session.query(Consultant).filter(
+                Consultant.id == consultant_id).first()
 
             # Onglets de détail
             tab1, tab2, tab3, tab4, tab5 = st.tabs(
@@ -262,19 +276,158 @@ def show_cv_analysis_fullwidth():
         )
 
         with tab1:
-            from .consultants import show_cv_missions_tab
             show_cv_missions_tab(analysis.get("missions", []), consultant)
 
         with tab2:
-            from .consultants import show_cv_skills_tab
             show_cv_skills_tab(analysis)
 
         with tab3:
-            from .consultants import show_cv_summary_tab
             show_cv_summary_tab(analysis, consultant)
 
         with tab4:
-            from .consultants import show_cv_actions_tab
             show_cv_actions_tab(analysis, consultant)
 
         st.markdown('</div>', unsafe_allow_html=True)
+
+
+def show_cv_missions_tab(missions, consultant):
+    """Affiche l'onglet des missions du CV"""
+    st.markdown("### 📋 Missions détectées")
+
+    if not missions:
+        st.info("Aucune mission détectée dans le CV")
+        return
+
+    for i, mission in enumerate(missions, 1):
+        with st.expander(f"Mission {i}: {mission.get('titre', 'Sans titre')}", expanded=False):
+            st.write(f"**Client:** {mission.get('client', 'Non spécifié')}")
+            st.write(f"**Période:** {mission.get('periode', 'Non spécifiée')}")
+            st.write(f"**Technologies:** {mission.get('technologies', 'Non spécifiées')}")
+            if mission.get('description'):
+                st.write(f"**Description:** {mission.get('description')}")
+
+
+def show_cv_skills_tab(analysis):
+    """Affiche l'onglet des compétences du CV"""
+    st.markdown("### 🛠️ Compétences détectées")
+
+    competences = analysis.get('competences', [])
+    if not competences:
+        st.info("Aucune compétence détectée dans le CV")
+        return
+
+    # Grouper par catégorie
+    skills_by_category = {}
+    for skill in competences:
+        category = categorize_skill(skill)
+        if category not in skills_by_category:
+            skills_by_category[category] = []
+        skills_by_category[category].append(skill)
+
+    for category, skills in skills_by_category.items():
+        st.markdown(f"**{category}**")
+        for skill in skills:
+            st.write(f"• {skill}")
+        st.markdown("---")
+
+
+def show_cv_summary_tab(analysis, consultant):
+    """Affiche l'onglet de résumé du CV"""
+    st.markdown("### 📊 Résumé de l'analyse")
+
+    # Score qualité
+    score = calculate_cv_quality_score(analysis)
+    st.metric("Score qualité du CV", f"{score}/100")
+
+    # Statistiques
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        missions_count = len(analysis.get('missions', []))
+        st.metric("Missions détectées", missions_count)
+
+    with col2:
+        skills_count = len(analysis.get('competences', []))
+        st.metric("Compétences détectées", skills_count)
+
+    with col3:
+        contact = analysis.get('contact', {})
+        completeness = sum([1 for field in ['email', 'phone', 'linkedin'] if contact.get(field)])
+        st.metric("Complétude contact", f"{completeness}/3")
+
+    # Résumé textuel
+    resume = analysis.get('resume', '')
+    if resume:
+        st.markdown("**Résumé extrait:**")
+        st.write(resume)
+
+
+def show_cv_actions_tab(analysis, consultant):
+    """Affiche l'onglet des actions du CV"""
+    st.markdown("### 💾 Actions disponibles")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("📥 Télécharger le rapport d'analyse", key="download_cv_report"):
+            st.info("Fonctionnalité de téléchargement à implémenter")
+
+        if st.button("🔄 Synchroniser avec le profil", key="sync_cv_profile"):
+            st.info("Fonctionnalité de synchronisation à implémenter")
+
+    with col2:
+        if st.button("📧 Partager l'analyse", key="share_cv_analysis"):
+            st.info("Fonctionnalité de partage à implémenter")
+
+        if st.button("🗂️ Archiver l'analyse", key="archive_cv_analysis"):
+            st.info("Fonctionnalité d'archivage à implémenter")
+
+
+def categorize_skill(skill):
+    """Catégorise une compétence"""
+    skill_lower = skill.lower()
+
+    if any(keyword in skill_lower for keyword in ['python', 'java', 'javascript', 'c++', 'php', 'ruby', 'go', 'rust']):
+        return "💻 Langages de programmation"
+    elif any(keyword in skill_lower for keyword in ['sql', 'mysql', 'postgresql', 'mongodb', 'oracle']):
+        return "🗄️ Bases de données"
+    elif any(keyword in skill_lower for keyword in ['aws', 'azure', 'gcp', 'docker', 'kubernetes']):
+        return "☁️ Cloud & DevOps"
+    elif any(keyword in skill_lower for keyword in ['agile', 'scrum', 'kanban', 'uml']):
+        return "📋 Méthodologies"
+    else:
+        return "🛠️ Autres technologies"
+
+
+def calculate_cv_quality_score(analysis):
+    """Calcule un score de qualité pour le CV"""
+    score = 0
+
+    # Missions (30 points)
+    missions = analysis.get('missions', [])
+    if len(missions) >= 5:
+        score += 30
+    elif len(missions) >= 3:
+        score += 20
+    elif len(missions) >= 1:
+        score += 10
+
+    # Compétences (30 points)
+    competences = analysis.get('competences', [])
+    if len(competences) >= 10:
+        score += 30
+    elif len(competences) >= 5:
+        score += 20
+    elif len(competences) >= 1:
+        score += 10
+
+    # Contact (20 points)
+    contact = analysis.get('contact', {})
+    contact_score = sum([5 for field in ['email', 'phone', 'linkedin'] if contact.get(field)])
+    score += contact_score
+
+    # Résumé (20 points)
+    if analysis.get('resume'):
+        score += 20
+
+    return min(score, 100)

@@ -3,12 +3,13 @@ Référentiel des technologies pour Consultator
 Ce fichier contient la liste complète des technologies disponibles
 """
 
-from typing import Dict, List
+from typing import Dict
+from typing import List
 
 # Référentiel complet des technologies par catégorie
 TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
     "Langages de programmation": [
-        "C", "C++", "C#", 
+        "C", "C++", "C#",
         "Java", "Java 8", "Java 11", "Java 17", "Java 21",
         "Python", "Python 2.7", "Python 3.x", "Python 3.8+", "Python 3.9+", "Python 3.10+", "Python 3.11+", "Python 3.12+",
         "JavaScript", "TypeScript", "ECMAScript 6+", "Node.js",
@@ -35,7 +36,7 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "Fortran",
         "Assembly"
     ],
-    
+
     "Frameworks Web": [
         # Frontend
         "React", "React.js", "React Native", "Next.js",
@@ -46,7 +47,7 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "Backbone.js",
         "jQuery",
         "Bootstrap", "Tailwind CSS", "Material-UI", "Ant Design",
-        
+
         # Backend
         "Express.js", "Koa.js", "Fastify",
         "Django", "Flask", "FastAPI", "Tornado",
@@ -58,7 +59,7 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "Play Framework",
         "Phoenix"
     ],
-    
+
     "Bases de données": [
         # Relationnelles
         "MySQL", "PostgreSQL", "SQLite", "MariaDB",
@@ -66,7 +67,7 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "SQL Server", "SQL Server 2019", "SQL Server 2022",
         "IBM DB2",
         "SAP HANA",
-        
+
         # NoSQL
         "MongoDB", "CouchDB", "CouchBase",
         "Redis", "Memcached",
@@ -75,38 +76,38 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "DynamoDB",
         "Neo4j", "ArangoDB",
         "InfluxDB", "TimescaleDB",
-        
+
         # Big Data
         "Apache Spark", "Apache Hadoop", "Apache Kafka", "Apache Storm",
         "Apache Flink", "Apache Beam",
         "Snowflake", "BigQuery", "Redshift"
     ],
-    
+
     "Cloud & DevOps": [
         # Cloud Providers
         "AWS", "Amazon Web Services", "EC2", "S3", "Lambda", "RDS", "CloudFormation",
         "Microsoft Azure", "Azure Functions", "Azure SQL", "Azure DevOps",
         "Google Cloud Platform", "GCP", "Google Cloud Functions", "Google Kubernetes Engine",
         "IBM Cloud", "Oracle Cloud",
-        
+
         # Containerisation
         "Docker", "Docker Compose", "Docker Swarm",
         "Kubernetes", "K8s", "OpenShift", "Rancher",
         "Podman", "LXC",
-        
+
         # CI/CD
         "Jenkins", "GitLab CI", "GitHub Actions", "Azure DevOps",
         "CircleCI", "Travis CI", "Bamboo", "TeamCity",
-        
+
         # Infrastructure as Code
         "Terraform", "Ansible", "Puppet", "Chef", "SaltStack",
         "CloudFormation", "ARM Templates", "Pulumi",
-        
+
         # Monitoring
         "Prometheus", "Grafana", "ELK Stack", "Elasticsearch", "Logstash", "Kibana",
         "Splunk", "Datadog", "New Relic", "AppDynamics"
     ],
-    
+
     "Intelligence Artificielle & Data Science": [
         # Machine Learning
         "TensorFlow", "PyTorch", "Scikit-learn", "Keras",
@@ -114,51 +115,51 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "Apache Spark MLlib", "H2O.ai",
         "Pandas", "NumPy", "SciPy", "Matplotlib", "Seaborn", "Plotly",
         "Jupyter", "Google Colab",
-        
+
         # Deep Learning
         "Neural Networks", "CNN", "RNN", "LSTM", "GAN", "Transformer",
         "BERT", "GPT", "OpenAI", "Hugging Face",
-        
+
         # Computer Vision
         "OpenCV", "PIL", "Pillow", "ImageIO",
-        
+
         # NLP
         "NLTK", "spaCy", "Gensim", "TextBlob",
-        
+
         # Big Data & Analytics
         "Apache Spark", "Hadoop", "Hive", "Pig", "HBase",
         "Tableau", "Power BI", "QlikView", "Looker",
         "Apache Airflow", "Prefect"
     ],
-    
+
     "Mobile": [
         "iOS", "Android", "React Native", "Flutter",
         "Xamarin", "PhoneGap", "Cordova", "Ionic",
         "Swift", "Objective-C", "Kotlin", "Java Android",
         "Unity", "Unreal Engine"
     ],
-    
+
     "Outils de développement": [
         # IDE
         "Visual Studio Code", "IntelliJ IDEA", "Eclipse", "Visual Studio",
         "PyCharm", "WebStorm", "Android Studio", "Xcode",
-        
+
         # Version Control
         "Git", "GitHub", "GitLab", "Bitbucket", "SVN", "Mercurial",
-        
+
         # Build Tools
         "Maven", "Gradle", "Ant", "SBT",
         "npm", "yarn", "pnpm",
         "pip", "conda", "poetry",
         "Webpack", "Vite", "Rollup", "Parcel",
-        
+
         # Testing
         "JUnit", "TestNG", "Mockito",
         "Jest", "Mocha", "Jasmine", "Cypress", "Selenium",
         "pytest", "unittest", "nose2",
         "Postman", "Insomnia"
     ],
-    
+
     "Architecture & Design": [
         "Microservices", "SOA", "RESTful API", "GraphQL",
         "Event-driven architecture", "CQRS", "Event Sourcing",
@@ -167,7 +168,7 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "API Gateway", "Service Mesh", "Istio",
         "Message Queues", "RabbitMQ", "Apache Kafka", "Redis Pub/Sub"
     ],
-    
+
     "Sécurité": [
         "OAuth", "JWT", "SAML", "LDAP", "Active Directory",
         "SSL/TLS", "HTTPS", "Cryptography",
@@ -175,13 +176,13 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "HashiCorp Vault", "AWS IAM", "Azure AD",
         "Firewalls", "VPN", "Network Security"
     ],
-    
+
     "Systèmes d'exploitation": [
         "Linux", "Ubuntu", "CentOS", "RHEL", "Debian", "Alpine",
         "Windows", "Windows Server", "Windows 10", "Windows 11",
         "macOS", "Unix", "FreeBSD"
     ],
-    
+
     "Méthodologies": [
         "Agile", "Scrum", "Kanban", "Lean",
         "DevOps", "GitOps", "DataOps", "MLOps",
@@ -212,7 +213,7 @@ def add_custom_technology(category: str, technology: str) -> bool:
     """Ajoute une technologie personnalisée à une catégorie"""
     if category not in TECHNOLOGIES_REFERENTIEL:
         TECHNOLOGIES_REFERENTIEL[category] = []
-    
+
     if technology not in TECHNOLOGIES_REFERENTIEL[category]:
         TECHNOLOGIES_REFERENTIEL[category].append(technology)
         TECHNOLOGIES_REFERENTIEL[category].sort()

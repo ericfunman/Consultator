@@ -5,7 +5,9 @@ Fonctions pour afficher, ajouter et modifier les compétences
 
 import os
 import sys
-from typing import List, Dict, Any
+from typing import Any
+from typing import Dict
+from typing import List
 
 import streamlit as st
 
@@ -23,7 +25,9 @@ imports_ok = False
 
 try:
     from database.database import get_database_session
-    from database.models import Consultant, Competence, ConsultantCompetence
+    from database.models import Competence
+    from database.models import Consultant
+    from database.models import ConsultantCompetence
     from services.consultant_service import ConsultantService
     from utils.skill_categories import SKILL_CATEGORIES
 
@@ -113,7 +117,10 @@ def show_consultant_skills(consultant):
                     if st.button("✏️", key=f"edit_skill_{skill_id}", help="Modifier"):
                         st.session_state.edit_skill = int(skill_id)
                         st.rerun()
-                    if st.button("🗑️", key=f"delete_skill_{skill_id}", help="Supprimer"):
+                    if st.button(
+                        "🗑️",
+                        key=f"delete_skill_{skill_id}",
+                            help="Supprimer"):
                         if delete_skill(int(skill_id)):
                             st.rerun()
 
@@ -131,7 +138,10 @@ def show_consultant_skills(consultant):
                 st.rerun()
 
         with col2:
-            if st.button("📊 Analyse compétences", key=f"analyze_skills_{consultant.id}"):
+            if st.button(
+                "📊 Analyse compétences",
+                key=f"analyze_skills_{
+                    consultant.id}"):
                 show_skills_analysis(consultant_competences)
 
         with col3:
@@ -179,7 +189,8 @@ def show_skills_statistics(consultant_competences):
         st.metric("Total compétences", total_skills)
 
     with col2:
-        avg_level = sum(cc.niveau for cc in consultant_competences) / len(consultant_competences)
+        avg_level = sum(cc.niveau for cc in consultant_competences) / \
+            len(consultant_competences)
         st.metric("Niveau moyen", f"{avg_level:.1f}/5")
 
     with col3:
@@ -187,7 +198,8 @@ def show_skills_statistics(consultant_competences):
         st.metric("Certifiées", certified_count)
 
     with col4:
-        avg_experience = sum(cc.annees_experience or 0 for cc in consultant_competences) / len(consultant_competences)
+        avg_experience = sum(
+            cc.annees_experience or 0 for cc in consultant_competences) / len(consultant_competences)
         st.metric("Expérience moyenne", f"{avg_experience:.1f} ans")
 
 
@@ -210,12 +222,16 @@ def show_add_skill_form(consultant_id: int):
                 .all()
 
         if not available_competences:
-            st.warning("⚠️ Toutes les compétences existantes sont déjà associées à ce consultant")
+            st.warning(
+                "⚠️ Toutes les compétences existantes sont déjà associées à ce consultant")
             return
 
         with st.form(f"add_skill_form_{consultant_id}", clear_on_submit=True):
             # Sélection de la compétence
-            skill_options = {c.id: f"{c.nom} ({c.categorie})" for c in available_competences}
+            skill_options = {
+                c.id: f"{
+                    c.nom} ({
+                    c.categorie})" for c in available_competences}
             selected_skill = st.selectbox(
                 "Compétence *",
                 options=list(skill_options.keys()),
@@ -295,7 +311,7 @@ def add_skill_to_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
                 .filter(
                     ConsultantCompetence.consultant_id == consultant_id,
                     ConsultantCompetence.competence_id == data['competence_id']
-                )\
+            )\
                 .first()
 
             if existing:
@@ -404,7 +420,8 @@ def show_edit_skill_form(consultant_competence_id: int):
         st.error(f"❌ Erreur lors du chargement du formulaire de modification: {e}")
 
 
-def update_consultant_skill(consultant_competence_id: int, data: Dict[str, Any]) -> bool:
+def update_consultant_skill(consultant_competence_id: int,
+                            data: Dict[str, Any]) -> bool:
     """Met à jour une compétence du consultant"""
 
     try:
@@ -498,10 +515,12 @@ def show_skills_analysis(consultant_competences):
     weak_skills = [cc for cc in consultant_competences if cc.niveau <= 2]
 
     if strong_skills:
-        st.success(f"✅ **Points forts :** {len(strong_skills)} compétence(s) de haut niveau")
+        st.success(
+            f"✅ **Points forts :** {len(strong_skills)} compétence(s) de haut niveau")
 
     if weak_skills:
-        st.warning(f"⚠️ **À développer :** {len(weak_skills)} compétence(s) à renforcer")
+        st.warning(
+            f"⚠️ **À développer :** {len(weak_skills)} compétence(s) à renforcer")
 
     # Certifications
     certified_count = sum(1 for cc in consultant_competences if cc.certification)

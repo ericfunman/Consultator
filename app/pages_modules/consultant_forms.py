@@ -6,7 +6,9 @@ Fonctions pour ajouter et modifier les consultants
 import os
 import sys
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Any
+from typing import Dict
+from typing import Optional
 
 import streamlit as st
 
@@ -24,10 +26,16 @@ Practice = None
 imports_ok = False
 
 try:
-    from database.database import get_database_session
-    from database.models import Consultant, Practice, Competence, ConsultantCompetence, Langue, ConsultantLangue
-    from services.consultant_service import ConsultantService
     from sqlalchemy.orm import joinedload
+
+    from database.database import get_database_session
+    from database.models import Competence
+    from database.models import Consultant
+    from database.models import ConsultantCompetence
+    from database.models import ConsultantLangue
+    from database.models import Langue
+    from database.models import Practice
+    from services.consultant_service import ConsultantService
 
     imports_ok = True
 except ImportError as e:
@@ -156,7 +164,11 @@ def show_add_consultant_form():
         st.code(str(e))
 
 
-def validate_consultant_form(prenom: str, nom: str, email: str, practice_id: int) -> bool:
+def validate_consultant_form(
+        prenom: str,
+        nom: str,
+        email: str,
+        practice_id: int) -> bool:
     """Valide les données du formulaire consultant"""
 
     errors = []
@@ -189,7 +201,8 @@ def create_consultant(data: Dict[str, Any]) -> bool:
     try:
         with get_database_session() as session:
             # Vérifier si l'email existe déjà
-            existing = session.query(Consultant).filter(Consultant.email == data['email']).first()
+            existing = session.query(Consultant).filter(
+                Consultant.email == data['email']).first()
             if existing:
                 st.error("❌ Un consultant avec cet email existe déjà")
                 return False
@@ -210,7 +223,11 @@ def create_consultant(data: Dict[str, Any]) -> bool:
             session.add(consultant)
             session.commit()
 
-            st.info(f"✅ Consultant {consultant.prenom} {consultant.nom} créé avec l'ID {consultant.id}")
+            st.info(
+                f"✅ Consultant {
+                    consultant.prenom} {
+                    consultant.nom} créé avec l'ID {
+                    consultant.id}")
             return True
 
     except Exception as e:
@@ -284,11 +301,13 @@ def show_edit_consultant_form(consultant_id: int):
 
                 practice_id = st.selectbox(
                     "Practice *",
-                    options=list(practice_options.keys()),
+                    options=list(
+                        practice_options.keys()),
                     format_func=lambda x: practice_options[x],
-                    index=list(practice_options.keys()).index(consultant.practice_id) if consultant.practice_id in practice_options else 0,
-                    help="Practice d'affectation"
-                )
+                    index=list(
+                        practice_options.keys()).index(
+                        consultant.practice_id) if consultant.practice_id in practice_options else 0,
+                    help="Practice d'affectation")
 
             st.markdown("#### 📝 Informations complémentaires")
 
@@ -362,16 +381,17 @@ def update_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = session.query(Consultant).filter(Consultant.id == consultant_id).first()
+            consultant = session.query(Consultant).filter(
+                Consultant.id == consultant_id).first()
 
             if not consultant:
                 st.error("❌ Consultant introuvable")
                 return False
 
             # Vérifier si l'email existe déjà pour un autre consultant
-            existing = session.query(Consultant)\
-                .filter(Consultant.email == data['email'], Consultant.id != consultant_id)\
-                .first()
+            existing = session.query(Consultant) .filter(
+                Consultant.email == data['email'],
+                Consultant.id != consultant_id) .first()
             if existing:
                 st.error("❌ Un autre consultant utilise déjà cet email")
                 return False
@@ -380,7 +400,8 @@ def update_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
             consultant.prenom = data['prenom'].strip()
             consultant.nom = data['nom'].strip()
             consultant.email = data['email'].strip().lower()
-            consultant.telephone = data['telephone'].strip() if data['telephone'] else None
+            consultant.telephone = data['telephone'].strip(
+            ) if data['telephone'] else None
             consultant.salaire_actuel = data['salaire_actuel']
             consultant.practice_id = data['practice_id']
             consultant.disponibilite = data['disponibilite']
@@ -401,13 +422,15 @@ def delete_consultant(consultant_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = session.query(Consultant).filter(Consultant.id == consultant_id).first()
+            consultant = session.query(Consultant).filter(
+                Consultant.id == consultant_id).first()
 
             if not consultant:
                 st.error("❌ Consultant introuvable")
                 return False
 
-            # Supprimer le consultant (les relations seront supprimées automatiquement grâce aux cascades)
+            # Supprimer le consultant (les relations seront supprimées automatiquement
+            # grâce aux cascades)
             session.delete(consultant)
             session.commit()
 
