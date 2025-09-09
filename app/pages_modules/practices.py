@@ -284,9 +284,7 @@ def show_practice_consultants_optimized(practice_name: str, consultants: list):
         return
 
     st.markdown(
-        f"### 🏢 {practice_name} ({
-            len(consultants)} consultant{
-            's' if len(consultants) > 1 else ''})"
+        f"### 🏢 {practice_name} ({len(consultants)} consultant{'s' if len(consultants) > 1 else ''})"
     )
 
     # Créer un DataFrame optimisé (données déjà préparées)
@@ -295,11 +293,7 @@ def show_practice_consultants_optimized(practice_name: str, consultants: list):
         # Gérer les deux formats possibles
         nom_complet = (
             consultant.get("nom_complet")
-            or f"{
-            consultant.get(
-                'prenom', '')} {
-            consultant.get(
-                'nom', '')}".strip()
+            or f"{consultant.get('prenom', '')} {consultant.get('nom', '')}".strip()
         )
 
         consultants_data.append(
@@ -308,10 +302,7 @@ def show_practice_consultants_optimized(practice_name: str, consultants: list):
                 "Email": consultant.get("email") or "Non renseigné",
                 "Téléphone": consultant.get("telephone") or "Non renseigné",
                 "Salaire": (
-                    f"{
-                    consultant.get(
-                        'salaire_actuel',
-                        0):,.0f} €"
+                    f"{consultant.get('salaire_actuel', 0):,.0f} €"
                     if consultant.get("salaire_actuel")
                     else "Non renseigné"
                 ),

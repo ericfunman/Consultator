@@ -62,7 +62,7 @@ def show():
         return
 
     # Onglets pour organiser les fonctionnalités
-    tab1, tab2 = st.tabs(["� Consultants", "➕ Ajouter un consultant"])
+    tab1, tab2 = st.tabs([" Consultants", "➕ Ajouter un consultant"])
 
     with tab1:
         show_consultants_list()

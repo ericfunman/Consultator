@@ -540,9 +540,7 @@ class ConsultantService:
                 session.add(consultant)
                 session.commit()
                 print(
-                    f"✅ Consultant {
-                        data.get('prenom')} {
-                        data.get('nom')} créé avec succès"
+                    f"✅ Consultant {data.get('prenom')} {data.get('nom')} créé avec succès"
                 )
                 return True
 
@@ -609,9 +607,7 @@ class ConsultantService:
                     return False
 
                 print(
-                    f"🔄 Suppression en cours du consultant {
-                        consultant.prenom} {
-                        consultant.nom} (ID: {consultant_id})"
+                    f"🔄 Suppression en cours du consultant {consultant.prenom} {consultant.nom} (ID: {consultant_id})"
                 )
                 session.delete(consultant)
                 session.commit()
@@ -879,11 +875,7 @@ class ConsultantService:
                     st.error(f"❌ Consultant avec ID {consultant_id} introuvable")
                     return False
 
-                st.info(
-                    f"💾 Sauvegarde de l'analyse CV pour {
-                        consultant.prenom} {
-                        consultant.nom}"
-                )
+                st.info(f"💾 Sauvegarde de l'analyse CV pour {consultant.prenom} {consultant.nom}")
 
                 missions_count = 0
                 skills_count = 0
@@ -899,10 +891,7 @@ class ConsultantService:
                         not mission_data.get("date_debut")
                         or mission_data.get("date_debut") == ""
                     ):
-                        st.warning(
-                            f"⚠️ Mission {
-                                mission_data['client']} ignorée - dates manquantes"
-                        )
+                        st.warning(f"⚠️ Mission {mission_data['client']} ignorée - dates manquantes")
                         continue
 
                     # Vérifier si la mission existe déjà (éviter les doublons)
@@ -943,10 +932,7 @@ class ConsultantService:
                             else:
                                 date_fin = None
                         except ValueError:
-                            st.warning(
-                                f"⚠️ Mission {
-                                    mission_data['client']} ignorée - format de date invalide"
-                            )
+                            st.warning(f"⚠️ Mission {mission_data['client']} ignorée - format de date invalide")
                             continue
 
                         # Créer la nouvelle mission

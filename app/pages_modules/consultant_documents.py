@@ -150,8 +150,7 @@ def show_document_details(document, consultant):
             # Bouton pour voir l'analyse complète
             if st.button(
                 "👁️ Voir analyse complète",
-                key=f"view_analysis_{
-                    document.id}",
+                key=f"view_analysis_{document.id}",
             ):
                 show_full_cv_analysis(analysis, document.nom_fichier, consultant)
 
