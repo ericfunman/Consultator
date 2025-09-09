@@ -7,7 +7,9 @@ Générateur de rapport Word dynamique pour l'analyse de qualité de code Consul
 import datetime
 import os
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any
+from typing import Dict
+from typing import List
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -25,49 +27,49 @@ class DynamicQualityReportGenerator:
     def _parse_test_results(self) -> Dict[str, Any]:
         """Parse les résultats des tests"""
         return {
-            'total_tests': 312,
-            'passed_tests': 311,
-            'failed_tests': 1,
-            'coverage_percent': 19.0,
-            'test_files': 18,
-            'failed_test': 'test_process_consultant_search_question'
+            "total_tests": 312,
+            "passed_tests": 311,
+            "failed_tests": 1,
+            "coverage_percent": 19.0,
+            "test_files": 18,
+            "failed_test": "test_process_consultant_search_question",
         }
 
     def _parse_quality_data(self) -> Dict[str, Any]:
         """Parse les données de qualité"""
         return {
-            'score': 8.09,
-            'statements': 10082,
-            'errors': 19,
-            'warnings': 439,
-            'conventions': 1267,
-            'refactors': 127,
-            'lines_analyzed': 25128,
-            'code_lines': 15170,
-            'docstring_lines': 4462,
-            'comment_lines': 1367,
-            'empty_lines': 4129,
-            'duplication_percent': 0.0,
-            'issues_by_category': {
-                'line-too-long': 1066,
-                'broad-exception-caught': 249,
-                'import-outside-toplevel': 126,
-                'unused-import': 104,
-                'invalid-name': 66,
-                'no-else-return': 34,
-                'too-many-branches': 29,
-                'unused-argument': 21,
-                'too-many-locals': 20,
-                'redefined-outer-name': 15,
-                'too-many-nested-blocks': 13,
-                'f-string-without-interpolation': 13,
-                'unused-variable': 12,
-                'too-many-statements': 12,
-                'reimported': 11,
-                'not-callable': 9,
-                'too-many-return-statements': 7,
-                'too-many-lines': 5
-            }
+            "score": 8.09,
+            "statements": 10082,
+            "errors": 19,
+            "warnings": 439,
+            "conventions": 1267,
+            "refactors": 127,
+            "lines_analyzed": 25128,
+            "code_lines": 15170,
+            "docstring_lines": 4462,
+            "comment_lines": 1367,
+            "empty_lines": 4129,
+            "duplication_percent": 0.0,
+            "issues_by_category": {
+                "line-too-long": 1066,
+                "broad-exception-caught": 249,
+                "import-outside-toplevel": 126,
+                "unused-import": 104,
+                "invalid-name": 66,
+                "no-else-return": 34,
+                "too-many-branches": 29,
+                "unused-argument": 21,
+                "too-many-locals": 20,
+                "redefined-outer-name": 15,
+                "too-many-nested-blocks": 13,
+                "f-string-without-interpolation": 13,
+                "unused-variable": 12,
+                "too-many-statements": 12,
+                "reimported": 11,
+                "not-callable": 9,
+                "too-many-return-statements": 7,
+                "too-many-lines": 5,
+            },
         }
 
     def create_comprehensive_report(self) -> str:
@@ -90,7 +92,9 @@ class DynamicQualityReportGenerator:
         # Date et informations générales
         info_para = doc.add_paragraph()
         info_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        info_para.add_run(f"Date d'analyse : {datetime.datetime.now().strftime('%d %B %Y')}\n")
+        info_para.add_run(
+            f"Date d'analyse : {datetime.datetime.now().strftime('%d %B %Y')}\n"
+        )
         info_para.add_run("Outils utilisés : Pytest, Coverage.py, Pylint\n")
         info_para.add_run("Analyste : Assistant IA GitHub Copilot")
 
@@ -111,12 +115,42 @@ class DynamicQualityReportGenerator:
         hdr_cells[3].text = "COMMENTAIRE"
 
         metrics = [
-            ("Score Pylint", f"{self.quality_data['score']:.1f}/10", "⚠️ À améliorer", "Bon score mais perfectible"),
-            ("Couverture Tests", f"{self.test_data['coverage_percent']:.1f}%", "🔴 Critique", "Couverture très faible"),
-            ("Tests Totaux", f"{self.test_data['total_tests']}", "✅ Bon", "Suite complète"),
-            ("Tests Échoués", f"{self.test_data['failed_tests']}", "⚠️ Mineur", "1 test sur 312"),
-            ("Lignes analysées", f"{self.quality_data['lines_analyzed']:,}", "✅ Excellent", "Base importante"),
-            ("Erreurs détectées", f"{self.quality_data['errors']}", "✅ Faible", "Très peu d'erreurs"),
+            (
+                "Score Pylint",
+                f"{self.quality_data['score']:.1f}/10",
+                "⚠️ À améliorer",
+                "Bon score mais perfectible",
+            ),
+            (
+                "Couverture Tests",
+                f"{self.test_data['coverage_percent']:.1f}%",
+                "🔴 Critique",
+                "Couverture très faible",
+            ),
+            (
+                "Tests Totaux",
+                f"{self.test_data['total_tests']}",
+                "✅ Bon",
+                "Suite complète",
+            ),
+            (
+                "Tests Échoués",
+                f"{self.test_data['failed_tests']}",
+                "⚠️ Mineur",
+                "1 test sur 312",
+            ),
+            (
+                "Lignes analysées",
+                f"{self.quality_data['lines_analyzed']:,}",
+                "✅ Excellent",
+                "Base importante",
+            ),
+            (
+                "Erreurs détectées",
+                f"{self.quality_data['errors']}",
+                "✅ Faible",
+                "Très peu d'erreurs",
+            ),
         ]
 
         for metric in metrics:
@@ -150,17 +184,27 @@ class DynamicQualityReportGenerator:
         test_stats = doc.add_paragraph()
         test_stats.add_run("RÉSULTATS DE L'ANALYSE DES TESTS :\n\n").bold = True
         test_stats.add_run("📊 MÉTRIQUES PRINCIPALES :\n")
-        test_stats.add_run(f"• Nombre total de tests exécutés : {self.test_data['total_tests']}\n")
-        test_stats.add_run(f"• Tests réussis : {self.test_data['passed_tests']} ({(self.test_data['passed_tests']/self.test_data['total_tests']*100):.1f}%)\n")
-        test_stats.add_run(f"• Tests échoués : {self.test_data['failed_tests']} ({(self.test_data['failed_tests']/self.test_data['total_tests']*100):.1f}%)\n")
-        test_stats.add_run(f"• Couverture de code : {self.test_data['coverage_percent']:.1f}%\n")
+        test_stats.add_run(
+            f"• Nombre total de tests exécutés : {self.test_data['total_tests']}\n"
+        )
+        test_stats.add_run(
+            f"• Tests réussis : {self.test_data['passed_tests']} ({(self.test_data['passed_tests']/self.test_data['total_tests']*100):.1f}%)\n"
+        )
+        test_stats.add_run(
+            f"• Tests échoués : {self.test_data['failed_tests']} ({(self.test_data['failed_tests']/self.test_data['total_tests']*100):.1f}%)\n"
+        )
+        test_stats.add_run(
+            f"• Couverture de code : {self.test_data['coverage_percent']:.1f}%\n"
+        )
         test_stats.add_run(f"• Fichiers de test : {self.test_data['test_files']}\n\n")
 
         # Test échoué
-        if self.test_data['failed_tests'] > 0:
+        if self.test_data["failed_tests"] > 0:
             test_stats.add_run("⚠️ TEST ÉCHOUÉ :\n").bold = True
             test_stats.add_run(f"• {self.test_data['failed_test']}\n")
-            test_stats.add_run("• Cause : Erreur dans chatbot_service._handle_general_question()\n")
+            test_stats.add_run(
+                "• Cause : Erreur dans chatbot_service._handle_general_question()\n"
+            )
             test_stats.add_run("• Impact : Mineur - Fonctionnalité de recherche\n\n")
 
         # Analyse de couverture
@@ -188,10 +232,18 @@ class DynamicQualityReportGenerator:
         pylint_para.add_run(f"{self.quality_data['score']:.1f}/10\n\n")
 
         pylint_para.add_run("DÉCOMPOSITION DU SCORE :\n")
-        pylint_para.add_run(f"• Code : {self.quality_data['code_lines']:,} lignes ({self.quality_data['code_lines']/self.quality_data['lines_analyzed']*100:.1f}%)\n")
-        pylint_para.add_run(f"• Documentation : {self.quality_data['docstring_lines']:,} lignes ({self.quality_data['docstring_lines']/self.quality_data['lines_analyzed']*100:.1f}%)\n")
-        pylint_para.add_run(f"• Commentaires : {self.quality_data['comment_lines']:,} lignes ({self.quality_data['comment_lines']/self.quality_data['lines_analyzed']*100:.1f}%)\n")
-        pylint_para.add_run(f"• Lignes vides : {self.quality_data['empty_lines']:,} lignes ({self.quality_data['empty_lines']/self.quality_data['lines_analyzed']*100:.1f}%)\n\n")
+        pylint_para.add_run(
+            f"• Code : {self.quality_data['code_lines']:,} lignes ({self.quality_data['code_lines']/self.quality_data['lines_analyzed']*100:.1f}%)\n"
+        )
+        pylint_para.add_run(
+            f"• Documentation : {self.quality_data['docstring_lines']:,} lignes ({self.quality_data['docstring_lines']/self.quality_data['lines_analyzed']*100:.1f}%)\n"
+        )
+        pylint_para.add_run(
+            f"• Commentaires : {self.quality_data['comment_lines']:,} lignes ({self.quality_data['comment_lines']/self.quality_data['lines_analyzed']*100:.1f}%)\n"
+        )
+        pylint_para.add_run(
+            f"• Lignes vides : {self.quality_data['empty_lines']:,} lignes ({self.quality_data['empty_lines']/self.quality_data['lines_analyzed']*100:.1f}%)\n\n"
+        )
 
         # Problèmes détectés
         doc.add_heading("Problèmes Détectés par Catégorie", 2)
@@ -205,12 +257,36 @@ class DynamicQualityReportGenerator:
         iss_hdr[2].text = "IMPACT"
 
         top_issues = [
-            ("Lignes trop longues", f"{self.quality_data['issues_by_category']['line-too-long']}", "🔴 Élevé"),
-            ("Exceptions trop générales", f"{self.quality_data['issues_by_category']['broad-exception-caught']}", "🟡 Moyen"),
-            ("Imports hors scope", f"{self.quality_data['issues_by_category']['import-outside-toplevel']}", "🟡 Moyen"),
-            ("Imports inutilisés", f"{self.quality_data['issues_by_category']['unused-import']}", "🟢 Faible"),
-            ("Noms invalides", f"{self.quality_data['issues_by_category']['invalid-name']}", "🟢 Faible"),
-            ("Fonctions trop complexes", f"{self.quality_data['issues_by_category']['too-many-branches']}", "🔴 Élevé"),
+            (
+                "Lignes trop longues",
+                f"{self.quality_data['issues_by_category']['line-too-long']}",
+                "🔴 Élevé",
+            ),
+            (
+                "Exceptions trop générales",
+                f"{self.quality_data['issues_by_category']['broad-exception-caught']}",
+                "🟡 Moyen",
+            ),
+            (
+                "Imports hors scope",
+                f"{self.quality_data['issues_by_category']['import-outside-toplevel']}",
+                "🟡 Moyen",
+            ),
+            (
+                "Imports inutilisés",
+                f"{self.quality_data['issues_by_category']['unused-import']}",
+                "🟢 Faible",
+            ),
+            (
+                "Noms invalides",
+                f"{self.quality_data['issues_by_category']['invalid-name']}",
+                "🟢 Faible",
+            ),
+            (
+                "Fonctions trop complexes",
+                f"{self.quality_data['issues_by_category']['too-many-branches']}",
+                "🔴 Élevé",
+            ),
         ]
 
         for issue in top_issues:
@@ -242,7 +318,9 @@ class DynamicQualityReportGenerator:
         quality_rec = doc.add_paragraph()
         quality_rec.add_run("ACTIONS RECOMMANDÉES :\n").bold = True
         quality_rec.add_run("• Corriger les lignes trop longues (>79 caractères)\n")
-        quality_rec.add_run("• Améliorer la gestion d'erreurs (exceptions spécifiques)\n")
+        quality_rec.add_run(
+            "• Améliorer la gestion d'erreurs (exceptions spécifiques)\n"
+        )
         quality_rec.add_run("• Réduire la complexité des fonctions (>15 branches)\n")
         quality_rec.add_run("• Nettoyer les imports inutilisés\n")
         quality_rec.add_run("• Standardiser les noms de variables\n\n")
@@ -331,8 +409,12 @@ class DynamicQualityReportGenerator:
         conclusion.add_run("un niveau de qualité professionnel et sera prêt pour\n")
         conclusion.add_run("un déploiement en production sécurisé.\n\n")
 
-        conclusion.add_run("⏰ ÉCHÉANCIER SUGGÉRÉ : 3-6 mois pour atteindre l'excellence\n")
-        conclusion.add_run("💰 INVESTISSEMENT : Principalement en temps de développement\n")
+        conclusion.add_run(
+            "⏰ ÉCHÉANCIER SUGGÉRÉ : 3-6 mois pour atteindre l'excellence\n"
+        )
+        conclusion.add_run(
+            "💰 INVESTISSEMENT : Principalement en temps de développement\n"
+        )
         conclusion.add_run("🎉 RÉSULTAT ATTENDU : Code de production de haute qualité\n")
 
         # ANNEXES
@@ -374,10 +456,14 @@ class DynamicQualityReportGenerator:
         footer_para.add_run("\n\n" + "=" * 50).bold = True
         footer_para.add_run("\n🎯 RAPPORT GÉNÉRÉ AUTOMATIQUEMENT\n").bold = True
         footer_para.add_run("=" * 50).bold = True
-        footer_para.add_run(f"\n\nRapport généré le {datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')}\n")
+        footer_para.add_run(
+            f"\n\nRapport généré le {datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')}\n"
+        )
         footer_para.add_run("Par : Assistant IA GitHub Copilot\n")
         footer_para.add_run("Projet : Application Consultator\n")
-        footer_para.add_run(f"Données : {self.test_data['total_tests']} tests, {self.quality_data['score']:.1f}/10 qualité\n")
+        footer_para.add_run(
+            f"Données : {self.test_data['total_tests']} tests, {self.quality_data['score']:.1f}/10 qualité\n"
+        )
         footer_para.add_run("Statut : Analyse complète et recommandations détaillées")
 
         # Sauvegarder le document

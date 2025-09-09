@@ -15,6 +15,7 @@ import streamlit as st
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy.exc import SQLAlchemyError
 
 # Imports des services existants
 from database.database import get_database_session
@@ -83,7 +84,7 @@ class ChatbotService:
             else:
                 return self._handle_general_question(clean_question)
 
-        except Exception as e:
+        except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError, KeyError, Exception) as e:
             return {
                 "response": f"❌ Désolé, j'ai rencontré une erreur : {str(e)}",
                 "data": None,
@@ -691,7 +692,7 @@ class ChatbotService:
                                 consultant.prenom} {
                                 consultant.nom}**."
 
-                except Exception as e:
+                except (ValueError, TypeError, AttributeError, KeyError) as e:
                     response = f"❌ Erreur lors de la récupération des données d'expérience : {
                         str(e)}"
 
@@ -790,7 +791,7 @@ class ChatbotService:
                     else:
                         response = "❓ Aucun consultant n'a d'expérience renseignée dans la base."
 
-            except Exception as e:
+            except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError, KeyError) as e:
                 response = f"❌ Erreur lors du calcul des statistiques : {str(e)}"
 
             return {
@@ -910,7 +911,7 @@ class ChatbotService:
                                 consultant.prenom} {
                                 consultant.nom}**."
 
-                except Exception as e:
+                except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
                     response = f"❌ Erreur lors de la récupération du profil : {str(e)}"
 
                 return {
@@ -1149,7 +1150,7 @@ class ChatbotService:
                     else:
                         response = "🤔 Précisez quel aspect du profil professionnel vous intéresse : grade, type de contrat, ou société ?"
 
-            except Exception as e:
+            except (SQLAlchemyError, AttributeError, ValueError, TypeError, KeyError) as e:
                 response = f"❌ Erreur lors de la récupération des données : {str(e)}"
 
             return {
@@ -2515,7 +2516,7 @@ class ChatbotService:
                         + "**."
                     )
 
-            except Exception as e:
+            except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
                 response = (
                     "❌ Erreur lors de la récupération des données de disponibilité : "
                     + str(e)
@@ -2611,7 +2612,7 @@ class ChatbotService:
                     "confidence": 0.8,
                 }
 
-            except Exception as e:
+            except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
                 return {
                     "response": "❌ Erreur lors de la récupération des disponibilités : "
                     + str(e),
@@ -2705,7 +2706,7 @@ class ChatbotService:
                         + "** : Aucune mission trouvée"
                     )
 
-            except Exception as e:
+            except (SQLAlchemyError, AttributeError, ValueError, TypeError, ZeroDivisionError) as e:
                 response = "❌ Erreur lors de la récupération des TJM : " + str(e)
 
             return {
@@ -2790,7 +2791,7 @@ class ChatbotService:
                     "confidence": 0.8,
                 }
 
-            except Exception as e:
+            except (SQLAlchemyError, ZeroDivisionError, TypeError, ValueError) as e:
                 return {
                     "response": "❌ Erreur lors de la récupération des statistiques TJM : "
                     + str(e),
@@ -2818,7 +2819,7 @@ class ChatbotService:
                 if response is not None
                 else "❓ Je n'ai pas compris votre question."
             )
-        except Exception as e:
+        except (AttributeError, KeyError, TypeError, ValueError) as e:
             return "❌ Erreur: " + str(e)
 
     def __del__(self):

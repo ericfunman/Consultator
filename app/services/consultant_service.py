@@ -13,6 +13,7 @@ from typing import Optional
 
 import streamlit as st
 from sqlalchemy import func
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 
@@ -48,7 +49,7 @@ class ConsultantService:
                     session.expunge(consultant)
 
                 return consultants
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors de la récupération des consultants: {e}")
             return []
 
@@ -92,7 +93,7 @@ class ConsultantService:
                     consultant_list.append(consultant_dict)
 
                 return consultant_list
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors de la récupération des consultants: {e}")
             return []
 
@@ -204,7 +205,7 @@ class ConsultantService:
                     consultant_list.append(consultant_dict)
 
                 return consultant_list
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors de la recherche optimisée: {e}")
             return []
 
@@ -215,7 +216,7 @@ class ConsultantService:
         try:
             with get_database_session() as session:
                 return session.query(Consultant).count()
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors du comptage des consultants: {e}")
             return 0
 
@@ -322,7 +323,7 @@ class ConsultantService:
                     consultant_list.append(consultant_dict)
 
                 return consultant_list
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors de la récupération optimisée des consultants: {e}")
             return []
 
@@ -348,7 +349,7 @@ class ConsultantService:
                     "active_missions": active_missions,
                     "busy_consultants": total_consultants - available_consultants,
                 }
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors de la récupération des stats: {e}")
             return {
                 "total_consultants": 0,
@@ -392,7 +393,7 @@ class ConsultantService:
                     )
 
                 return result
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(
                 f"Erreur lors de la récupération des consultants par disponibilité: {e}"
             )
@@ -419,7 +420,7 @@ class ConsultantService:
                     session.expunge(consultant)
 
                 return consultant
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors de la récupération du consultant {consultant_id}: {e}")
             return None
 
@@ -489,7 +490,7 @@ class ConsultantService:
 
                 return consultant_data
 
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(
                 f"Erreur lors de la récupération du consultant avec stats {consultant_id}: {e}"
             )
@@ -505,7 +506,7 @@ class ConsultantService:
                     .filter(Consultant.email == email.lower())
                     .first()
                 )
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(
                 f"Erreur lors de la récupération du consultant par email {email}: {e}"
             )
@@ -544,7 +545,7 @@ class ConsultantService:
                 )
                 return True
 
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"❌ Erreur lors de la création du consultant: {e}")
             return False
 
@@ -587,7 +588,7 @@ class ConsultantService:
                 print(f"✅ Consultant {consultant_id} mis à jour avec succès")
                 return True
 
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"❌ Erreur lors de la mise à jour du consultant: {e}")
             return False
 
@@ -614,10 +615,8 @@ class ConsultantService:
                 print(f"✅ Consultant {consultant_id} supprimé avec succès")
                 return True
 
-        except Exception as e:
-            print(
-                f"❌ Erreur lors de la suppression du consultant {consultant_id}: {e}"
-            )
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
+            print(f"❌ Erreur lors de la suppression du consultant {consultant_id}: {e}")
             print(f"Type d'erreur: {type(e).__name__}")
             import traceback
 
@@ -638,7 +637,7 @@ class ConsultantService:
                     )
                     .all()
                 )
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors de la recherche: {e}")
             return []
 
@@ -648,7 +647,7 @@ class ConsultantService:
         try:
             with get_database_session() as session:
                 return session.query(Consultant).filter(Consultant.disponibilite).all()
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur lors de la récupération des consultants disponibles: {e}")
             return []
 
@@ -722,7 +721,7 @@ class ConsultantService:
             session.add(mission)
             return True
 
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur sauvegarde mission {mission_data.get('client', 'N/A')}: {e}")
             return False
 
@@ -781,7 +780,7 @@ class ConsultantService:
                 # Compétence déjà existante
                 return False
 
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(f"Erreur sauvegarde compétence {competence_name}: {e}")
             return False
 
@@ -875,7 +874,9 @@ class ConsultantService:
                     st.error(f"❌ Consultant avec ID {consultant_id} introuvable")
                     return False
 
-                st.info(f"💾 Sauvegarde de l'analyse CV pour {consultant.prenom} {consultant.nom}")
+                st.info(
+                    f"💾 Sauvegarde de l'analyse CV pour {consultant.prenom} {consultant.nom}"
+                )
 
                 missions_count = 0
                 skills_count = 0
@@ -891,7 +892,9 @@ class ConsultantService:
                         not mission_data.get("date_debut")
                         or mission_data.get("date_debut") == ""
                     ):
-                        st.warning(f"⚠️ Mission {mission_data['client']} ignorée - dates manquantes")
+                        st.warning(
+                            f"⚠️ Mission {mission_data['client']} ignorée - dates manquantes"
+                        )
                         continue
 
                     # Vérifier si la mission existe déjà (éviter les doublons)
@@ -932,7 +935,9 @@ class ConsultantService:
                             else:
                                 date_fin = None
                         except ValueError:
-                            st.warning(f"⚠️ Mission {mission_data['client']} ignorée - format de date invalide")
+                            st.warning(
+                                f"⚠️ Mission {mission_data['client']} ignorée - format de date invalide"
+                            )
                             continue
 
                         # Créer la nouvelle mission
@@ -1062,11 +1067,13 @@ class ConsultantService:
                 session.commit()
 
                 st.success(f"🎉 Analyse CV sauvegardée avec succès !")
-                st.info(f"📊 **Résumé**: {missions_count} missions ajoutées, {skills_count} compétences ajoutées")
+                st.info(
+                    f"📊 **Résumé**: {missions_count} missions ajoutées, {skills_count} compétences ajoutées"
+                )
 
                 return True
 
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             st.error("❌ Erreur lors de la sauvegarde de l'analyse CV: " + str(e))
             print(f"Erreur détaillée: {e}")
             import traceback

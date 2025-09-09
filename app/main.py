@@ -48,7 +48,7 @@ def load_module_safe(module_name):
         st.session_state.modules_cache[module_name] = module
         return module
 
-    except Exception as e:
+    except (ImportError, ModuleNotFoundError, AttributeError) as e:
         st.error(f"❌ Erreur lors du chargement du module {module_name}: {e}")
         return None
 
@@ -117,7 +117,7 @@ def main():
         if module and hasattr(module, "show"):
             try:
                 module.show()
-            except Exception as e:
+            except (AttributeError, TypeError, ValueError) as e:
                 st.error(f"❌ Erreur lors de l'affichage de la page: {e}")
                 st.info("🔄 Essayez de recharger la page")
                 # Afficher les détails de l'erreur
@@ -136,7 +136,7 @@ def main():
                 st.markdown("### Application de gestion de consultants")
                 st.info("Sélectionnez une page dans le menu à gauche")
 
-    except Exception as e:
+    except (RuntimeError, SystemError, KeyboardInterrupt) as e:
         st.error(f"❌ Erreur critique: {e}")
         st.info("🔄 Rechargez l'application")
 

@@ -10,6 +10,7 @@ from typing import List
 from typing import Optional
 
 import streamlit as st
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 
@@ -57,7 +58,7 @@ class BusinessManagerService:
                     )
 
                 return bm_list
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(f"Erreur lors de la récupération des Business Managers: {e}")
             return []
 
@@ -107,7 +108,7 @@ class BusinessManagerService:
                     )
 
                 return bm_list
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(f"Erreur lors de la recherche des Business Managers: {e}")
             return []
 
@@ -118,7 +119,7 @@ class BusinessManagerService:
         try:
             with get_database_session() as session:
                 return session.query(BusinessManager).count()
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(f"Erreur lors du comptage des Business Managers: {e}")
             return 0
 
@@ -132,6 +133,6 @@ class BusinessManagerService:
                     .filter(BusinessManager.id == bm_id)
                     .first()
                 )
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(f"Erreur lors de la récupération du Business Manager {bm_id}: {e}")
             return None

@@ -9,6 +9,7 @@ import statistics
 import sys
 import time
 from datetime import datetime
+from sqlalchemy.exc import SQLAlchemyError
 
 # Ajouter le chemin app au PYTHONPATH
 sys.path.insert(0, os.path.join(os.getcwd(), "app"))
@@ -162,7 +163,11 @@ def analyze_consultant_service_performance():
             status = (
                 "🚀"
                 if avg_time < 0.1
-                else "⚡" if avg_time < 0.5 else "🐌" if avg_time > 1.0 else "✅"
+                else "⚡"
+                if avg_time < 0.5
+                else "🐌"
+                if avg_time > 1.0
+                else "✅"
             )
             print(f"  {i}. {status} {test_name}: {avg_time:.3f}s ({description})")
 
@@ -210,7 +215,7 @@ def analyze_consultant_service_performance():
             "large_avg": avg_large,
         }
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         print(f"❌ Erreur lors de l'analyse: {e}")
         import traceback
 
@@ -290,7 +295,7 @@ def analyze_database_performance():
             "total_missions": count_missions,
         }
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         print(f"❌ Erreur DB: {e}")
         return None
 

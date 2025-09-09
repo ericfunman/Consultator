@@ -315,7 +315,9 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         original_name = uploaded_file.name
         file_extension = os.path.splitext(original_name)[1]
-        unique_filename = f"{consultant_id}_{data['type_document']}_{timestamp}{file_extension}"
+        unique_filename = (
+            f"{consultant_id}_{data['type_document']}_{timestamp}{file_extension}"
+        )
         file_path = os.path.join(upload_dir, unique_filename)
 
         # Sauvegarder le fichier

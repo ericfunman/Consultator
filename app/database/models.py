@@ -20,8 +20,8 @@ from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Text
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import relationship
 
 if TYPE_CHECKING:

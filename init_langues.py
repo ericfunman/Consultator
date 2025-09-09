@@ -6,6 +6,8 @@ Script pour initialiser les langues de base dans la base de données
 import os
 import sys
 
+from sqlalchemy.exc import SQLAlchemyError
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "app"))
 
 from database.database import get_database_session
@@ -63,7 +65,7 @@ def init_langues():
         total_langues = session.query(Langue).count()
         print(f"📊 Total des langues en base : {total_langues}")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()
         print(f"❌ Erreur lors de l'initialisation : {e}")
     finally:
@@ -161,7 +163,7 @@ def add_sample_consultant_languages():
         session.commit()
         print(f"\n✅ Langues d'exemple ajoutées avec succès!")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()
         print(f"❌ Erreur lors de l'ajout des langues d'exemple : {e}")
     finally:

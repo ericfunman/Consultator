@@ -23,6 +23,7 @@ Mission = None
 imports_ok = False
 
 try:
+    from sqlalchemy.exc import SQLAlchemyError
     from sqlalchemy.orm import joinedload
 
     from database.database import get_database_session
@@ -276,16 +277,15 @@ def show_consultant_profile():
             with tab5:
                 show_consultant_documents(consultant_obj)
 
-    except Exception as e:
+    except (AttributeError, TypeError, ValueError, SQLAlchemyError, Exception) as e:
         st.error("❌ Erreur lors du chargement du profil consultant: " + str(e))
         st.code(str(e))
 
         # Bouton manuel pour retourner à la liste
         if st.button("← Retour à la liste", key="back_to_list_exception"):
-            del st.session_state.view_consultant_profile
+            if hasattr(st.session_state, 'view_consultant_profile'):
+                del st.session_state.view_consultant_profile
             st.rerun()
-
-
 def show_consultant_info(consultant):
     """Affiche et permet la modification des informations du consultant"""
 
@@ -539,7 +539,7 @@ def show_consultant_info(consultant):
                         else:
                             st.error("❌ Erreur lors de la modification")
 
-                    except Exception as e:
+                    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
                         st.error("❌ Erreur: " + str(e))
 
     # Historique des salaires (hors formulaire principal)
@@ -600,7 +600,7 @@ def show_consultant_info(consultant):
                     )
                     c.salaire_actuel = salaire_max.salaire
                     session.commit()
-            except Exception as e:
+            except (SQLAlchemyError, ValueError, TypeError) as e:
                 st.warning(f"⚠️ Erreur lors de la mise à jour du salaire: {e}")
                 # Ne pas interrompre le processus pour une erreur mineure
         # Affichage du graphique
@@ -665,7 +665,7 @@ def show_consultant_info(consultant):
                         session.commit()
                     st.success("✅ Évolution de salaire ajoutée !")
                     st.rerun()
-                except Exception as e:
+                except (SQLAlchemyError, ValueError, TypeError) as e:
                     st.error(f"❌ Erreur lors de l'ajout : {e}")
 
 
@@ -774,7 +774,7 @@ def _show_technical_skills(consultant):
 
             st.metric("🛠️ Technologies utilisées", len(technologies_missions))
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors du chargement des compétences techniques: {e}")
 
 
@@ -831,7 +831,7 @@ def _show_functional_skills(consultant):
                 "Utilisez l'onglet **'Ajouter Compétences'** pour ajouter des compétences bancaires/assurance."
             )
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors du chargement des compétences fonctionnelles: {e}")
 
 
@@ -1001,7 +1001,7 @@ def _save_consultant_competence(
             st.success(f"✅ Compétence '{competence_nom}' ajoutée avec succès!")
             st.rerun()
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de l'ajout: {e}")
 
 
@@ -1022,7 +1022,7 @@ def _delete_consultant_competence(consultant_competence_id):
             else:
                 st.error("❌ Compétence non trouvée")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de la suppression: {e}")
 
 
@@ -1090,7 +1090,7 @@ def show_consultant_languages(consultant):
             with st.expander("➕ Ajouter une langue"):
                 _add_language_form(consultant)
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de l'affichage des langues: {e}")
 
 
@@ -1162,7 +1162,7 @@ def _add_language_form(consultant):
                     )
                     st.rerun()
 
-        except Exception as e:
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             st.error(f"❌ Erreur lors de la préparation du formulaire: {e}")
 
 
@@ -1196,7 +1196,7 @@ def _save_consultant_language(consultant_id, langue_id, niveau, commentaire):
             session.commit()
             st.success("✅ Langue ajoutée avec succès!")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de l'ajout de la langue: {e}")
 
 
@@ -1217,7 +1217,7 @@ def _delete_consultant_language(consultant_langue_id):
             else:
                 st.error("❌ Langue non trouvée")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de la suppression: {e}")
 
 
@@ -1287,7 +1287,7 @@ def show_consultant_missions(consultant):
             st.info("📝 Aucune mission enregistrée pour ce consultant")
             show_add_mission_form(consultant)
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors du chargement des missions: {e}")
 
 
@@ -1603,12 +1603,13 @@ def show_consultants_list():
                 st.metric("🔴 Occupés", occupes)
 
             with col4:
-                salaire_moyen = (
-                    sum(c.get("salaire_actuel", 0) or 0 for c in consultants)
-                    / len(consultants)
-                    if consultants
-                    else 0
-                )
+                if len(consultants) > 0:
+                    salaire_moyen = (
+                        sum(c.get("salaire_actuel", 0) or 0 for c in consultants)
+                        / len(consultants)
+                    )
+                else:
+                    salaire_moyen = 0
                 st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
 
         else:
@@ -1617,7 +1618,7 @@ def show_consultants_list():
                 "💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil"
             )
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors du chargement de la liste: {e}")
 
 
@@ -1759,7 +1760,7 @@ def show_add_consultant_form():
                         else:
                             st.error("❌ Erreur lors de la création")
 
-                    except Exception as e:
+                    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
                         st.error(f"❌ Erreur lors de la création: {e}")
 
 
@@ -1790,7 +1791,7 @@ def save_mission_changes(mission_id, mission_data):
             else:
                 st.error("❌ Mission non trouvée")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de la sauvegarde: {e}")
 
 
@@ -1808,7 +1809,7 @@ def delete_mission(mission_id):
             else:
                 st.error("❌ Mission non trouvée")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de la suppression: {e}")
 
 
@@ -1839,7 +1840,7 @@ def add_new_mission(consultant_id, mission_data):
             st.success("✅ Nouvelle mission ajoutée avec succès !")
             st.rerun()
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de l'ajout: {e}")
 
 
@@ -1932,7 +1933,7 @@ def save_consultant_document(uploaded_file, consultant, document_type, descripti
         # Recharger la page pour afficher le nouveau document
         st.rerun()
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de la sauvegarde: {e}")
 
 
@@ -2012,7 +2013,7 @@ def save_consultant_document_simple(uploaded_file, consultant):
             "💡 Le document a été sauvegardé ! Cliquez sur 'Actualiser la liste' pour le voir dans la liste ci-dessous."
         )
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de la sauvegarde: {e}")
 
 
@@ -2099,7 +2100,7 @@ def show_existing_documents(consultant):
 
             st.markdown("---")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de l'affichage des documents: {e}")
 
 
@@ -2113,7 +2114,7 @@ def delete_consultant_document(file_path):
             st.rerun()
         else:
             st.error("❌ Fichier introuvable")
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de la suppression: {e}")
 
 
@@ -2174,18 +2175,60 @@ def extract_original_filename(full_filename):
     parts = full_filename.split("_")
 
     if len(parts) >= 4:
-        # Enlever ID, Prénom, Nom et Timestamp (dernière partie avant extension)
-        # Garder tout ce qui est entre le nom et le timestamp
-        original_parts = parts[3:-1]  # Tout sauf ID, Prénom, Nom et Timestamp
+        # Identifier les parties : ID, Prénom, Nom, puis le reste
+        id_part = parts[0]
+        prenom_part = parts[1]
+        nom_part = parts[2]
+
+        # Le reste après Nom
+        remaining_parts = parts[3:]
+
+        # Chercher le timestamp (format YYYYMMDD) dans les parties restantes
+        original_parts = []
+        timestamp_found = False
+
+        for i, part in enumerate(remaining_parts):
+            # Vérifier si cette partie ressemble à un timestamp YYYYMMDD
+            if len(part) == 8 and part.isdigit() and part.startswith(('20', '19')):
+                # C'est probablement un timestamp, arrêter ici
+                original_parts = remaining_parts[:i]
+                timestamp_found = True
+                break
+
+        if not timestamp_found:
+            # Si pas de timestamp trouvé, prendre tout sauf la dernière partie (qui peut contenir l'extension)
+            if len(remaining_parts) > 1:
+                original_parts = remaining_parts[:-1]
+            else:
+                original_parts = remaining_parts
 
         if original_parts:
             original_name = "_".join(original_parts)
 
-            # Remettre l'extension si elle a été séparée
-            if "." in parts[-1]:
-                timestamp_and_ext = parts[-1].split(".")
-                if len(timestamp_and_ext) == 2:
-                    extension = timestamp_and_ext[1]
+            # Gérer l'extension
+            last_part = remaining_parts[-1] if remaining_parts else ""
+            if "." in last_part:
+                # La dernière partie contient l'extension
+                name_without_ext = last_part.split(".")[0]
+                extension = last_part.split(".")[-1]
+
+                # Si on a trouvé un timestamp, la dernière partie devrait être le timestamp.extension
+                # Donc on utilise les original_parts pour construire le nom
+                if timestamp_found:
+                    # Les original_parts contiennent le nom original sans extension
+                    # On ajoute l'extension du fichier complet
+                    if "." in full_filename:
+                        extension = full_filename.split(".")[-1]
+                        original_name = f"{original_name}.{extension}"
+                else:
+                    # Pas de timestamp trouvé, utiliser la logique normale
+                    if not original_name:
+                        original_name = name_without_ext
+                    original_name = f"{original_name}.{extension}"
+            elif not "." in original_name and "." in full_filename:
+                # Chercher l'extension dans le nom complet
+                if "." in full_filename:
+                    extension = full_filename.split(".")[-1]
                     original_name = f"{original_name}.{extension}"
 
             return original_name
@@ -2216,7 +2259,7 @@ def download_document_direct(file_path, consultant, display_name):
             help=f"Télécharger {display_name}",
         )
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur: {e}")
 
 
@@ -2241,7 +2284,7 @@ def download_document(file_path, consultant):
             key=f"download_btn_{file_path.name}_{consultant.id}",
         )
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors du téléchargement: {e}")
 
 
@@ -2267,7 +2310,7 @@ def preview_document(file_path, consultant):
                 st.info("👁️ Aperçu non disponible pour ce type de fichier")
                 st.info("💡 Utilisez le bouton télécharger pour voir le fichier")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de l'aperçu: {e}")
 
 
@@ -2299,7 +2342,7 @@ def preview_pdf(file_path):
 
         st.markdown(pdf_display, unsafe_allow_html=True)
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de l'aperçu PDF: {e}")
         st.info("💡 Utilisez le bouton télécharger pour voir le fichier")
 
@@ -2339,7 +2382,7 @@ def preview_word(file_path):
         """
         )
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de l'aperçu Word: {e}")
 
 
@@ -2376,7 +2419,7 @@ def preview_powerpoint(file_path):
 
         st.info("🎯 Pour voir le contenu complet, utilisez le bouton télécharger")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de l'aperçu PowerPoint: {e}")
 
 
@@ -2427,7 +2470,7 @@ def analyze_cv_document(file_path, consultant):
             )
             st.rerun()  # Recharger pour afficher les résultats
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as e:
         st.error(f"❌ Erreur lors de l'analyse : {e}")
         st.info("💡 Vérifiez que le fichier est bien un CV valide")
 
@@ -2677,7 +2720,7 @@ def save_all_missions_to_consultant(missions, consultant):
                     session.add(nouvelle_mission)
                     success_count += 1
 
-                except Exception as e:
+                except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
                     error_count += 1
                     st.error(f"❌ Erreur mission {i}: {str(e)}")
 
@@ -2695,7 +2738,7 @@ def save_all_missions_to_consultant(missions, consultant):
             else:
                 st.error("❌ Aucune mission n'a pu être sauvegardée")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur générale lors de la sauvegarde : {e}")
 
         # Debug info supprimé pour la production
@@ -2838,7 +2881,7 @@ def save_mission_to_consultant(
             st.balloons()
             return True  # Succès
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de la sauvegarde de la mission {mission_num}: {e}")
         return False
 
@@ -3184,7 +3227,7 @@ def import_missions_to_profile(missions, consultant):
             st.success(f"✅ {success_count} mission(s) importée(s) avec succès !")
             st.rerun()
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de l'import : {e}")
 
 
@@ -3213,7 +3256,7 @@ def import_single_mission(mission_data, consultant):
             )
             st.rerun()
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
         st.error(f"❌ Erreur lors de l'import : {e}")
 
 

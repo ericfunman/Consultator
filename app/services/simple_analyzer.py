@@ -96,7 +96,7 @@ class SimpleDocumentAnalyzer:
                     return f.read()
             elif file_path.lower().endswith(".pdf"):
                 try:
-                    import PyPDF2
+                    import pypdf as PyPDF2
 
                     with open(file_path, "rb") as f:
                         reader = PyPDF2.PdfReader(f)
@@ -128,11 +128,11 @@ class SimpleDocumentAnalyzer:
                             if hasattr(shape, "text"):
                                 text.append(shape.text)
                     return "\n".join(text)
-                except Exception as e:
+                except (OSError, ValueError, TypeError, AttributeError) as e:
                     return f"Erreur lors de l'extraction PowerPoint: {str(e)}"
             else:
                 return "Format de fichier non supporté"
-        except Exception as e:
+        except (OSError, ValueError, TypeError, AttributeError) as e:
             return f"Erreur d'extraction: {str(e)}"
 
     @staticmethod
@@ -207,7 +207,7 @@ class SimpleDocumentAnalyzer:
                     len(technologies_found)} technologies"
             )
 
-        except Exception as e:
+        except (OSError, ValueError, TypeError, AttributeError, KeyError) as e:
             st.error(f"❌ Erreur pendant l'analyse: {str(e)}")
 
         return result

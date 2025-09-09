@@ -11,7 +11,7 @@ from typing import Dict
 from typing import List
 
 import pdfplumber
-import PyPDF2
+import pypdf as PyPDF2
 import streamlit as st
 from docx import Document
 from pptx import Presentation
@@ -254,7 +254,7 @@ class DocumentAnalyzer:
             else:
                 raise ValueError(f"Format de fichier non supporté: {file_extension}")
 
-        except Exception as e:
+        except (OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"Erreur lors de l'extraction du fichier {file_path}: {e}")
             return ""
 
@@ -290,7 +290,7 @@ class DocumentAnalyzer:
                                     f"--- TABLEAU PAGE {page_num} ---\n{table_text}"
                                 )
 
-                    except Exception as e:
+                    except (ValueError, TypeError, AttributeError, KeyError) as e:
                         st.warning(f"⚠️ Erreur page {page_num}: {e}")
                         continue
 
@@ -313,7 +313,7 @@ class DocumentAnalyzer:
                         page_text = page.extract_text()
                         if page_text:
                             text_parts.append(f"--- PAGE {page_num} ---\n{page_text}")
-                    except Exception as e:
+                    except (ValueError, TypeError, AttributeError, KeyError) as e:
                         st.warning(f"⚠️ Erreur page {page_num}: {e}")
                         continue
 
@@ -324,7 +324,7 @@ class DocumentAnalyzer:
             st.error("❌ Aucun texte extrait du PDF")
             return ""
 
-        except Exception as e:
+        except (OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"❌ Erreur extraction PDF: {e}")
             return ""
 
@@ -369,7 +369,7 @@ class DocumentAnalyzer:
             )
             return result
 
-        except Exception as e:
+        except (OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"❌ Erreur extraction Word: {e}")
             return ""
 
@@ -405,7 +405,7 @@ class DocumentAnalyzer:
                                 slide_text.append(
                                     "--- TABLEAU ---\n" + "\n".join(table_text)
                                 )
-                    except Exception as e:
+                    except (ValueError, TypeError, AttributeError, KeyError) as e:
                         st.warning(
                             f"⚠️ Erreur lors du traitement d'une forme PowerPoint: {e}"
                         )
@@ -422,7 +422,7 @@ class DocumentAnalyzer:
             )
             return result
 
-        except Exception as e:
+        except (OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"❌ Erreur extraction PowerPoint: {e}")
             return ""
 
@@ -473,7 +473,7 @@ class DocumentAnalyzer:
                         analysis['langages_techniques'])} technologies"
             )
 
-        except Exception as e:
+        except (ValueError, TypeError, AttributeError, KeyError) as e:
             st.error(f"❌ Erreur analyse: {e}")
             import traceback
 

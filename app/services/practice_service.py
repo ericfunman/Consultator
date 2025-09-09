@@ -7,6 +7,7 @@ from typing import List
 from typing import Optional
 
 import streamlit as st
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from database.database import get_database_session
@@ -30,7 +31,7 @@ class PracticeService:
                 .order_by(Practice.nom)
                 .all()
             )
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de la récupération des practices: {e}")
             return []
         finally:
@@ -42,7 +43,7 @@ class PracticeService:
         session = get_session()
         try:
             return session.query(Practice).filter(Practice.id == practice_id).first()
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de la récupération de la practice: {e}")
             return None
         finally:
@@ -54,7 +55,7 @@ class PracticeService:
         session = get_session()
         try:
             return session.query(Practice).filter(Practice.nom == nom).first()
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de la récupération de la practice: {e}")
             return None
         finally:
@@ -84,7 +85,7 @@ class PracticeService:
             st.success(f"Practice '{nom}' créée avec succès")
             return practice
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de la création de la practice: {e}")
             return None
         finally:
@@ -110,7 +111,7 @@ class PracticeService:
             st.success("Practice mise à jour avec succès")
             return True
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de la mise à jour de la practice: {e}")
             return False
         finally:
@@ -192,7 +193,7 @@ class PracticeService:
                     result["Sans Practice"] = consultants_sans_practice
 
                 return result
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(
                 f"Erreur lors de la récupération des consultants par practice: {e}"
             )
@@ -231,7 +232,7 @@ class PracticeService:
                 st.success("Consultant retiré de sa practice")
 
             return True
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de l'assignation: {e}")
             return False
         finally:
@@ -300,7 +301,7 @@ class PracticeService:
                 stats["total_consultants"] += sans_practice
 
             return stats
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de la récupération des statistiques: {e}")
             return {
                 "total_practices": 0,
@@ -339,7 +340,7 @@ class PracticeService:
 
                 session.commit()
                 st.success("Practices par défaut initialisées : Data et Quant")
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de l'initialisation des practices: {e}")
         finally:
             session.close()

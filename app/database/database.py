@@ -9,6 +9,7 @@ import os
 import streamlit as st
 from sqlalchemy import create_engine
 from sqlalchemy import pool
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
 from .models import CV
@@ -59,7 +60,7 @@ def get_database_session():
 get_session = get_database_session
 
 # Pour compatibilité avec les tests
-SessionLocal = get_session_factory()
+session_local = get_session_factory()
 
 
 @st.cache_data(ttl=300)  # Cache pendant 5 minutes
@@ -103,7 +104,7 @@ def init_database():
         print(f"✅ Base de données initialisée: {DATABASE_PATH}")
         return True
 
-    except Exception as e:
+    except (SQLAlchemyError, OSError) as e:
         print(f"❌ Erreur lors de l'initialisation de la base de données: {e}")
         return False
 
@@ -131,7 +132,7 @@ def reset_database():
         print("✅ Base de données remise à zéro")
         return True
 
-    except Exception as e:
+    except (SQLAlchemyError, OSError) as e:
         print(f"❌ Erreur lors de la remise à zéro: {e}")
         return False
 
@@ -162,5 +163,5 @@ def get_database_info():
                 "missions": mission_count,
                 "practices": practice_count,
             }
-    except Exception as e:
+    except SQLAlchemyError as e:
         return {"exists": True, "error": str(e)}

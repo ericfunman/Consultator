@@ -261,9 +261,9 @@ def create_quality_report():
     doc.add_heading("🧮 ANALYSE DE COMPLEXITÉ", 1)
 
     complexity_para = doc.add_paragraph()
-    complexity_para.add_run("FONCTIONS LES PLUS COMPLEXES À OPTIMISER :\\n\\n").bold = (
-        True
-    )
+    complexity_para.add_run(
+        "FONCTIONS LES PLUS COMPLEXES À OPTIMISER :\\n\\n"
+    ).bold = True
 
     complexity_table = doc.add_table(rows=1, cols=4)
     complexity_table.style = "Table Grid"

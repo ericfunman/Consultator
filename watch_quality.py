@@ -111,7 +111,7 @@ class CodeQualityWatcher(FileSystemEventHandler):
         except SyntaxError as e:
             print(f"❌ Erreur syntaxe ligne {e.lineno}: {e.msg}")
             return False
-        except Exception as e:
+        except (OSError, ValueError, TypeError) as e:
             print(f"❌ Erreur lecture fichier: {e}")
             return False
 
@@ -143,7 +143,7 @@ class CodeQualityWatcher(FileSystemEventHandler):
 
         except subprocess.TimeoutExpired:
             print("⏰ Timeout Pylint")
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur Pylint : {e}")
 
     def _run_related_tests(self, file_path):
@@ -192,7 +192,7 @@ class CodeQualityWatcher(FileSystemEventHandler):
 
         except subprocess.TimeoutExpired:
             print(f"⏰ Timeout test {test_file.name}")
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur test {test_file.name}: {e}")
 
     def _run_general_checks(self):
@@ -215,7 +215,7 @@ class CodeQualityWatcher(FileSystemEventHandler):
 
         except subprocess.TimeoutExpired:
             print("⏰ Timeout import application")
-        except Exception as e:
+        except (subprocess.SubprocessError, ImportError, OSError) as e:
             print(f"❌ Erreur import : {e}")
 
 
@@ -287,7 +287,7 @@ class ContinuousQualityMonitor:
 
         except subprocess.TimeoutExpired:
             print("⏰ Timeout vérification initiale")
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur vérification initiale : {e}")
 
 

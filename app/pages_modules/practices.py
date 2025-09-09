@@ -185,14 +185,15 @@ def show_consultants_by_practice_optimized():
 
     # Récupération paginée des consultants
     with st.spinner("🔄 Chargement des consultants..."):
-        consultants, total = (
-            PracticeServiceOptimized.get_consultants_by_practice_paginated(
-                practice_name=(
-                    selected_practice if selected_practice != "Toutes" else None
-                ),
-                page=st.session_state.practice_page,
-                per_page=per_page,
-            )
+        (
+            consultants,
+            total,
+        ) = PracticeServiceOptimized.get_consultants_by_practice_paginated(
+            practice_name=(
+                selected_practice if selected_practice != "Toutes" else None
+            ),
+            page=st.session_state.practice_page,
+            per_page=per_page,
         )
 
     if consultants:

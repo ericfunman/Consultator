@@ -13,6 +13,7 @@ from typing import Tuple
 import streamlit as st
 from sqlalchemy import func
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import sessionmaker
 
@@ -50,7 +51,7 @@ class PracticeServiceOptimized:
                 }
                 for p in practices
             ]
-        except Exception as e:
+        except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"Erreur lors de la récupération des practices: {e}")
             return []
         finally:
@@ -100,7 +101,7 @@ class PracticeServiceOptimized:
                     stats["total_practices"] += 1
 
             return stats
-        except Exception as e:
+        except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"Erreur lors de la récupération des statistiques: {e}")
             return {
                 "total_practices": 0,
@@ -171,7 +172,7 @@ class PracticeServiceOptimized:
                 consultants_by_practice[practice_nom].append(consultant_data)
 
             return consultants_by_practice
-        except Exception as e:
+        except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"Erreur lors de la récupération des consultants: {e}")
             return {}
         finally:
@@ -254,7 +255,7 @@ class PracticeServiceOptimized:
                 consultants.append(consultant_data)
 
             return consultants, total
-        except Exception as e:
+        except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"Erreur lors de la récupération paginée: {e}")
             return [], 0
         finally:
@@ -300,7 +301,7 @@ class PracticeServiceOptimized:
                 "total_missions": result.total_missions or 0,
                 "total_competences": result.total_competences or 0,
             }
-        except Exception as e:
+        except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"Erreur lors du calcul des stats détaillées: {e}")
             return {}
         finally:
@@ -313,5 +314,5 @@ class PracticeServiceOptimized:
             # Effacer les caches Streamlit
             st.cache_data.clear()
             st.success("🔄 Cache effacé - données mises à jour")
-        except Exception as e:
+        except (OSError, ValueError, TypeError, AttributeError) as e:
             st.warning(f"Impossible d'effacer le cache: {e}")

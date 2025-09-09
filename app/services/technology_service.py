@@ -7,6 +7,8 @@ import sys
 from typing import List
 from typing import Optional
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from database.database import get_database_session
 from database.models import CustomTechnology
 from utils.technologies_referentiel import TECHNOLOGIES_REFERENTIEL
@@ -32,7 +34,7 @@ class TechnologyService:
             all_technologies = list(set(ref_technologies + custom_tech_names))
             return sorted(all_technologies)
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(
                 f"Erreur lors de la récupération des technologies personnalisées: {e}"
             )
@@ -64,7 +66,7 @@ class TechnologyService:
                 session.commit()
                 return True
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(f"Erreur lors de l'ajout de la technologie: {e}")
             return False
 
@@ -85,7 +87,7 @@ class TechnologyService:
                     for tech in custom_techs
                 ]
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(
                 f"Erreur lors de la récupération des technologies personnalisées: {e}"
             )
@@ -108,7 +110,7 @@ class TechnologyService:
                     return True
                 return False
 
-        except Exception as e:
+        except SQLAlchemyError as e:
             print(f"Erreur lors de la suppression de la technologie: {e}")
             return False
 

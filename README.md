@@ -115,7 +115,7 @@ Consultator/
 - `pandas` : Manipulation de données
 - `sqlalchemy` : ORM base de données
 - `plotly` : Visualisations interactives
-- `PyPDF2` / `python-docx` : Parsing CVs
+- `pypdf` / `python-docx` : Parsing CVs
 
 ## 📋 Cas d'usage
 

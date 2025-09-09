@@ -18,11 +18,13 @@ import streamlit as st
 # Import pour le parsing de documents
 try:
     import pdfplumber
-    import PyPDF2
+    import pypdf as PyPDF2
     from docx import Document as DocxDocument
     from pptx import Presentation
 except ImportError as e:
     st.error(f"❌ Dépendance manquante pour le parsing de documents: {e}")
+
+from sqlalchemy.exc import SQLAlchemyError
 
 from database.database import get_database_session
 from database.models import Consultant
@@ -100,7 +102,7 @@ class DocumentService:
                 "upload_date": datetime.now().isoformat(),
             }
 
-        except Exception as e:
+        except (OSError, IOError) as e:
             return {"success": False, "error": str(e)}
 
     @classmethod
@@ -118,7 +120,7 @@ class DocumentService:
             else:
                 return f"Format {extension} non supporté"
 
-        except Exception as e:
+        except (OSError, IOError, ValueError) as e:
             return f"Erreur d'extraction: {e}"
 
     @classmethod
@@ -132,7 +134,7 @@ class DocumentService:
                     if page_text:
                         text += page_text + "\n"
             return text.strip()
-        except Exception as e:
+        except (OSError, IOError, ValueError) as e:
             return f"Erreur PDF: {e}"
 
     @classmethod
@@ -144,7 +146,7 @@ class DocumentService:
             for paragraph in doc.paragraphs:
                 text += paragraph.text + "\n"
             return text.strip()
-        except Exception as e:
+        except (OSError, IOError, ValueError) as e:
             return f"Erreur DOCX: {e}"
 
     @classmethod
@@ -158,7 +160,7 @@ class DocumentService:
                     if hasattr(shape, "text"):
                         text += shape.text + "\n"
             return text.strip()
-        except Exception as e:
+        except (OSError, IOError, ValueError) as e:
             return f"Erreur PPTX: {e}"
 
     @classmethod
@@ -183,7 +185,7 @@ class DocumentService:
 
             return text.strip()
 
-        except Exception as e:
+        except (OSError, IOError, ValueError) as e:
             return f"Erreur lors de l'extraction PDF: {str(e)}"
 
     @classmethod
@@ -205,7 +207,7 @@ class DocumentService:
 
             return text.strip()
 
-        except Exception as e:
+        except (OSError, IOError, ValueError) as e:
             return f"Erreur lors de l'extraction DOCX: {str(e)}"
 
     @classmethod
@@ -222,7 +224,7 @@ class DocumentService:
 
             return text.strip()
 
-        except Exception as e:
+        except (OSError, IOError, ValueError) as e:
             return f"Erreur lors de l'extraction PPTX: {str(e)}"
 
     @classmethod
@@ -406,7 +408,7 @@ class DocumentService:
 
             return sorted(documents, key=lambda x: x["modified"], reverse=True)
 
-        except Exception as e:
+        except (OSError, IOError) as e:
             st.error(f"Erreur lors de la récupération des documents: {e}")
             return []
 
@@ -437,7 +439,7 @@ class DocumentService:
         try:
             Path(file_path).unlink()
             return True
-        except Exception as e:
+        except (OSError, IOError) as e:
             st.error(f"Erreur lors de la suppression: {e}")
             return False
 
@@ -461,6 +463,6 @@ class DocumentService:
                     }
                     for consultant in consultants
                 ]
-        except Exception as e:
+        except SQLAlchemyError as e:
             st.error(f"Erreur lors de la récupération des consultants: {e}")
             return []

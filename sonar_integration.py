@@ -63,7 +63,7 @@ class SonarIntegration:
 
             print(f"✅ Rapport Pylint généré : {self.reports_dir}/pylint-report.txt")
 
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur Pylint : {e}")
 
     def _run_flake8(self):
@@ -84,7 +84,7 @@ class SonarIntegration:
 
             print(f"✅ Rapport Flake8 généré : {self.reports_dir}/flake8-report.txt")
 
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur Flake8 : {e}")
 
     def _run_bandit(self):
@@ -107,7 +107,7 @@ class SonarIntegration:
 
             print(f"✅ Rapport Bandit généré : {self.reports_dir}/bandit-report.json")
 
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur Bandit : {e}")
 
     def _run_tests_with_coverage(self):
@@ -134,7 +134,7 @@ class SonarIntegration:
 
             print(f"✅ Rapports de coverage générés")
 
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur coverage : {e}")
 
     def _run_sonar_scanner(self):
@@ -159,7 +159,7 @@ class SonarIntegration:
             print("✅ Analyse SonarQube terminée")
             return result.returncode == 0
 
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur SonarQube Scanner : {e}")
             return False
 
@@ -178,7 +178,7 @@ class SonarIntegration:
                 print(f"❌ Erreur récupération Quality Gate : {response.status_code}")
                 return None
 
-        except Exception as e:
+        except (requests.RequestException, ConnectionError, TimeoutError) as e:
             print(f"❌ Erreur API SonarQube : {e}")
             return None
 
@@ -253,7 +253,7 @@ class SonarIntegration:
                         "status": "PASSED" if coverage_pct >= 80 else "WARNING",
                     }
                 )
-            except Exception as e:
+            except (ET.ParseError, OSError, ValueError) as e:
                 print(f"❌ Erreur lecture coverage : {e}")
 
         # Quality Gate

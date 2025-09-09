@@ -8,6 +8,8 @@ import sys
 from datetime import date
 from datetime import datetime
 
+from sqlalchemy.exc import SQLAlchemyError
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "app"))
 
 from database.database import get_database_session
@@ -83,7 +85,7 @@ def init_business_managers():
         total_bms = session.query(BusinessManager).count()
         print(f"📊 Total des BMs en base : {total_bms}")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()
         print(f"❌ Erreur lors de l'initialisation : {e}")
     finally:
@@ -143,7 +145,7 @@ def assign_consultants_to_bms():
             nb_consultants = bm.nombre_consultants_actuels
             print(f"  • {bm.nom_complet}: {nb_consultants} consultant(s)")
 
-    except Exception as e:
+    except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()
         print(f"❌ Erreur lors des affectations : {e}")
     finally:
