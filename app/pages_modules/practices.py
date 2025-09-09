@@ -570,11 +570,7 @@ def show_assign_consultant_form_optimized(practices_cached: list):
             nom_complet = getattr(
                 c,
                 "nom_complet",
-                f"{
-                    getattr(
-                        c, 'prenom', '')} {
-                    getattr(
-                        c, 'nom', '')}".strip(),
+                f"{getattr(c, 'prenom', '')} {getattr(c, 'nom', '')}".strip(),
             )
             email = getattr(c, "email", "Pas d'email")
             consultant_options[f"{nom_complet} ({email})"] = c

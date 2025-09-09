@@ -1076,13 +1076,7 @@ class ConsultantService:
                 session.commit()
 
                 st.success(f"🎉 Analyse CV sauvegardée avec succès !")
-                st.info(
-                    "📊 **Résumé**: "
-                    + str(missions_count)
-                    + " missions ajoutées, "
-                    + str(skills_count)
-                    + " compétences ajoutées"
-                )
+                st.info(f"📊 **Résumé**: {missions_count} missions ajoutées, {skills_count} compétences ajoutées")
 
                 return True
 
