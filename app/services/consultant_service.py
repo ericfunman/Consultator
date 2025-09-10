@@ -516,26 +516,41 @@ class ConsultantService:
     def create_consultant(data: dict) -> bool:
         """Crée un nouveau consultant"""
         try:
+            # Validation des champs requis
+            required_fields = ["prenom", "nom", "email"]
+            for field in required_fields:
+                if not data.get(field) or str(data.get(field, "")).strip() == "":
+                    print(f"❌ Champ requis manquant ou vide: {field}")
+                    return False
+
+            # Validation de l'email
+            email = data.get("email", "").strip()
+            if "@" not in email or "." not in email:
+                print(f"❌ Format d'email invalide: {email}")
+                return False
+
             with get_database_session() as session:
                 consultant = Consultant(
-                    prenom=data.get("prenom"),
-                    nom=data.get("nom"),
-                    email=data.get("email"),
-                    telephone=data.get("telephone"),
+                    prenom=data.get("prenom").strip(),
+                    nom=data.get("nom").strip(),
+                    email=email.lower(),
+                    telephone=data.get("telephone", "").strip()
+                    if data.get("telephone")
+                    else None,
                     salaire_actuel=data.get("salaire"),
                     practice_id=data.get("practice_id"),
                     disponibilite=data.get("disponible", True),
-                    notes=data.get("notes"),
+                    notes=data.get("notes", "").strip() if data.get("notes") else None,
                     date_creation=datetime.now(),
                     derniere_maj=datetime.now(),
                     # Nouveaux champs V1.2
-                    societe=data.get("societe", "Quanteam"),
+                    societe=data.get("societe", "Quanteam").strip(),
                     date_entree_societe=data.get("date_entree_societe"),
                     date_sortie_societe=data.get("date_sortie_societe"),
                     date_premiere_mission=data.get("date_premiere_mission"),
                     # Nouveaux champs V1.2.1
-                    grade=data.get("grade", "Junior"),
-                    type_contrat=data.get("type_contrat", "CDI"),
+                    grade=data.get("grade", "Junior").strip(),
+                    type_contrat=data.get("type_contrat", "CDI").strip(),
                 )
 
                 session.add(consultant)

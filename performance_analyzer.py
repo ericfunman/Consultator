@@ -9,6 +9,7 @@ import statistics
 import sys
 import time
 from datetime import datetime
+
 from sqlalchemy.exc import SQLAlchemyError
 
 # Ajouter le chemin app au PYTHONPATH
