@@ -20,6 +20,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ImportInfo:
     """Informations sur un import"""
@@ -29,6 +30,7 @@ class ImportInfo:
     line_number: int = 0
     is_used: bool = False
 
+
 @dataclass
 class FileAnalysis:
     """Résultats d'analyse d'un fichier"""
@@ -36,6 +38,7 @@ class FileAnalysis:
     imports: List[ImportInfo]
     unused_imports: List[ImportInfo]
     used_imports: List[ImportInfo]
+
 
 class ImportCleaner:
     """Classe principale pour nettoyer les imports"""
@@ -214,7 +217,7 @@ class ImportCleaner:
                 logger.info(f"[DRY RUN] {analysis.file_path}: {len(lines_to_remove)} lignes à supprimer")
                 for imp in analysis.unused_imports:
                     logger.info(f"  - Import inutilisé: {imp.module}.{imp.name}" +
-                              (f" as {imp.alias}" if imp.alias else ""))
+                                (f" as {imp.alias}" if imp.alias else ""))
                 return True
             else:
                 # Écrire le nouveau contenu
@@ -301,6 +304,7 @@ class ImportCleaner:
 
         logger.info("="*60)
 
+
 def main():
     """Fonction principale"""
     import argparse
@@ -350,6 +354,7 @@ def main():
         logger.info("⚠️  Pensez à faire un commit avant d'appliquer les changements !")
 
     return 0 if success else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

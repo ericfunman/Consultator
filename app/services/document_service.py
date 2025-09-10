@@ -228,31 +228,6 @@ class DocumentService:
             return f"Erreur lors de l'extraction PPTX: {str(e)}"
 
     @classmethod
-    def extract_text_from_file(cls, file_path: str) -> str:
-        """
-        Extrait le texte d'un fichier selon son extension
-
-        Args:
-            file_path: Chemin vers le fichier
-
-        Returns:
-            Texte extrait du fichier
-        """
-        extension = cls.get_file_extension(file_path)
-
-        if extension == "pdf":
-            return cls.extract_text_from_pdf(file_path)
-        elif extension == "docx":
-            return cls.extract_text_from_docx(file_path)
-        elif extension == "pptx":
-            return cls.extract_text_from_pptx(file_path)
-        elif extension in ["doc", "ppt"]:
-            return f"Format {
-                extension.upper()} détecté mais nécessite une conversion vers {extension}x pour l'extraction de texte."
-        else:
-            return "Format de fichier non supporté pour l'extraction de texte."
-
-    @classmethod
     def analyze_cv_content(cls, text: str) -> Dict[str, Any]:
         """
         Analyse le contenu d'un CV et extrait des informations

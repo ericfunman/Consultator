@@ -31,7 +31,7 @@ try:
     from services.consultant_service import ConsultantService
 
     imports_ok = True
-except ImportError as e:
+except ImportError:
     # Imports échoués, on continue quand même
     pass
 
@@ -244,7 +244,7 @@ def show_add_language_form(consultant_id: int):
 
         with st.form(f"add_language_form_{consultant_id}", clear_on_submit=True):
             # Sélection de la langue
-            lang_options = {l.id: l.nom for l in available_langues}
+            lang_options = {langue.id: langue.nom for langue in available_langues}
             selected_lang = st.selectbox(
                 "Langue *",
                 options=list(lang_options.keys()),

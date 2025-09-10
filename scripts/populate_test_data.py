@@ -364,12 +364,12 @@ def main():
     missions = create_test_missions(consultants)
     associations = create_consultant_competences(consultants, competences)
 
-    print(f"\n✅ Données de test créées avec succès !")
+    print("\n✅ Données de test créées avec succès !")
     print(f"   - {len(consultants)} consultants")
     print(f"   - {len(competences)} compétences")
     print(f"   - {len(missions)} missions")
     print(f"   - {len(associations)} associations consultant-compétence")
-    print(f"\n🌐 Vous pouvez maintenant tester le chatbot !")
+    print("\n🌐 Vous pouvez maintenant tester le chatbot !")
 
 
 if __name__ == "__main__":

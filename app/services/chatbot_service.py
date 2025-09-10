@@ -466,8 +466,6 @@ class ChatbotService:
         entities["competences"] = list(dict.fromkeys(entities["competences"]))
 
         # Langues - chercher dans la base de données des langues
-        from database.models import Langue
-
         all_langues = self.session.query(Langue).all()
         langues_connues: List[str] = [
             "français",
@@ -2267,8 +2265,6 @@ class ChatbotService:
 
     def _find_consultants_by_language(self, langue: str) -> List[Any]:
         """Trouve les consultants parlant une langue"""
-        from database.models import ConsultantLangue
-        from database.models import Langue
 
         # Construction de la requête de base
         consultants = (

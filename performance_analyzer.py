@@ -54,7 +54,7 @@ def analyze_consultant_service_performance():
         min_get_all = min(times_get_all)
         max_get_all = max(times_get_all)
 
-        print(f"  📊 Statistiques:")
+        print("  📊 Statistiques:")
         print(f"    • Moyenne: {avg_get_all:.3f}s")
         print(f"    • Min: {min_get_all:.3f}s")
         print(f"    • Max: {max_get_all:.3f}s")
@@ -75,7 +75,7 @@ def analyze_consultant_service_performance():
         min_search = min(times_search)
         max_search = max(times_search)
 
-        print(f"  📊 Statistiques:")
+        print("  📊 Statistiques:")
         print(f"    • Moyenne: {avg_search:.3f}s")
         print(f"    • Min: {min_search:.3f}s")
         print(f"    • Max: {max_search:.3f}s")
@@ -96,7 +96,7 @@ def analyze_consultant_service_performance():
         min_objects = min(times_objects)
         max_objects = max(times_objects)
 
-        print(f"  📊 Statistiques:")
+        print("  📊 Statistiques:")
         print(f"    • Moyenne: {avg_objects:.3f}s")
         print(f"    • Min: {min_objects:.3f}s")
         print(f"    • Max: {max_objects:.3f}s")
@@ -117,7 +117,7 @@ def analyze_consultant_service_performance():
         min_specific = min(times_specific)
         max_specific = max(times_specific)
 
-        print(f"  📊 Statistiques:")
+        print("  📊 Statistiques:")
         print(f"    • Moyenne: {avg_specific:.3f}s")
         print(f"    • Min: {min_specific:.3f}s")
         print(f"    • Max: {max_specific:.3f}s")
@@ -138,7 +138,7 @@ def analyze_consultant_service_performance():
         min_large = min(times_large)
         max_large = max(times_large)
 
-        print(f"  📊 Statistiques:")
+        print("  📊 Statistiques:")
         print(f"    • Moyenne: {avg_large:.3f}s")
         print(f"    • Min: {min_large:.3f}s")
         print(f"    • Max: {max_large:.3f}s")
@@ -199,7 +199,7 @@ def analyze_consultant_service_performance():
         search_vs_list = avg_search / avg_get_all
         objects_vs_dict = avg_objects / avg_get_all
 
-        print(f"\n📊 RATIOS:")
+        print("\n📊 RATIOS:")
         print(f"  • Recherche vs Liste: {search_vs_list:.2f}x")
         print(f"  • Objets vs Dictionnaires: {objects_vs_dict:.2f}x")
 
@@ -263,7 +263,7 @@ def analyze_database_performance():
 
         # Test requête avec JOIN
         start_time = time.time()
-        consultants_with_practice = (
+        consultants_with_practice = (  # noqa: F841
             session.query(Consultant)
             .join(Practice, Consultant.practice_id == Practice.id, isouter=True)
             .limit(10)
@@ -333,7 +333,7 @@ def main():
         print(f"📋 Missions: {db_perf['total_missions']} missions")
 
         # Recommandations finales
-        print(f"\n💎 RECOMMANDATIONS FINALES:")
+        print("\n💎 RECOMMANDATIONS FINALES:")
         if avg_response < 0.3:
             print("  ✅ Application très performante - RAS")
         elif avg_response < 0.7:

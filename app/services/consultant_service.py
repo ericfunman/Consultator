@@ -998,7 +998,7 @@ class ConsultantService:
                             categorie=ConsultantService._determine_skill_category(
                                 skill_name, "technique"
                             ),
-                            description=f"Compétence technique extraite automatiquement du CV",
+                            description="Compétence technique extraite automatiquement du CV",
                         )
                         session.add(competence)
                         session.flush()  # Pour obtenir l'ID
@@ -1048,7 +1048,7 @@ class ConsultantService:
                             categorie=ConsultantService._determine_skill_category(
                                 skill_name, "fonctionnelle"
                             ),
-                            description=f"Compétence fonctionnelle extraite automatiquement du CV",
+                            description="Compétence fonctionnelle extraite automatiquement du CV",
                         )
                         session.add(competence)
                         session.flush()  # Pour obtenir l'ID
@@ -1081,7 +1081,7 @@ class ConsultantService:
                 # Committer toutes les modifications
                 session.commit()
 
-                st.success(f"🎉 Analyse CV sauvegardée avec succès !")
+                st.success("🎉 Analyse CV sauvegardée avec succès !")
                 st.info(
                     f"📊 **Résumé**: {missions_count} missions ajoutées, {skills_count} compétences ajoutées"
                 )

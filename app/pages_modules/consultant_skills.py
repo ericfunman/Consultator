@@ -32,7 +32,7 @@ try:
     from utils.skill_categories import SKILL_CATEGORIES
 
     imports_ok = True
-except ImportError as e:
+except ImportError:
     # Imports échoués, on continue quand même
     pass
 

@@ -1220,8 +1220,7 @@ class DocumentAnalyzer:
             preview.append(f"🚀 **{len(missions)} mission(s) détectée(s):**")
             for i, mission in enumerate(missions, 1):
                 role_info = (
-                    f" - {mission.get('role',
-                                              'Rôle non défini')}"
+                    f" - {mission.get('role', 'Rôle non défini')}"
                     if mission.get("role")
                     else ""
                 )

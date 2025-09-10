@@ -389,12 +389,11 @@ def show_current_bm_consultants(bm, session):
                             )
                             if assignment:
                                 existing_comment = assignment.commentaire or ""
+                                date_str = datetime.now().strftime('%d/%m/%Y')
                                 new_comment = (
-                                    f"{existing_comment}\n{
-                                    datetime.now().strftime('%d/%m/%Y')}: {comment}"
+                                    f"{existing_comment}\n{date_str}: {comment}"
                                     if existing_comment
-                                    else f"{
-                                    datetime.now().strftime('%d/%m/%Y')}: {comment}"
+                                    else f"{date_str}: {comment}"
                                 )
                                 assignment.commentaire = new_comment
                                 session.commit()
@@ -655,10 +654,7 @@ def show_bm_assignments_history(bm, session):
             duree = (
                 "En cours"
                 if assignment.date_fin is None
-                else f"{
-                (
-                    assignment.date_fin -
-                    assignment.date_debut).days} jours"
+                else f"{(assignment.date_fin - assignment.date_debut).days} jours"
             )
 
             data.append(
@@ -960,7 +956,7 @@ def show_statistics():
             total_active_bms = (
                 session.query(BusinessManager).filter(BusinessManager.actif).count()
             )
-            total_assignments = session.query(ConsultantBusinessManager).count()
+            total_assignments = session.query(ConsultantBusinessManager).count()  # noqa: F841
             active_assignments = (
                 session.query(ConsultantBusinessManager)
                 .filter(ConsultantBusinessManager.date_fin.is_(None))

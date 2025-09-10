@@ -84,7 +84,7 @@ class ProjectImportCleaner:
         }
 
         # Patterns de fichiers à exclure (dépendances externes)
-        exclude_patterns = [
+        exclude_patterns = [  # noqa: F841
             "test_*.py",  # Fichiers de test externes
             "conftest*.py",  # Configuration pytest externe
         ]

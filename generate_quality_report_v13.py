@@ -36,12 +36,12 @@ def create_quality_report():
     # Informations du rapport
     info_para = doc.add_paragraph()
     info_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    info_para.add_run(f"Analyse SonarQube/Fortify & Bonnes Pratiques\n").bold = True
+    info_para.add_run("Analyse SonarQube/Fortify & Bonnes Pratiques\n").bold = True
     info_para.add_run(
         f'Date de génération : {datetime.now().strftime("%d/%m/%Y %H:%M")}\n'
     )
-    info_para.add_run(f"Analysé par : GitHub Copilot + Outils de qualité\n")
-    info_para.add_run(f"Environnement : Python 3.13 + Streamlit + SQLAlchemy")
+    info_para.add_run("Analysé par : GitHub Copilot + Outils de qualité\n")
+    info_para.add_run("Environnement : Python 3.13 + Streamlit + SQLAlchemy")
 
     doc.add_page_break()
 
@@ -78,7 +78,7 @@ def create_quality_report():
     try:
         with open("reports/bandit-security-analysis.json", "r") as f:
             bandit_data = json.load(f)
-    except:
+    except Exception:
         bandit_data = {
             "metrics": {
                 "_totals": {
@@ -315,8 +315,8 @@ def create_quality_report():
     doc.save(report_filename)
 
     print(f"📄 Rapport de qualité généré : {report_filename}")
-    print(f"🎯 Score global : 92/100 (Grade A)")
-    print(f"✅ Application prête pour production")
+    print("🎯 Score global : 92/100 (Grade A)")
+    print("✅ Application prête pour production")
 
     return report_filename
 
@@ -328,6 +328,6 @@ if __name__ == "__main__":
     # Générer le rapport
     report_file = create_quality_report()
 
-    print(f"\n🔍 ANALYSE COMPLÈTE TERMINÉE")
+    print("\n🔍 ANALYSE COMPLÈTE TERMINÉE")
     print(f"📊 Fichier généré : {report_file}")
-    print(f"🚀 Status : PRÊT POUR PRODUCTION")
+    print("🚀 Status : PRÊT POUR PRODUCTION")

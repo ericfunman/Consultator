@@ -38,7 +38,7 @@ try:
     from services.consultant_service import ConsultantService
 
     imports_ok = True
-except ImportError as e:
+except ImportError:
     # Imports échoués, on continue quand même
     pass
 

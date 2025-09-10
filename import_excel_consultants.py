@@ -123,20 +123,20 @@ def import_consultants_from_excel(
                         consultant_data["date_entree_societe"] = pd.to_datetime(
                             row["Date Entree Société"]
                         ).date()
-                except:
+                except Exception:
                     consultant_data["date_entree_societe"] = None
-                    print(f"  ⚠️  Date d'entrée invalide, ignorée")
+                    print("  ⚠️  Date d'entrée invalide, ignorée")
 
                 try:
                     if pd.notna(row["Date Sortie société"]):
                         consultant_data["date_sortie_societe"] = pd.to_datetime(
                             row["Date Sortie société"]
                         ).date()
-                except:
+                except Exception:
                     consultant_data["date_sortie_societe"] = None
 
                 # Afficher les données qui seront importées
-                print(f"  📝 Données à importer:")
+                print("  📝 Données à importer:")
                 for key, value in consultant_data.items():
                     if value is not None:
                         print(f"    • {key}: {value}")
@@ -147,7 +147,7 @@ def import_consultants_from_excel(
                     results["consultants_crees"].append(
                         f"{consultant_data['prenom']} {consultant_data['nom']}"
                     )
-                    print(f"  ✅ [SIMULATION] Consultant prêt pour import")
+                    print("  ✅ [SIMULATION] Consultant prêt pour import")
                 else:
                     # Mode réel - créer en base
                     consultant = Consultant(**consultant_data)
@@ -156,7 +156,7 @@ def import_consultants_from_excel(
                     results["consultants_crees"].append(
                         f"{consultant.prenom} {consultant.nom}"
                     )
-                    print(f"  ✅ Consultant créé en base")
+                    print("  ✅ Consultant créé en base")
 
                 print()
 
@@ -193,20 +193,20 @@ def show_import_summary(results):
     print(f"❌ Erreurs: {len(results['erreurs'])}")
 
     if results["consultants_crees"]:
-        print(f"\n👥 Consultants traités:")
+        print("\n👥 Consultants traités:")
         for consultant in results["consultants_crees"]:
             print(f"  • {consultant}")
 
     if results["erreurs"]:
-        print(f"\n🔍 Détail des erreurs:")
+        print("\n🔍 Détail des erreurs:")
         for error in results["erreurs"]:
             print(f"  • {error}")
 
-    print(f"\n🎯 Prochaines étapes après import:")
-    print(f"  1. Assigner les practices aux consultants")
-    print(f"  2. Vérifier/ajuster les grades si nécessaire")
-    print(f"  3. Ajouter les compétences et langues")
-    print(f"  4. Ajouter les missions historiques")
+    print("\n🎯 Prochaines étapes après import:")
+    print("  1. Assigner les practices aux consultants")
+    print("  2. Vérifier/ajuster les grades si nécessaire")
+    print("  3. Ajouter les compétences et langues")
+    print("  4. Ajouter les missions historiques")
 
 
 if __name__ == "__main__":
@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
     # Demander confirmation pour l'import réel
     if results["importes"] > 0 and len(results["erreurs"]) == 0:
-        print(f"\n❓ Voulez-vous procéder à l'import réel ? (o/n)")
+        print("\n❓ Voulez-vous procéder à l'import réel ? (o/n)")
         # response = input().lower()
         # if response == 'o':
         #     print(f"\n💾 IMPORT RÉEL")
@@ -226,4 +226,4 @@ if __name__ == "__main__":
         #     real_results = import_consultants_from_excel(dry_run=False)
         #     show_import_summary(real_results)
     else:
-        print(f"\n⚠️  Import non recommandé - Corrigez les erreurs d'abord")
+        print("\n⚠️  Import non recommandé - Corrigez les erreurs d'abord")

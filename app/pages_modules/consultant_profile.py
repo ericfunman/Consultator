@@ -30,7 +30,7 @@ try:
     from services.document_service import DocumentService
 
     imports_ok = True
-except ImportError as e:
+except ImportError:
     # Imports échoués, on continue quand même
     pass
 

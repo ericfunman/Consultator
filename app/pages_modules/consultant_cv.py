@@ -18,9 +18,6 @@ parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
-# Imports des modèles
-from database.models import Client
-
 # Variables pour les imports
 ConsultantService = None
 get_database_session = None
@@ -36,7 +33,7 @@ try:
     from services.consultant_service import ConsultantService
 
     imports_ok = True
-except ImportError as e:
+except ImportError:
     # Imports échoués, on continue quand même
     pass
 
@@ -333,7 +330,7 @@ def add_skill_from_cv(skill_name: str, consultant_id: Optional[int]):
                     .replace("📋 ", "")
                     .replace("🤝 ", "")
                     .replace("📚 ", ""),
-                    description=f"Compétence extraite du CV",
+                    description="Compétence extraite du CV",
                 )
                 session.add(competence)
                 session.flush()

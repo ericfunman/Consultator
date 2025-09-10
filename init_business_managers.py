@@ -137,10 +137,10 @@ def assign_consultants_to_bms():
             print(f"  ✅ {consultant.nom_complet} → {bm.nom_complet}")
 
         session.commit()
-        print(f"\n✅ Affectations créées avec succès!")
+        print("\n✅ Affectations créées avec succès!")
 
         # Statistiques finales
-        print(f"\n📊 Répartition des consultants :")
+        print("\n📊 Répartition des consultants :")
         for bm in session.query(BusinessManager).all():
             nb_consultants = bm.nombre_consultants_actuels
             print(f"  • {bm.nom_complet}: {nb_consultants} consultant(s)")

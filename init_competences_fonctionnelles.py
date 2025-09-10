@@ -68,7 +68,7 @@ def init_competences_fonctionnelles():
         # Sauvegarder les changements
         session.commit()
 
-        print(f"\n🎯 Résumé de l'initialisation:")
+        print("\n🎯 Résumé de l'initialisation:")
         print(f"   ✅ Compétences ajoutées: {competences_ajoutees}")
         print(f"   ⚠️ Compétences existantes: {competences_existantes}")
         print(f"   📊 Total traité: {competences_ajoutees + competences_existantes}")
@@ -83,7 +83,7 @@ def init_competences_fonctionnelles():
         print(f"\n📈 Total compétences fonctionnelles en base: {total_fonctionnelles}")
 
         # Afficher quelques exemples par catégorie
-        print(f"\n📋 Aperçu des catégories créées:")
+        print("\n📋 Aperçu des catégories créées:")
         for categorie in COMPETENCES_FONCTIONNELLES.keys():
             count = (
                 session.query(Competence)
@@ -95,7 +95,7 @@ def init_competences_fonctionnelles():
             )
             print(f"   • {categorie}: {count} compétences")
 
-        print(f"\n🎉 Initialisation terminée avec succès!")
+        print("\n🎉 Initialisation terminée avec succès!")
 
     except Exception as e:
         print(f"❌ Erreur lors de l'initialisation: {e}")
@@ -134,7 +134,7 @@ def show_competences_summary():
         print(f"📈 Total compétences: {total}")
 
         # Détail des catégories fonctionnelles
-        print(f"\n🏦 DÉTAIL COMPÉTENCES FONCTIONNELLES:")
+        print("\n🏦 DÉTAIL COMPÉTENCES FONCTIONNELLES:")
         print("-" * 40)
 
         categories_func = (

@@ -369,7 +369,7 @@ class AutomatedQualityPipeline:
                 if "Your code has been rated at" in line:
                     return float(line.split("rated at ")[1].split("/10")[0])
             return 0.0
-        except:
+        except Exception:
             return 0.0
 
     def _count_flake8_issues(self):
@@ -380,7 +380,7 @@ class AutomatedQualityPipeline:
                 with open(flake8_file, "r", encoding="utf-8") as f:
                     return len(f.readlines())
             return 0
-        except:
+        except Exception:
             return 999
 
     def _count_bandit_issues(self):
@@ -392,7 +392,7 @@ class AutomatedQualityPipeline:
                     data = json.load(f)
                     return len(data.get("results", []))
             return 0
-        except:
+        except Exception:
             return 999
 
     def _calculate_overall_success(self):

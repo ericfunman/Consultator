@@ -322,12 +322,12 @@ def show_practice_consultants_optimized(practice_name: str, consultants: list):
 
             with col1:
                 if st.button(
-                    f"📊 Statistiques détaillées", key=f"stats_{practice_name}"
+                    "📊 Statistiques détaillées", key=f"stats_{practice_name}"
                 ):
                     show_practice_detailed_stats_cached(practice_name)
 
             with col2:
-                if st.button(f"📧 Exporter emails", key=f"export_{practice_name}"):
+                if st.button("📧 Exporter emails", key=f"export_{practice_name}"):
                     emails = [
                         c["email"]
                         for c in consultants

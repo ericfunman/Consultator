@@ -2350,3 +2350,89 @@ app/utils\technologies_referentiel.py:230:2: W292 no newline at end of file
 13    F811 redefinition of unused 'Client' from line 6
 14    F841 local variable 'total_assignments' is assigned to but never used
 48    W292 no newline at end of file
+[1mapp/main_original_backup.py[m[36m:[m170[36m:[m1[36m:[m [1m[31mC901[m 'main' is too complex (20)
+[1mapp/main_preloading.py[m[36m:[m170[36m:[m1[36m:[m [1m[31mC901[m 'main' is too complex (20)
+[1mapp/pages_modules\business_managers.py[m[36m:[m301[36m:[m1[36m:[m [1m[31mC901[m 'show_current_bm_consultants' is too complex (16)
+[1mapp/pages_modules\business_managers.py[m[36m:[m394[36m:[m37[36m:[m [1m[31mE122[m continuation line missing indentation or outdented
+[1mapp/pages_modules\business_managers.py[m[36m:[m397[36m:[m37[36m:[m [1m[31mE122[m continuation line missing indentation or outdented
+[1mapp/pages_modules\business_managers.py[m[36m:[m416[36m:[m1[36m:[m [1m[31mC901[m 'show_add_bm_assignment' is too complex (19)
+[1mapp/pages_modules\business_managers.py[m[36m:[m659[36m:[m17[36m:[m [1m[31mE122[m continuation line missing indentation or outdented
+[1mapp/pages_modules\business_managers.py[m[36m:[m963[36m:[m13[36m:[m [1m[31mF841[m local variable 'total_assignments' is assigned to but never used
+[1mapp/pages_modules\consultant_cv.py[m[36m:[m22[36m:[m1[36m:[m [1m[31mE402[m module level import not at top of file
+[1mapp/pages_modules\consultant_cv.py[m[36m:[m32[36m:[m5[36m:[m [1m[31mF811[m redefinition of unused 'Client' from line 22
+[1mapp/pages_modules\consultant_cv.py[m[36m:[m39[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_cv.py[m[36m:[m336[36m:[m33[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\consultant_documents.py[m[36m:[m37[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_documents.py[m[36m:[m108[36m:[m1[36m:[m [1m[31mC901[m 'show_document_details' is too complex (18)
+[1mapp/pages_modules\consultant_forms.py[m[36m:[m41[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_info.py[m[36m:[m34[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_languages.py[m[36m:[m34[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_languages.py[m[36m:[m39[36m:[m1[36m:[m [1m[31mC901[m 'show_consultant_languages' is too complex (16)
+[1mapp/pages_modules\consultant_languages.py[m[36m:[m247[36m:[m45[36m:[m [1m[31mE741[m ambiguous variable name 'l'
+[1mapp/pages_modules\consultant_list.py[m[36m:[m39[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_list.py[m[36m:[m44[36m:[m1[36m:[m [1m[31mC901[m 'show_consultants_list' is too complex (20)
+[1mapp/pages_modules\consultant_missions.py[m[36m:[m39[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_missions.py[m[36m:[m117[36m:[m1[36m:[m [1m[31mC901[m 'show_mission_details' is too complex (17)
+[1mapp/pages_modules\consultant_missions.py[m[36m:[m665[36m:[m1[36m:[m [1m[31mC901[m 'show_mission_full_details' is too complex (17)
+[1mapp/pages_modules\consultant_profile.py[m[36m:[m33[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_skills.py[m[36m:[m35[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultant_skills.py[m[36m:[m40[36m:[m1[36m:[m [1m[31mC901[m 'show_consultant_skills' is too complex (19)
+[1mapp/pages_modules\consultants.py[m[36m:[m45[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\consultants.py[m[36m:[m289[36m:[m1[36m:[m [1m[31mC901[m 'show_consultant_info' is too complex (25)
+[1mapp/pages_modules\consultants.py[m[36m:[m289[36m:[m1[36m:[m [1m[31mE302[m expected 2 blank lines, found 0
+[1mapp/pages_modules\consultants.py[m[36m:[m320[36m:[m5[36m:[m [1m[31mF811[m redefinition of unused 'ConsultantSalaire' from line 35
+[1mapp/pages_modules\consultants.py[m[36m:[m1117[36m:[m47[36m:[m [1m[31mE741[m ambiguous variable name 'l'
+[1mapp/pages_modules\consultants.py[m[36m:[m1121[36m:[m27[36m:[m [1m[31mE741[m ambiguous variable name 'l'
+[1mapp/pages_modules\consultants.py[m[36m:[m2179[36m:[m9[36m:[m [1m[31mF841[m local variable 'id_part' is assigned to but never used
+[1mapp/pages_modules\consultants.py[m[36m:[m2180[36m:[m9[36m:[m [1m[31mF841[m local variable 'prenom_part' is assigned to but never used
+[1mapp/pages_modules\consultants.py[m[36m:[m2181[36m:[m9[36m:[m [1m[31mF841[m local variable 'nom_part' is assigned to but never used
+[1mapp/pages_modules\consultants.py[m[36m:[m2228[36m:[m18[36m:[m [1m[31mE713[m test for membership should be 'not in'
+[1mapp/pages_modules\consultants.py[m[36m:[m2478[36m:[m1[36m:[m [1m[31mC901[m 'show_cv_missions' is too complex (19)
+[1mapp/pages_modules\consultants.py[m[36m:[m2871[36m:[m30[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\consultants.py[m[36m:[m2999[36m:[m1[36m:[m [1m[31mC901[m 'show_cv_actions' is too complex (22)
+[1mapp/pages_modules\consultants.py[m[36m:[m3166[36m:[m1[36m:[m [1m[31mF811[m redefinition of unused 'show_cv_summary' from line 2966
+[1mapp/pages_modules\consultants_clean.py[m[36m:[m423[36m:[m21[36m:[m [1m[31mF841[m local variable 'nouveau_consultant' is assigned to but never used
+[1mapp/pages_modules\consultants_final.py[m[36m:[m546[36m:[m21[36m:[m [1m[31mF841[m local variable 'nouveau_consultant' is assigned to but never used
+[1mapp/pages_modules\consultants_optimized.py[m[36m:[m38[36m:[m1[36m:[m [1m[31mF841[m local variable 'e' is assigned to but never used
+[1mapp/pages_modules\documents_functions.py[m[36m:[m175[36m:[m34[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\documents_functions.py[m[36m:[m183[36m:[m25[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\documents_functions.py[m[36m:[m188[36m:[m34[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\documents_functions.py[m[36m:[m192[36m:[m34[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\practices.py[m[36m:[m343[36m:[m21[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\practices.py[m[36m:[m348[36m:[m30[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\practices_optimized.py[m[36m:[m325[36m:[m21[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/pages_modules\practices_optimized.py[m[36m:[m330[36m:[m30[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/services\chatbot_service.py[m[36m:[m38[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService.process_question' is too complex (17)
+[1mapp/services\chatbot_service.py[m[36m:[m106[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService._analyze_intent' is too complex (16)
+[1mapp/services\chatbot_service.py[m[36m:[m387[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService._extract_entities' is too complex (17)
+[1mapp/services\chatbot_service.py[m[36m:[m469[36m:[m9[36m:[m [1m[31mF811[m redefinition of unused 'Langue' from line 26
+[1mapp/services\chatbot_service.py[m[36m:[m613[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService._handle_experience_question' is too complex (18)
+[1mapp/services\chatbot_service.py[m[36m:[m810[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService._handle_professional_profile_question' is too complex (50)
+[1mapp/services\chatbot_service.py[m[36m:[m1163[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService._handle_skills_question' is too complex (19)
+[1mapp/services\chatbot_service.py[m[36m:[m1355[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService._handle_languages_question' is too complex (22)
+[1mapp/services\chatbot_service.py[m[36m:[m2270[36m:[m9[36m:[m [1m[31mF811[m redefinition of unused 'ConsultantLangue' from line 25
+[1mapp/services\chatbot_service.py[m[36m:[m2271[36m:[m9[36m:[m [1m[31mF811[m redefinition of unused 'Langue' from line 26
+[1mapp/services\chatbot_service.py[m[36m:[m2422[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService._handle_availability_question' is too complex (22)
+[1mapp/services\chatbot_service.py[m[36m:[m2624[36m:[m5[36m:[m [1m[31mC901[m 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+[1mapp/services\consultant_service.py[m[36m:[m869[36m:[m5[36m:[m [1m[31mC901[m 'ConsultantService.save_cv_analysis' is too complex (22)
+[1mapp/services\consultant_service.py[m[36m:[m1001[36m:[m41[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/services\consultant_service.py[m[36m:[m1051[36m:[m41[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/services\consultant_service.py[m[36m:[m1084[36m:[m28[36m:[m [1m[31mF541[m f-string is missing placeholders
+[1mapp/services\document_analyzer.py[m[36m:[m676[36m:[m5[36m:[m [1m[31mC901[m 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+[1mapp/services\document_analyzer.py[m[36m:[m873[36m:[m5[36m:[m [1m[31mC901[m 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+[1mapp/services\document_analyzer.py[m[36m:[m1224[36m:[m47[36m:[m [1m[31mE127[m continuation line over-indented for visual indent
+[1mapp/services\document_analyzer_clean.py[m[36m:[m602[36m:[m5[36m:[m [1m[31mC901[m 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+[1mapp/services\document_service.py[m[36m:[m231[36m:[m5[36m:[m [1m[31mF811[m redefinition of unused 'extract_text_from_file' from line 109
+[1mapp/services\simple_analyzer.py[m[36m:[m91[36m:[m5[36m:[m [1m[31mC901[m 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+[1mapp/test_streamlit_debug.py[m[36m:[m66[36m:[m5[36m:[m [1m[31mF811[m redefinition of unused 'get_database_session' from line 51
+[1mapp/test_streamlit_debug.py[m[36m:[m67[36m:[m5[36m:[m [1m[31mF811[m redefinition of unused 'BusinessManager' from line 44
+27    C901 'main' is too complex (20)
+3     E122 continuation line missing indentation or outdented
+1     E127 continuation line over-indented for visual indent
+1     E302 expected 2 blank lines, found 0
+1     E402 module level import not at top of file
+1     E713 test for membership should be 'not in'
+3     E741 ambiguous variable name 'l'
+13    F541 f-string is missing placeholders
+9     F811 redefinition of unused 'Client' from line 22
+17    F841 local variable 'total_assignments' is assigned to but never used

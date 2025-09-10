@@ -6,7 +6,19 @@ from services.document_service import DocumentService
 
 
 def show_consultant_documents(consultant):
-    """Affiche et gere les documents du consultant"""
+    """Affiche et                 with col1:
+                    if doc_type == "CV" and st.button(
+                        " Analyser", key=f"analyze_existing_{file_path.name}"
+                    ):
+                        st.info(" Analyse de CV en cours de developpement...")
+
+                with col2:
+                    if st.button(" Telecharger", key=f"download_{file_path.name}"):
+                        st.info(" Telechargement en cours de developpement...")
+
+                with col3:
+                    if st.button(" Aperçu", key=f"preview_{file_path.name}"):
+                        st.info(" Aperçu en cours de developpement...")ments du consultant"""
 
     st.subheader(f" Documents de {consultant.prenom} {consultant.nom}")
 
@@ -172,7 +184,7 @@ def show_existing_documents(consultant):
                     st.metric(" Type", doc_type)
 
                 with col4:
-                    if st.button(f" Supprimer", key=f"delete_{file_path.name}"):
+                    if st.button(" Supprimer", key=f"delete_{file_path.name}"):
                         delete_consultant_document(file_path)
 
                 # Boutons d'action
@@ -180,16 +192,16 @@ def show_existing_documents(consultant):
 
                 with col1:
                     if doc_type == "CV" and st.button(
-                        f" Analyser", key=f"analyze_existing_{file_path.name}"
+                        " Analyser", key=f"analyze_existing_{file_path.name}"
                     ):
                         st.info(" Analyse de CV en cours de developpement...")
 
                 with col2:
-                    if st.button(f" Telecharger", key=f"download_{file_path.name}"):
+                    if st.button(" Telecharger", key=f"download_{file_path.name}"):
                         st.info(" Telechargement en cours de developpement...")
 
                 with col3:
-                    if st.button(f" Previsualiser", key=f"preview_{file_path.name}"):
+                    if st.button(" Previsualiser", key=f"preview_{file_path.name}"):
                         st.info(" Previsualisation en cours de developpement...")
 
     except Exception as e:

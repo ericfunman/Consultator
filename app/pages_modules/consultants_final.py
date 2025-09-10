@@ -543,7 +543,7 @@ def show_add_consultant_form():
                         "disponibilite": disponibilite,
                     }
 
-                    nouveau_consultant = ConsultantService.create_consultant(
+                    nouveau_consultant = ConsultantService.create_consultant(  # noqa: F841
                         consultant_data
                     )
                     st.success(f"✅ {prenom} {nom} a été créé avec succès !")

@@ -54,7 +54,7 @@ def main():
                 if clean_file_aggressively(filepath):
                     modified += 1
 
-    print(f"\n📊 Résultats:")
+    print("\n📊 Résultats:")
     print(f"   • Fichiers traités: {count}")
     print(f"   • Fichiers modifiés: {modified}")
     print("🎉 Nettoyage agressif terminé!")

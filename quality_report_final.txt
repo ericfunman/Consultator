@@ -4,16 +4,16 @@
 📈 STATISTIQUES GÉNÉRALES
 ------------------------------
 • Fichiers Python analysés: 49
-• Lignes totales: 22,718
-• Lignes de code: 17,187
-• Fonctions: 441
+• Lignes totales: 25,012
+• Lignes de code: 19,455
+• Fonctions: 437
 • Classes: 22
 
 🎯 ANALYSE DE COMPLEXITÉ
 ------------------------------
 Top 5 fichiers par complexité:
-1. app\services\chatbot_service.py: 681 points
-2. app\pages_modules\consultants.py: 616 points
+1. app\services\chatbot_service.py: 677 points
+2. app\pages_modules\consultants.py: 604 points
 3. app\services\document_analyzer.py: 315 points
 4. app\pages_modules\consultant_missions.py: 274 points
 5. app\pages_modules\consultant_cv.py: 226 points
@@ -21,49 +21,49 @@ Top 5 fichiers par complexité:
 📋 MÉTRIQUES DÉTAILLÉES
 ------------------------------
 📄 app\components\technology_widget.py:
-   • Lignes: 207 (168 code)
+   • Lignes: 213 (172 code)
    • Fonctions: 3, Classes: 0
-   • Ratio commentaires: 12.5%
+   • Ratio commentaires: 12.2%
 
 📄 app\database\database.py:
-   • Lignes: 172 (115 code)
+   • Lignes: 167 (110 code)
    • Fonctions: 8, Classes: 0
-   • Ratio commentaires: 13.0%
+   • Ratio commentaires: 13.6%
 
 📄 app\database\models.py:
-   • Lignes: 459 (351 code)
+   • Lignes: 520 (400 code)
    • Fonctions: 25, Classes: 12
-   • Ratio commentaires: 7.1%
+   • Ratio commentaires: 6.0%
 
 📄 app\main.py:
-   • Lignes: 165 (123 code)
+   • Lignes: 166 (123 code)
    • Fonctions: 4, Classes: 0
    • Ratio commentaires: 9.8%
 
 📄 app\main_new.py:
-   • Lignes: 165 (123 code)
+   • Lignes: 166 (123 code)
    • Fonctions: 4, Classes: 0
    • Ratio commentaires: 9.8%
 
 📄 app\main_optimized.py:
-   • Lignes: 223 (183 code)
+   • Lignes: 223 (181 code)
    • Fonctions: 4, Classes: 0
-   • Ratio commentaires: 3.8%
+   • Ratio commentaires: 3.9%
 
 📄 app\main_optimized_simple.py:
-   • Lignes: 218 (183 code)
+   • Lignes: 223 (181 code)
    • Fonctions: 4, Classes: 0
-   • Ratio commentaires: 3.8%
+   • Ratio commentaires: 3.9%
 
 📄 app\main_original_backup.py:
-   • Lignes: 287 (224 code)
+   • Lignes: 307 (230 code)
    • Fonctions: 7, Classes: 0
-   • Ratio commentaires: 9.8%
+   • Ratio commentaires: 9.6%
 
 📄 app\main_preloading.py:
-   • Lignes: 294 (224 code)
+   • Lignes: 307 (230 code)
    • Fonctions: 7, Classes: 0
-   • Ratio commentaires: 9.8%
+   • Ratio commentaires: 9.6%
 
 📄 app\main_simple.py:
    • Lignes: 0 (0 code)
@@ -73,132 +73,128 @@ Top 5 fichiers par complexité:
 ⚠️ PROBLÈMES DÉTECTÉS
 ------------------------------
 📄 app\main_original_backup.py:
-   • Ligne 210: f-string inutile sans variables
+   • Ligne 227: f-string inutile sans variables
 
 📄 app\main_preloading.py:
-   • Ligne 216: f-string inutile sans variables
+   • Ligne 227: f-string inutile sans variables
+
+📄 app\database\models.py:
+   • 5 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\business_managers.py:
-   • Ligne 134: f-string inutile sans variables
-   • Ligne 687: f-string inutile sans variables
-   • Ligne 806: f-string inutile sans variables
-   • 8 lignes trop longues (>100 caractères)
-
-📄 app\pages_modules\consultants.py:
-   • Ligne 715: f-string inutile sans variables
-   • Ligne 1782: f-string inutile sans variables
-   • Ligne 2083: f-string inutile sans variables
-   • Ligne 2099: f-string inutile sans variables
-   • Ligne 2199: f-string inutile sans variables
-   • Ligne 2231: f-string inutile sans variables
-   • Ligne 2233: f-string inutile sans variables
-   • Ligne 2744: f-string inutile sans variables
-   • Ligne 2972: f-string inutile sans variables
-   • Ligne 3038: f-string inutile sans variables
-   • Littéral 'N/A' dupliqué plusieurs fois
-   • 19 lignes trop longues (>100 caractères)
-
-📄 app\pages_modules\consultants_clean.py:
+   • Ligne 138: f-string inutile sans variables
+   • Ligne 773: f-string inutile sans variables
+   • Ligne 858: f-string inutile sans variables
+   • Ligne 889: f-string inutile sans variables
    • 4 lignes trop longues (>100 caractères)
 
+📄 app\pages_modules\consultants.py:
+   • Ligne 766: f-string inutile sans variables
+   • Ligne 1855: f-string inutile sans variables
+   • Ligne 2145: f-string inutile sans variables
+   • Ligne 2161: f-string inutile sans variables
+   • Ligne 2303: f-string inutile sans variables
+   • Ligne 2333: f-string inutile sans variables
+   • Ligne 2335: f-string inutile sans variables
+   • Ligne 2871: f-string inutile sans variables
+   • Ligne 3113: f-string inutile sans variables
+   • Littéral 'N/A' dupliqué plusieurs fois
+   • 14 lignes trop longues (>100 caractères)
+
+📄 app\pages_modules\consultants_clean.py:
+   • 2 lignes trop longues (>100 caractères)
+
 📄 app\pages_modules\consultants_final.py:
-   • Ligne 184: f-string inutile sans variables
-   • 6 lignes trop longues (>100 caractères)
+   • Ligne 204: f-string inutile sans variables
+   • 3 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\consultant_cv.py:
-   • Ligne 329: f-string inutile sans variables
-   • Ligne 665: f-string inutile sans variables
-   • Ligne 703: f-string inutile sans variables
+   • Ligne 336: f-string inutile sans variables
+   • Ligne 680: f-string inutile sans variables
+   • Ligne 720: f-string inutile sans variables
    • Littéral 'N/A' dupliqué plusieurs fois
    • 1 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\consultant_documents.py:
-   • Ligne 642: f-string inutile sans variables
-   • Ligne 654: f-string inutile sans variables
-   • Ligne 662: f-string inutile sans variables
+   • Ligne 261: f-string inutile sans variables
+   • Ligne 667: f-string inutile sans variables
+   • Ligne 679: f-string inutile sans variables
+   • Ligne 687: f-string inutile sans variables
    • Littéral 'N/A' dupliqué plusieurs fois
    • 1 lignes trop longues (>100 caractères)
 
-📄 app\pages_modules\consultant_forms.py:
-   • 1 lignes trop longues (>100 caractères)
-
 📄 app\pages_modules\consultant_info.py:
-   • 2 lignes trop longues (>100 caractères)
+   • Ligne 176: f-string inutile sans variables
+   • Ligne 229: f-string inutile sans variables
 
 📄 app\pages_modules\consultant_list.py:
-   • Ligne 372: f-string inutile sans variables
-   • 2 lignes trop longues (>100 caractères)
-
-📄 app\pages_modules\consultant_missions.py:
-   • 5 lignes trop longues (>100 caractères)
+   • Ligne 384: f-string inutile sans variables
 
 📄 app\pages_modules\consultant_profile.py:
-   • 3 lignes trop longues (>100 caractères)
-
-📄 app\pages_modules\consultant_skills.py:
-   • 2 lignes trop longues (>100 caractères)
+   • 1 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\documents_functions.py:
-   • Ligne 16: f-string inutile sans variables
+   • Ligne 17: f-string inutile sans variables
 
 📄 app\pages_modules\documents_upload.py:
-   • Ligne 42: f-string inutile sans variables
+   • Ligne 43: f-string inutile sans variables
 
 📄 app\pages_modules\home.py:
    • 8 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\practices.py:
-   • Ligne 324: f-string inutile sans variables
-   • 2 lignes trop longues (>100 caractères)
-
-📄 app\pages_modules\practices_optimized.py:
-   • Ligne 297: f-string inutile sans variables
+   • Ligne 510: f-string inutile sans variables
    • 3 lignes trop longues (>100 caractères)
 
+📄 app\pages_modules\practices_optimized.py:
+   • Ligne 492: f-string inutile sans variables
+   • 2 lignes trop longues (>100 caractères)
+
+📄 app\services\business_manager_service.py:
+   • Ligne 53: f-string inutile sans variables
+   • Ligne 103: f-string inutile sans variables
+
 📄 app\services\chatbot_service.py:
-   • Ligne 212: f-string inutile sans variables
-   • Ligne 421: f-string inutile sans variables
-   • Ligne 551: f-string inutile sans variables
-   • Ligne 567: f-string inutile sans variables
-   • Ligne 1293: f-string inutile sans variables
-   • Ligne 1403: f-string inutile sans variables
-   • Ligne 1652: f-string inutile sans variables
-   • Ligne 1690: f-string inutile sans variables
-   • Ligne 1706: f-string inutile sans variables
-   • Ligne 1959: f-string inutile sans variables
-   • Ligne 2147: f-string inutile sans variables
-   • Ligne 2152: f-string inutile sans variables
-   • 46 lignes trop longues (>100 caractères)
+   • Ligne 345: f-string inutile sans variables
+   • Ligne 598: f-string inutile sans variables
+   • Ligne 1704: f-string inutile sans variables
+   • Ligne 1824: f-string inutile sans variables
+   • 19 lignes trop longues (>100 caractères)
 
 📄 app\services\consultant_service.py:
-   • Ligne 1031: f-string inutile sans variables
-   • Littéral 'En cours' dupliqué plusieurs fois
-   • Littéral 'N/A' dupliqué plusieurs fois
+   • Ligne 1001: f-string inutile sans variables
+   • Ligne 1051: f-string inutile sans variables
+   • Ligne 1084: f-string inutile sans variables
    • 4 lignes trop longues (>100 caractères)
 
 📄 app\services\document_analyzer.py:
-   • Littéral 'En cours' dupliqué plusieurs fois
-   • 15 lignes trop longues (>100 caractères)
+   • Ligne 248: f-string inutile sans variables
+   • Ligne 1321: f-string inutile sans variables
+   • 12 lignes trop longues (>100 caractères)
 
 📄 app\services\document_analyzer_clean.py:
-   • Littéral 'En cours' dupliqué plusieurs fois
-   • 3 lignes trop longues (>100 caractères)
+   • Ligne 84: f-string inutile sans variables
+   • 2 lignes trop longues (>100 caractères)
 
 📄 app\services\document_service.py:
+   • Ligne 38: f-string inutile sans variables
+   • Ligne 114: f-string inutile sans variables
+   • Ligne 243: f-string inutile sans variables
+   • Ligne 420: f-string inutile sans variables
    • 1 lignes trop longues (>100 caractères)
 
 📄 app\services\practice_service.py:
    • 2 lignes trop longues (>100 caractères)
 
 📄 app\services\practice_service_optimized.py:
+   • Ligne 50: f-string inutile sans variables
    • 2 lignes trop longues (>100 caractères)
 
-📄 app\utils\skill_categories.py:
-   • 1 lignes trop longues (>100 caractères)
+📄 app\services\simple_analyzer.py:
+   • Ligne 97: f-string inutile sans variables
 
 📄 app\utils\technologies_referentiel.py:
-   • Ligne 103: f-string inutile sans variables
-   • 1 lignes trop longues (>100 caractères)
+   • Ligne 203: f-string inutile sans variables
 
 
 💡 RECOMMANDATIONS

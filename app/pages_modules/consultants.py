@@ -42,7 +42,7 @@ try:
     )
 
     imports_ok = True
-except ImportError as e:
+except ImportError:
     # Imports échoués, on continue quand même
     pass
 
@@ -286,6 +286,8 @@ def show_consultant_profile():
             if hasattr(st.session_state, 'view_consultant_profile'):
                 del st.session_state.view_consultant_profile
             st.rerun()
+
+
 def show_consultant_info(consultant):
     """Affiche et permet la modification des informations du consultant"""
 
@@ -316,8 +318,6 @@ def show_consultant_info(consultant):
     current_practice_id = (
         consultant_db.practice_id if hasattr(consultant_db, "practice_id") else None
     )
-
-    from database.models import ConsultantSalaire
 
     # Formulaire principal infos consultant
     with st.form(f"edit_consultant_{consultant.id}"):
@@ -1114,11 +1114,11 @@ def _add_language_form(consultant):
                     .filter(ConsultantLangue.consultant_id == consultant.id)
                     .all()
                 )
-                langues_assignees = [l[0] for l in langues_consultant]
+                langues_assignees = [lang[0] for lang in langues_consultant]
 
                 # Filtrer les langues non assignées
                 langues_libres = [
-                    l for l in langues_disponibles if l.id not in langues_assignees
+                    langue for langue in langues_disponibles if langue.id not in langues_assignees
                 ]
 
                 if not langues_libres:
@@ -2176,9 +2176,9 @@ def extract_original_filename(full_filename):
 
     if len(parts) >= 4:
         # Identifier les parties : ID, Prénom, Nom, puis le reste
-        id_part = parts[0]
-        prenom_part = parts[1]
-        nom_part = parts[2]
+        id_part = parts[0]  # noqa: F841
+        prenom_part = parts[1]  # noqa: F841
+        nom_part = parts[2]  # noqa: F841
 
         # Le reste après Nom
         remaining_parts = parts[3:]
@@ -2225,7 +2225,7 @@ def extract_original_filename(full_filename):
                     if not original_name:
                         original_name = name_without_ext
                     original_name = f"{original_name}.{extension}"
-            elif not "." in original_name and "." in full_filename:
+            elif "." not in original_name and "." in full_filename:
                 # Chercher l'extension dans le nom complet
                 if "." in full_filename:
                     extension = full_filename.split(".")[-1]
@@ -2868,7 +2868,7 @@ def save_mission_to_consultant(
                 if date_fin:
                     st.write(f"**Fin:** {date_fin.strftime('%d/%m/%Y')}")
                 else:
-                    st.write(f"**Statut:** En cours")
+                    st.write("**Statut:** En cours")
                 if description:
                     st.write(f"**Description:** {description}")
                 if tech_list:
@@ -3161,42 +3161,6 @@ def show_cv_actions(analysis, consultant):
                         if len(mission["description"]) > 200
                         else mission["description"]
                     )
-
-
-def show_cv_summary(analysis, consultant):
-    """Affiche un résumé de l'analyse"""
-
-    st.subheader("📊 Résumé de l'analyse")
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        nb_missions = len(analysis.get("missions", []))
-        st.metric("🚀 Missions", nb_missions)
-
-    with col2:
-        nb_skills = len(analysis.get("langages_techniques", []))
-        st.metric("🛠️ Compétences", nb_skills)
-
-    with col3:
-        nb_clients = len(
-            set(
-                m.get("client", "")
-                for m in analysis.get("missions", [])
-                if m.get("client")
-            )
-        )
-        st.metric("🏢 Clients", nb_clients)
-
-    # Informations générales
-    if analysis.get("informations_generales"):
-        st.subheader("ℹ️ Informations détectées")
-        info = analysis["informations_generales"]
-
-        if info.get("email"):
-            st.write(f"📧 **Email:** {info['email']}")
-        if info.get("telephone"):
-            st.write(f"📞 **Téléphone:** {info['telephone']}")
 
 
 def import_missions_to_profile(missions, consultant):

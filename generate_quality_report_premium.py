@@ -637,11 +637,11 @@ def create_premium_quality_report():
     # Informations
     info_para = doc.add_paragraph()
     info_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    info_para.add_run(f"📊 Visualisations Matplotlib Professionnelles\n").bold = True
-    info_para.add_run(f"🎨 Design Moderne & Élégant\n")
+    info_para.add_run("📊 Visualisations Matplotlib Professionnelles\n").bold = True
+    info_para.add_run("🎨 Design Moderne & Élégant\n")
     info_para.add_run(f'📅 Généré le : {datetime.now().strftime("%d/%m/%Y à %H:%M")}\n')
-    info_para.add_run(f"🤖 GitHub Copilot Advanced + Matplotlib Pro\n")
-    info_para.add_run(f"🏗️ Python 3.13 + Streamlit + SQLAlchemy + Seaborn")
+    info_para.add_run("🤖 GitHub Copilot Advanced + Matplotlib Pro\n")
+    info_para.add_run("🏗️ Python 3.13 + Streamlit + SQLAlchemy + Seaborn")
 
     doc.add_page_break()
 
@@ -841,9 +841,9 @@ def create_premium_quality_report():
     doc.save(report_filename)
 
     print(f"📄 Rapport premium avec graphiques généré : {report_filename}")
-    print(f"🎯 Score : 98/100 (Grade A+)")
-    print(f"🎨 Graphiques : 6 visualisations professionnelles")
-    print(f"🏆 Design : Premium quality")
+    print("🎯 Score : 98/100 (Grade A+)")
+    print("🎨 Graphiques : 6 visualisations professionnelles")
+    print("🏆 Design : Premium quality")
 
     return report_filename, charts
 
@@ -855,8 +855,8 @@ if __name__ == "__main__":
     # Générer le rapport premium
     report_file, charts = create_premium_quality_report()
 
-    print(f"\n🌟 RAPPORT PREMIUM TERMINÉ 🌟")
+    print("\n🌟 RAPPORT PREMIUM TERMINÉ 🌟")
     print(f"📊 Fichier : {report_file}")
     print(f"🎨 Graphiques HD : {list(charts.values())}")
-    print(f"🏆 Status : EXCELLENCE VISUELLE CONFIRMÉE")
-    print(f"🚀 Design : CLASSE MONDIALE")
+    print("🏆 Status : EXCELLENCE VISUELLE CONFIRMÉE")
+    print("🚀 Design : CLASSE MONDIALE")

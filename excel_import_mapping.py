@@ -20,7 +20,7 @@ def analyze_excel_file():
 
     try:
         # Lire le fichier Excel
-        excel_file = pd.ExcelFile("Data Quanteam 1 ligne.xlsx")
+        excel_file = pd.ExcelFile("Data Quanteam 1 ligne.xlsx")  # noqa: F841
         df = pd.read_excel("Data Quanteam 1 ligne.xlsx", sheet_name="Consultant")
 
         print(f"📊 Nombre de lignes: {len(df)}")

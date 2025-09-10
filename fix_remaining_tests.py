@@ -66,7 +66,7 @@ def categorize_failures(failures):
     }
 
     for failure in failures:
-        test = failure["test"]
+        test = failure["test"]  # noqa: F841
         error = failure["error"]
 
         if "subheader" in error and "not called" in error:

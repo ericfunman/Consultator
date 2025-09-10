@@ -156,7 +156,7 @@ def add_consultants_batch(target_total: int = 1000):
                             session.add(cbm)
 
                     session.commit()
-                    print(f"✅ Assignations BM committées pour ce batch")
+                    print("✅ Assignations BM committées pour ce batch")
 
             except Exception as e:
                 print(f"❌ Erreur batch {batch_start}-{batch_end}: {e}")

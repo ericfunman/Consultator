@@ -53,7 +53,7 @@ def main():
                     modified += 1
                     print(f"✅ {filepath}")
 
-    print(f"\n📊 Résultats:")
+    print("\n📊 Résultats:")
     print(f"   • Fichiers analysés: {count}")
     print(f"   • Fichiers modifiés: {modified}")
     print("🎉 Nettoyage terminé!")

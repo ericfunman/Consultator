@@ -70,7 +70,7 @@ class SonarIntegration:
         """Exécute Flake8 et génère le rapport"""
         print("📊 Exécution de Flake8...")
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: F841
                 [
                     "flake8",
                     "app/",
@@ -91,7 +91,7 @@ class SonarIntegration:
         """Exécute Bandit (analyse de sécurité)"""
         print("🔒 Exécution de Bandit...")
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: F841
                 [
                     "bandit",
                     "-r",
@@ -132,7 +132,7 @@ class SonarIntegration:
                 check=True,
             )
 
-            print(f"✅ Rapports de coverage générés")
+            print("✅ Rapports de coverage générés")
 
         except (subprocess.SubprocessError, OSError, ValueError) as e:
             print(f"❌ Erreur coverage : {e}")

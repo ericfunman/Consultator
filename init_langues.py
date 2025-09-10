@@ -5,13 +5,13 @@ Script pour initialiser les langues de base dans la base de données
 
 import os
 import sys
-
 from sqlalchemy.exc import SQLAlchemyError
 
+# Ajouter le chemin vers le module app
 sys.path.append(os.path.join(os.path.dirname(__file__), "app"))
 
-from database.database import get_database_session
-from database.models import Langue
+from database.database import get_database_session  # noqa: E402
+from database.models import Langue  # noqa: E402
 
 
 def init_langues():
@@ -161,7 +161,7 @@ def add_sample_consultant_languages():
             print(f"  ✅ Langues ajoutées pour {consultant.prenom} {consultant.nom}")
 
         session.commit()
-        print(f"\n✅ Langues d'exemple ajoutées avec succès!")
+        print("\n✅ Langues d'exemple ajoutées avec succès!")
 
     except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()

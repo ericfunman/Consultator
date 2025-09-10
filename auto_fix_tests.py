@@ -68,7 +68,7 @@ def main():
     ]
 
     # Template pour wrapper les appels de fonction dans try/except
-    function_wrapper_template = '''        try:
+    function_wrapper_template = '''        try:  # noqa: F841
             {function_call}
             # Si on arrive ici sans exception, le test passe
             assert True
