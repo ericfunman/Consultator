@@ -13,22 +13,28 @@ def get_e999_errors() -> List[Tuple[str, int, str]]:
     """Récupère toutes les erreurs E999 via flake8."""
     try:
         result = subprocess.run(
-            ["python", "-m", "flake8", "--select=E999", "--exclude=.venv_backup,venv,.git"],
+            [
+                "python",
+                "-m",
+                "flake8",
+                "--select=E999",
+                "--exclude=.venv_backup,venv,.git",
+            ],
             capture_output=True,
             text=True,
-            cwd="."
+            cwd=".",
         )
 
         errors = []
-        for line in result.stdout.strip().split('\n'):
-            if line.strip() and 'E999' in line:
-                parts = line.split(':')
+        for line in result.stdout.strip().split("\n"):
+            if line.strip() and "E999" in line:
+                parts = line.split(":")
                 if len(parts) >= 4:
-                    file_path = parts[0].strip('.')
-                    if file_path.startswith('\\'):
+                    file_path = parts[0].strip(".")
+                    if file_path.startswith("\\"):
                         file_path = file_path[1:]
                     line_num = int(parts[1])
-                    message = ':'.join(parts[3:]).strip()
+                    message = ":".join(parts[3:]).strip()
                     errors.append((file_path, line_num, message))
 
         return errors
@@ -44,7 +50,7 @@ def fix_indentation_in_file(file_path: str, error_lines: List[int]) -> int:
         return 0
 
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         fixes = 0
@@ -55,32 +61,40 @@ def fix_indentation_in_file(file_path: str, error_lines: List[int]) -> int:
                 line = lines[error_line - 1]
 
                 # Vérifier si c'est un problème d'import mal placé
-                if ('import' in line and error_line > 5 and
-                    not line.strip().startswith('#') and
-                        line.strip().startswith((' ', '\t'))):
-
+                if (
+                    "import" in line
+                    and error_line > 5
+                    and not line.strip().startswith("#")
+                    and line.strip().startswith((" ", "\t"))
+                ):
                     # Déplacer l'import vers le haut du fichier
                     import_line = line.strip()
 
                     # Supprimer la ligne actuelle
-                    lines[error_line - 1] = ''
+                    lines[error_line - 1] = ""
 
                     # Trouver où insérer l'import (après les imports existants)
                     insert_pos = 0
-                    for i, l in enumerate(lines[:20]):  # Chercher dans les 20 premières lignes
-                        if l.strip().startswith(('import ', 'from ')) and not l.strip().startswith('#'):
+                    for i, l in enumerate(
+                        lines[:20]
+                    ):  # Chercher dans les 20 premières lignes
+                        if l.strip().startswith(
+                            ("import ", "from ")
+                        ) and not l.strip().startswith("#"):
                             insert_pos = i + 1
 
                     # Insérer l'import
-                    lines.insert(insert_pos, import_line + '\n')
+                    lines.insert(insert_pos, import_line + "\n")
                     fixes += 1
-                    print(f"  Import déplacé ligne {error_line} -> ligne {insert_pos + 1}")
+                    print(
+                        f"  Import déplacé ligne {error_line} -> ligne {insert_pos + 1}"
+                    )
 
                 # Problème d'indentation après try/except/if
-                elif 'expected an indented block' in str(error_lines):
+                elif "expected an indented block" in str(error_lines):
                     # Ajouter une instruction pass si le bloc est vide
-                    if error_line <= len(lines) and lines[error_line - 1].strip() == '':
-                        lines[error_line - 1] = '        pass\n'
+                    if error_line <= len(lines) and lines[error_line - 1].strip() == "":
+                        lines[error_line - 1] = "        pass\n"
                         fixes += 1
                         print(f"  Ajout de 'pass' ligne {error_line}")
 
@@ -89,7 +103,7 @@ def fix_indentation_in_file(file_path: str, error_lines: List[int]) -> int:
             cleaned_lines = []
             empty_count = 0
             for line in lines:
-                if line.strip() == '':
+                if line.strip() == "":
                     empty_count += 1
                     if empty_count <= 2:  # Maximum 2 lignes vides consécutives
                         cleaned_lines.append(line)
@@ -97,7 +111,7 @@ def fix_indentation_in_file(file_path: str, error_lines: List[int]) -> int:
                     empty_count = 0
                     cleaned_lines.append(line)
 
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.writelines(cleaned_lines)
 
             print(f"✅ {fixes} corrections dans {file_path}")

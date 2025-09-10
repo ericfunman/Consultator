@@ -13,22 +13,28 @@ def get_f841_errors() -> List[Tuple[str, int, str]]:
     """Récupère toutes les erreurs F841 via flake8."""
     try:
         result = subprocess.run(
-            ["python", "-m", "flake8", "--select=F841", "--exclude=.venv_backup,venv,.git"],
+            [
+                "python",
+                "-m",
+                "flake8",
+                "--select=F841",
+                "--exclude=.venv_backup,venv,.git",
+            ],
             capture_output=True,
             text=True,
-            cwd="."
+            cwd=".",
         )
 
         errors = []
-        for line in result.stdout.strip().split('\n'):
-            if line.strip() and 'F841' in line:
-                parts = line.split(':')
+        for line in result.stdout.strip().split("\n"):
+            if line.strip() and "F841" in line:
+                parts = line.split(":")
                 if len(parts) >= 4:
-                    file_path = parts[0].strip('.')
-                    if file_path.startswith('\\'):
+                    file_path = parts[0].strip(".")
+                    if file_path.startswith("\\"):
                         file_path = file_path[1:]
                     line_num = int(parts[1])
-                    message = ':'.join(parts[3:]).strip()
+                    message = ":".join(parts[3:]).strip()
                     errors.append((file_path, line_num, message))
 
         return errors
@@ -44,7 +50,7 @@ def fix_f841_in_file(file_path: str, line_numbers: List[int]) -> int:
         return 0
 
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         fixes = 0
@@ -55,20 +61,25 @@ def fix_f841_in_file(file_path: str, line_numbers: List[int]) -> int:
 
                 # Patterns pour corriger F841
                 # 1. Variables d'exception non utilisées: except Exception as e:
-                if re.search(r'except\s+\w+\s+as\s+(\w+):', line):
+                if re.search(r"except\s+\w+\s+as\s+(\w+):", line):
                     # Remplacer par except Exception:
-                    new_line = re.sub(r'except\s+(\w+)\s+as\s+\w+:', r'except \1:', line)
+                    new_line = re.sub(
+                        r"except\s+(\w+)\s+as\s+\w+:", r"except \1:", line
+                    )
                     if new_line != line:
                         lines[line_num - 1] = new_line
                         fixes += 1
                         print(f"  Ligne {line_num}: except ... as var -> except ...")
 
                 # 2. Variables de déballage non utilisées
-                elif '=' in line and (',' in line or 'unpack' in line.lower()):
+                elif "=" in line and ("," in line or "unpack" in line.lower()):
                     # Remplacer par _ pour les variables non utilisées
                     patterns = [
-                        (r'(\w+),\s*(\w+)\s*=', r'_, \2 ='),  # var1, var2 = -> _, var2 =
-                        (r'(\w+)\s*,\s*_\s*=', r'_, _ ='),     # var, _ = -> _, _ =
+                        (
+                            r"(\w+),\s*(\w+)\s*=",
+                            r"_, \2 =",
+                        ),  # var1, var2 = -> _, var2 =
+                        (r"(\w+)\s*,\s*_\s*=", r"_, _ ="),  # var, _ = -> _, _ =
                     ]
                     for pattern, replacement in patterns:
                         new_line = re.sub(pattern, replacement, line)
@@ -79,16 +90,16 @@ def fix_f841_in_file(file_path: str, line_numbers: List[int]) -> int:
                             break
 
                 # 3. Variables simples non utilisées (commentaire)
-                elif '=' in line and not line.strip().startswith('#'):
+                elif "=" in line and not line.strip().startswith("#"):
                     # Ajouter un commentaire # noqa: F841
-                    if '# noqa' not in line:
-                        new_line = line.rstrip() + '  # noqa: F841\n'
+                    if "# noqa" not in line:
+                        new_line = line.rstrip() + "  # noqa: F841\n"
                         lines[line_num - 1] = new_line
                         fixes += 1
                         print(f"  Ligne {line_num}: ajout # noqa: F841")
 
         if fixes > 0:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.writelines(lines)
             print(f"✅ {fixes} corrections dans {file_path}")
 

@@ -93,9 +93,7 @@ def show_consultant_missions(consultant):
                 st.rerun()
 
         with col2:
-            if st.button(
-                "📊 Analyse missions", key=f"analyze_missions_{consultant.id}"
-            ):
+            if st.button("📊 Analyse missions", key=f"analyze_missions_{consultant.id}"):
                 show_missions_analysis(missions)
 
         with col3:

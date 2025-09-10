@@ -475,7 +475,9 @@ class AutomatedQualityPipeline:
                             detail = (
                                 f" (Score: {score})"
                                 if score
-                                else f" ({issues} issues)" if issues else ""
+                                else f" ({issues} issues)"
+                                if issues
+                                else ""
                             )
                             report_lines.append(f"  └─ {tool}: {tool_status}{detail}")
 

@@ -33,7 +33,7 @@ class AuditQualiteComplet:
             "radon": {},
             "metrics": {},
             "test_coverage": {},
-            "timestamp": datetime.datetime.now().isoformat()
+            "timestamp": datetime.datetime.now().isoformat(),
         }
 
     def run_bandit_analysis(self) -> Dict:
@@ -44,16 +44,22 @@ class AuditQualiteComplet:
             # Lire le rapport JSON existant
             bandit_json = self.reports_dir / "bandit-report.json"
             if bandit_json.exists():
-                with open(bandit_json, 'r', encoding='utf-8') as f:
+                with open(bandit_json, "r", encoding="utf-8") as f:
                     data = json.load(f)
 
                 self.results["bandit"] = {
                     "total_lines": data["metrics"]["_totals"]["loc"],
                     "total_issues": len(data["results"]),
-                    "high_severity": len([r for r in data["results"] if r["issue_severity"] == "HIGH"]),
-                    "medium_severity": len([r for r in data["results"] if r["issue_severity"] == "MEDIUM"]),
-                    "low_severity": len([r for r in data["results"] if r["issue_severity"] == "LOW"]),
-                    "issues": data["results"][:5]  # Top 5 pour le rapport
+                    "high_severity": len(
+                        [r for r in data["results"] if r["issue_severity"] == "HIGH"]
+                    ),
+                    "medium_severity": len(
+                        [r for r in data["results"] if r["issue_severity"] == "MEDIUM"]
+                    ),
+                    "low_severity": len(
+                        [r for r in data["results"] if r["issue_severity"] == "LOW"]
+                    ),
+                    "issues": data["results"][:5],  # Top 5 pour le rapport
                 }
 
                 return self.results["bandit"]
@@ -68,13 +74,20 @@ class AuditQualiteComplet:
 
         try:
             # Exécuter flake8 directement avec les bonnes exclusions
-            result = subprocess.run([
-                "python", "-m", "flake8",
-                "--exclude=.venv_backup,venv,.git",
-                "--statistics"
-            ], capture_output=True, text=True, cwd=str(self.project_root))
+            result = subprocess.run(
+                [
+                    "python",
+                    "-m",
+                    "flake8",
+                    "--exclude=.venv_backup,venv,.git",
+                    "--statistics",
+                ],
+                capture_output=True,
+                text=True,
+                cwd=str(self.project_root),
+            )
 
-            lines = result.stdout.split('\n')
+            lines = result.stdout.split("\n")
             issues = []
             counts = {}
             total_issues = 0
@@ -87,7 +100,9 @@ class AuditQualiteComplet:
                         parts = line.split(":")
                         if len(parts) >= 4:  # format: file:line:col: error
                             error_msg = parts[-1].strip()
-                            error_type = error_msg.split()[0] if error_msg else "Unknown"
+                            error_type = (
+                                error_msg.split()[0] if error_msg else "Unknown"
+                            )
                             counts[error_type] = counts.get(error_type, 0) + 1
                             total_issues += 1
 
@@ -112,7 +127,7 @@ class AuditQualiteComplet:
             self.results["flake8"] = {
                 "total_issues": total_issues,
                 "error_types": counts,
-                "top_issues": issues
+                "top_issues": issues,
             }
 
             return self.results["flake8"]
@@ -129,16 +144,24 @@ class AuditQualiteComplet:
         try:
             # Analyser la sortie terminal de Radon
             complex_functions = [
-                ("ChatbotService._handle_professional_profile_question", "F (79)", "🔴 Très Critique"),
+                (
+                    "ChatbotService._handle_professional_profile_question",
+                    "F (79)",
+                    "🔴 Très Critique",
+                ),
                 ("ChatbotService._handle_languages_question", "E (34)", "🔴 Critique"),
                 ("ChatbotService._handle_skills_question", "E (32)", "🔴 Critique"),
                 ("show_consultant_info", "F (50)", "🔴 Très Critique"),
                 ("ConsultantService.save_cv_analysis", "D (26)", "🟡 Élevée"),
                 ("show_consultants_list", "D (24)", "🟡 Élevée"),
-                ("DocumentAnalyzer._extract_missions_company_date_role_format", "D (22)", "🟡 Élevée"),
+                (
+                    "DocumentAnalyzer._extract_missions_company_date_role_format",
+                    "D (22)",
+                    "🟡 Élevée",
+                ),
                 ("show_consultant_skills", "D (22)", "🟡 Élevée"),
                 ("show_consultant_languages", "C (20)", "🟠 Modérée"),
-                ("main", "C (20)", "🟠 Modérée")
+                ("main", "C (20)", "🟠 Modérée"),
             ]
 
             self.results["radon"] = {
@@ -150,8 +173,8 @@ class AuditQualiteComplet:
                     "B (6-10)": 112,
                     "C (11-20)": 45,
                     "D (21-50)": 12,
-                    "E-F (>50)": 2
-                }
+                    "E-F (>50)": 2,
+                },
             }
 
             return self.results["radon"]
@@ -170,15 +193,15 @@ class AuditQualiteComplet:
                 ["python", "-m", "pytest", "--collect-only", "-q"],
                 capture_output=True,
                 text=True,
-                cwd="."
+                cwd=".",
             )
 
             total_tests = 535  # Valeur réelle confirmée
             if result.returncode == 0:
                 # Extraire le nombre de tests de la sortie pytest
-                lines = result.stdout.strip().split('\n')
+                lines = result.stdout.strip().split("\n")
                 for line in lines:
-                    if 'tests collected' in line:
+                    if "tests collected" in line:
                         total_tests = int(line.split()[0])
                         break
 
@@ -187,7 +210,7 @@ class AuditQualiteComplet:
                 "total_tests": total_tests,
                 "passing_tests": 524,  # Selon vos données : 524 OK
                 "failing_tests": 0,
-                "skipped_tests": 11,   # Selon vos données : 11 skipped
+                "skipped_tests": 11,  # Selon vos données : 11 skipped
                 "coverage_percentage": 26,
                 "test_categories": {
                     "Tests Unitaires": {"count": 180, "coverage": 75},
@@ -196,8 +219,11 @@ class AuditQualiteComplet:
                     "Tests Performance": {"count": 8, "coverage": 60},
                     "Tests Accessibilité": {"count": 5, "coverage": 55},
                     "Tests Services": {"count": 120, "coverage": 80},
-                    "Tests UI": {"count": 152, "coverage": 90}  # Ajusté pour totaliser 535
-                }
+                    "Tests UI": {
+                        "count": 152,
+                        "coverage": 90,
+                    },  # Ajusté pour totaliser 535
+                },
             }
 
             return self.results["test_coverage"]
@@ -224,17 +250,20 @@ class AuditQualiteComplet:
                     continue
 
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         content = f.read()
-                        lines = content.split('\n')
+                        lines = content.split("\n")
 
                     total_lines += len(lines)
-                    code_lines = sum(1 for line in lines
-                                     if line.strip() and not line.strip().startswith('#'))
+                    code_lines = sum(
+                        1
+                        for line in lines
+                        if line.strip() and not line.strip().startswith("#")
+                    )
                     total_code_lines += code_lines
 
-                    total_functions += content.count('def ')
-                    total_classes += content.count('class ')
+                    total_functions += content.count("def ")
+                    total_classes += content.count("class ")
 
                 except Exception:
                     continue
@@ -245,8 +274,12 @@ class AuditQualiteComplet:
                 "total_code_lines": total_code_lines,
                 "total_functions": total_functions,
                 "total_classes": total_classes,
-                "avg_lines_per_file": total_lines // len(python_files) if python_files else 0,
-                "code_to_total_ratio": round(total_code_lines / total_lines * 100, 1) if total_lines > 0 else 0
+                "avg_lines_per_file": total_lines // len(python_files)
+                if python_files
+                else 0,
+                "code_to_total_ratio": round(total_code_lines / total_lines * 100, 1)
+                if total_lines > 0
+                else 0,
             }
 
             return self.results["metrics"]
@@ -298,14 +331,20 @@ class AuditQualiteComplet:
         title = doc.add_heading("🔍 AUDIT DE QUALITÉ DE CODE COMPLET", 0)
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        subtitle = doc.add_heading("Application Consultator - Rapport d'Audit Détaillé", 1)
+        subtitle = doc.add_heading(
+            "Application Consultator - Rapport d'Audit Détaillé", 1
+        )
         subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Date et informations
         info_para = doc.add_paragraph()
         info_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        info_para.add_run(f"Date d'audit : {datetime.datetime.now().strftime('%d %B %Y à %H:%M')}\n")
-        info_para.add_run("Outils utilisés : Bandit, Flake8, Radon, Pytest, Analyse personnalisée\n")
+        info_para.add_run(
+            f"Date d'audit : {datetime.datetime.now().strftime('%d %B %Y à %H:%M')}\n"
+        )
+        info_para.add_run(
+            "Outils utilisés : Bandit, Flake8, Radon, Pytest, Analyse personnalisée\n"
+        )
         info_para.add_run("Analyste : Assistant IA GitHub Copilot")
 
         doc.add_page_break()
@@ -345,11 +384,37 @@ class AuditQualiteComplet:
         audit_data = [
             ("Lignes de code", f"{metrics.get('total_code_lines', 0):,}", "📊 Mesuré"),
             ("Fichiers Python", f"{metrics.get('total_files', 0)}", "📊 Mesuré"),
-            ("Vulnérabilités de sécurité", f"{bandit.get('total_issues', 0)}", "✅ Aucune" if bandit.get('total_issues', 0) == 0 else "⚠️ Détectées"),
-            ("Problèmes de style", f"{flake8.get('total_issues', 0)}", "⚠️ À corriger" if flake8.get('total_issues', 0) > 50 else "✅ Acceptable"),
-            ("Fonctions complexes", f"{len(radon.get('complex_functions', []))}", "🔴 Critique" if len(radon.get('complex_functions', [])) > 5 else "✅ Acceptable"),
-            ("Couverture de tests", f"{tests.get('coverage_percentage', 0)}%", "🔴 Faible" if tests.get('coverage_percentage', 0) < 50 else "✅ Correct"),
-            ("Tests réussis", f"{tests.get('passing_tests', 0)}/{tests.get('total_tests', 0)}", "✅ Excellent" if tests.get('passing_tests', 0) > 390 else "⚠️ À améliorer")
+            (
+                "Vulnérabilités de sécurité",
+                f"{bandit.get('total_issues', 0)}",
+                "✅ Aucune" if bandit.get("total_issues", 0) == 0 else "⚠️ Détectées",
+            ),
+            (
+                "Problèmes de style",
+                f"{flake8.get('total_issues', 0)}",
+                "⚠️ À corriger"
+                if flake8.get("total_issues", 0) > 50
+                else "✅ Acceptable",
+            ),
+            (
+                "Fonctions complexes",
+                f"{len(radon.get('complex_functions', []))}",
+                "🔴 Critique"
+                if len(radon.get("complex_functions", [])) > 5
+                else "✅ Acceptable",
+            ),
+            (
+                "Couverture de tests",
+                f"{tests.get('coverage_percentage', 0)}%",
+                "🔴 Faible" if tests.get("coverage_percentage", 0) < 50 else "✅ Correct",
+            ),
+            (
+                "Tests réussis",
+                f"{tests.get('passing_tests', 0)}/{tests.get('total_tests', 0)}",
+                "✅ Excellent"
+                if tests.get("passing_tests", 0) > 390
+                else "⚠️ À améliorer",
+            ),
         ]
 
         for item in audit_data:
@@ -366,39 +431,55 @@ class AuditQualiteComplet:
         security_para = doc.add_paragraph()
         security_para.add_run("RÉSULTAT : ").bold = True
 
-        if bandit.get('total_issues', 0) == 0:
+        if bandit.get("total_issues", 0) == 0:
             security_para.add_run("AUCUNE VULNÉRABILITÉ DÉTECTÉE ✅\n\n")
-            security_para.add_run(f"• {bandit.get('total_lines', 0):,} lignes de code analysées\n")
+            security_para.add_run(
+                f"• {bandit.get('total_lines', 0):,} lignes de code analysées\n"
+            )
             security_para.add_run("• Aucun problème de sécurité critique\n")
             security_para.add_run("• Code conforme aux bonnes pratiques de sécurité")
         else:
-            security_para.add_run(f"{bandit.get('total_issues', 0)} PROBLÈMES DÉTECTÉS ⚠️\n\n")
-            security_para.add_run(f"• Haute gravité : {bandit.get('high_severity', 0)}\n")
-            security_para.add_run(f"• Gravité moyenne : {bandit.get('medium_severity', 0)}\n")
+            security_para.add_run(
+                f"{bandit.get('total_issues', 0)} PROBLÈMES DÉTECTÉS ⚠️\n\n"
+            )
+            security_para.add_run(
+                f"• Haute gravité : {bandit.get('high_severity', 0)}\n"
+            )
+            security_para.add_run(
+                f"• Gravité moyenne : {bandit.get('medium_severity', 0)}\n"
+            )
             security_para.add_run(f"• Faible gravité : {bandit.get('low_severity', 0)}")
 
         # =================== ANALYSE DE STYLE ===================
         doc.add_heading("📝 ANALYSE DE STYLE (FLAKE8)", 1)
 
         style_para = doc.add_paragraph()
-        style_para.add_run(f"TOTAL : {flake8.get('total_issues', 0)} problèmes détectés\n\n").bold = True
+        style_para.add_run(
+            f"TOTAL : {flake8.get('total_issues', 0)} problèmes détectés\n\n"
+        ).bold = True
 
         # Top des erreurs
-        error_types = flake8.get('error_types', {})
+        error_types = flake8.get("error_types", {})
         if error_types:
             style_para.add_run("TYPES D'ERREURS LES PLUS FRÉQUENTS :\n")
-            for error_type, count in sorted(error_types.items(), key=lambda x: x[1], reverse=True)[:5]:
+            for error_type, count in sorted(
+                error_types.items(), key=lambda x: x[1], reverse=True
+            )[:5]:
                 style_para.add_run(f"• {error_type}: {count} occurrences\n")
 
         # =================== ANALYSE DE COMPLEXITÉ ===================
         doc.add_heading("🧮 ANALYSE DE COMPLEXITÉ (RADON)", 1)
 
         complexity_para = doc.add_paragraph()
-        complexity_para.add_run(f"COMPLEXITÉ MOYENNE : {radon.get('average_complexity', 0):.1f}\n").bold = True
-        complexity_para.add_run(f"TOTAL DE BLOCS ANALYSÉS : {radon.get('total_blocks', 0)}\n\n")
+        complexity_para.add_run(
+            f"COMPLEXITÉ MOYENNE : {radon.get('average_complexity', 0):.1f}\n"
+        ).bold = True
+        complexity_para.add_run(
+            f"TOTAL DE BLOCS ANALYSÉS : {radon.get('total_blocks', 0)}\n\n"
+        )
 
         # Tableau des fonctions complexes
-        if radon.get('complex_functions'):
+        if radon.get("complex_functions"):
             complexity_table = doc.add_table(rows=1, cols=3)
             complexity_table.style = "Table Grid"
 
@@ -407,7 +488,7 @@ class AuditQualiteComplet:
             comp_hdr[1].text = "COMPLEXITÉ"
             comp_hdr[2].text = "PRIORITÉ"
 
-            for func_data in radon.get('complex_functions', [])[:10]:
+            for func_data in radon.get("complex_functions", [])[:10]:
                 row_cells = complexity_table.add_row().cells
                 row_cells[0].text = func_data[0]
                 row_cells[1].text = func_data[1]
@@ -422,10 +503,12 @@ class AuditQualiteComplet:
         test_para.add_run(f"• Tests réussis : {tests.get('passing_tests', 0)}\n")
         test_para.add_run(f"• Tests échoués : {tests.get('failing_tests', 0)}\n")
         test_para.add_run(f"• Tests ignorés : {tests.get('skipped_tests', 0)}\n")
-        test_para.add_run(f"• Couverture globale : {tests.get('coverage_percentage', 0)}%\n\n")
+        test_para.add_run(
+            f"• Couverture globale : {tests.get('coverage_percentage', 0)}%\n\n"
+        )
 
         # Tableau des catégories de tests
-        test_categories = tests.get('test_categories', {})
+        test_categories = tests.get("test_categories", {})
         if test_categories:
             test_table = doc.add_table(rows=1, cols=3)
             test_table.style = "Table Grid"
@@ -438,7 +521,7 @@ class AuditQualiteComplet:
             for category, data in test_categories.items():
                 row_cells = test_table.add_row().cells
                 row_cells[0].text = category
-                row_cells[1].text = str(data.get('count', 0))
+                row_cells[1].text = str(data.get("count", 0))
                 row_cells[2].text = f"{data.get('coverage', 0)}%"
 
         # =================== MÉTRIQUES GÉNÉRALES ===================
@@ -448,11 +531,17 @@ class AuditQualiteComplet:
         metrics_para.add_run("STATISTIQUES DU PROJET :\n").bold = True
         metrics_para.add_run(f"• Fichiers Python : {metrics.get('total_files', 0)}\n")
         metrics_para.add_run(f"• Lignes totales : {metrics.get('total_lines', 0):,}\n")
-        metrics_para.add_run(f"• Lignes de code : {metrics.get('total_code_lines', 0):,}\n")
+        metrics_para.add_run(
+            f"• Lignes de code : {metrics.get('total_code_lines', 0):,}\n"
+        )
         metrics_para.add_run(f"• Fonctions : {metrics.get('total_functions', 0)}\n")
         metrics_para.add_run(f"• Classes : {metrics.get('total_classes', 0)}\n")
-        metrics_para.add_run(f"• Moyenne lignes/fichier : {metrics.get('avg_lines_per_file', 0)}\n")
-        metrics_para.add_run(f"• Ratio code/total : {metrics.get('code_to_total_ratio', 0)}%")
+        metrics_para.add_run(
+            f"• Moyenne lignes/fichier : {metrics.get('avg_lines_per_file', 0)}\n"
+        )
+        metrics_para.add_run(
+            f"• Ratio code/total : {metrics.get('code_to_total_ratio', 0)}%"
+        )
 
         # =================== RECOMMANDATIONS ===================
         doc.add_heading("💡 RECOMMANDATIONS PRIORITAIRES", 1)
@@ -462,19 +551,23 @@ class AuditQualiteComplet:
 
         reco_list = []
 
-        if flake8.get('total_issues', 0) > 100:
-            reco_list.append("🔧 URGENT: Corriger les problèmes de style Flake8 (formatage automatique recommandé)")
+        if flake8.get("total_issues", 0) > 100:
+            reco_list.append(
+                "🔧 URGENT: Corriger les problèmes de style Flake8 (formatage automatique recommandé)"
+            )
 
-        if len(radon.get('complex_functions', [])) > 3:
+        if len(radon.get("complex_functions", [])) > 3:
             reco_list.append("🧮 PRIORITAIRE: Refactoriser les fonctions trop complexes")
 
-        if tests.get('coverage_percentage', 0) < 50:
-            reco_list.append("🧪 IMPORTANT: Améliorer la couverture de tests (objectif: 70%+)")
+        if tests.get("coverage_percentage", 0) < 50:
+            reco_list.append(
+                "🧪 IMPORTANT: Améliorer la couverture de tests (objectif: 70%+)"
+            )
 
-        if tests.get('failing_tests', 0) > 0:
+        if tests.get("failing_tests", 0) > 0:
             reco_list.append("🔴 URGENT: Corriger les tests qui échouent")
 
-        if bandit.get('total_issues', 0) > 0:
+        if bandit.get("total_issues", 0) > 0:
             reco_list.append("🔒 CRITIQUE: Résoudre les problèmes de sécurité détectés")
 
         reco_list.append("📖 CONTINU: Ajouter de la documentation dans le code")
@@ -487,7 +580,9 @@ class AuditQualiteComplet:
         doc.add_heading("📋 PLAN D'ACTION DÉTAILLÉ", 1)
 
         plan_para = doc.add_paragraph()
-        plan_para.add_run("PHASE 1 - CORRECTIONS IMMÉDIATES (1-2 jours) :\n").bold = True
+        plan_para.add_run(
+            "PHASE 1 - CORRECTIONS IMMÉDIATES (1-2 jours) :\n"
+        ).bold = True
         plan_para.add_run("• Corriger les tests qui échouent\n")
         plan_para.add_run("• Appliquer le formatage automatique (Black, isort)\n")
         plan_para.add_run("• Résoudre les problèmes de sécurité critiques\n\n")
@@ -509,13 +604,15 @@ class AuditQualiteComplet:
         footer_para.add_run("\n\n" + "=" * 50).bold = True
         footer_para.add_run(f"\n🎯 SCORE FINAL : {quality_score}/100\n").bold = True
         footer_para.add_run("=" * 50).bold = True
-        footer_para.add_run(f"\n\nRapport généré le {datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')}\n")
+        footer_para.add_run(
+            f"\n\nRapport généré le {datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')}\n"
+        )
         footer_para.add_run("Par : Assistant IA GitHub Copilot\n")
         footer_para.add_run("Projet : Application Consultator\n")
         footer_para.add_run(f"Fichiers analysés : {metrics.get('total_files', 0)}")
 
         # Sauvegarder le document
-        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = self.reports_dir / f"Audit_Qualite_Consultator_{timestamp}.docx"
         doc.save(str(filename))
 
@@ -562,8 +659,12 @@ def main():
     print("\n📋 RÉSUMÉ DES ANALYSES :")
     print(f"• Sécurité : {auditor.results['bandit'].get('total_issues', 0)} problèmes")
     print(f"• Style : {auditor.results['flake8'].get('total_issues', 0)} problèmes")
-    print(f"• Complexité : {len(auditor.results['radon'].get('complex_functions', []))} fonctions complexes")
-    print(f"• Tests : {auditor.results['test_coverage'].get('coverage_percentage', 0)}% de couverture")
+    print(
+        f"• Complexité : {len(auditor.results['radon'].get('complex_functions', []))} fonctions complexes"
+    )
+    print(
+        f"• Tests : {auditor.results['test_coverage'].get('coverage_percentage', 0)}% de couverture"
+    )
 
     print(f"\n📄 Rapport disponible dans : {report_path}")
 

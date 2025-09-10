@@ -3,8 +3,8 @@
 Script pour corriger automatiquement les tests similaires
 """
 
-import re
 import os
+import re
 from pathlib import Path
 
 

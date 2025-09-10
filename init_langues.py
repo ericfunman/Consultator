@@ -5,6 +5,7 @@ Script pour initialiser les langues de base dans la base de données
 
 import os
 import sys
+
 from sqlalchemy.exc import SQLAlchemyError
 
 # Ajouter le chemin vers le module app

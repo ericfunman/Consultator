@@ -13,22 +13,28 @@ def get_f541_errors() -> List[Tuple[str, int, str]]:
     """Récupère toutes les erreurs F541 via flake8."""
     try:
         result = subprocess.run(
-            ["python", "-m", "flake8", "--select=F541", "--exclude=.venv_backup,venv,.git"],
+            [
+                "python",
+                "-m",
+                "flake8",
+                "--select=F541",
+                "--exclude=.venv_backup,venv,.git",
+            ],
             capture_output=True,
             text=True,
-            cwd="."
+            cwd=".",
         )
 
         errors = []
-        for line in result.stdout.strip().split('\n'):
-            if line.strip() and 'F541' in line:
-                parts = line.split(':')
+        for line in result.stdout.strip().split("\n"):
+            if line.strip() and "F541" in line:
+                parts = line.split(":")
                 if len(parts) >= 4:
-                    file_path = parts[0].strip('.')
-                    if file_path.startswith('\\'):
+                    file_path = parts[0].strip(".")
+                    if file_path.startswith("\\"):
                         file_path = file_path[1:]
                     line_num = int(parts[1])
-                    message = ':'.join(parts[3:]).strip()
+                    message = ":".join(parts[3:]).strip()
                     errors.append((file_path, line_num, message))
 
         return errors
@@ -44,7 +50,7 @@ def fix_f541_in_file(file_path: str, line_numbers: List[int]) -> int:
         return 0
 
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         fixes = 0
@@ -65,17 +71,19 @@ def fix_f541_in_file(file_path: str, line_numbers: List[int]) -> int:
                     matches = re.finditer(pattern, line)
                     for match in matches:
                         content = match.group(1)
-                        if '{' not in content and '}' not in content:
+                        if "{" not in content and "}" not in content:
                             line = re.sub(pattern, replacement, line, count=1)
                             fixes += 1
                             break
 
                 if line != original_line:
                     lines[line_num - 1] = line
-                    print(f"  Ligne {line_num}: {original_line.strip()} -> {line.strip()}")
+                    print(
+                        f"  Ligne {line_num}: {original_line.strip()} -> {line.strip()}"
+                    )
 
         if fixes > 0:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.writelines(lines)
             print(f"✅ {fixes} corrections dans {file_path}")
 

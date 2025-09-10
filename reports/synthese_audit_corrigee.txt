@@ -17,13 +17,13 @@ Score global: 55/100
 
 📈 MÉTRIQUES GÉNÉRALES:
 • 49 fichiers Python
-• 25,012 lignes totales  
+• 25,012 lignes totales
 • 19,455 lignes de code
 • 437 fonctions
 • 22 classes
 
 📋 EXPLICATION DE LA DIFFÉRENCE:
-L'écart de 128 tests (535 réels vs 407 dans le rapport initial) provient d'une valeur 
+L'écart de 128 tests (535 réels vs 407 dans le rapport initial) provient d'une valeur
 codée en dur dans le script d'audit au lieu d'un décompte dynamique avec pytest.
 
 🔧 RECOMMANDATIONS PRIORITAIRES:

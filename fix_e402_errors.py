@@ -13,22 +13,28 @@ def get_e402_errors() -> List[Tuple[str, int, str]]:
     """Récupère toutes les erreurs E402 via flake8."""
     try:
         result = subprocess.run(
-            ["python", "-m", "flake8", "--select=E402", "--exclude=.venv_backup,venv,.git"],
+            [
+                "python",
+                "-m",
+                "flake8",
+                "--select=E402",
+                "--exclude=.venv_backup,venv,.git",
+            ],
             capture_output=True,
             text=True,
-            cwd="."
+            cwd=".",
         )
 
         errors = []
-        for line in result.stdout.strip().split('\n'):
-            if line.strip() and 'E402' in line:
-                parts = line.split(':')
+        for line in result.stdout.strip().split("\n"):
+            if line.strip() and "E402" in line:
+                parts = line.split(":")
                 if len(parts) >= 4:
-                    file_path = parts[0].strip('.')
-                    if file_path.startswith('\\'):
+                    file_path = parts[0].strip(".")
+                    if file_path.startswith("\\"):
                         file_path = file_path[1:]
                     line_num = int(parts[1])
-                    message = ':'.join(parts[3:]).strip()
+                    message = ":".join(parts[3:]).strip()
                     errors.append((file_path, line_num, message))
 
         return errors
@@ -43,7 +49,7 @@ def analyze_imports_in_file(file_path: str) -> Dict:
         return {"error": f"Fichier non trouvé: {file_path}"}
 
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         # Trouver les imports et leur position
@@ -60,17 +66,19 @@ def analyze_imports_in_file(file_path: str) -> Dict:
             stripped = line.strip()
 
             # Shebang
-            if i == 0 and stripped.startswith('#!'):
+            if i == 0 and stripped.startswith("#!"):
                 shebang_lines.append(i)
                 continue
 
             # Encoding
-            if i <= 1 and re.search(r'coding[:=]\s*([-\w.]+)', line):
+            if i <= 1 and re.search(r"coding[:=]\s*([-\w.]+)", line):
                 encoding_lines.append(i)
                 continue
 
             # Docstring detection (simple)
-            if not in_docstring and (stripped.startswith('"""') or stripped.startswith("'''")):
+            if not in_docstring and (
+                stripped.startswith('"""') or stripped.startswith("'''")
+            ):
                 in_docstring = True
                 docstring_quotes = stripped[:3]
                 if stripped.count(docstring_quotes) >= 2:
@@ -88,15 +96,17 @@ def analyze_imports_in_file(file_path: str) -> Dict:
                 continue
 
             # Import statements
-            if (stripped.startswith('import ') or
-                    stripped.startswith('from ') or
-                    (stripped.startswith('import') and ' ' in stripped) or
-                    (stripped.startswith('from') and ' ' in stripped)):
+            if (
+                stripped.startswith("import ")
+                or stripped.startswith("from ")
+                or (stripped.startswith("import") and " " in stripped)
+                or (stripped.startswith("from") and " " in stripped)
+            ):
                 imports.append((i, line))
                 continue
 
             # Ligne non vide qui n'est pas un import
-            if stripped and not stripped.startswith('#'):
+            if stripped and not stripped.startswith("#"):
                 non_import_lines.append(i)
 
         return {
@@ -105,7 +115,7 @@ def analyze_imports_in_file(file_path: str) -> Dict:
             "shebang_lines": shebang_lines,
             "encoding_lines": encoding_lines,
             "docstring_end": docstring_end,
-            "total_lines": len(lines)
+            "total_lines": len(lines),
         }
 
     except Exception as e:
@@ -128,7 +138,7 @@ def fix_e402_in_file(file_path: str) -> int:
 
     # Vérifier s'il y a des imports après du code non-import
     problematic_imports = []
-    first_non_import = min(non_import_lines) if non_import_lines else float('inf')
+    first_non_import = min(non_import_lines) if non_import_lines else float("inf")
 
     for line_num, import_line in imports:
         if line_num > first_non_import:
@@ -138,14 +148,14 @@ def fix_e402_in_file(file_path: str) -> int:
         return 0
 
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         # Position où insérer les imports (après docstring, shebang, encoding)
         insert_position = max(
             analysis["docstring_end"],
             max(analysis["shebang_lines"], default=-1) + 1,
-            max(analysis["encoding_lines"], default=-1) + 1
+            max(analysis["encoding_lines"], default=-1) + 1,
         )
 
         # Extraire les imports problématiques
@@ -166,7 +176,7 @@ def fix_e402_in_file(file_path: str) -> int:
             lines.insert(insert_position + i, import_line)
 
         # Sauvegarder le fichier modifié
-        with open(file_path, 'w', encoding='utf-8') as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             f.writelines(lines)
 
         print(f"  ✅ {len(problematic_imports)} imports déplacés")
@@ -204,7 +214,7 @@ def main():
         print(f"\n📁 Correction de {file_path} ({len(line_numbers)} erreurs)")
 
         # Analyser le fichier pour voir s'il est "safe" à corriger
-        if any(keyword in file_path.lower() for keyword in ['test_', 'debug', 'temp']):
+        if any(keyword in file_path.lower() for keyword in ["test_", "debug", "temp"]):
             print("  ⚠️ Fichier de test/debug détecté - correction prudente")
 
         fixes = fix_e402_in_file(file_path)

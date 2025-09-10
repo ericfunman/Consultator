@@ -655,9 +655,7 @@ def create_comprehensive_quality_report():
     doc.add_heading("🎯 VERDICT FINAL - CHEF-D'ŒUVRE TECHNOLOGIQUE", 1)
 
     final_verdict = doc.add_paragraph()
-    final_verdict.add_run("🌟 CONSULTATOR V1.3 : UNE LÉGENDE EST NÉE 🌟\n\n").bold = (
-        True
-    )
+    final_verdict.add_run("🌟 CONSULTATOR V1.3 : UNE LÉGENDE EST NÉE 🌟\n\n").bold = True
 
     epic_points = [
         "👑 Score historique : 98/100 (Grade A+) - Parmi les 1% mondiaux",
@@ -687,9 +685,9 @@ def create_comprehensive_quality_report():
     footer_para.add_run(
         "🤖 GitHub Copilot Advanced + Bandit Security Pro + PyLint + Flake8\n"
     ).italic = True
-    footer_para.add_run("📊 Visualisations ASCII générées automatiquement\n").italic = (
-        True
-    )
+    footer_para.add_run(
+        "📊 Visualisations ASCII générées automatiquement\n"
+    ).italic = True
     footer_para.add_run(
         "🏆 Standards: SonarQube + Fortify + OWASP + ISO 27001\n"
     ).italic = True

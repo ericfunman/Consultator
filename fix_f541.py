@@ -11,15 +11,23 @@ from pathlib import Path
 
 def get_f541_errors():
     """Récupère la liste des erreurs F541"""
-    result = subprocess.run([
-        'python', '-m', 'flake8', '--select=F541',
-        '--exclude=.venv_backup,venv,.git', '--format=%(path)s:%(row)d:%(col)d: %(text)s'
-    ], capture_output=True, text=True)
+    result = subprocess.run(
+        [
+            "python",
+            "-m",
+            "flake8",
+            "--select=F541",
+            "--exclude=.venv_backup,venv,.git",
+            "--format=%(path)s:%(row)d:%(col)d: %(text)s",
+        ],
+        capture_output=True,
+        text=True,
+    )
 
     errors = []
-    for line in result.stdout.strip().split('\n'):
-        if line and 'F541' in line:
-            parts = line.split(':')
+    for line in result.stdout.strip().split("\n"):
+        if line and "F541" in line:
+            parts = line.split(":")
             if len(parts) >= 4:
                 file_path = parts[0]
                 line_num = int(parts[1])
@@ -31,7 +39,7 @@ def get_f541_errors():
 def fix_f541_in_file(file_path, line_num):
     """Corrige une erreur F541 dans un fichier"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         if line_num <= len(lines):
@@ -41,11 +49,11 @@ def fix_f541_in_file(file_path, line_num):
             # Pattern 1: f"text simple sans variables"
             if re.search(r'f["\'][^{]*["\']', line):
                 # Remplacer f"text" par "text" si pas de {}
-                new_line = re.sub(r'f(["\'][^{]*["\'])', r'\1', line)
+                new_line = re.sub(r'f(["\'][^{]*["\'])', r"\1", line)
                 if new_line != line:
                     lines[line_num - 1] = new_line
 
-                    with open(file_path, 'w', encoding='utf-8') as f:
+                    with open(file_path, "w", encoding="utf-8") as f:
                         f.writelines(lines)
 
                     print(f"✅ Corrigé {file_path}:{line_num}")

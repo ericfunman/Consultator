@@ -828,9 +828,9 @@ def create_premium_quality_report():
     footer_para.add_run(
         "🔧 Technologies : Matplotlib + Seaborn + NumPy + Pandas\n"
     ).italic = True
-    footer_para.add_run("📊 6 Visualisations HD (300 DPI) - Qualité Print\n").italic = (
-        True
-    )
+    footer_para.add_run(
+        "📊 6 Visualisations HD (300 DPI) - Qualité Print\n"
+    ).italic = True
     footer_para.add_run(
         f'⏰ Généré le {datetime.now().strftime("%d/%m/%Y à %H:%M:%S")}\n'
     ).italic = True

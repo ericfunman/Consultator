@@ -302,9 +302,9 @@ def create_quality_report():
     footer_para.add_run(
         "Rapport généré automatiquement par GitHub Copilot\n"
     ).italic = True
-    footer_para.add_run("Outils utilisés : Bandit, Flake8, PyLint, Pytest\n").italic = (
-        True
-    )
+    footer_para.add_run(
+        "Outils utilisés : Bandit, Flake8, PyLint, Pytest\n"
+    ).italic = True
     footer_para.add_run(
         f'Version Consultator : V1.3 - {datetime.now().strftime("%d/%m/%Y")}\n'
     ).italic = True

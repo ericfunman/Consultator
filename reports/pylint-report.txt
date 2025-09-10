@@ -1843,16 +1843,16 @@ External dependencies
 ---------------------
 ::
 
-    components 
+    components
       \-technology_widget (pages_modules.consultants_clean,pages_modules.consultants_final,pages_modules.technologies)
-    database 
+    database
       \-database (main_optimized,main_optimized_simple,main_original_backup,main_preloading,pages_modules.business_managers,pages_modules.consultant_cv,pages_modules.consultant_documents,pages_modules.consultant_forms,pages_modules.consultant_info,pages_modules.consultant_languages,pages_modules.consultant_list,pages_modules.consultant_missions,pages_modules.consultant_profile,pages_modules.consultant_skills,pages_modules.consultants,pages_modules.consultants_clean,pages_modules.consultants_final,pages_modules.consultants_optimized,pages_modules.home,services.business_manager_service,services.chatbot_service,services.consultant_service,services.document_service,services.practice_service,services.practice_service_optimized,services.technology_service,test_streamlit_debug)
       \-models (pages_modules.business_managers,pages_modules.consultant_cv,pages_modules.consultant_documents,pages_modules.consultant_forms,pages_modules.consultant_info,pages_modules.consultant_languages,pages_modules.consultant_list,pages_modules.consultant_missions,pages_modules.consultant_profile,pages_modules.consultant_skills,pages_modules.consultants,pages_modules.consultants_clean,pages_modules.consultants_final,pages_modules.consultants_optimized,services.business_manager_service,services.chatbot_service,services.consultant_service,services.document_service,services.practice_service,services.practice_service_optimized,services.technology_service,test_streamlit_debug)
-    docx 
+    docx
       \-Document (services.document_analyzer,services.document_analyzer_clean,services.document_service,services.simple_analyzer)
     openpyxl (pages_modules.consultant_list)
       \-styles (pages_modules.consultant_list)
-    pages_modules 
+    pages_modules
       \-business_managers (main,main_new,main_optimized,main_optimized_simple,main_original_backup,main_preloading)
       \-business_managers_simple (test_streamlit_debug)
       \-chatbot (main,main_new,main_optimized,main_optimized_simple,main_original_backup,main_preloading)
@@ -1862,13 +1862,13 @@ External dependencies
       \-technologies (main,main_new,main_optimized,main_optimized_simple,main_original_backup,main_preloading)
     pandas (pages_modules.business_managers,pages_modules.consultant_documents,pages_modules.consultant_info,pages_modules.consultant_languages,pages_modules.consultant_list,pages_modules.consultant_missions,pages_modules.consultant_skills,pages_modules.consultants,pages_modules.consultants_clean,pages_modules.consultants_final,pages_modules.consultants_optimized,pages_modules.home,pages_modules.practices,pages_modules.practices_optimized)
     pdfplumber (services.document_analyzer,services.document_analyzer_clean,services.document_service)
-    plotly 
+    plotly
       \-express (pages_modules.home,pages_modules.practices)
       \-graph_objects (pages_modules.consultants)
-    pptx 
+    pptx
       \-Presentation (services.document_analyzer,services.document_analyzer_clean,services.document_service,services.simple_analyzer)
     pypdf (services.document_analyzer,services.document_analyzer_clean,services.document_service,services.simple_analyzer)
-    services 
+    services
       \-business_manager_service (pages_modules.business_managers)
       \-chatbot_service (pages_modules.chatbot)
       \-consultant_service (pages_modules.consultant_cv,pages_modules.consultant_documents,pages_modules.consultant_forms,pages_modules.consultant_info,pages_modules.consultant_languages,pages_modules.consultant_list,pages_modules.consultant_missions,pages_modules.consultant_profile,pages_modules.consultant_skills,pages_modules.consultants,pages_modules.consultants_clean,pages_modules.consultants_final,pages_modules.consultants_optimized,pages_modules.practices,pages_modules.practices_optimized)
@@ -1885,7 +1885,7 @@ External dependencies
       \-pool (database.database)
     streamlit (components.technology_widget,database.database,main,main_new,main_optimized,main_optimized_simple,main_original_backup,main_preloading,main_test,pages_modules.business_managers,pages_modules.business_managers_simple,pages_modules.chatbot,pages_modules.consultant_cv,pages_modules.consultant_documents,pages_modules.consultant_forms,pages_modules.consultant_info,pages_modules.consultant_languages,pages_modules.consultant_list,pages_modules.consultant_missions,pages_modules.consultant_profile,pages_modules.consultant_skills,pages_modules.consultants,pages_modules.consultants_clean,pages_modules.consultants_final,pages_modules.consultants_optimized,pages_modules.documents_functions,pages_modules.documents_upload,pages_modules.home,pages_modules.practices,pages_modules.practices_optimized,pages_modules.technologies,services.business_manager_service,services.chatbot_service,services.consultant_service,services.document_analyzer,services.document_analyzer_clean,services.document_service,services.practice_service,services.practice_service_optimized,services.simple_analyzer,test_streamlit_debug)
     streamlit_option_menu (main,main_new,main_optimized,main_optimized_simple,main_original_backup,main_preloading)
-    utils 
+    utils
       \-skill_categories (pages_modules.consultant_skills,pages_modules.consultants)
       \-technologies_referentiel (services.technology_service)
 
@@ -2133,4 +2133,3 @@ Messages
 
 ------------------------------------------------------------------
 Your code has been rated at 8.17/10 (previous run: 9.82/10, -1.64)
-

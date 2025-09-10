@@ -13,22 +13,28 @@ def get_e722_errors() -> List[Tuple[str, int, str]]:
     """Récupère toutes les erreurs E722 via flake8."""
     try:
         result = subprocess.run(
-            ["python", "-m", "flake8", "--select=E722", "--exclude=.venv_backup,venv,.git"],
+            [
+                "python",
+                "-m",
+                "flake8",
+                "--select=E722",
+                "--exclude=.venv_backup,venv,.git",
+            ],
             capture_output=True,
             text=True,
-            cwd="."
+            cwd=".",
         )
 
         errors = []
-        for line in result.stdout.strip().split('\n'):
-            if line.strip() and 'E722' in line:
-                parts = line.split(':')
+        for line in result.stdout.strip().split("\n"):
+            if line.strip() and "E722" in line:
+                parts = line.split(":")
                 if len(parts) >= 4:
-                    file_path = parts[0].strip('.')
-                    if file_path.startswith('\\'):
+                    file_path = parts[0].strip(".")
+                    if file_path.startswith("\\"):
                         file_path = file_path[1:]
                     line_num = int(parts[1])
-                    message = ':'.join(parts[3:]).strip()
+                    message = ":".join(parts[3:]).strip()
                     errors.append((file_path, line_num, message))
 
         return errors
@@ -44,7 +50,7 @@ def fix_e722_in_file(file_path: str, line_numbers: List[int]) -> int:
         return 0
 
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         fixes = 0
@@ -54,15 +60,15 @@ def fix_e722_in_file(file_path: str, line_numbers: List[int]) -> int:
                 original_line = line.strip()  # noqa: F841
 
                 # Pattern pour corriger bare except
-                if 'except:' in line:
+                if "except:" in line:
                     # Remplacer except: par except Exception:
-                    new_line = line.replace('except:', 'except Exception:')
+                    new_line = line.replace("except:", "except Exception:")
                     lines[line_num - 1] = new_line
                     fixes += 1
                     print(f"  Ligne {line_num}: except: -> except Exception:")
 
         if fixes > 0:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.writelines(lines)
             print(f"✅ {fixes} corrections dans {file_path}")
 
