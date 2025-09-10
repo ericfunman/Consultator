@@ -7,7 +7,6 @@ enableXsrfProtection = false
 
 [global]
 # Cache et performances
-dataFrameSerialization = "arrow"
 showWarningOnDirectExecution = false
 
 [browser]
@@ -25,8 +24,6 @@ textColor = "#262730"
 [runner]
 # Optimisations d'exécution
 magicEnabled = false
-installTracer = false
-fixMatplotlib = false
 postScriptGC = true
 
 [client]
