@@ -41,16 +41,17 @@ class AutomatedQualityPipeline:
             return False
 
     def run_unit_tests(self):
-        """Exécute les tests unitaires avec le script simple (sans pytest)"""
+        """Exécute les tests unitaires avec gestion d'erreur robuste"""
         print("🧪 Exécution des tests unitaires...")
 
         try:
-            # Utiliser le script de test simple au lieu de pytest
+            # Utiliser le script de test simple avec timeout court
             result = subprocess.run(
-                ["python", "tests/test_simple.py"],
+                [sys.executable, "tests/test_simple.py"],
                 capture_output=True,
                 text=True,
-                timeout=120,
+                timeout=30,  # Timeout plus court
+                cwd=self.project_root
             )
 
             # Analyser les résultats
@@ -59,16 +60,30 @@ class AutomatedQualityPipeline:
                 "success": success,
                 "exit_code": result.returncode,
                 "output": result.stdout,
+                "error": result.stderr
             }
 
             if success:
                 print("✅ Tests unitaires réussis")
-                print(result.stdout.split("\n")[-3])  # Afficher le résumé
+                print("📄 Sortie:", result.stdout.strip()[-200:])  # Derniers 200 caractères
             else:
                 print("❌ Échec des tests unitaires")
-                print(result.stderr)
+                print("📄 Erreur:", result.stderr.strip()[-500:])  # Derniers 500 caractères
 
             return success
+
+        except subprocess.TimeoutExpired:
+            print("❌ Timeout des tests unitaires")
+            self.test_results["unit_tests"] = {"success": False, "error": "Timeout"}
+            return False
+        except FileNotFoundError:
+            print("❌ Fichier de test introuvable")
+            self.test_results["unit_tests"] = {"success": False, "error": "File not found"}
+            return False
+        except Exception as e:
+            print(f"❌ Erreur inattendue: {e}")
+            self.test_results["unit_tests"] = {"success": False, "error": str(e)}
+            return False
 
         except subprocess.TimeoutExpired:
             print("⏰ Timeout des tests unitaires (2 min)")
@@ -86,20 +101,25 @@ class AutomatedQualityPipeline:
         try:
             # Utiliser le même script de test simple pour les smoke tests
             result = subprocess.run(
-                ["python", "tests/test_simple.py"], capture_output=True, text=True, timeout=60
+                [sys.executable, "tests/test_simple.py"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=self.project_root
             )
 
             success = result.returncode == 0
             self.test_results["smoke_tests"] = {
                 "success": success,
                 "output": result.stdout,
+                "error": result.stderr
             }
 
             if success:
                 print("✅ Tests de fumée réussis")
             else:
                 print("❌ Échec des tests de fumée")
-                print(result.stderr)
+                print("📄 Erreur:", result.stderr.strip()[-500:])
 
             return success
 
