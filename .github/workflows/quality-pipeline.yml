@@ -199,6 +199,24 @@ jobs:
           exit 1
         fi
 
+    - name: Create gh-pages branch if needed
+      run: |
+        echo "🔧 Vérification de la branche gh-pages..."
+        if ! git ls-remote --heads origin gh-pages | grep gh-pages; then
+          echo "📝 Création de la branche gh-pages..."
+          git checkout --orphan gh-pages
+          git rm -rf .
+          echo "# Performance Benchmarks" > README.md
+          echo "Ce repository contient les résultats des benchmarks de performance." >> README.md
+          git add README.md
+          git commit -m "Initial commit for gh-pages branch"
+          git push origin gh-pages
+          git checkout master
+          echo "✅ Branche gh-pages créée"
+        else
+          echo "✅ Branche gh-pages existe déjà"
+        fi
+
     - name: Store benchmark result
       if: always()
       continue-on-error: true
@@ -207,7 +225,7 @@ jobs:
         tool: 'pytest'
         output-file-path: reports/benchmark.json
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        auto-push: false
+        auto-push: true
         comment-on-alert: true
         fail-on-alert: false
         alert-threshold: 200%
