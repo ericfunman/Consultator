@@ -3,8 +3,27 @@ name: Quality Assurance Pipeline
 on:
   push:
     branches: [ main, master, develop ]
-  pull_request:
-            echo "📋 INSTRUCTIONS POUR CONFIGURER SONARQUBE :" branches: [ main, master ]
+  pull_reques        if [ -n "$SONAR_TOKEN" ]; then
+          echo "✅ SONAR_TOKEN trouvé (longueur: ${#SONAR_TOKEN})"
+          echo "🔧 Token starts with: ${SONAR_TOKEN:0:4}..."
+          # Définir une variable pour indiquer que SonarQube peut être exécuté
+          echo "SONARQUBE_ENABLED=true" >> $GITHUB_ENV
+        else
+          echo "❌ SONAR_TOKEN manquant - SonarQube sera skip"
+          echo ""
+          echo "📋 INSTRUCTIONS POUR CONFIGURER SONARQUBE :"
+          echo "=========================================="
+          echo "1. Allez sur https://sonarcloud.io/account/security/"
+          echo "2. Générez un nouveau token"
+          echo "3. Dans GitHub : Settings > Secrets and variables > Actions"
+          echo "4. Ajoutez un nouveau secret nommé 'SONAR_TOKEN'"
+          echo "5. Collez votre token SonarCloud"
+          echo ""
+          echo "🔗 Liens utiles :"
+          echo "- SonarCloud: https://sonarcloud.io"
+          echo "- Documentation: https://docs.sonarsource.com/sonarcloud/"
+          echo "SONARQUBE_ENABLED=false" >> $GITHUB_ENV
+        fiho "📋 INSTRUCTIONS POUR CONFIGURER SONARQUBE :" branches: [ main, master ]
   schedule:
     # Exécution quotidienne à 6h00 UTC
     - cron: '0 6 * * *'
@@ -124,7 +143,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     - name: Setup SonarQube properties
-      if: matrix.python-version == '3.12' && secrets.SONAR_TOKEN != ''
+      if: matrix.python-version == '3.12' && env.SONARQUBE_ENABLED == 'true'
       run: |
         echo "🔧 Configuration SonarQube..."
         # S'assurer que le fichier de couverture existe
@@ -135,7 +154,7 @@ jobs:
         fi
 
     - name: SonarQube Scan
-      if: matrix.python-version == '3.12' && secrets.SONAR_TOKEN != ''
+      if: matrix.python-version == '3.12' && env.SONARQUBE_ENABLED == 'true'
       uses: SonarSource/sonarqube-scan-action@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
