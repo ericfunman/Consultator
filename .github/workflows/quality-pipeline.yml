@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main, master, develop ]
   pull_request:
-    branches: [ main, master ]
+            echo "📋 INSTRUCTIONS POUR CONFIGURER SONARQUBE :" branches: [ main, master ]
   schedule:
     # Exécution quotidienne à 6h00 UTC
     - cron: '0 6 * * *'
@@ -102,7 +102,7 @@ jobs:
       if: matrix.python-version == '3.12'
       run: |
         echo "🔍 Vérification du token SonarQube..."
-        if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
+        if [ -n "$SONAR_TOKEN" ]; then
           echo "✅ SONAR_TOKEN trouvé"
           echo "🔧 Token length: ${#SONAR_TOKEN}"
         else
