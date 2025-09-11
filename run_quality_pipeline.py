@@ -47,7 +47,7 @@ class AutomatedQualityPipeline:
         try:
             # Utiliser le script de test simple au lieu de pytest
             result = subprocess.run(
-                ["python", "test_simple.py"],
+                ["python", "tests/test_simple.py"],
                 capture_output=True,
                 text=True,
                 timeout=120,
@@ -86,7 +86,7 @@ class AutomatedQualityPipeline:
         try:
             # Utiliser le même script de test simple pour les smoke tests
             result = subprocess.run(
-                ["python", "test_simple.py"], capture_output=True, text=True, timeout=60
+                ["python", "tests/test_simple.py"], capture_output=True, text=True, timeout=60
             )
 
             success = result.returncode == 0
