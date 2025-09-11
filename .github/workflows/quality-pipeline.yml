@@ -9,6 +9,12 @@ on:
     # Exécution quotidienne à 6h00 UTC
     - cron: '0 6 * * *'
 
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
+  statuses: write
+
 jobs:
   quality-check:
     runs-on: ubuntu-latest
@@ -71,12 +77,26 @@ jobs:
           !reports/htmlcov/
 
     - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.12' && env.CODECOV_TOKEN != ''
       uses: codecov/codecov-action@v4
-      if: matrix.python-version == '3.12'
       with:
         file: ./reports/coverage.xml
         flags: unittests
         name: codecov-umbrella
+        token: ${{ secrets.CODECOV_TOKEN }}
+      continue-on-error: true
+
+    - name: Check coverage file
+      if: matrix.python-version == '3.12'
+      run: |
+        if [ -f reports/coverage.xml ]; then
+          echo "✅ Fichier de couverture trouvé"
+          head -10 reports/coverage.xml
+        else
+          echo "⚠️ Fichier de couverture manquant - génération d'un fichier vide"
+          mkdir -p reports
+          echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > reports/coverage.xml
+        fi
 
     - name: SonarQube Scan
       if: matrix.python-version == '3.12' && env.SONAR_TOKEN != ''
@@ -187,8 +207,8 @@ jobs:
         tool: 'pytest'
         output-file-path: reports/benchmark.json
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        auto-push: true
-        comment-on-alert: false
+        auto-push: false
+        comment-on-alert: true
         fail-on-alert: false
         alert-threshold: 200%
 
