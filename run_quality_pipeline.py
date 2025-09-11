@@ -155,8 +155,8 @@ class AutomatedQualityPipeline:
             return False
 
     def run_regression_tests(self):
-        """Exécute les tests de non-régression"""
-        print("🔄 Exécution des tests de régression...")
+        """Exécute TOUS les tests (mode régression complète)"""
+        print("🔄 Exécution de TOUS les tests (mode régression)...")
 
         try:
             result = subprocess.run(
@@ -165,38 +165,33 @@ class AutomatedQualityPipeline:
                     "-m",
                     "pytest",
                     "tests/",
-                    "-m",
-                    "regression",
                     "-v",
                     "--tb=short",
+                    "--maxfail=5",
                 ],
                 capture_output=True,
                 text=True,
-                timeout=180,
+                timeout=300,  # Augmenté pour tous les tests
             )
 
             # Analyser le résultat plus finement
             if result.returncode == 0:
-                # Tests de régression réussis
+                # Tests réussis
                 success = True
-                print("✅ Tests de régression réussis")
+                print("✅ TOUS les tests réussis")
             elif result.returncode == 5:
-                # Code 5 = No tests collected (pas de tests de régression)
-                success = True
-                print("ℹ️ Aucun test de régression trouvé (considéré comme succès)")
-            elif "no tests ran" in result.stdout.lower() or "no tests collected" in result.stdout.lower():
-                # Pas de tests de régression trouvés
-                success = True
-                print("ℹ️ Aucun test de régression trouvé (considéré comme succès)")
-            else:
-                # Autre erreur = possible régression
+                # Code 5 = No tests collected
                 success = False
-                print("⚠️ Attention : Détection de régression possible")
+                print("❌ Aucun test trouvé")
+            else:
+                # Autre erreur
+                success = False
+                print("❌ Échec des tests")
                 print(f"   Code de sortie: {result.returncode}")
                 if result.stdout:
-                    print(f"   Sortie: {result.stdout.strip()[-200:]}")
+                    print(f"   Sortie: {result.stdout.strip()[-500:]}")
                 if result.stderr:
-                    print(f"   Erreur: {result.stderr.strip()[-200:]}")
+                    print(f"   Erreur: {result.stderr.strip()[-500:]}")
 
             self.test_results["regression_tests"] = {
                 "success": success,
