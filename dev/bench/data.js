@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757600208395,
+  "lastUpdate": 1757600664930,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -59,6 +59,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000015701546810419726",
             "extra": "mean: 5.085307786802572 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "f492c4176eb8beb114c2c580ec10473d6c82acee",
+          "message": "fix: Tests de régression exécutent maintenant TOUS les tests\n\n- Suppression du filtre -m regression pour exécuter tous les tests\n- Augmentation du timeout à 300s pour gérer tous les tests\n- Modification des messages pour refléter l'exécution complète\n- Le job regression-tests exécute maintenant les 486 tests complets",
+          "timestamp": "2025-09-11T16:20:09+02:00",
+          "tree_id": "336d2c70865cb9c6a8ef874cc9a6c5175247291c",
+          "url": "https://github.com/ericfunman/Consultator/commit/f492c4176eb8beb114c2c580ec10473d6c82acee"
+        },
+        "date": 1757600664096,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.4736788511242,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000021058894856563945",
+            "extra": "mean: 1.0621645856528834 msec\nrounds: 934"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 286684.9733795575,
+            "unit": "iter/sec",
+            "range": "stddev: 5.277385751665898e-7",
+            "extra": "mean: 3.488149337621707 usec\nrounds: 115115"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 156879.51856611742,
+            "unit": "iter/sec",
+            "range": "stddev: 8.28584402529986e-7",
+            "extra": "mean: 6.37431838865917 usec\nrounds: 75166"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33005.05219970383,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000017461631944543692",
+            "extra": "mean: 30.298391711344525 usec\nrounds: 21789"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.47012890349936,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000015512782819636255",
+            "extra": "mean: 5.0898322588833445 msec\nrounds: 197"
           }
         ]
       }
