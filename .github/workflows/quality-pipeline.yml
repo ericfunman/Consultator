@@ -199,6 +199,12 @@ jobs:
           exit 1
         fi
 
+    - name: Configure Git identity
+      run: |
+        git config --global user.email "lapinae@gmail.com"
+        git config --global user.name "Eric Lapina"
+        echo "✅ Identité Git configurée pour Eric Lapina"
+
     - name: Create gh-pages branch if needed
       run: |
         echo "🔧 Vérification de la branche gh-pages..."
