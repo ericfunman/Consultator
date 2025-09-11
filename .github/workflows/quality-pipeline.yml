@@ -98,8 +98,44 @@ jobs:
           echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > reports/coverage.xml
         fi
 
+    - name: Check SonarQube token
+      if: matrix.python-version == '3.12'
+      run: |
+        echo "🔍 Vérification du token SonarQube..."
+        if [ -n "${{ secrets.SONAR_TOKEN }}" ]; then
+          echo "✅ SONAR_TOKEN trouvé"
+          echo "🔧 Token length: ${#SONAR_TOKEN}"
+        else
+          echo "❌ SONAR_TOKEN manquant - SonarQube sera skip"
+          echo ""
+          echo "� INSTRUCTIONS POUR CONFIGURER SONARQUBE :"
+          echo "=========================================="
+          echo "1. Allez sur https://sonarcloud.io/account/security/"
+          echo "2. Générez un nouveau token"
+          echo "3. Dans GitHub : Settings > Secrets and variables > Actions"
+          echo "4. Ajoutez un nouveau secret nommé 'SONAR_TOKEN'"
+          echo "5. Collez votre token SonarCloud"
+          echo ""
+          echo "🔗 Liens utiles :"
+          echo "- SonarCloud: https://sonarcloud.io"
+          echo "- Documentation: https://docs.sonarsource.com/sonarcloud/"
+        fi
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Setup SonarQube properties
+      if: matrix.python-version == '3.12' && secrets.SONAR_TOKEN != ''
+      run: |
+        echo "🔧 Configuration SonarQube..."
+        # S'assurer que le fichier de couverture existe
+        if [ ! -f reports/coverage.xml ]; then
+          echo "⚠️ Fichier coverage.xml manquant, création d'un fichier vide"
+          mkdir -p reports
+          echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > reports/coverage.xml
+        fi
+
     - name: SonarQube Scan
-      if: matrix.python-version == '3.12' && env.SONAR_TOKEN != ''
+      if: matrix.python-version == '3.12' && secrets.SONAR_TOKEN != ''
       uses: SonarSource/sonarqube-scan-action@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
