@@ -38,6 +38,16 @@ def show():
 def show_bm_profile():
     """Affiche le profil détaillé d'un Business Manager"""
     bm_id = st.session_state.view_bm_profile
+    
+    # S'assurer que bm_id est un entier
+    if isinstance(bm_id, str):
+        try:
+            bm_id = int(bm_id)
+        except ValueError:
+            st.error("❌ ID du Business Manager invalide")
+            del st.session_state.view_bm_profile
+            st.rerun()
+            return
 
     try:
         with get_session() as session:
@@ -100,12 +110,12 @@ def show_bm_profile():
                 col_edit, col_delete = st.columns(2)
 
                 with col_edit:
-                    if st.button("✏️ Modifier", use_container_width=True):
+                    if st.button("✏️ Modifier", width="stretch"):
                         st.session_state.edit_bm_mode = True
 
                 with col_delete:
                     if st.button(
-                        "🗑️ Supprimer", use_container_width=True, type="primary"
+                        "🗑️ Supprimer", width="stretch", type="primary"
                     ):
                         st.session_state.delete_bm_mode = True
 
@@ -222,7 +232,7 @@ def show_delete_bm_confirmation(bm):
 
             with col1:
                 if st.button(
-                    "�️ Oui, supprimer", type="primary", use_container_width=True
+                    "🗑️ Oui, supprimer", type="primary", width="stretch"
                 ):
                     try:
                         # Clôturer les assignations actives
@@ -269,7 +279,7 @@ def show_delete_bm_confirmation(bm):
                         st.error(f"❌ Erreur lors de la suppression : {e}")
 
             with col2:
-                if st.button("❌ Non, annuler", use_container_width=True):
+                if st.button("❌ Non, annuler", width="stretch"):
                     st.session_state.delete_bm_mode = False
                     st.rerun()
 
@@ -706,7 +716,7 @@ def show_bm_assignments_history(bm, session):
 
         st.dataframe(
             df,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config={
                 "Consultant": st.column_config.TextColumn("Consultant", width="large"),
@@ -805,98 +815,171 @@ def show_business_managers_list():
                 }
             )
 
-        # Afficher le tableau avec sélection (EN DEHORS de la boucle)
+        # Afficher le tableau avec noms cliquables
         df = pd.DataFrame(bms_data)
 
-        event = st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True,
-            on_select="rerun",
-            selection_mode="single-row",
-            column_config={
-                "ID": st.column_config.NumberColumn("ID", width="small"),
-                "Prénom": st.column_config.TextColumn("Prénom", width="medium"),
-                "Nom": st.column_config.TextColumn("Nom", width="medium"),
-                "Email": st.column_config.TextColumn("Email", width="large"),
-                "Téléphone": st.column_config.TextColumn("Téléphone", width="medium"),
-                "Consultants actuels": st.column_config.NumberColumn(
-                    "Consultants", width="small"
-                ),
-                "Total assignations": st.column_config.NumberColumn(
-                    "Total", width="small"
-                ),
-                "Statut": st.column_config.TextColumn("Statut", width="small"),
-                "Créé le": st.column_config.TextColumn("Créé le", width="medium"),
-            },
-        )
+        # En-tête du tableau
+        st.markdown("### 📋 Liste des Business Managers")
+        
+        # CSS pour styliser les boutons comme des liens hypertextes
+        st.markdown("""
+        <style>
+        /* Style pour transformer les boutons en liens hypertextes - sélecteurs très spécifiques */
+        .stButton button, 
+        .stButton > div > button,
+        div[data-testid="column"] button,
+        div[data-testid="column"] > div button,
+        div[data-testid="column"] > div > div button,
+        div[data-testid="column"] > div > div > div button,
+        div[data-testid="column"] > div > div > div > div button {
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            color: #1f77b4 !important;
+            text-decoration: underline !important;
+            cursor: pointer !important;
+            font-size: 14px !important;
+            font-weight: 400 !important;
+            text-align: left !important;
+            box-shadow: none !important;
+            min-height: auto !important;
+            height: auto !important;
+            width: auto !important;
+            border-width: 0 !important;
+            outline: none !important;
+        }
+        
+        .stButton button:hover, 
+        .stButton > div > button:hover,
+        div[data-testid="column"] button:hover,
+        div[data-testid="column"] > div button:hover,
+        div[data-testid="column"] > div > div button:hover,
+        div[data-testid="column"] > div > div > div button:hover,
+        div[data-testid="column"] > div > div > div > div button:hover {
+            color: #0d47a1 !important;
+            text-decoration: underline !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .stButton button:focus, 
+        .stButton > div > button:focus,
+        div[data-testid="column"] button:focus,
+        div[data-testid="column"] > div button:focus,
+        div[data-testid="column"] > div > div button:focus,
+        div[data-testid="column"] > div > div > div button:focus,
+        div[data-testid="column"] > div > div > div > div button:focus {
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: 1px dotted #1f77b4 !important;
+        }
+        
+        .stButton button:active, 
+        .stButton > div > button:active,
+        div[data-testid="column"] button:active,
+        div[data-testid="column"] > div button:active,
+        div[data-testid="column"] > div > div button:active,
+        div[data-testid="column"] > div > div > div button:active,
+        div[data-testid="column"] > div > div > div > div button:active {
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #0d47a1 !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # En-tête avec colonnes
+        header_cols = st.columns([1, 3, 3, 2, 2, 2, 2])
+        with header_cols[0]:
+            st.markdown("**ID**")
+        with header_cols[1]:
+            st.markdown("**👤 Nom complet**")
+        with header_cols[2]:
+            st.markdown("**Email**")
+        with header_cols[3]:
+            st.markdown("**📱 Téléphone**")
+        with header_cols[4]:
+            st.markdown("**👥 Consultants**")
+        with header_cols[5]:
+            st.markdown("**📊 Total**")
+        with header_cols[6]:
+            st.markdown("**🔄 Statut**")
+        
+        st.markdown("---")
 
-        # Actions sur sélection
-        if event.selection.rows:
-            selected_row = event.selection.rows[0]
-            selected_id = bms_data[selected_row]["ID"]
-            selected_name = f"{
-                bms_data[selected_row]['Prénom']} {
-                bms_data[selected_row]['Nom']}"
-
-            st.success(f"✅ Business Manager sélectionné : **{selected_name}**")
-
-            col1, col2, col3 = st.columns(3)
-
-            with col1:
-                if st.button(
-                    "👁️ Voir le profil",
-                    type="primary",
-                    use_container_width=True,
-                    key=f"view_bm_{selected_id}",
-                ):
-                    st.session_state.view_bm_profile = selected_id
+        # Lignes de données
+        for i, row in enumerate(bms_data):
+            cols = st.columns([1, 3, 3, 2, 2, 2, 2])
+            
+            with cols[0]:
+                st.write(f"`{row['ID']}`")
+            
+            with cols[1]:
+                # Nom comme vrai lien hypertexte HTML + bouton invisible pour la navigation
+                nom_complet = f"{row['Prénom']} {row['Nom']}"
+                
+                # Nom comme lien hypertexte cliquable
+                if st.button(f"👤 {nom_complet}", key=f"btn_bm_{row['ID']}", help=f"Voir le profil de {nom_complet}"):
+                    st.session_state.view_bm_profile = int(row['ID'])
                     st.rerun()
-
-            with col2:
-                if st.button(
-                    "✏️ Modifier",
-                    use_container_width=True,
-                    key=f"edit_bm_{selected_id}",
-                ):
-                    st.session_state.view_bm_profile = selected_id
-                    st.session_state.edit_bm_mode = True
-                    st.rerun()
-
-            with col3:
-                if st.button(
-                    "🗑️ Supprimer",
-                    use_container_width=True,
-                    key=f"delete_bm_{selected_id}",
-                ):
-                    st.session_state.view_bm_profile = selected_id
-                    st.session_state.delete_bm_mode = True
-                    st.rerun()
+            
+            with cols[2]:
+                # Email simple non cliquable (utilisation du HTML pour éviter la détection automatique)
+                st.markdown(f"""
+                <div style="color: #262730; font-size: 14px;">
+                    {row['Email']}
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with cols[3]:
+                st.write(row['Téléphone'])
+            
+            with cols[4]:
+                st.write(f"**{row['Consultants actuels']}**")
+            
+            with cols[5]:
+                st.write(f"{row['Total assignations']}")
+            
+            with cols[6]:
+                st.write(row['Statut'])
+            
+            # Ligne de séparation subtile
+            if i < len(bms_data) - 1:
+                st.markdown("<hr style='margin: 0.5rem 0; border: 0; border-top: 1px solid #eee;'>", unsafe_allow_html=True)
 
         # Métriques générales
         st.markdown("---")
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            st.metric("👔 Total BMs", len(bms_data_from_service))
+            st.write(f"**👔 Total BMs:** {len(bms_data_from_service)}")
 
         with col2:
             actifs = len([bm for bm in bms_data_from_service if bm["actif"]])
-            st.metric("🟢 Actifs", actifs)
+            st.write(f"**🟢 Actifs:** {actifs}")
 
-            with col3:
-                total_consultants = sum(
-                    bm_data["Consultants actuels"] for bm_data in bms_data
-                )
-                st.metric("👥 Total consultants gérés", total_consultants)
+        with col3:
+            total_consultants = sum(
+                bm_data["Consultants actuels"] for bm_data in bms_data
+            )
+            st.write(f"**👥 Total consultants gérés:** {total_consultants}")
 
-            with col4:
-                avg_consultants = (
-                    total_consultants / len(bms_data_from_service)
-                    if len(bms_data_from_service) > 0
-                    else 0
-                )
-                st.metric("📊 Moyenne consultants/BM", f"{avg_consultants:.1f}")
+        with col4:
+            avg_consultants = (
+                total_consultants / len(bms_data_from_service)
+                if len(bms_data_from_service) > 0
+                else 0
+            )
+            st.write(f"**📊 Moyenne consultants/BM:** {avg_consultants:.1f}")
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement de la liste : {e}")
@@ -996,19 +1079,19 @@ def show_statistics():
             col1, col2, col3, col4 = st.columns(4)
 
             with col1:
-                st.metric("� Total BMs", total_bms)
+                st.write(f"**👔 Total BMs:** {total_bms}")
 
             with col2:
-                st.metric("🟢 BMs Actifs", total_active_bms)
+                st.write(f"**🟢 BMs Actifs:** {total_active_bms}")
 
             with col3:
-                st.metric("🔗 Assignations actives", active_assignments)
+                st.write(f"**🔗 Assignations actives:** {active_assignments}")
 
             with col4:
                 avg_consultants = (
                     active_assignments / total_active_bms if total_active_bms > 0 else 0
                 )
-                st.metric("📊 Moyenne consultants/BM", f"{avg_consultants:.1f}")
+                st.write(f"**📊 Moyenne consultants/BM:** {avg_consultants:.1f}")
 
             # Répartition par BM
             st.subheader("� Répartition des consultants par BM")
