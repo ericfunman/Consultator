@@ -9,6 +9,7 @@ from database.database import get_session
 from database.models import BusinessManager
 from database.models import Consultant
 from database.models import ConsultantBusinessManager
+from database.models import Mission
 from services.business_manager_service import BusinessManagerService
 
 
@@ -318,20 +319,49 @@ def show_current_bm_consultants(bm, session):
             st.info("👥 Aucun consultant actuellement assigné")
             return
 
-        # Tableau des consultants actuels
+        # Tableau des consultants actuels avec nouvelles colonnes
         data = []
         for assignment, consultant in current_assignments:
-            duree = (datetime.now().date() - assignment.date_debut).days
+            # Récupérer la mission en cours (la plus récente active)
+            mission_en_cours = (
+                session.query(Mission)
+                .filter(
+                    and_(
+                        Mission.consultant_id == consultant.id,
+                        Mission.statut == "en_cours"
+                    )
+                )
+                .order_by(Mission.date_debut.desc())
+                .first()
+            )
+            
+            # Préparer les données de mission
+            client_mission = mission_en_cours.client if mission_en_cours else "N/A"
+            role_mission = mission_en_cours.role if mission_en_cours and mission_en_cours.role else "N/A"
+            tjm_mission = mission_en_cours.tjm if mission_en_cours and mission_en_cours.tjm else (
+                mission_en_cours.taux_journalier if mission_en_cours and mission_en_cours.taux_journalier else "N/A"
+            )
+            date_debut_mission = mission_en_cours.date_debut.strftime("%d/%m/%Y") if mission_en_cours else "N/A"
+            
+            # Formatage du TJM
+            tjm_display = f"{tjm_mission}€" if isinstance(tjm_mission, (int, float)) else tjm_mission
+            
+            # Formatage du salaire
+            salaire_display = f"{consultant.salaire_actuel}€" if consultant.salaire_actuel else "N/A"
+            
             data.append(
                 {
-                    "ID": consultant.id,
                     "Consultant": f"{consultant.prenom} {consultant.nom}",
                     "Email": consultant.email,
-                    "Depuis le": assignment.date_debut.strftime("%d/%m/%Y"),
-                    "Durée (jours)": duree,
-                    "Statut": (
+                    "Type Contrat": consultant.type_contrat or "N/A",
+                    "Disponibilité": (
                         "🟢 Disponible" if consultant.disponibilite else "🔴 Occupé"
                     ),
+                    "Client": client_mission,
+                    "Rôle": role_mission,
+                    "Salaire": salaire_display,
+                    "TJM Mission": tjm_display,
+                    "Début Mission": date_debut_mission,
                 }
             )
 
@@ -340,7 +370,7 @@ def show_current_bm_consultants(bm, session):
         # Affichage avec sélection
         event = st.dataframe(
             df,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             on_select="rerun",
             selection_mode="single-row",
