@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757600664930,
+  "lastUpdate": 1757602473606,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -118,6 +118,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000015512782819636255",
             "extra": "mean: 5.0898322588833445 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "e4248b8d6ae41f1ad75786cef9d5ad5101f81a18",
+          "message": "fix: Recréer complètement le workflow SonarQube avec configuration simplifiée",
+          "timestamp": "2025-09-11T16:49:42+02:00",
+          "tree_id": "929d56d640c3ab39cebfc8c61b2e15c79627f576",
+          "url": "https://github.com/ericfunman/Consultator/commit/e4248b8d6ae41f1ad75786cef9d5ad5101f81a18"
+        },
+        "date": 1757602473055,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.4201653748514,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001916313608807815",
+            "extra": "mean: 1.0622249626465388 msec\nrounds: 937"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 289656.00634363265,
+            "unit": "iter/sec",
+            "range": "stddev: 5.350540068969868e-7",
+            "extra": "mean: 3.4523710128546505 usec\nrounds: 114996"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 159624.6439930409,
+            "unit": "iter/sec",
+            "range": "stddev: 8.141304855149487e-7",
+            "extra": "mean: 6.26469682240041 usec\nrounds: 72855"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 34438.547519470325,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001785273529693676",
+            "extra": "mean: 29.037229268587346 usec\nrounds: 21224"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.5139349657299,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014053755087470774",
+            "extra": "mean: 5.088697654822241 msec\nrounds: 197"
           }
         ]
       }
