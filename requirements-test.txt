@@ -1,2 +1,14 @@
 # Tests Configuration - Version minimale
 # Aucune dépendance externe pour éviter les erreurs d'installation
+
+# Outils de qualité de code (versions compatibles)
+pylint>=2.15.0,<3.0.0
+flake8>=6.0.0,<7.0.0
+bandit>=1.7.0,<2.0.0
+
+# Tests
+pytest>=7.0.0,<8.0.0
+pytest-cov>=4.0.0,<5.0.0
+
+# Sécurité
+safety>=2.3.0,<3.0.0

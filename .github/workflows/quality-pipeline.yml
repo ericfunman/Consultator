@@ -40,6 +40,19 @@ jobs:
         pip install -r requirements.txt
         echo "✅ Requirements de base installés"
 
+    - name: Install test dependencies
+      run: |
+        pip install -r requirements-test.txt
+        echo "✅ Dépendances de test installées"
+
+    - name: Verify linting tools installation
+      run: |
+        echo "🔍 Vérification des outils de linting..."
+        python -c "import pylint; print('✅ Pylint OK')" || echo "❌ Pylint manquant"
+        python -c "import flake8; print('✅ Flake8 OK')" || echo "❌ Flake8 manquant"
+        python -c "import bandit; print('✅ Bandit OK')" || echo "❌ Bandit manquant"
+        echo "✅ Vérification terminée"
+
     - name: Create reports directory
       run: mkdir -p reports
 
