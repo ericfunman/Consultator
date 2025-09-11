@@ -513,8 +513,7 @@ def mock_streamlit_complete():
 @pytest.fixture(scope="function", autouse=True)
 def mock_sqlalchemy_models_global():
     """Mock global des modèles SQLAlchemy pour tous les tests"""
-    from unittest.mock import MagicMock
-    from unittest.mock import patch
+    from unittest.mock import MagicMock, patch
 
     # Créer des mocks simples pour les modèles
     class MockPractice:
@@ -617,26 +616,23 @@ def mock_sqlalchemy_models_global():
 
     mock_session = MockSession()
 
-    with patch("app.database.models.Consultant", MockConsultant), patch(
-        "app.database.models.Practice", MockPractice
-    ), patch("app.database.models.BusinessManager", MagicMock()), patch(
-        "app.database.models.Mission", MagicMock()
-    ), patch(
-        "app.database.models.Competence", MagicMock()
-    ), patch(
-        "app.database.models.ConsultantCompetence", MagicMock()
-    ), patch(
-        "app.database.models.Langue", MagicMock()
-    ), patch(
-        "app.database.models.ConsultantLangue", MagicMock()
-    ), patch(
-        "app.pages_modules.consultants.get_database_session", return_value=mock_session
-    ), patch(
-        "app.database.database.get_database_session", return_value=mock_session
-    ), patch(
-        "app.database.database.session_local", return_value=mock_session
-    ):
+    # Patch seulement les modules qui existent réellement
+    patches = []
+    try:
+        # Patch des sessions de base de données
+        patches.append(patch("app.database.database.get_database_session", return_value=mock_session))
+        patches.append(patch("app.database.database.session_local", return_value=mock_session))
+
+        # Démarrer tous les patches
+        for p in patches:
+            p.start()
+
         yield
+
+    finally:
+        # Arrêter tous les patches
+        for p in patches:
+            p.stop()
 
 
 @pytest.fixture(scope="function")

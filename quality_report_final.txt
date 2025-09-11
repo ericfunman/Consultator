@@ -4,16 +4,16 @@
 📈 STATISTIQUES GÉNÉRALES
 ------------------------------
 • Fichiers Python analysés: 49
-• Lignes totales: 25,012
-• Lignes de code: 19,455
+• Lignes totales: 25,065
+• Lignes de code: 19,467
 • Fonctions: 437
 • Classes: 22
 
 🎯 ANALYSE DE COMPLEXITÉ
 ------------------------------
 Top 5 fichiers par complexité:
-1. app\services\chatbot_service.py: 677 points
-2. app\pages_modules\consultants.py: 604 points
+1. app\services\chatbot_service.py: 679 points
+2. app\pages_modules\consultants.py: 593 points
 3. app\services\document_analyzer.py: 315 points
 4. app\pages_modules\consultant_missions.py: 274 points
 5. app\pages_modules\consultant_cv.py: 226 points
@@ -83,9 +83,9 @@ Top 5 fichiers par complexité:
 
 📄 app\pages_modules\business_managers.py:
    • Ligne 138: f-string inutile sans variables
-   • Ligne 773: f-string inutile sans variables
-   • Ligne 858: f-string inutile sans variables
-   • Ligne 889: f-string inutile sans variables
+   • Ligne 769: f-string inutile sans variables
+   • Ligne 854: f-string inutile sans variables
+   • Ligne 885: f-string inutile sans variables
    • 4 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\consultants.py:
@@ -96,7 +96,6 @@ Top 5 fichiers par complexité:
    • Ligne 2303: f-string inutile sans variables
    • Ligne 2333: f-string inutile sans variables
    • Ligne 2335: f-string inutile sans variables
-   • Ligne 2871: f-string inutile sans variables
    • Ligne 3113: f-string inutile sans variables
    • Littéral 'N/A' dupliqué plusieurs fois
    • 14 lignes trop longues (>100 caractères)
@@ -109,9 +108,8 @@ Top 5 fichiers par complexité:
    • 3 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\consultant_cv.py:
-   • Ligne 336: f-string inutile sans variables
-   • Ligne 680: f-string inutile sans variables
-   • Ligne 720: f-string inutile sans variables
+   • Ligne 677: f-string inutile sans variables
+   • Ligne 717: f-string inutile sans variables
    • Littéral 'N/A' dupliqué plusieurs fois
    • 1 lignes trop longues (>100 caractères)
 
@@ -124,8 +122,8 @@ Top 5 fichiers par complexité:
    • 1 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\consultant_info.py:
-   • Ligne 176: f-string inutile sans variables
-   • Ligne 229: f-string inutile sans variables
+   • Ligne 174: f-string inutile sans variables
+   • Ligne 227: f-string inutile sans variables
 
 📄 app\pages_modules\consultant_list.py:
    • Ligne 384: f-string inutile sans variables
@@ -134,7 +132,7 @@ Top 5 fichiers par complexité:
    • 1 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\documents_functions.py:
-   • Ligne 17: f-string inutile sans variables
+   • Ligne 29: f-string inutile sans variables
 
 📄 app\pages_modules\documents_upload.py:
    • Ligne 43: f-string inutile sans variables
@@ -143,7 +141,7 @@ Top 5 fichiers par complexité:
    • 8 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\practices.py:
-   • Ligne 510: f-string inutile sans variables
+   • Ligne 508: f-string inutile sans variables
    • 3 lignes trop longues (>100 caractères)
 
 📄 app\pages_modules\practices_optimized.py:
@@ -155,21 +153,18 @@ Top 5 fichiers par complexité:
    • Ligne 103: f-string inutile sans variables
 
 📄 app\services\chatbot_service.py:
-   • Ligne 345: f-string inutile sans variables
-   • Ligne 598: f-string inutile sans variables
-   • Ligne 1704: f-string inutile sans variables
-   • Ligne 1824: f-string inutile sans variables
-   • 19 lignes trop longues (>100 caractères)
+   • Ligne 369: f-string inutile sans variables
+   • Ligne 630: f-string inutile sans variables
+   • Ligne 1736: f-string inutile sans variables
+   • Ligne 1856: f-string inutile sans variables
+   • 20 lignes trop longues (>100 caractères)
 
 📄 app\services\consultant_service.py:
-   • Ligne 1001: f-string inutile sans variables
-   • Ligne 1051: f-string inutile sans variables
-   • Ligne 1084: f-string inutile sans variables
    • 4 lignes trop longues (>100 caractères)
 
 📄 app\services\document_analyzer.py:
    • Ligne 248: f-string inutile sans variables
-   • Ligne 1321: f-string inutile sans variables
+   • Ligne 1320: f-string inutile sans variables
    • 12 lignes trop longues (>100 caractères)
 
 📄 app\services\document_analyzer_clean.py:
@@ -179,9 +174,7 @@ Top 5 fichiers par complexité:
 📄 app\services\document_service.py:
    • Ligne 38: f-string inutile sans variables
    • Ligne 114: f-string inutile sans variables
-   • Ligne 243: f-string inutile sans variables
-   • Ligne 420: f-string inutile sans variables
-   • 1 lignes trop longues (>100 caractères)
+   • Ligne 395: f-string inutile sans variables
 
 📄 app\services\practice_service.py:
    • 2 lignes trop longues (>100 caractères)

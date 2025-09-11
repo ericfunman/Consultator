@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-09-11T09:05:54.082258",
+  "project": "Consultator",
+  "pipeline_results": {
+    "startup_test": {
+      "success": true,
+      "output": "Streamlit OK\nApp import OK\n"
+    },
+    "database_test": {
+      "success": true,
+      "output": "DB OK\n"
+    },
+    "smoke_tests": {
+      "success": false,
+      "output": ""
+    },
+    "linting": {
+      "pylint": {
+        "score": 0.0,
+        "success": false
+      },
+      "flake8": {
+        "issues": 2438,
+        "success": false
+      },
+      "bandit": {
+        "security_issues": 0,
+        "success": true
+      }
+    }
+  },
+  "overall_success": false,
+  "recommendations": [
+    "❌ Corriger les tests unitaires qui échouent",
+    "⚠️ Vérifier les régressions détectées",
+    "📊 Améliorer le score Pylint (actuel: 0.0/10)",
+    "🔧 Corriger les 2438 problèmes Flake8"
+  ]
+}
