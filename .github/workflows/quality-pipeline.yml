@@ -2,9 +2,9 @@ name: Quality Assurance Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
   schedule:
     # Exécution quotidienne à 6h00 UTC
     - cron: '0 6 * * *'
