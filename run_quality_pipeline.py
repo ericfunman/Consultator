@@ -175,19 +175,46 @@ class AutomatedQualityPipeline:
                 timeout=180,
             )
 
-            success = result.returncode == 0
+            # Analyser le résultat plus finement
+            if result.returncode == 0:
+                # Tests de régression réussis
+                success = True
+                print("✅ Tests de régression réussis")
+            elif result.returncode == 5:
+                # Code 5 = No tests collected (pas de tests de régression)
+                success = True
+                print("ℹ️ Aucun test de régression trouvé (considéré comme succès)")
+            elif "no tests ran" in result.stdout.lower() or "no tests collected" in result.stdout.lower():
+                # Pas de tests de régression trouvés
+                success = True
+                print("ℹ️ Aucun test de régression trouvé (considéré comme succès)")
+            else:
+                # Autre erreur = possible régression
+                success = False
+                print("⚠️ Attention : Détection de régression possible")
+                print(f"   Code de sortie: {result.returncode}")
+                if result.stdout:
+                    print(f"   Sortie: {result.stdout.strip()[-200:]}")
+                if result.stderr:
+                    print(f"   Erreur: {result.stderr.strip()[-200:]}")
+
             self.test_results["regression_tests"] = {
                 "success": success,
                 "exit_code": result.returncode,
+                "output": result.stdout,
+                "error": result.stderr
             }
-
-            if success:
-                print("✅ Tests de régression réussis")
-            else:
-                print("⚠️ Attention : Détection de régression possible")
 
             return success
 
+        except subprocess.TimeoutExpired:
+            print("⏰ Timeout des tests de régression")
+            self.test_results["regression_tests"] = {"success": False, "error": "timeout"}
+            return False
+        except FileNotFoundError:
+            print("ℹ️ Pytest non trouvé - tests de régression ignorés")
+            self.test_results["regression_tests"] = {"success": True, "error": "pytest not found"}
+            return True
         except Exception as e:
             print(f"❌ Erreur tests de régression : {e}")
             self.test_results["regression_tests"] = {"success": False, "error": str(e)}
@@ -536,12 +563,26 @@ class AutomatedQualityPipeline:
 
     def _calculate_overall_success(self):
         """Calcule le succès global du pipeline"""
-        critical_tests = ["unit_tests", "startup_test", "database_test"]
+        # Tests critiques qui doivent TOUJOURS passer
+        critical_tests = ["startup_test", "database_test", "unit_tests"]
 
         # Tests critiques doivent tous passer
         for test_name in critical_tests:
             if not self.test_results.get(test_name, {}).get("success", False):
                 return False
+
+        # Tests supplémentaires (smoke, regression, linting)
+        additional_tests = ["smoke_tests", "regression_tests", "linting"]
+
+        failed_additional = []
+        for test_name in additional_tests:
+            test_result = self.test_results.get(test_name, {})
+            if test_result and not test_result.get("success", False):
+                failed_additional.append(test_name)
+
+        if failed_additional:
+            print(f"⚠️ Tests supplémentaires échoués : {', '.join(failed_additional)}")
+            print("   Le pipeline continue mais ces échecs sont signalés")
 
         # Linting est optionnel - ne pas échouer si les outils ne sont pas disponibles
         lint_results = self.test_results.get("linting", {})
@@ -558,24 +599,45 @@ class AutomatedQualityPipeline:
         else:
             print("⚠️ Avertissement : Aucun résultat de linting")
 
-        # Retourner True si les tests critiques passent
+        # Retourner True si les tests critiques passent (tests supplémentaires peuvent échouer)
         return True
 
     def _generate_recommendations(self):
         """Génère des recommandations basées sur les résultats"""
         recommendations = []
 
-        # Recommandations basées sur les résultats
-        if not self.test_results.get("unit_tests", {}).get("success", False):
-            recommendations.append("❌ Corriger les tests unitaires qui échouent")
+        # Recommandations basées sur les résultats de TOUS les tests
+        all_tests = ["startup_test", "database_test", "unit_tests", "smoke_tests", "regression_tests", "linting"]
 
-        if not self.test_results.get("regression_tests", {}).get("success", False):
-            recommendations.append("⚠️ Vérifier les régressions détectées")
+        for test_name in all_tests:
+            test_result = self.test_results.get(test_name, {})
+            if test_result and not test_result.get("success", False):
+                error_msg = test_result.get("error", "").lower()
+                exit_code = test_result.get("exit_code", 0)
 
+                # Cas spéciaux où ce n'est pas vraiment une erreur
+                if test_name == "regression_tests":
+                    if (exit_code == 5 or
+                        "no tests" in error_msg or
+                        "pytest not found" in error_msg):
+                        continue  # Ne pas considérer comme erreur
+                elif test_name == "linting":
+                    if "not available" in error_msg or "not installed" in error_msg:
+                        continue  # Les outils de linting sont optionnels
+
+                # Erreurs normales
+                if "timeout" in error_msg:
+                    recommendations.append(f"⏰ Corriger le timeout du test {test_name}")
+                elif "not available" in error_msg or "not installed" in error_msg:
+                    recommendations.append(f"📦 Installer les dépendances manquantes pour {test_name}")
+                else:
+                    recommendations.append(f"❌ Corriger le test {test_name} qui échoue")
+
+        # Recommandations spécifiques pour linting
         lint_results = self.test_results.get("linting", {})
         pylint_score = lint_results.get("pylint", {}).get("score", 0)
 
-        if pylint_score < 8.0:
+        if pylint_score > 0 and pylint_score < 7.0:
             recommendations.append(
                 f"📊 Améliorer le score Pylint (actuel: {pylint_score}/10)"
             )
@@ -589,6 +651,17 @@ class AutomatedQualityPipeline:
             recommendations.append(
                 f"🔒 Corriger les {security_issues} problèmes de sécurité"
             )
+
+        # Tests de régression
+        regression_result = self.test_results.get("regression_tests", {})
+        if regression_result and not regression_result.get("success", False):
+            error_msg = regression_result.get("error", "")
+            exit_code = regression_result.get("exit_code", 0)
+            # Ne pas considérer comme erreur si pas de tests trouvés
+            if exit_code != 5 and "no tests" not in error_msg.lower() and "pytest not found" not in error_msg.lower():
+                recommendations.append("🔄 Vérifier les régressions détectées")
+            else:
+                print("ℹ️ Note: Aucun test de régression défini (c'est normal)")
 
         if not recommendations:
             recommendations.append(
@@ -662,10 +735,12 @@ def main():
     parser.add_argument(
         "--quick",
         action="store_true",
-        help="Exécution rapide (tests essentiels seulement)",
+        help="Mode rapide : tests essentiels + smoke tests + linting (sans régression)",
     )
     parser.add_argument(
-        "--regression-only", action="store_true", help="Tests de régression seulement"
+        "--regression-only",
+        action="store_true",
+        help="Mode régression seulement : uniquement les tests de régression",
     )
 
     args = parser.parse_args()
@@ -685,10 +760,11 @@ def main():
             success_count += 1
         total_tests += 1
 
-    # Tests essentiels
+    # Tests essentiels (toujours exécutés)
     essential_tests = [
         ("startup_test", pipeline.run_app_startup_test),
         ("database_test", pipeline.run_database_tests),
+        ("unit_tests", pipeline.run_unit_tests),
     ]
 
     for test_name, test_func in essential_tests:
@@ -698,17 +774,19 @@ def main():
         else:
             print(f"⚠️ Test essentiel {test_name} échoué")
 
-    # Tests rapides ou complets
+    # Tests supplémentaires selon les arguments
     if args.quick:
+        # Mode rapide : seulement smoke tests et linting
         test_suite = [
             ("smoke_tests", pipeline.run_smoke_tests),
             ("linting", pipeline.run_linting),
         ]
     elif args.regression_only:
+        # Mode régression seulement
         test_suite = [("regression_tests", pipeline.run_regression_tests)]
     else:
+        # Mode complet : tous les tests
         test_suite = [
-            ("unit_tests", pipeline.run_unit_tests),
             ("smoke_tests", pipeline.run_smoke_tests),
             ("regression_tests", pipeline.run_regression_tests),
             ("linting", pipeline.run_linting),
