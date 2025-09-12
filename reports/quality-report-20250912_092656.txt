@@ -1,0 +1,27 @@
+============================================================
+📊 RAPPORT DE QUALITÉ - CONSULTATOR
+============================================================
+⏰ Timestamp: 2025-09-12T09:26:56.440670
+🎯 Succès global: ❌ NON
+
+📋 RÉSULTATS DES TESTS:
+------------------------------
+startup_test: ✅ PASS
+database_test: ✅ PASS
+unit_tests: ❌ FAIL
+smoke_tests: ❌ FAIL
+regression_tests: ❌ FAIL
+linting: ❌ FAIL
+  └─ pylint: ❌
+  └─ flake8: ❌ (2582 issues)
+  └─ bandit: ✅
+
+💡 RECOMMANDATIONS:
+--------------------
+1. ❌ Corriger le test unit_tests qui échoue
+2. ❌ Corriger le test smoke_tests qui échoue
+3. ❌ Corriger le test regression_tests qui échoue
+4. ❌ Corriger le test linting qui échoue
+5. 🔧 Corriger les 2582 problèmes Flake8
+6. 🔄 Vérifier les régressions détectées
+============================================================

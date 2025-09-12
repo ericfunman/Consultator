@@ -2436,3 +2436,147 @@ app/utils\technologies_referentiel.py:230:2: W292 no newline at end of file
 13    F541 f-string is missing placeholders
 9     F811 redefinition of unused 'Client' from line 22
 17    F841 local variable 'total_assignments' is assigned to but never used
+app/main_original_backup.py:170:1: C901 'main' is too complex (20)
+app/main_preloading.py:170:1: C901 'main' is too complex (20)
+app/pages_modules\business_managers.py:41:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:312:1: C901 'show_current_bm_consultants' is too complex (16)
+app/pages_modules\business_managers.py:347:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:355:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:358:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:361:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:455:1: C901 'show_add_bm_assignment' is too complex (19)
+app/pages_modules\business_managers.py:819:9: F841 local variable 'df' is assigned to but never used
+app/pages_modules\business_managers.py:823:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:828:26: W291 trailing whitespace
+app/pages_modules\business_managers.py:854:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:855:32: W291 trailing whitespace
+app/pages_modules\business_managers.py:869:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:870:32: W291 trailing whitespace
+app/pages_modules\business_managers.py:883:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:884:33: W291 trailing whitespace
+app/pages_modules\business_managers.py:899:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:916:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:922:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:925:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:929:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:934:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:942:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:945:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:948:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:951:1: W293 blank line contains whitespace
+app/pages_modules\business_managers.py:954:1: W293 blank line contains whitespace
+app/pages_modules\consultant_documents.py:108:1: C901 'show_document_details' is too complex (18)
+app/pages_modules\consultant_languages.py:39:1: C901 'show_consultant_languages' is too complex (16)
+app/pages_modules\consultant_list.py:44:1: C901 'show_consultants_list' is too complex (20)
+app/pages_modules\consultant_missions.py:115:1: C901 'show_mission_details' is too complex (17)
+app/pages_modules\consultant_missions.py:663:1: C901 'show_mission_full_details' is too complex (17)
+app/pages_modules\consultant_skills.py:40:1: C901 'show_consultant_skills' is too complex (19)
+app/pages_modules\consultants.py:291:1: C901 'show_consultant_info' is too complex (25)
+app/pages_modules\consultants.py:2478:1: C901 'show_cv_missions' is too complex (19)
+app/pages_modules\consultants.py:2999:1: C901 'show_cv_actions' is too complex (22)
+app/services\chatbot_service.py:61:5: C901 'ChatbotService.process_question' is too complex (17)
+app/services\chatbot_service.py:129:5: C901 'ChatbotService._analyze_intent' is too complex (16)
+app/services\chatbot_service.py:411:5: C901 'ChatbotService._extract_entities' is too complex (17)
+app/services\chatbot_service.py:489:13: E303 too many blank lines (2)
+app/services\chatbot_service.py:540:13: E303 too many blank lines (2)
+app/services\chatbot_service.py:645:5: C901 'ChatbotService._handle_experience_question' is too complex (18)
+app/services\chatbot_service.py:842:5: C901 'ChatbotService._handle_professional_profile_question' is too complex (50)
+app/services\chatbot_service.py:1195:5: C901 'ChatbotService._handle_skills_question' is too complex (19)
+app/services\chatbot_service.py:1387:5: C901 'ChatbotService._handle_languages_question' is too complex (22)
+app/services\chatbot_service.py:2201:17: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2202:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2214:17: E303 too many blank lines (2)
+app/services\chatbot_service.py:2215:17: E128 continuation line under-indented for visual indent
+app/services\chatbot_service.py:2216:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2217:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2218:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2219:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2220:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2259:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2263:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2270:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2271:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2272:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2282:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2286:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2289:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2290:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2291:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2307:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2310:1: W293 blank line contains whitespace
+app/services\chatbot_service.py:2312:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2313:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2314:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2315:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2333:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2335:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2336:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2337:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2338:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2339:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2340:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2375:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2377:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2378:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2379:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2408:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2412:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2414:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2415:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2416:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2447:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2448:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2460:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2461:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2483:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2484:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2485:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2486:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2487:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2495:13: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2496:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2497:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2498:13: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2499:9: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2517:5: C901 'ChatbotService._handle_availability_question' is too complex (22)
+app/services\chatbot_service.py:2533:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2535:21: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2536:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2537:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2652:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2654:21: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2655:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2656:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2661:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2663:21: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2664:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2665:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2731:5: C901 'ChatbotService._handle_mission_tjm_question' is too complex (16)
+app/services\chatbot_service.py:2747:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2749:21: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2750:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2751:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2848:21: E124 closing bracket does not match visual indentation
+app/services\chatbot_service.py:2849:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2850:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2851:21: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2852:17: E122 continuation line missing indentation or outdented
+app/services\chatbot_service.py:2857:1: W293 blank line contains whitespace
+app/services\chatbot_service.py:2944:13: F821 undefined name 'session'
+app/services\consultant_service.py:869:5: C901 'ConsultantService.save_cv_analysis' is too complex (22)
+app/services\document_analyzer.py:676:5: C901 'DocumentAnalyzer._find_dates_in_text_improved' is too complex (16)
+app/services\document_analyzer.py:873:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\document_analyzer_clean.py:602:5: C901 'DocumentAnalyzer._extract_long_mission_summary' is too complex (16)
+app/services\simple_analyzer.py:91:5: C901 'SimpleDocumentAnalyzer.extract_text_from_file' is too complex (18)
+app/test_streamlit_debug.py:66:5: F811 redefinition of unused 'get_database_session' from line 51
+app/test_streamlit_debug.py:67:5: F811 redefinition of unused 'BusinessManager' from line 44
+27    C901 'main' is too complex (20)
+58    E122 continuation line missing indentation or outdented
+15    E124 closing bracket does not match visual indentation
+1     E128 continuation line under-indented for visual indent
+3     E303 too many blank lines (2)
+2     F811 redefinition of unused 'get_database_session' from line 51
+1     F821 undefined name 'session'
+1     F841 local variable 'df' is assigned to but never used
+4     W291 trailing whitespace
+22    W293 blank line contains whitespace

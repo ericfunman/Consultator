@@ -10,10 +10,10 @@ def test_basic_import():
     """Test d'import basique"""
     try:
         import json
-        print("✅ Import JSON réussi")
+        print("[OK] Import JSON reussi")
         return True
     except ImportError as e:
-        print(f"❌ Erreur import JSON: {e}")
+        print(f"[ERROR] Erreur import JSON: {e}")
         return False
 
 def test_project_structure():
@@ -28,24 +28,24 @@ def test_project_structure():
 
         for file_path in files_to_check:
             if os.path.exists(file_path):
-                print(f"✅ Fichier trouvé: {file_path}")
+                print(f"[OK] Fichier trouve: {file_path}")
             else:
-                print(f"❌ Fichier manquant: {file_path}")
+                print(f"[ERROR] Fichier manquant: {file_path}")
                 return False
 
         return True
     except Exception as e:
-        print(f"❌ Erreur vérification structure: {e}")
+        print(f"[ERROR] Erreur verification structure: {e}")
         return False
 
 def test_python_version():
     """Test de la version Python"""
     try:
         version = sys.version_info
-        print(f"✅ Python {version.major}.{version.minor}.{version.micro}")
+        print(f"[OK] Python {version.major}.{version.minor}.{version.micro}")
         return True
     except Exception as e:
-        print(f"❌ Erreur version Python: {e}")
+        print(f"[ERROR] Erreur version Python: {e}")
         return False
 
 def main():
@@ -61,31 +61,31 @@ def main():
 
     results = []
     for test_name, test_func in tests:
-        print(f"\n🧪 Exécution: {test_name}")
+        print(f"\n[TEST] Execution: {test_name}")
         try:
             result = test_func()
             results.append(result)
-            status = "RÉUSSI" if result else "ÉCHEC"
-            print(f"   Résultat: {status}")
+            status = "REUSSI" if result else "ECHEC"
+            print(f"   Resultat: {status}")
         except Exception as e:
             print(f"   ERREUR: {e}")
             results.append(False)
 
     print("\n" + "=" * 50)
-    print("RÉSULTATS FINAUX:")
+    print("RESULTATS FINAUX:")
 
     total_tests = len(results)
     passed_tests = sum(results)
 
-    print(f"   Tests exécutés: {total_tests}")
-    print(f"   Tests réussis: {passed_tests}")
-    print(f"   Tests échoués: {total_tests - passed_tests}")
+    print(f"   Tests executes: {total_tests}")
+    print(f"   Tests reussis: {passed_tests}")
+    print(f"   Tests echoues: {total_tests - passed_tests}")
 
     if passed_tests == total_tests:
-        print("   TOUS LES TESTS RÉUSSIS !")
+        print("   TOUS LES TESTS REUSSIS !")
         return 0
     else:
-        print("   ÉCHEC DE CERTAINS TESTS !")
+        print("   ECHEC DE CERTAINS TESTS !")
         return 1
 
 if __name__ == "__main__":
