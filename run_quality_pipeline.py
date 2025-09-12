@@ -165,6 +165,25 @@ class AutomatedQualityPipeline:
                     "-m",
                     "pytest",
                     "tests/",
+                    "--collect-only",
+                    "--quiet",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+
+            # Compter les tests collectés
+            collected_count = result.stdout.count("test_") if result.returncode == 0 else 0
+            print(f"🔍 Tests collectés: {collected_count}")
+
+            # Maintenant exécuter les tests
+            result = subprocess.run(
+                [
+                    "python",
+                    "-m",
+                    "pytest",
+                    "tests/",
                     "-v",
                     "--tb=short",
                     "--maxfail=5",
