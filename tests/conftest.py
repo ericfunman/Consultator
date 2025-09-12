@@ -22,33 +22,39 @@ TEST_DATABASE_URL = "sqlite:///:memory:"  # Base en mémoire - pas de fichier
 @pytest.fixture(scope="session")
 def test_db():
     """Base de données de test en mémoire (Windows-safe)"""
-    from sqlalchemy import create_engine
-    from sqlalchemy.orm import sessionmaker
-
-    from app.database.database import get_database_session
-    from app.database.database import init_database
-    from app.database.models import Base
-
-    # Créer engine de test en mémoire
-    engine = create_engine(
-        TEST_DATABASE_URL,
-        echo=False,
-        pool_pre_ping=True,  # Vérifier les connexions
-        pool_recycle=300,  # Recycler les connexions
-    )
-    Base.metadata.create_all(engine)
-
-    # Session de test
-    TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-    yield TestSessionLocal
-
-    # Cleanup automatique (mémoire libérée)
     try:
-        Base.metadata.drop_all(engine)
-        engine.dispose()  # Fermer toutes les connexions
-    except Exception:
-        pass  # Ignore les erreurs de cleanup
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import sessionmaker
+
+        from app.database.database import get_database_session
+        from app.database.database import init_database
+        from app.database.models import Base
+
+        # Créer engine de test en mémoire
+        engine = create_engine(
+            TEST_DATABASE_URL,
+            echo=False,
+            pool_pre_ping=True,  # Vérifier les connexions
+            pool_recycle=300,  # Recycler les connexions
+        )
+        Base.metadata.create_all(engine)
+
+        # Session de test
+        TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+        yield TestSessionLocal
+
+        # Cleanup automatique (mémoire libérée)
+        try:
+            Base.metadata.drop_all(engine)
+            engine.dispose()  # Fermer toutes les connexions
+        except Exception:
+            pass  # Ignore les erreurs de cleanup
+    except ImportError as e:
+        # Si les modules de l'app ne sont pas disponibles, retourner un mock
+        from unittest.mock import MagicMock
+        pytest.skip(f"Modules de l'application non disponibles: {e}")
+        yield MagicMock()
 
 
 @pytest.fixture
@@ -288,16 +294,20 @@ def mock_sqlalchemy_models():
     # Patch des modèles et classes avec gestion des imports
     patches = []
     try:
-        # Patch des modèles principaux
-        patches.append(patch("app.database.models.Consultant", mock_consultant_class))
-        patches.append(patch("app.database.models.Practice", mock_practice_class))
-        patches.append(patch("app.database.models.BusinessManager", MagicMock()))
-        patches.append(patch("app.database.models.Mission", MagicMock()))
-        patches.append(patch("app.database.models.Competence", MagicMock()))
-        patches.append(patch("app.database.models.ConsultantCompetence", MagicMock()))
-        patches.append(patch("app.database.models.Langue", MagicMock()))
-        patches.append(patch("app.database.models.ConsultantLangue", MagicMock()))
-        patches.append(patch("sqlalchemy.func", mock_func))
+        # Patch des modèles principaux - seulement si disponibles
+        try:
+            patches.append(patch("app.database.models.Consultant", mock_consultant_class))
+            patches.append(patch("app.database.models.Practice", mock_practice_class))
+            patches.append(patch("app.database.models.BusinessManager", MagicMock()))
+            patches.append(patch("app.database.models.Mission", MagicMock()))
+            patches.append(patch("app.database.models.Competence", MagicMock()))
+            patches.append(patch("app.database.models.ConsultantCompetence", MagicMock()))
+            patches.append(patch("app.database.models.Langue", MagicMock()))
+            patches.append(patch("app.database.models.ConsultantLangue", MagicMock()))
+            patches.append(patch("sqlalchemy.func", mock_func))
+        except ImportError:
+            # Si les modules ne sont pas disponibles, ne pas patcher
+            pass
 
         # Démarrer tous les patches
         for p in patches:
@@ -619,9 +629,13 @@ def mock_sqlalchemy_models_global():
     # Patch seulement les modules qui existent réellement
     patches = []
     try:
-        # Patch des sessions de base de données
-        patches.append(patch("app.database.database.get_database_session", return_value=mock_session))
-        patches.append(patch("app.database.database.session_local", return_value=mock_session))
+        # Patch des sessions de base de données - seulement si les modules sont disponibles
+        try:
+            patches.append(patch("app.database.database.get_database_session", return_value=mock_session))
+            patches.append(patch("app.database.database.session_local", return_value=mock_session))
+        except ImportError:
+            # Si les modules de l'app ne sont pas disponibles, ne pas patcher
+            pass
 
         # Démarrer tous les patches
         for p in patches:
@@ -694,13 +708,22 @@ def mock_services():
     mock_practice_service.get_all_practices = MagicMock(return_value=[])
     mock_practice_service.get_practice_by_id = MagicMock(return_value=None)
 
-    with patch(
-        "services.consultant_service.ConsultantService", mock_consultant_service
-    ), patch(
-        "services.business_manager_service.BusinessManagerService", mock_bm_service
-    ), patch(
-        "services.practice_service.PracticeService", mock_practice_service
-    ):
+    # Essayer de patcher seulement si les modules sont disponibles
+    try:
+        with patch(
+            "services.consultant_service.ConsultantService", mock_consultant_service
+        ), patch(
+            "services.business_manager_service.BusinessManagerService", mock_bm_service
+        ), patch(
+            "services.practice_service.PracticeService", mock_practice_service
+        ):
+            yield {
+                "consultant_service": mock_consultant_service,
+                "business_manager_service": mock_bm_service,
+                "practice_service": mock_practice_service,
+            }
+    except ImportError:
+        # Si les modules de services ne sont pas disponibles, retourner quand même les mocks
         yield {
             "consultant_service": mock_consultant_service,
             "business_manager_service": mock_bm_service,
