@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757661683385,
+  "lastUpdate": 1757662105527,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -942,6 +942,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0000164550515663039",
             "extra": "mean: 5.088398218274398 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "6cc727784de3eb5bb3428544cb620124dd72c5fd",
+          "message": "fix: Améliorer la collection de tests en CI avec configuration pytest simplifiée\n\n- Ignorer pytest.ini en CI pour éviter les conflits avec coverage/html reports\n- Ajouter diagnostic avancé des imports pour identifier les modules manquants\n- Configuration spécifique CI pour collecter tous les tests sans dépendances problématiques\n- Ajout de checks sur PYTHONPATH et modules principaux",
+          "timestamp": "2025-09-12T09:23:59+02:00",
+          "tree_id": "da97c283477bb4726eb3d9102f063083feff025e",
+          "url": "https://github.com/ericfunman/Consultator/commit/6cc727784de3eb5bb3428544cb620124dd72c5fd"
+        },
+        "date": 1757662105005,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 940.7027772228565,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000035770222629218512",
+            "extra": "mean: 1.0630350246782525 msec\nrounds: 932"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 288319.5590775963,
+            "unit": "iter/sec",
+            "range": "stddev: 5.078931684051661e-7",
+            "extra": "mean: 3.4683737835866593 usec\nrounds: 123518"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 152459.36505102136,
+            "unit": "iter/sec",
+            "range": "stddev: 7.780237466670693e-7",
+            "extra": "mean: 6.5591247849244585 usec\nrounds: 58100"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33958.86983011033,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000016552892039808588",
+            "extra": "mean: 29.447387530939842 usec\nrounds: 21846"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.44166309377798,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014831691391001512",
+            "extra": "mean: 5.090569812181934 msec\nrounds: 197"
           }
         ]
       }
