@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757662105527,
+  "lastUpdate": 1757662398921,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -1001,6 +1001,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014831691391001512",
             "extra": "mean: 5.090569812181934 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "2483a8bf0ea608d74632947920fa001115f76bb6",
+          "message": "fix: Retirer les emojis de test_simple.py pour éviter les erreurs d'encodage Unicode en CI",
+          "timestamp": "2025-09-12T09:28:51+02:00",
+          "tree_id": "7fc53f64eb29add669093ca0e948797def8e1d0d",
+          "url": "https://github.com/ericfunman/Consultator/commit/2483a8bf0ea608d74632947920fa001115f76bb6"
+        },
+        "date": 1757662398541,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.6962395671219,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000015421109327747932",
+            "extra": "mean: 1.0619135534189657 msec\nrounds: 936"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 292632.2044549871,
+            "unit": "iter/sec",
+            "range": "stddev: 5.489918172001018e-7",
+            "extra": "mean: 3.4172588825705303 usec\nrounds: 115929"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158479.34301406457,
+            "unit": "iter/sec",
+            "range": "stddev: 7.604140684223123e-7",
+            "extra": "mean: 6.309970630754401 usec\nrounds: 105076"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33319.861998259556,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000017033597872447228",
+            "extra": "mean: 30.012129103422897 usec\nrounds: 22176"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.45586224997598,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000015289008240967027",
+            "extra": "mean: 5.090201883248319 msec\nrounds: 197"
           }
         ]
       }
