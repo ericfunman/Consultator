@@ -1,0 +1,817 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutoriels &mdash; Documentation Consultator 1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7a28dfa3"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/translations.js?v=e6b791cb"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="prev" title="API Reference" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #1f77b4" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Consultator
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">🚀 Premiers pas</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation et Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Guide de démarrage rapide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🎯 Fonctionnalités</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Fonctionnalités</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🔧 Développement</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Guide de développement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">📚 API &amp; Référence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">📖 Guides &amp; Tutoriels</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutoriels</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#import-de-donnees-excel">Import de données Excel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preparation-des-donnees">Préparation des données</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#import-etape-par-etape">Import étape par étape</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gestion-des-erreurs-d-import">Gestion des erreurs d’import</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#creation-de-rapports-personnalises">Création de rapports personnalisés</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#types-de-rapports-disponibles">Types de rapports disponibles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#analyse-des-competences">Analyse des compétences</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-du-chatbot-ia">Configuration du chatbot IA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-de-base">Configuration de base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#entrainement-du-modele">Entraînement du modèle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#utilisation-avancee">Utilisation avancée</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#maintenance-et-optimisation">Maintenance et optimisation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#integration-api-externe">Intégration API externe</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#authentification-api">Authentification API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#synchronisation-avec-un-crm">Synchronisation avec un CRM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#integration-avec-jira">Intégration avec Jira</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#webhook-pour-les-evenements">Webhook pour les événements</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#optimisation-des-performances">Optimisation des performances</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#indexation-de-la-base-de-donnees">Indexation de la base de données</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cache-intelligent">Cache intelligent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optimisation-des-requetes">Optimisation des requêtes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#monitoring-des-performances">Monitoring des performances</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#maintenance-preventive">Maintenance préventive</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #1f77b4" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Consultator</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tutoriels</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tutorials.rst.txt" rel="nofollow"> Afficher la source de la page</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tutoriels">
+<h1>Tutoriels<a class="headerlink" href="#tutoriels" title="Lien vers cette rubrique"></a></h1>
+<p>Cette section contient des guides pratiques pour maîtriser les fonctionnalités avancées de Consultator.</p>
+<section id="import-de-donnees-excel">
+<span id="tutorials-import-data"></span><h2>Import de données Excel<a class="headerlink" href="#import-de-donnees-excel" title="Lien vers cette rubrique"></a></h2>
+<p>Apprenez à importer efficacement vos données de consultants depuis Excel.</p>
+<section id="preparation-des-donnees">
+<h3>Préparation des données<a class="headerlink" href="#preparation-des-donnees" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Format requis</strong></p>
+<p>Votre fichier Excel doit contenir les colonnes suivantes :</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Colonnes obligatoires</span><a class="headerlink" href="#id1" title="Lien vers ce tableau"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Colonne</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Exemple</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>nom</p></td>
+<td><p>Texte</p></td>
+<td><p>Nom de famille en majuscules</p></td>
+<td><p>DUPONT</p></td>
+</tr>
+<tr class="row-odd"><td><p>prenom</p></td>
+<td><p>Texte</p></td>
+<td><p>Prénom</p></td>
+<td><p>Jean</p></td>
+</tr>
+<tr class="row-even"><td><p>email</p></td>
+<td><p>Texte</p></td>
+<td><p>Adresse email professionnelle</p></td>
+<td><p><a class="reference external" href="mailto:jean&#46;dupont&#37;&#52;&#48;consultant&#46;com">jean<span>&#46;</span>dupont<span>&#64;</span>consultant<span>&#46;</span>com</a></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Colonnes optionnelles</span><a class="headerlink" href="#id2" title="Lien vers ce tableau"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Colonne</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>telephone</p></td>
+<td><p>Texte</p></td>
+<td><p>Numéro de téléphone</p></td>
+</tr>
+<tr class="row-odd"><td><p>competence_1</p></td>
+<td><p>Texte</p></td>
+<td><p>Première compétence</p></td>
+</tr>
+<tr class="row-even"><td><p>annees_exp_1</p></td>
+<td><p>Nombre</p></td>
+<td><p>Années d’expérience pour competence_1</p></td>
+</tr>
+<tr class="row-odd"><td><p>competence_2</p></td>
+<td><p>Texte</p></td>
+<td><p>Deuxième compétence</p></td>
+</tr>
+<tr class="row-even"><td><p>annees_exp_2</p></td>
+<td><p>Nombre</p></td>
+<td><p>Années d’expérience pour competence_2</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exemple de fichier Excel</strong></p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Exemple de données</span><a class="headerlink" href="#id3" title="Lien vers ce tableau"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>nom</p></th>
+<th class="head"><p>prenom</p></th>
+<th class="head"><p>email</p></th>
+<th class="head"><p>telephone</p></th>
+<th class="head"><p>competence_1</p></th>
+<th class="head"><p>annees_exp_1</p></th>
+<th class="head"><p>competence_2</p></th>
+<th class="head"><p>annees_exp_2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DUPONT</p></td>
+<td><p>Jean</p></td>
+<td><p><a class="reference external" href="mailto:jean&#46;dupont&#37;&#52;&#48;email&#46;com">jean<span>&#46;</span>dupont<span>&#64;</span>email<span>&#46;</span>com</a></p></td>
+<td><p>+33123456789</p></td>
+<td><p>Python</p></td>
+<td><p>5</p></td>
+<td><p>SQL</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p>MARTIN</p></td>
+<td><p>Marie</p></td>
+<td><p><a class="reference external" href="mailto:marie&#46;martin&#37;&#52;&#48;email&#46;com">marie<span>&#46;</span>martin<span>&#64;</span>email<span>&#46;</span>com</a></p></td>
+<td><p>+33987654321</p></td>
+<td><p>Data Science</p></td>
+<td><p>4</p></td>
+<td><p>Machine Learning</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>BERNARD</p></td>
+<td><p>Paul</p></td>
+<td><p><a class="reference external" href="mailto:paul&#46;bernard&#37;&#52;&#48;email&#46;com">paul<span>&#46;</span>bernard<span>&#64;</span>email<span>&#46;</span>com</a></p></td>
+<td><p>+33555666777</p></td>
+<td><p>Java</p></td>
+<td><p>8</p></td>
+<td><p>Spring</p></td>
+<td><p>6</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="import-etape-par-etape">
+<h3>Import étape par étape<a class="headerlink" href="#import-etape-par-etape" title="Lien vers cette rubrique"></a></h3>
+<ol class="arabic">
+<li><p><strong>Accès à la fonctionnalité d’import</strong></p>
+<ul class="simple">
+<li><p>Lancez Consultator</p></li>
+<li><p>Allez dans « 👥 Consultants »</p></li>
+<li><p>Cliquez sur « 📥 Importer des données »</p></li>
+</ul>
+</li>
+<li><p><strong>Sélection du fichier</strong></p>
+<ul class="simple">
+<li><p>Cliquez sur « Choisir un fichier »</p></li>
+<li><p>Sélectionnez votre fichier Excel (.xlsx ou .xls)</p></li>
+<li><p>Vérifiez que le fichier est correctement chargé</p></li>
+</ul>
+</li>
+<li><p><strong>Configuration du mapping</strong></p>
+<img alt="Interface de mapping des colonnes" src="_static/import_mapping.png" />
+<ul class="simple">
+<li><p>Vérifiez automatiquement le mapping des colonnes</p></li>
+<li><p>Ajustez manuellement si nécessaire</p></li>
+<li><p>Consultez l’aperçu des données</p></li>
+</ul>
+</li>
+<li><p><strong>Validation des données</strong></p>
+<p>Le système vérifie automatiquement :</p>
+<ul class="simple">
+<li><p><strong>Format des emails</strong> : Validation des adresses email</p></li>
+<li><p><strong>Cohérence des compétences</strong> : Vérification des noms de compétences</p></li>
+<li><p><strong>Doublons</strong> : Détection des consultants déjà existants</p></li>
+</ul>
+</li>
+<li><p><strong>Import final</strong></p>
+<ul class="simple">
+<li><p>Lancez l’import</p></li>
+<li><p>Suivez la progression en temps réel</p></li>
+<li><p>Consultez le rapport d’import</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="gestion-des-erreurs-d-import">
+<h3>Gestion des erreurs d’import<a class="headerlink" href="#gestion-des-erreurs-d-import" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Erreurs courantes et solutions</strong></p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Problèmes fréquents</span><a class="headerlink" href="#id4" title="Lien vers ce tableau"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Erreur</p></th>
+<th class="head"><p>Cause</p></th>
+<th class="head"><p>Solution</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Email invalide</p></td>
+<td><p>Format d’email incorrect</p></td>
+<td><p>Vérifier et corriger l’adresse email</p></td>
+</tr>
+<tr class="row-odd"><td><p>Compétence inconnue</p></td>
+<td><p>Compétence non référencée</p></td>
+<td><p>Ajouter la compétence au référentiel ou corriger le nom</p></td>
+</tr>
+<tr class="row-even"><td><p>Doublon détecté</p></td>
+<td><p>Consultant déjà existant</p></td>
+<td><p>Choisir de mettre à jour ou ignorer</p></td>
+</tr>
+<tr class="row-odd"><td><p>Colonne manquante</p></td>
+<td><p>Colonne obligatoire absente</p></td>
+<td><p>Ajouter la colonne ou modifier le mapping</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rapport d’erreurs détaillé</strong></p>
+<p>Après l’import, consultez le rapport qui détaille :</p>
+<ul class="simple">
+<li><p>Nombre de consultants importés avec succès</p></li>
+<li><p>Liste des erreurs par ligne</p></li>
+<li><p>Suggestions de correction automatique</p></li>
+</ul>
+</section>
+</section>
+<section id="creation-de-rapports-personnalises">
+<span id="tutorials-custom-reports"></span><h2>Création de rapports personnalisés<a class="headerlink" href="#creation-de-rapports-personnalises" title="Lien vers cette rubrique"></a></h2>
+<p>Apprenez à créer des rapports sur mesure pour vos besoins d’analyse.</p>
+<section id="types-de-rapports-disponibles">
+<h3>Types de rapports disponibles<a class="headerlink" href="#types-de-rapports-disponibles" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Rapports standards</strong></p>
+<ul class="simple">
+<li><p><strong>Tableau de bord général</strong> : Vue d’ensemble des métriques</p></li>
+<li><p><strong>Rapport par compétence</strong> : Analyse détaillée des compétences</p></li>
+<li><p><strong>Rapport financier</strong> : Revenus et performance économique</p></li>
+<li><p><strong>Rapport RH</strong> : Évolution des effectifs et turnover</p></li>
+</ul>
+<p><strong>Rapports personnalisés</strong></p>
+<p>Création d’un rapport sur mesure :</p>
+<ol class="arabic">
+<li><p><strong>Définition des critères</strong></p>
+<ul class="simple">
+<li><p>Période d’analyse (date de début/fin)</p></li>
+<li><p>Filtres sur les consultants (compétences, statut, etc.)</p></li>
+<li><p>Métriques à inclure</p></li>
+<li><p>Format de sortie (PDF, Excel, HTML)</p></li>
+</ul>
+</li>
+<li><p><strong>Configuration des métriques</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Exemple de configuration de rapport</span>
+<span class="n">report_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Rapport Data Science Q4 2024&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;2024-10-01&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="s2">&quot;2024-12-31&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;skills&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Python&quot;</span><span class="p">,</span> <span class="s2">&quot;Machine Learning&quot;</span><span class="p">,</span> <span class="s2">&quot;Data Science&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;active&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;consultant_count&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;average_revenue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;skill_distribution&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;project_completion_rate&quot;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;pdf&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Génération automatique</strong></p>
+<ul class="simple">
+<li><p>Planification des rapports récurrents</p></li>
+<li><p>Export automatique vers le cloud</p></li>
+<li><p>Distribution par email</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="analyse-des-competences">
+<h3>Analyse des compétences<a class="headerlink" href="#analyse-des-competences" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Matrice de compétences</strong></p>
+<p>Visualisez les compétences de votre équipe :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Génération d&#39;une matrice compétence/niveau</span>
+<span class="n">skill_matrix</span> <span class="o">=</span> <span class="n">consultant_service</span><span class="o">.</span><span class="n">generate_skill_matrix</span><span class="p">(</span>
+    <span class="n">consultants</span><span class="o">=</span><span class="n">active_consultants</span><span class="p">,</span>
+    <span class="n">skills</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Python&quot;</span><span class="p">,</span> <span class="s2">&quot;SQL&quot;</span><span class="p">,</span> <span class="s2">&quot;Machine Learning&quot;</span><span class="p">,</span> <span class="s2">&quot;AWS&quot;</span><span class="p">],</span>
+    <span class="n">group_by</span><span class="o">=</span><span class="s2">&quot;seniority&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Gap analysis</strong></p>
+<p>Identifiez les besoins en recrutement :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Analyse des écarts de compétences</span>
+<span class="n">gaps</span> <span class="o">=</span> <span class="n">analytics_service</span><span class="o">.</span><span class="n">identify_skill_gaps</span><span class="p">(</span>
+    <span class="n">required_skills</span><span class="o">=</span><span class="n">project_requirements</span><span class="p">,</span>
+    <span class="n">available_skills</span><span class="o">=</span><span class="n">current_team_skills</span><span class="p">,</span>
+    <span class="n">timeframe_months</span><span class="o">=</span><span class="mi">6</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Prévisions de compétences</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prévision des besoins futurs</span>
+<span class="n">forecast</span> <span class="o">=</span> <span class="n">analytics_service</span><span class="o">.</span><span class="n">forecast_skill_demand</span><span class="p">(</span>
+    <span class="n">historical_data</span><span class="o">=</span><span class="n">mission_history</span><span class="p">,</span>
+    <span class="n">market_trends</span><span class="o">=</span><span class="n">market_data</span><span class="p">,</span>
+    <span class="n">prediction_months</span><span class="o">=</span><span class="mi">12</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="configuration-du-chatbot-ia">
+<span id="tutorials-chatbot-setup"></span><h2>Configuration du chatbot IA<a class="headerlink" href="#configuration-du-chatbot-ia" title="Lien vers cette rubrique"></a></h2>
+<p>Configurez et optimisez le chatbot IA pour vos besoins métier.</p>
+<section id="configuration-de-base">
+<h3>Configuration de base<a class="headerlink" href="#configuration-de-base" title="Lien vers cette rubrique"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Accès aux paramètres</strong></p>
+<ul class="simple">
+<li><p>Allez dans « ⚙️ Configuration »</p></li>
+<li><p>Section « 🤖 Chatbot IA »</p></li>
+</ul>
+</li>
+<li><p><strong>Configuration des sources de connaissances</strong></p>
+<ul class="simple">
+<li><p><strong>Base de données consultants</strong> : Activé par défaut</p></li>
+<li><p><strong>Documents uploadés</strong> : CV, présentations, etc.</p></li>
+<li><p><strong>Base de connaissances métier</strong> : Documents internes</p></li>
+</ul>
+</li>
+<li><p><strong>Paramètres de réponse</strong></p>
+<ul class="simple">
+<li><p><strong>Style de réponse</strong> : Professionnel, Conversationnel, Technique</p></li>
+<li><p><strong>Niveau de détail</strong> : Synthétique, Détaillé, Exhaustif</p></li>
+<li><p><strong>Langue</strong> : Français, Anglais</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="entrainement-du-modele">
+<h3>Entraînement du modèle<a class="headerlink" href="#entrainement-du-modele" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Ajout de connaissances spécifiques</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Entraînement sur des documents métier</span>
+<span class="n">chatbot_service</span><span class="o">.</span><span class="n">train_on_documents</span><span class="p">([</span>
+    <span class="s2">&quot;docs/referentiel_competences.pdf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;docs/methodologie_projets.docx&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;data/base_connaissances.json&quot;</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+<p><strong>Personnalisation des réponses</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configuration des réponses personnalisées</span>
+<span class="n">custom_responses</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;tarifs&quot;</span><span class="p">:</span> <span class="s2">&quot;Nos tarifs varient de 500€ à 1200€ par jour selon l&#39;expertise.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;delais&quot;</span><span class="p">:</span> <span class="s2">&quot;Les délais de mobilisation sont généralement de 2-4 semaines.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;methodologie&quot;</span><span class="p">:</span> <span class="s2">&quot;Nous suivons une approche agile avec Scrum/Kanban.&quot;</span>
+<span class="p">}</span>
+
+<span class="n">chatbot_service</span><span class="o">.</span><span class="n">add_custom_responses</span><span class="p">(</span><span class="n">custom_responses</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="utilisation-avancee">
+<h3>Utilisation avancée<a class="headerlink" href="#utilisation-avancee" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Requêtes complexes</strong></p>
+<p>Le chatbot peut traiter des demandes sophistiquées :</p>
+<ul class="simple">
+<li><p><em>« Quels sont mes consultants Python seniors disponibles en région parisienne ? »</em></p></li>
+<li><p><em>« Peux-tu me proposer une équipe de 3 personnes pour un projet Data Science de 6 mois ? »</em></p></li>
+<li><p><em>« Quel est le coût moyen d’un consultant AWS certifié ? »</em></p></li>
+</ul>
+<p><strong>Intégration avec les analyses</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Génération de rapports via le chatbot</span>
+<span class="n">report_request</span> <span class="o">=</span> <span class="s2">&quot;Génère-moi un rapport des compétences Data Science pour le trimestre dernier&quot;</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">chatbot_service</span><span class="o">.</span><span class="n">generate_report_from_query</span><span class="p">(</span><span class="n">report_request</span><span class="p">)</span>
+
+<span class="c1"># Analyse prédictive</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">chatbot_service</span><span class="o">.</span><span class="n">predict_from_query</span><span class="p">(</span>
+    <span class="s2">&quot;Quelles compétences seront demandées dans 6 mois ?&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="maintenance-et-optimisation">
+<h3>Maintenance et optimisation<a class="headerlink" href="#maintenance-et-optimisation" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Mise à jour des connaissances</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mise à jour périodique des connaissances</span>
+python<span class="w"> </span>scripts/update_chatbot_knowledge.py
+</pre></div>
+</div>
+<p><strong>Monitoring des performances</strong></p>
+<ul class="simple">
+<li><p>Taux de réponses satisfaisantes</p></li>
+<li><p>Temps de réponse moyen</p></li>
+<li><p>Types de questions fréquentes</p></li>
+<li><p>Améliorations suggérées</p></li>
+</ul>
+</section>
+</section>
+<section id="integration-api-externe">
+<span id="tutorials-api-integration"></span><h2>Intégration API externe<a class="headerlink" href="#integration-api-externe" title="Lien vers cette rubrique"></a></h2>
+<p>Connectez Consultator à vos outils existants via l’API.</p>
+<section id="authentification-api">
+<h3>Authentification API<a class="headerlink" href="#authentification-api" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Obtention d’un token</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://api.consultator.com/v1/auth/login<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;username&quot;: &quot;votre-email&quot;, &quot;password&quot;: &quot;votre-mot-de-passe&quot;}&#39;</span>
+</pre></div>
+</div>
+<p><strong>Utilisation du token</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer VOTRE_TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>https://api.consultator.com/v1/consultants
+</pre></div>
+</div>
+</section>
+<section id="synchronisation-avec-un-crm">
+<h3>Synchronisation avec un CRM<a class="headerlink" href="#synchronisation-avec-un-crm" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Export vers Salesforce</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">simple_salesforce</span><span class="w"> </span><span class="kn">import</span> <span class="n">Salesforce</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sync_consultants_to_salesforce</span><span class="p">():</span>
+    <span class="c1"># Récupération des consultants</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s2">&quot;https://api.consultator.com/v1/consultants&quot;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">consultants</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Connexion Salesforce</span>
+    <span class="n">sf</span> <span class="o">=</span> <span class="n">Salesforce</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span> <span class="n">security_token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span>
+
+    <span class="c1"># Synchronisation</span>
+    <span class="k">for</span> <span class="n">consultant</span> <span class="ow">in</span> <span class="n">consultants</span><span class="p">:</span>
+        <span class="n">sf</span><span class="o">.</span><span class="n">Contact</span><span class="o">.</span><span class="n">create</span><span class="p">({</span>
+            <span class="s2">&quot;LastName&quot;</span><span class="p">:</span> <span class="n">consultant</span><span class="p">[</span><span class="s2">&quot;nom&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;FirstName&quot;</span><span class="p">:</span> <span class="n">consultant</span><span class="p">[</span><span class="s2">&quot;prenom&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;Email&quot;</span><span class="p">:</span> <span class="n">consultant</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;Title&quot;</span><span class="p">:</span> <span class="s2">&quot;Consultant&quot;</span>
+        <span class="p">})</span>
+</pre></div>
+</div>
+<p><strong>Import depuis HubSpot</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hubspot</span><span class="w"> </span><span class="kn">import</span> <span class="n">HubSpot</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">import_contacts_from_hubspot</span><span class="p">():</span>
+    <span class="n">api_client</span> <span class="o">=</span> <span class="n">HubSpot</span><span class="p">(</span><span class="n">access_token</span><span class="o">=</span><span class="n">access_token</span><span class="p">)</span>
+    <span class="n">contacts</span> <span class="o">=</span> <span class="n">api_client</span><span class="o">.</span><span class="n">crm</span><span class="o">.</span><span class="n">contacts</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">contact</span> <span class="ow">in</span> <span class="n">contacts</span><span class="p">:</span>
+        <span class="n">consultant_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;nom&quot;</span><span class="p">:</span> <span class="n">contact</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;lastname&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;prenom&quot;</span><span class="p">:</span> <span class="n">contact</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;firstname&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">contact</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">&quot;https://api.consultator.com/v1/consultants&quot;</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">consultant_data</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="integration-avec-jira">
+<h3>Intégration avec Jira<a class="headerlink" href="#integration-avec-jira" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Synchronisation des projets</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">jira</span><span class="w"> </span><span class="kn">import</span> <span class="n">JIRA</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sync_projects_from_jira</span><span class="p">():</span>
+    <span class="n">jira</span> <span class="o">=</span> <span class="n">JIRA</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="n">jira_url</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
+
+    <span class="c1"># Récupération des projets actifs</span>
+    <span class="n">projects</span> <span class="o">=</span> <span class="n">jira</span><span class="o">.</span><span class="n">projects</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">:</span>
+        <span class="c1"># Création d&#39;une mission dans Consultator</span>
+        <span class="n">mission_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;nom_projet&quot;</span><span class="p">:</span> <span class="n">project</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;client&quot;</span><span class="p">:</span> <span class="n">project</span><span class="o">.</span><span class="n">lead</span><span class="o">.</span><span class="n">displayName</span><span class="p">,</span>
+            <span class="s2">&quot;statut&quot;</span><span class="p">:</span> <span class="s2">&quot;en_cours&quot;</span>
+        <span class="p">}</span>
+
+        <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="s2">&quot;https://api.consultator.com/v1/missions&quot;</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">mission_data</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="webhook-pour-les-evenements">
+<h3>Webhook pour les événements<a class="headerlink" href="#webhook-pour-les-evenements" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Configuration d’un webhook</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">webhook_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://mon-app.com/webhooks/consultator&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;consultant.created&quot;</span><span class="p">,</span> <span class="s2">&quot;mission.completed&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;secret&quot;</span><span class="p">:</span> <span class="s2">&quot;mon-secret-webhook&quot;</span>
+<span class="p">}</span>
+
+<span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;https://api.consultator.com/v1/webhooks&quot;</span><span class="p">,</span>
+    <span class="n">json</span><span class="o">=</span><span class="n">webhook_config</span><span class="p">,</span>
+    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Traitement des événements</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hmac</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/webhooks/consultator&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_webhook</span><span class="p">():</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X-Consultator-Signature&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Vérification de la signature</span>
+    <span class="n">expected_signature</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+        <span class="n">webhook_secret</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
+        <span class="n">payload</span><span class="p">,</span>
+        <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">hmac</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="n">expected_signature</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Invalid signature&#39;</span><span class="p">,</span> <span class="mi">400</span>
+
+    <span class="c1"># Traitement de l&#39;événement</span>
+    <span class="n">event_data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+    <span class="n">event_type</span> <span class="o">=</span> <span class="n">event_data</span><span class="p">[</span><span class="s1">&#39;event&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">event_type</span> <span class="o">==</span> <span class="s1">&#39;consultant.created&#39;</span><span class="p">:</span>
+        <span class="c1"># Mise à jour du CRM externe</span>
+        <span class="n">update_external_crm</span><span class="p">(</span><span class="n">event_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;consultant&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="s1">&#39;OK&#39;</span><span class="p">,</span> <span class="mi">200</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="optimisation-des-performances">
+<span id="tutorials-performance"></span><h2>Optimisation des performances<a class="headerlink" href="#optimisation-des-performances" title="Lien vers cette rubrique"></a></h2>
+<p>Techniques pour maintenir des performances optimales avec une base de données importante.</p>
+<section id="indexation-de-la-base-de-donnees">
+<h3>Indexation de la base de données<a class="headerlink" href="#indexation-de-la-base-de-donnees" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Index stratégiques</strong></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- Index sur les recherches fréquentes</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_consultant_email</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">consultants</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_consultant_nom_prenom</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">consultants</span><span class="p">(</span><span class="n">nom</span><span class="p">,</span><span class="w"> </span><span class="n">prenom</span><span class="p">);</span>
+
+<span class="c1">-- Index sur les compétences</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_competence_nom</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">competences</span><span class="p">(</span><span class="n">nom</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_consultant_competence_consultant_id</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">consultant_competence</span><span class="p">(</span><span class="n">consultant_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_consultant_competence_competence_id</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">consultant_competence</span><span class="p">(</span><span class="n">competence_id</span><span class="p">);</span>
+
+<span class="c1">-- Index composites pour les analyses</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_mission_consultant_dates</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">missions</span><span class="p">(</span><span class="n">consultant_id</span><span class="p">,</span><span class="w"> </span><span class="n">date_debut</span><span class="p">,</span><span class="w"> </span><span class="n">date_fin</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><strong>Maintenance des index</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Analyse et reconstruction des index</span>
+python<span class="w"> </span>scripts/optimize_database_indexes.py
+</pre></div>
+</div>
+</section>
+<section id="cache-intelligent">
+<h3>Cache intelligent<a class="headerlink" href="#cache-intelligent" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Cache des requêtes fréquentes</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_data</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="nd">@cache_data</span><span class="p">(</span><span class="n">ttl</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>  <span class="c1"># Cache pendant 1 heure</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_consultant_stats</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache les statistiques des consultants.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">consultant_service</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">()</span>
+
+<span class="nd">@cache_data</span><span class="p">(</span><span class="n">ttl</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>  <span class="c1"># Cache pendant 30 minutes</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_skill_distribution</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache la distribution des compétences.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">analytics_service</span><span class="o">.</span><span class="n">get_skill_distribution</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Cache des données de référence</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@st</span><span class="o">.</span><span class="n">cache_data</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_referentiel_competences</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cache le référentiel des compétences.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">competence_service</span><span class="o">.</span><span class="n">get_all_competences</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="optimisation-des-requetes">
+<h3>Optimisation des requêtes<a class="headerlink" href="#optimisation-des-requetes" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Requêtes paginées</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_consultants_optimized</span><span class="p">(</span><span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Récupération optimisée avec pagination.&quot;&quot;&quot;</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Consultant</span><span class="p">)</span>
+
+    <span class="c1"># Application des filtres</span>
+    <span class="k">if</span> <span class="n">filters</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skill&#39;</span><span class="p">):</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Consultant</span><span class="o">.</span><span class="n">competences</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Competence</span><span class="o">.</span><span class="n">nom</span><span class="o">.</span><span class="n">ilike</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%</span><span class="si">{</span><span class="n">filters</span><span class="p">[</span><span class="s1">&#39;skill&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">):</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Consultant</span><span class="o">.</span><span class="n">statut</span> <span class="o">==</span> <span class="n">filters</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Pagination</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">per_page</span>
+    <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">per_page</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Chargement sélectif</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_consultant_summary</span><span class="p">(</span><span class="n">consultant_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chargement sélectif des données essentielles.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+        <span class="n">Consultant</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">Consultant</span><span class="o">.</span><span class="n">nom</span><span class="p">,</span>
+        <span class="n">Consultant</span><span class="o">.</span><span class="n">prenom</span><span class="p">,</span>
+        <span class="n">Consultant</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+        <span class="n">func</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">Competence</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="s1">&#39;nb_competences&#39;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Consultant</span><span class="o">.</span><span class="n">competences</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">Consultant</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">consultant_id</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">Consultant</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="monitoring-des-performances">
+<h3>Monitoring des performances<a class="headerlink" href="#monitoring-des-performances" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Métriques clés à surveiller</strong></p>
+<ul class="simple">
+<li><p><strong>Temps de réponse des pages</strong> : &lt; 2 secondes</p></li>
+<li><p><strong>Temps de chargement des données</strong> : &lt; 5 secondes pour 1000 consultants</p></li>
+<li><p><strong>Utilisation mémoire</strong> : &lt; 80% de la RAM disponible</p></li>
+<li><p><strong>Temps de requête base de données</strong> : &lt; 500ms en moyenne</p></li>
+</ul>
+<p><strong>Outils de monitoring</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">monitor_query_performance</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Décorateur pour mesurer les performances des requêtes.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">execution_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+
+        <span class="k">if</span> <span class="n">execution_time</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>  <span class="c1"># Log si &gt; 1 seconde</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requête lente: </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">execution_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="nd">@monitor_query_performance</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_consultants_with_skills</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">consultant_service</span><span class="o">.</span><span class="n">get_all_with_competences</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="maintenance-preventive">
+<h3>Maintenance préventive<a class="headerlink" href="#maintenance-preventive" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Tâches automatisées</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Optimisation quotidienne de la base</span>
+<span class="m">0</span><span class="w"> </span><span class="m">2</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>python<span class="w"> </span>scripts/daily_database_maintenance.py
+
+<span class="c1"># Reconstruction des index hebdomadaire</span>
+<span class="m">0</span><span class="w"> </span><span class="m">3</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span><span class="m">1</span><span class="w"> </span>python<span class="w"> </span>scripts/weekly_index_rebuild.py
+
+<span class="c1"># Archive des données anciennes mensuelle</span>
+<span class="m">0</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>python<span class="w"> </span>scripts/monthly_data_archive.py
+</pre></div>
+</div>
+<p><strong>Seuils d’alerte</strong></p>
+<ul class="simple">
+<li><p>Nombre de consultants &gt; 5000 : optimisation obligatoire</p></li>
+<li><p>Taille base de données &gt; 10GB : archivage recommandé</p></li>
+<li><p>Temps de sauvegarde &gt; 30min : optimisation nécessaire</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pied de page">
+        <a href="api.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Précédent</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2025, Eric Lapina.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

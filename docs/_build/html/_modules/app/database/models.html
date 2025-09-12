@@ -1,0 +1,679 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app.database.models &mdash; Documentation Consultator 1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=7a28dfa3"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../../_static/translations.js?v=e6b791cb"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Recherche" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #1f77b4" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Consultator
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">🚀 Premiers pas</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation et Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Guide de démarrage rapide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🎯 Fonctionnalités</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">Fonctionnalités</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🔧 Développement</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Guide de développement</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">📚 API &amp; Référence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">📖 Guides &amp; Tutoriels</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutoriels</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #1f77b4" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Consultator</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Code du module</a></li>
+      <li class="breadcrumb-item active">app.database.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Code source de app.database.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Modèles de base de données pour Consultator</span>
+<span class="sd">Définit la structure des tables avec SQLAlchemy</span>
+<span class="sd">Optimisé pour gérer 1000+ consultants avec index de performance</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Boolean</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Column</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Date</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">DateTime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Float</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForeignKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Index</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Integer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">String</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapped</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">declarative_base</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">relationship</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Practice">
+<a class="viewcode-back" href="../../../api.html#app.database.models.Practice">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Practice</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modèle pour les practices (Data, Quant, etc.)&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;practices&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+    <span class="n">responsable</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+    <span class="p">)</span>  <span class="c1"># Nom du responsable de practice</span>
+    <span class="n">date_creation</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">actif</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Boolean</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultants</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;Consultant&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Consultant&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;practice&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;Practice(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, nom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nombre_consultants</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retourne le nombre de consultants dans cette practice&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">consultants</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">disponibilite</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="Consultant">
+<a class="viewcode-back" href="../../../api.html#app.database.models.Consultant">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Consultant</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modèle pour les consultants avec optimisations de performance&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;consultants&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">prenom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">email</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">telephone</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+    <span class="n">salaire_actuel</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">date_creation</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">derniere_maj</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">onupdate</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span>
+    <span class="p">)</span>
+    <span class="n">disponibilite</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Boolean</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">notes</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+
+    <span class="c1"># Nouveaux champs pour l&#39;historique société V1.2</span>
+    <span class="n">date_entree_societe</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Date</span>
+    <span class="p">)</span>  <span class="c1"># Date d&#39;entrée dans la société</span>
+    <span class="n">date_sortie_societe</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Date</span><span class="p">)</span>
+    <span class="n">societe</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Quanteam&quot;</span><span class="p">)</span>  <span class="c1"># Quanteam ou Asigma</span>
+    <span class="n">date_premiere_mission</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Date</span>
+    <span class="p">)</span>  <span class="c1"># Date de la première mission</span>
+
+    <span class="c1"># Nouveaux champs pour grade et contrat V1.2.1</span>
+    <span class="c1"># Junior, Confirmé, Consultant Manager, Directeur de Practice</span>
+    <span class="n">grade</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Junior&quot;</span><span class="p">)</span>
+    <span class="c1"># CDI, CDD, Stagiaire, Alternant, Indépendant</span>
+    <span class="n">type_contrat</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;CDI&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">practice_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;practices.id&quot;</span><span class="p">))</span>
+    <span class="n">practice</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Practice&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Practice&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultants&quot;</span>
+    <span class="p">)</span>
+    <span class="n">competences</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ConsultantCompetence&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;ConsultantCompetence&quot;</span><span class="p">,</span>
+        <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant&quot;</span><span class="p">,</span>
+        <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;all, delete-orphan&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">missions</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;Mission&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Mission&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant&quot;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;all, delete-orphan&quot;</span>
+    <span class="p">)</span>
+    <span class="n">cvs</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;CV&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;CV&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant&quot;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;all, delete-orphan&quot;</span>
+    <span class="p">)</span>
+    <span class="n">salaires</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ConsultantSalaire&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;ConsultantSalaire&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant&quot;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;all, delete-orphan&quot;</span>
+    <span class="p">)</span>
+    <span class="n">langues</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ConsultantLangue&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;ConsultantLangue&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant&quot;</span><span class="p">,</span> <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;all, delete-orphan&quot;</span>
+    <span class="p">)</span>
+    <span class="n">business_manager_gestions</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ConsultantBusinessManager&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;ConsultantBusinessManager&quot;</span><span class="p">,</span>
+        <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant&quot;</span><span class="p">,</span>
+        <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;all, delete-orphan&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Index de performance pour recherches rapides</span>
+    <span class="n">__table_args__</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_consultant_nom_prenom&quot;</span><span class="p">,</span> <span class="s2">&quot;nom&quot;</span><span class="p">,</span> <span class="s2">&quot;prenom&quot;</span><span class="p">),</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_consultant_email&quot;</span><span class="p">,</span> <span class="s2">&quot;email&quot;</span><span class="p">),</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_consultant_disponibilite&quot;</span><span class="p">,</span> <span class="s2">&quot;disponibilite&quot;</span><span class="p">),</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_consultant_practice&quot;</span><span class="p">,</span> <span class="s2">&quot;practice_id&quot;</span><span class="p">),</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_consultant_date_maj&quot;</span><span class="p">,</span> <span class="s2">&quot;derniere_maj&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;Consultant(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, nom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom</span><span class="si">}</span><span class="s2">&#39;, prenom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prenom</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nom_complet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prenom</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">business_manager_actuel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;BusinessManager&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retourne le Business Manager actuel du consultant&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">cbm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">business_manager_gestions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cbm</span><span class="o">.</span><span class="n">date_fin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">cbm</span><span class="o">.</span><span class="n">business_manager</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">experience_annees</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calcule l&#39;expérience en années depuis la première mission&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_premiere_mission</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="n">today</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">today</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_premiere_mission</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">delta</span><span class="o">.</span><span class="n">days</span> <span class="o">/</span> <span class="mf">365.25</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Prise en compte des années bissextiles</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">statut_societe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retourne le statut actuel dans la société&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_sortie_societe</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;En poste&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_sortie_societe</span> <span class="o">&gt;</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">():</span>
+            <span class="k">return</span> <span class="s2">&quot;Départ prévu&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Parti&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">date_disponibilite</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calcule la date de disponibilité du consultant</span>
+<span class="sd">        - Si disponible immédiatement: &#39;ASAP&#39;</span>
+<span class="sd">        - Sinon: date de fin de la mission la plus tardive (si &gt; aujourd&#39;hui)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Si marqué comme disponible, retour ASAP</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">disponibilite</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;ASAP&quot;</span>
+
+        <span class="c1"># Chercher la date de fin de mission la plus tardive</span>
+        <span class="n">today</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="n">max_date_fin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">mission</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">missions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mission</span><span class="o">.</span><span class="n">date_fin</span> <span class="ow">and</span> <span class="n">mission</span><span class="o">.</span><span class="n">date_fin</span> <span class="o">&gt;</span> <span class="n">today</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">max_date_fin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">mission</span><span class="o">.</span><span class="n">date_fin</span> <span class="o">&gt;</span> <span class="n">max_date_fin</span><span class="p">:</span>
+                    <span class="n">max_date_fin</span> <span class="o">=</span> <span class="n">mission</span><span class="o">.</span><span class="n">date_fin</span>
+
+        <span class="k">if</span> <span class="n">max_date_fin</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">max_date_fin</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Aucune mission avec date de fin future, donc ASAP</span>
+            <span class="k">return</span> <span class="s2">&quot;ASAP&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Competence">
+<a class="viewcode-back" href="../../../api.html#app.database.models.Competence">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Competence</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modèle pour les compétences techniques et fonctionnelles&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;competences&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># Frontend, Backend, Data, Cloud, etc.</span>
+    <span class="n">categorie</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># technique ou fonctionnelle</span>
+    <span class="n">type_competence</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;technique&quot;</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+    <span class="n">niveau_requis</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;junior&quot;</span>
+    <span class="p">)</span>  <span class="c1"># junior, medior, senior</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultant_competences</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ConsultantCompetence&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;ConsultantCompetence&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;competence&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;Competence(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, nom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom</span><span class="si">}</span><span class="s2">&#39;, categorie=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">categorie</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ConsultantCompetence">
+<a class="viewcode-back" href="../../../api.html#app.database.models.ConsultantCompetence">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsultantCompetence</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Table de liaison entre consultants et compétences&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;consultant_competences&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">consultant_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;consultants.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">competence_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;competences.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">annees_experience</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># debutant, intermediaire, expert</span>
+    <span class="n">niveau_maitrise</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;debutant&quot;</span><span class="p">)</span>
+    <span class="n">certifications</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>  <span class="c1"># JSON ou texte simple</span>
+    <span class="n">projets_realises</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+    <span class="n">date_ajout</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultant</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;Consultant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Consultant&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;competences&quot;</span>
+    <span class="p">)</span>
+    <span class="n">competence</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;Competence&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Competence&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant_competences&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ConsultantCompetence(consultant_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">consultant_id</span><span class="si">}</span><span class="s2">, competence_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">competence_id</span><span class="si">}</span><span class="s2">, experience=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">annees_experience</span><span class="si">}</span><span class="s2">)&gt;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Mission">
+<a class="viewcode-back" href="../../../api.html#app.database.models.Mission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Mission</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modèle pour les missions des consultants avec optimisations&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;missions&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">consultant_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;consultants.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">nom_mission</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">client</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">role</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">String</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+    <span class="p">)</span>  <span class="c1"># Nouveau champ pour le rôle/poste</span>
+    <span class="n">date_debut</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Date</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">date_fin</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Date</span><span class="p">)</span>
+    <span class="n">statut</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;en_cours&quot;</span>
+    <span class="p">)</span>  <span class="c1"># en_cours, terminee, suspendue</span>
+    <span class="n">taux_journalier</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Float</span>
+    <span class="p">)</span>  <span class="c1"># Ancien champ, conservé pour compatibilité</span>
+    <span class="n">tjm</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Float</span>
+    <span class="p">)</span>  <span class="c1"># Nouveau champ TJM spécifique mission V1.2.2</span>
+    <span class="n">revenus_generes</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
+    <span class="n">technologies_utilisees</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Text</span>
+    <span class="p">)</span>  <span class="c1"># JSON ou texte séparé par virgules</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultant</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;Consultant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Consultant&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;missions&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Index de performance pour requêtes fréquentes</span>
+    <span class="n">__table_args__</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_mission_consultant&quot;</span><span class="p">,</span> <span class="s2">&quot;consultant_id&quot;</span><span class="p">),</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_mission_client&quot;</span><span class="p">,</span> <span class="s2">&quot;client&quot;</span><span class="p">),</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_mission_statut&quot;</span><span class="p">,</span> <span class="s2">&quot;statut&quot;</span><span class="p">),</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_mission_dates&quot;</span><span class="p">,</span> <span class="s2">&quot;date_debut&quot;</span><span class="p">,</span> <span class="s2">&quot;date_fin&quot;</span><span class="p">),</span>
+        <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;idx_mission_consultant_dates&quot;</span><span class="p">,</span> <span class="s2">&quot;consultant_id&quot;</span><span class="p">,</span> <span class="s2">&quot;date_debut&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&lt;Mission(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, nom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom_mission</span><span class="si">}</span><span class="s2">&#39;, client=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">duree_jours</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calcule la durée de la mission en jours&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_fin</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_debut</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date_fin</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_debut</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="CV">
+<a class="viewcode-back" href="../../../api.html#app.database.models.CV">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CV</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modèle pour les CVs uploadés&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;cvs&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">consultant_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;consultants.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">fichier_nom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">fichier_path</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">contenu_extrait</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>  <span class="c1"># Contenu parsé du CV</span>
+    <span class="n">date_upload</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">taille_fichier</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">)</span>  <span class="c1"># en bytes</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultant</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;Consultant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Consultant&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;cvs&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;CV(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, consultant_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">consultant_id</span><span class="si">}</span><span class="s2">, fichier=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fichier_nom</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="CustomTechnology">
+<a class="viewcode-back" href="../../../api.html#app.database.models.CustomTechnology">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomTechnology</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modèle pour les technologies personnalisées&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;custom_technologies&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">categorie</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Personnalisées&quot;</span>
+    <span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+    <span class="n">date_creation</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;CustomTechnology(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, nom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom</span><span class="si">}</span><span class="s2">&#39;, categorie=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">categorie</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ConsultantSalaire">
+<a class="viewcode-back" href="../../../api.html#app.database.models.ConsultantSalaire">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsultantSalaire</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Historique des salaires d&#39;un consultant&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;consultant_salaires&quot;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">consultant_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;consultants.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">salaire</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Float</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">date_debut</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Date</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span>
+    <span class="p">)</span>
+    <span class="n">date_fin</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Date</span><span class="p">)</span>
+    <span class="n">commentaire</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+    <span class="n">consultant</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;Consultant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Consultant&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;salaires&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ConsultantSalaire(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, consultant_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">consultant_id</span><span class="si">}</span><span class="s2">, salaire=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">salaire</span><span class="si">}</span><span class="s2">, date_debut=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">date_debut</span><span class="si">}</span><span class="s2">)&gt;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Langue">
+<a class="viewcode-back" href="../../../api.html#app.database.models.Langue">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Langue</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modèle pour les langues&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;langues&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">code_iso</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>  <span class="c1"># ex: FR, EN, ES, DE, IT</span>
+    <span class="n">description</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultant_langues</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ConsultantLangue&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;ConsultantLangue&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;langue&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;Langue(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, nom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom</span><span class="si">}</span><span class="s2">&#39;, code_iso=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code_iso</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ConsultantLangue">
+<a class="viewcode-back" href="../../../api.html#app.database.models.ConsultantLangue">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsultantLangue</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Table de liaison entre consultants et langues avec niveau&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;consultant_langues&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">consultant_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;consultants.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">langue_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;langues.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># 1=Débutant, 2=Élémentaire, 3=Intermédiaire, 4=Avancé, 5=Natif</span>
+    <span class="n">niveau</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># ex: &quot;Lu, écrit, parlé&quot;, &quot;Certification TOEIC 850&quot;, etc.</span>
+    <span class="n">commentaire</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+    <span class="n">date_ajout</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultant</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;Consultant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Consultant&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;langues&quot;</span>
+    <span class="p">)</span>
+    <span class="n">langue</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;Langue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Langue&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant_langues&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ConsultantLangue(consultant_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">consultant_id</span><span class="si">}</span><span class="s2">, langue_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">langue_id</span><span class="si">}</span><span class="s2">, niveau=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">niveau</span><span class="si">}</span><span class="s2">)&gt;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">niveau_label</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retourne le label du niveau&quot;&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Débutant (A1)&quot;</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;Élémentaire (A2)&quot;</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;Intermédiaire (B1-B2)&quot;</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;Avancé (C1)&quot;</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="s2">&quot;Natif (C2)&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">labels</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">niveau</span><span class="p">,</span> <span class="s2">&quot;Inconnu&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="BusinessManager">
+<a class="viewcode-back" href="../../../api.html#app.database.models.BusinessManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BusinessManager</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modèle pour les Business Managers&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;business_managers&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">prenom</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">email</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">telephone</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+    <span class="n">date_creation</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">derniere_maj</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">,</span> <span class="n">onupdate</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span>
+    <span class="p">)</span>
+    <span class="n">actif</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Boolean</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">notes</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultant_gestions</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;ConsultantBusinessManager&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;ConsultantBusinessManager&quot;</span><span class="p">,</span>
+        <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;business_manager&quot;</span><span class="p">,</span>
+        <span class="n">cascade</span><span class="o">=</span><span class="s2">&quot;all, delete-orphan&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&lt;BusinessManager(id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, nom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom</span><span class="si">}</span><span class="s2">&#39;, prenom=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prenom</span><span class="si">}</span><span class="s2">&#39;)&gt;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nom_complet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retourne le nom complet du BM&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prenom</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nom</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">consultants_actuels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;Consultant&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retourne les consultants actuellement gérés par ce BM&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">cbm</span><span class="o">.</span><span class="n">consultant</span> <span class="k">for</span> <span class="n">cbm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">consultant_gestions</span> <span class="k">if</span> <span class="n">cbm</span><span class="o">.</span><span class="n">date_fin</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nombre_consultants_actuels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retourne le nombre de consultants actuellement gérés&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consultants_actuels</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ConsultantBusinessManager">
+<a class="viewcode-back" href="../../../api.html#app.database.models.ConsultantBusinessManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsultantBusinessManager</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Table de liaison entre consultants et business managers avec historique&quot;&quot;&quot;</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;consultant_business_managers&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">autoincrement</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">consultant_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;consultants.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">business_manager_id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Integer</span><span class="p">,</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;business_managers.id&quot;</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">date_debut</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Date</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span>
+    <span class="p">)</span>
+    <span class="n">date_fin</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Date</span>
+    <span class="p">)</span>  <span class="c1"># NULL si la gestion est active</span>
+    <span class="n">commentaire</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">Text</span>
+    <span class="p">)</span>  <span class="c1"># ex: &quot;Changement d&#39;équipe&quot;, &quot;Promotion&quot;, etc.</span>
+    <span class="n">date_creation</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">consultant</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;Consultant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;Consultant&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;business_manager_gestions&quot;</span>
+    <span class="p">)</span>
+    <span class="n">business_manager</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="s2">&quot;BusinessManager&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span>
+        <span class="s2">&quot;BusinessManager&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant_gestions&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ConsultantBusinessManager(consultant_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">consultant_id</span><span class="si">}</span><span class="s2">, bm_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">business_manager_id</span><span class="si">}</span><span class="s2">, debut=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">date_debut</span><span class="si">}</span><span class="s2">)&gt;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">est_actuel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retourne True si cette gestion est actuellement active&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_fin</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">duree_jours</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calcule la durée de la gestion en jours&quot;&quot;&quot;</span>
+        <span class="n">date_fin_effective</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_fin</span> <span class="ow">or</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">date_fin_effective</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_debut</span><span class="p">)</span><span class="o">.</span><span class="n">days</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2025, Eric Lapina.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -37,7 +37,27 @@ except ImportError:
 
 
 def show_consultant_languages(consultant):
-    """Affiche les langues du consultant"""
+    """
+    Affiche la page complète des langues d'un consultant.
+
+    Interface principale pour la gestion des langues incluant :
+    - Liste des langues avec niveaux détaillés
+    - Statistiques générales (total, maternelles, certifiées)
+    - Actions d'ajout/modification/suppression
+    - Analyses et comparaisons
+
+    Args:
+        consultant: Objet Consultant dont on veut afficher les langues
+
+    Raises:
+        ImportError: Si les services de base ne sont pas disponibles
+        Exception: Pour toute erreur lors de l'affichage ou des opérations DB
+
+    Example:
+        >>> consultant = ConsultantService.get_consultant_by_id(123)
+        >>> show_consultant_languages(consultant)
+        # Affiche la page complète des langues du consultant
+    """
 
     if not imports_ok:
         st.error("❌ Les services de base ne sont pas disponibles")
@@ -174,7 +194,23 @@ def show_consultant_languages(consultant):
 
 
 def get_niveau_label(niveau: int) -> str:
-    """Retourne le label du niveau de langue"""
+    """
+    Convertit un niveau numérique en label descriptif selon le CECR.
+
+    Args:
+        niveau: Niveau numérique (1-6) selon l'échelle CECR
+
+    Returns:
+        str: Label descriptif du niveau (ex: "A1 - Débutant")
+
+    Example:
+        >>> get_niveau_label(1)
+        'A1 - Débutant'
+        >>> get_niveau_label(6)
+        'C2 - Maîtrise'
+        >>> get_niveau_label(7)
+        'Niveau 7'
+    """
 
     niveaux = {
         1: "A1 - Débutant",
@@ -188,7 +224,22 @@ def get_niveau_label(niveau: int) -> str:
 
 
 def show_languages_statistics(consultant_langues):
-    """Affiche les statistiques des langues"""
+    """
+    Affiche les statistiques générales des langues d'un consultant.
+
+    Calcule et présente les métriques clés :
+    - Nombre total de langues
+    - Nombre de langues maternelles
+    - Nombre de langues certifiées
+    - Niveau moyen global
+
+    Args:
+        consultant_langues: Liste des objets ConsultantLangue du consultant
+
+    Note:
+        Les niveaux sont calculés selon l'échelle CECR (1-6)
+        où 6 correspond au niveau C2 (maîtrise).
+    """
 
     if not consultant_langues:
         return
@@ -217,7 +268,27 @@ def show_languages_statistics(consultant_langues):
 
 
 def show_add_language_form(consultant_id: int):
-    """Affiche le formulaire d'ajout de langue"""
+    """
+    Affiche le formulaire d'ajout d'une nouvelle langue au consultant.
+
+    Formulaire complet avec validation incluant :
+    - Sélection de langue (parmi celles non déjà associées)
+    - Niveaux détaillés (général, écrit, parlé)
+    - Statut langue maternelle
+    - Certification
+    - Validation des données
+
+    Args:
+        consultant_id: ID du consultant pour lequel ajouter la langue
+
+    Raises:
+        Exception: En cas d'erreur lors du chargement des langues disponibles
+
+    Note:
+        Évite les doublons en filtrant les langues déjà associées
+        au consultant. Supporte les niveaux séparés pour expression
+        écrite et orale.
+    """
 
     st.markdown("### ➕ Ajouter une langue")
 
@@ -333,7 +404,42 @@ def show_add_language_form(consultant_id: int):
 
 
 def add_language_to_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
-    """Ajoute une langue au consultant"""
+    """
+    Ajoute une langue au profil d'un consultant.
+
+    Args:
+        consultant_id: ID du consultant
+        data: Dictionnaire contenant les données de la langue :
+            - langue_id: ID de la langue à ajouter
+            - niveau: Niveau général (1-6)
+            - niveau_ecrit: Niveau écrit spécifique (1-6)
+            - niveau_parle: Niveau parlé spécifique (1-6)
+            - certification: Booléen pour certification
+            - langue_maternelle: Booléen pour langue maternelle
+
+    Returns:
+        bool: True si ajout réussi, False sinon
+
+    Raises:
+        Exception: En cas d'erreur de base de données
+
+    Note:
+        Vérifie automatiquement l'absence de doublons avant l'ajout.
+        Les niveaux écrit et parlé sont optionnels et peuvent être null.
+
+    Example:
+        >>> data = {
+        ...     "langue_id": 1,
+        ...     "niveau": 5,
+        ...     "niveau_ecrit": 4,
+        ...     "niveau_parle": 5,
+        ...     "certification": True,
+        ...     "langue_maternelle": False
+        ... }
+        >>> success = add_language_to_consultant(123, data)
+        >>> print(success)
+        True
+    """
 
     try:
         with get_database_session() as session:
@@ -373,7 +479,25 @@ def add_language_to_consultant(consultant_id: int, data: Dict[str, Any]) -> bool
 
 
 def show_edit_language_form(consultant_langue_id: int):
-    """Affiche le formulaire de modification de langue"""
+    """
+    Affiche le formulaire de modification d'une langue existante.
+
+    Formulaire pré-rempli avec les données actuelles permettant :
+    - Modification de tous les niveaux
+    - Changement du statut langue maternelle
+    - Modification du statut certification
+    - Validation des modifications
+
+    Args:
+        consultant_langue_id: ID de l'association consultant-langue à modifier
+
+    Raises:
+        Exception: En cas d'erreur de chargement des données
+
+    Note:
+        Préserve les valeurs existantes comme valeurs par défaut
+        dans le formulaire pour faciliter la modification.
+    """
 
     st.markdown("### ✏️ Modifier une langue")
 
@@ -477,7 +601,25 @@ def show_edit_language_form(consultant_langue_id: int):
 
 
 def update_consultant_language(consultant_langue_id: int, data: Dict[str, Any]) -> bool:
-    """Met à jour une langue du consultant"""
+    """
+    Met à jour les informations d'une langue pour un consultant.
+
+    Args:
+        consultant_langue_id: ID de l'association consultant-langue à modifier
+        data: Dictionnaire contenant les nouvelles données (mêmes clés que add_language_to_consultant)
+
+    Returns:
+        bool: True si mise à jour réussie, False sinon
+
+    Raises:
+        Exception: En cas d'erreur de base de données ou association introuvable
+
+    Example:
+        >>> data = {"niveau": 4, "certification": True}
+        >>> success = update_consultant_language(456, data)
+        >>> print(success)
+        True
+    """
 
     try:
         with get_database_session() as session:
@@ -508,7 +650,27 @@ def update_consultant_language(consultant_langue_id: int, data: Dict[str, Any]) 
 
 
 def delete_language(consultant_langue_id: int) -> bool:
-    """Supprime une langue du consultant"""
+    """
+    Supprime une langue du profil d'un consultant.
+
+    Args:
+        consultant_langue_id: ID de l'association consultant-langue à supprimer
+
+    Returns:
+        bool: True si suppression réussie, False sinon
+
+    Raises:
+        Exception: En cas d'erreur de base de données
+
+    Note:
+        Opération irréversible - l'association langue-consultant
+        sera définitivement supprimée de la base de données.
+
+    Example:
+        >>> success = delete_language(789)
+        >>> print(success)
+        True
+    """
 
     try:
         with get_database_session() as session:
@@ -534,7 +696,23 @@ def delete_language(consultant_langue_id: int) -> bool:
 
 
 def show_languages_analysis(consultant_langues):
-    """Affiche une analyse des langues"""
+    """
+    Affiche une analyse complète des compétences linguistiques.
+
+    Analyse multi-dimensionnelle incluant :
+    - Répartition par niveau CECR
+    - Identification des points forts
+    - Recommandations d'amélioration
+    - Statut des langues maternelles
+    - État des certifications
+
+    Args:
+        consultant_langues: Liste des objets ConsultantLangue à analyser
+
+    Note:
+        Fournit des insights actionnables pour le développement
+        des compétences linguistiques du consultant.
+    """
 
     st.markdown("### 📊 Analyse des langues")
 
@@ -590,7 +768,26 @@ def show_languages_analysis(consultant_langues):
 
 
 def show_languages_comparison(consultant_id: int):
-    """Compare les niveaux de langues du consultant avec d'autres consultants"""
+    """
+    Compare les niveaux de langues du consultant avec l'équipe.
+
+    Analyse comparative incluant :
+    - Comparaison niveau par niveau avec la moyenne équipe
+    - Écart par rapport à la moyenne
+    - Nombre de consultants comparés
+    - Résumé des forces et faiblesses relatives
+
+    Args:
+        consultant_id: ID du consultant à comparer
+
+    Raises:
+        Exception: En cas d'erreur lors de la récupération des données
+
+    Note:
+        Nécessite au minimum 2 consultants par langue pour
+        effectuer une comparaison statistiquement pertinente.
+        Les moyennes sont calculées sur l'ensemble de l'équipe.
+    """
 
     st.markdown("### 🌍 Comparaison des niveaux de langues")
 

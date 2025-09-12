@@ -1,0 +1,797 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guide de développement &mdash; Documentation Consultator 1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7a28dfa3"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/translations.js?v=e6b791cb"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="Fonctionnalités" href="features.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #1f77b4" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Consultator
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">🚀 Premiers pas</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation et Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Guide de démarrage rapide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🎯 Fonctionnalités</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Fonctionnalités</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">🔧 Développement</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Guide de développement</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#architecture-du-projet">Architecture du projet</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#structure-des-dossiers">Structure des dossiers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#architecture-en-couches">Architecture en couches</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#standards-de-code">Standards de code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#style-python">Style Python</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nommage">Nommage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gestion-d-erreurs">Gestion d’erreurs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#base-de-donnees">Base de données</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#modeles-sqlalchemy">Modèles SQLAlchemy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#requetes-optimisees">Requêtes optimisées</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#services-metier">Services métier</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pattern-des-services">Pattern des services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#structure-des-tests">Structure des tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tests-unitaires">Tests unitaires</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tests-d-integration">Tests d’intégration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#couverture-de-code">Couverture de code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ci-cd">CI/CD</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pipeline-github-actions">Pipeline GitHub Actions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-locale">Configuration locale</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#deploiement">Déploiement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#environnements">Environnements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variables-d-environnement">Variables d’environnement</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#containerisation">Containerisation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#monitoring">Monitoring</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#logs">Logs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metriques">Métriques</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#alertes">Alertes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#contribution">Contribution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#workflow-git">Workflow Git</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#types-de-commits">Types de commits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-review">Code review</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">📚 API &amp; Référence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">📖 Guides &amp; Tutoriels</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutoriels</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #1f77b4" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Consultator</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Guide de développement</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/development.rst.txt" rel="nofollow"> Afficher la source de la page</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="guide-de-developpement">
+<h1>Guide de développement<a class="headerlink" href="#guide-de-developpement" title="Lien vers cette rubrique"></a></h1>
+<p>Ce guide présente les bonnes pratiques et conventions de développement pour contribuer à Consultator.</p>
+<section id="architecture-du-projet">
+<h2>Architecture du projet<a class="headerlink" href="#architecture-du-projet" title="Lien vers cette rubrique"></a></h2>
+<section id="structure-des-dossiers">
+<span id="dev-architecture"></span><h3>Structure des dossiers<a class="headerlink" href="#structure-des-dossiers" title="Lien vers cette rubrique"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>consultator/
+├── app/                    # Code principal de l&#39;application
+│   ├── database/          # Modèles et connexion base de données
+│   ├── pages/             # Pages Streamlit
+│   ├── services/          # Services métier
+│   ├── utils/             # Utilitaires et helpers
+│   └── components/        # Composants réutilisables
+├── config/                # Configuration de l&#39;application
+├── tests/                 # Tests unitaires et d&#39;intégration
+├── docs/                  # Documentation Sphinx
+├── scripts/               # Scripts utilitaires
+└── data/                  # Données et fichiers temporaires
+</pre></div>
+</div>
+</section>
+<section id="architecture-en-couches">
+<h3>Architecture en couches<a class="headerlink" href="#architecture-en-couches" title="Lien vers cette rubrique"></a></h3>
+<dl class="simple">
+<dt><strong>Couche présentation (Streamlit)</strong></dt><dd><p>Pages et composants utilisateur dans <code class="docutils literal notranslate"><span class="pre">app/pages/</span></code></p>
+</dd>
+<dt><strong>Couche service</strong></dt><dd><p>Logique métier dans <code class="docutils literal notranslate"><span class="pre">app/services/</span></code></p>
+</dd>
+<dt><strong>Couche données</strong></dt><dd><p>Modèles et accès base de données dans <code class="docutils literal notranslate"><span class="pre">app/database/</span></code></p>
+</dd>
+<dt><strong>Couche utilitaires</strong></dt><dd><p>Fonctions helpers dans <code class="docutils literal notranslate"><span class="pre">app/utils/</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="standards-de-code">
+<h2>Standards de code<a class="headerlink" href="#standards-de-code" title="Lien vers cette rubrique"></a></h2>
+<section id="style-python">
+<span id="dev-standards"></span><h3>Style Python<a class="headerlink" href="#style-python" title="Lien vers cette rubrique"></a></h3>
+<dl>
+<dt><strong>PEP 8</strong></dt><dd><p>Respect strict des conventions PEP 8 avec Black pour le formatage automatique.</p>
+</dd>
+<dt><strong>Type hints</strong></dt><dd><p>Utilisation systématique des annotations de type :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_consultant_by_id</span><span class="p">(</span><span class="n">consultant_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Consultant</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Récupère un consultant par son ID.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>Docstrings</strong></dt><dd><p>Documentation complète en français :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_revenue</span><span class="p">(</span><span class="n">consultant</span><span class="p">:</span> <span class="n">Consultant</span><span class="p">,</span>
+                    <span class="n">start_date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+                    <span class="n">end_date</span><span class="p">:</span> <span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calcule le revenu généré par un consultant sur une période.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        consultant: Instance du consultant</span>
+<span class="sd">        start_date: Date de début de la période</span>
+<span class="sd">        end_date: Date de fin de la période</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Revenu total en euros</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: Si les dates sont invalides</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</section>
+<section id="nommage">
+<h3>Nommage<a class="headerlink" href="#nommage" title="Lien vers cette rubrique"></a></h3>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Conventions de nommage</span><a class="headerlink" href="#id1" title="Lien vers ce tableau"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Élément</p></th>
+<th class="head"><p>Convention</p></th>
+<th class="head"><p>Exemples</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Classes</p></td>
+<td><p>PascalCase</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ConsultantService</span></code>, <code class="docutils literal notranslate"><span class="pre">DatabaseManager</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Fonctions</p></td>
+<td><p>snake_case</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">get_consultant_by_id</span></code>, <code class="docutils literal notranslate"><span class="pre">calculate_revenue</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Variables</p></td>
+<td><p>snake_case</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">consultant_list</span></code>, <code class="docutils literal notranslate"><span class="pre">total_revenue</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Constantes</p></td>
+<td><p>UPPER_SNAKE_CASE</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DATABASE_PATH</span></code>, <code class="docutils literal notranslate"><span class="pre">MAX_RETRIES</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Modules</p></td>
+<td><p>snake_case</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">consultant_service.py</span></code>, <code class="docutils literal notranslate"><span class="pre">database_utils.py</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="gestion-d-erreurs">
+<h3>Gestion d’erreurs<a class="headerlink" href="#gestion-d-erreurs" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Exceptions personnalisées</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ConsultatorError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception de base pour Consultator.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ValidationError</span><span class="p">(</span><span class="n">ConsultatorError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Erreur de validation des données.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DatabaseError</span><span class="p">(</span><span class="n">ConsultatorError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Erreur de base de données.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p><strong>Gestion contextuelle</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">database_session</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager pour les sessions de base de données.&quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">SessionLocal</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">session</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="n">DatabaseError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Erreur base de données: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Logging</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_consultant_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Début du traitement des données consultant&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Traitement des données</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Données reçues: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">validate_and_save</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Traitement terminé avec succès&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Erreur de validation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Erreur inattendue: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">raise</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="base-de-donnees">
+<h2>Base de données<a class="headerlink" href="#base-de-donnees" title="Lien vers cette rubrique"></a></h2>
+<section id="modeles-sqlalchemy">
+<span id="dev-database"></span><h3>Modèles SQLAlchemy<a class="headerlink" href="#modeles-sqlalchemy" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Définition des modèles</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">ForeignKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">relationship</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.ext.declarative</span><span class="w"> </span><span class="kn">import</span> <span class="n">declarative_base</span>
+
+<span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Consultant</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s2">&quot;consultants&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nom</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">prenom</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">competences</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;CompetenceConsultant&quot;</span><span class="p">,</span>
+                             <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant&quot;</span><span class="p">)</span>
+    <span class="n">missions</span> <span class="o">=</span> <span class="n">relationship</span><span class="p">(</span><span class="s2">&quot;Mission&quot;</span><span class="p">,</span> <span class="n">back_populates</span><span class="o">=</span><span class="s2">&quot;consultant&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Migrations</strong></p>
+<p>Utilisation d’Alembic pour les migrations :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Générer une nouvelle migration</span>
+alembic<span class="w"> </span>revision<span class="w"> </span>--autogenerate<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Ajout table missions&quot;</span>
+
+<span class="c1"># Appliquer les migrations</span>
+alembic<span class="w"> </span>upgrade<span class="w"> </span>head
+</pre></div>
+</div>
+</section>
+<section id="requetes-optimisees">
+<h3>Requêtes optimisées<a class="headerlink" href="#requetes-optimisees" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Eager loading</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">joinedload</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_consultant_with_competences</span><span class="p">(</span><span class="n">consultant_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Consultant</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+        <span class="n">joinedload</span><span class="p">(</span><span class="n">Consultant</span><span class="o">.</span><span class="n">competences</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Consultant</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">consultant_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Pagination</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_consultants_paginated</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">per_page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">):</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">per_page</span>
+    <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Consultant</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">per_page</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="services-metier">
+<h2>Services métier<a class="headerlink" href="#services-metier" title="Lien vers cette rubrique"></a></h2>
+<section id="pattern-des-services">
+<span id="dev-services"></span><h3>Pattern des services<a class="headerlink" href="#pattern-des-services" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Structure d’un service</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.database.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Consultant</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsultantService</span><span class="p">:</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_consultants</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">per_page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Consultant</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Récupère tous les consultants avec pagination.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">database_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Consultant</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">per_page</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">per_page</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_consultant_by_id</span><span class="p">(</span><span class="n">consultant_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Consultant</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Récupère un consultant par son ID.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">database_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">Consultant</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Consultant</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">consultant_id</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_consultant</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Consultant</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crée un nouveau consultant.&quot;&quot;&quot;</span>
+        <span class="c1"># Validation des données</span>
+        <span class="n">validated_data</span> <span class="o">=</span> <span class="n">ConsultantValidator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">database_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">consultant</span> <span class="o">=</span> <span class="n">Consultant</span><span class="p">(</span><span class="o">**</span><span class="n">validated_data</span><span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">consultant</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">consultant</span>
+</pre></div>
+</div>
+<p><strong>Injection de dépendances</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dependency_injector</span><span class="w"> </span><span class="kn">import</span> <span class="n">containers</span><span class="p">,</span> <span class="n">providers</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Container</span><span class="p">(</span><span class="n">containers</span><span class="o">.</span><span class="n">DeclarativeContainer</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+
+    <span class="n">database</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">DatabaseManager</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">database</span><span class="p">)</span>
+
+    <span class="n">consultant_service</span> <span class="o">=</span> <span class="n">providers</span><span class="o">.</span><span class="n">Factory</span><span class="p">(</span>
+        <span class="n">ConsultantService</span><span class="p">,</span>
+        <span class="n">database</span><span class="o">=</span><span class="n">database</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="tests">
+<h2>Tests<a class="headerlink" href="#tests" title="Lien vers cette rubrique"></a></h2>
+<section id="structure-des-tests">
+<span id="dev-testing"></span><h3>Structure des tests<a class="headerlink" href="#structure-des-tests" title="Lien vers cette rubrique"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>tests/
+├── unit/                  # Tests unitaires
+│   ├── test_consultant_service.py
+│   └── test_validators.py
+├── integration/          # Tests d&#39;intégration
+│   ├── test_database_integration.py
+│   └── test_api_integration.py
+├── fixtures/             # Données de test
+│   ├── consultants.json
+│   └── sample_data.sql
+└── conftest.py           # Configuration pytest
+</pre></div>
+</div>
+</section>
+<section id="tests-unitaires">
+<h3>Tests unitaires<a class="headerlink" href="#tests-unitaires" title="Lien vers cette rubrique"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mock</span><span class="p">,</span> <span class="n">patch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.services.consultant_service</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConsultantService</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TestConsultantService</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_get_consultant_by_id_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_session</span><span class="p">):</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">expected_consultant</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">()</span>
+        <span class="n">mock_session</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="n">expected_consultant</span>
+
+        <span class="c1"># Act</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">ConsultantService</span><span class="o">.</span><span class="n">get_consultant_by_id</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Assert</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="o">==</span> <span class="n">expected_consultant</span>
+        <span class="n">mock_session</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">assert_called_once</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_get_consultant_by_id_not_found</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_session</span><span class="p">):</span>
+        <span class="c1"># Arrange</span>
+        <span class="n">mock_session</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">return_value</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Act</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">ConsultantService</span><span class="o">.</span><span class="n">get_consultant_by_id</span><span class="p">(</span><span class="mi">999</span><span class="p">)</span>
+
+        <span class="c1"># Assert</span>
+        <span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</section>
+<section id="tests-d-integration">
+<h3>Tests d’intégration<a class="headerlink" href="#tests-d-integration" title="Lien vers cette rubrique"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">app.database.database</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_database</span><span class="p">,</span> <span class="n">reset_database</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">,</span> <span class="n">autouse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_test_database</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialise la base de test au début de la session.&quot;&quot;&quot;</span>
+    <span class="n">init_database</span><span class="p">()</span>
+    <span class="k">yield</span>
+    <span class="n">reset_database</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_consultant_creation_integration</span><span class="p">(</span><span class="n">test_client</span><span class="p">,</span> <span class="n">sample_consultant_data</span><span class="p">):</span>
+    <span class="c1"># Act</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">test_client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/api/consultants&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">sample_consultant_data</span><span class="p">)</span>
+
+    <span class="c1"># Assert</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;nom&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sample_consultant_data</span><span class="p">[</span><span class="s2">&quot;nom&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="s2">&quot;id&quot;</span> <span class="ow">in</span> <span class="n">data</span>
+</pre></div>
+</div>
+</section>
+<section id="couverture-de-code">
+<h3>Couverture de code<a class="headerlink" href="#couverture-de-code" title="Lien vers cette rubrique"></a></h3>
+<p>Objectif de couverture : <strong>90% minimum</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Exécuter les tests avec couverture</span>
+pytest<span class="w"> </span>--cov<span class="o">=</span>app<span class="w"> </span>--cov-report<span class="o">=</span>html<span class="w"> </span>--cov-report<span class="o">=</span>term
+
+<span class="c1"># Générer le rapport HTML</span>
+open<span class="w"> </span>htmlcov/index.html
+</pre></div>
+</div>
+</section>
+</section>
+<section id="ci-cd">
+<h2>CI/CD<a class="headerlink" href="#ci-cd" title="Lien vers cette rubrique"></a></h2>
+<section id="pipeline-github-actions">
+<span id="dev-cicd"></span><h3>Pipeline GitHub Actions<a class="headerlink" href="#pipeline-github-actions" title="Lien vers cette rubrique"></a></h3>
+<p>Le pipeline comprend :</p>
+<ol class="arabic simple">
+<li><p><strong>Linting</strong> : flake8, black, isort</p></li>
+<li><p><strong>Tests</strong> : pytest avec couverture</p></li>
+<li><p><strong>Sécurité</strong> : audit des dépendances</p></li>
+<li><p><strong>Documentation</strong> : build Sphinx</p></li>
+<li><p><strong>Déploiement</strong> : vers staging/production</p></li>
+</ol>
+</section>
+<section id="configuration-locale">
+<h3>Configuration locale<a class="headerlink" href="#configuration-locale" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Pre-commit hooks</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Installation</span>
+pre-commit<span class="w"> </span>install
+
+<span class="c1"># Exécution manuelle</span>
+pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</pre></div>
+</div>
+<p><strong>Qualité du code</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Analyse complète</span>
+python<span class="w"> </span>run_quality_pipeline.py
+
+<span class="c1"># Tests uniquement</span>
+pytest
+
+<span class="c1"># Linting</span>
+flake8<span class="w"> </span>app/<span class="w"> </span>tests/
+</pre></div>
+</div>
+</section>
+</section>
+<section id="deploiement">
+<h2>Déploiement<a class="headerlink" href="#deploiement" title="Lien vers cette rubrique"></a></h2>
+<section id="environnements">
+<span id="dev-deployment"></span><h3>Environnements<a class="headerlink" href="#environnements" title="Lien vers cette rubrique"></a></h3>
+<ul class="simple">
+<li><p><strong>Development</strong> : Environnement local des développeurs</p></li>
+<li><p><strong>Staging</strong> : Environnement de pré-production</p></li>
+<li><p><strong>Production</strong> : Environnement de production</p></li>
+</ul>
+</section>
+<section id="variables-d-environnement">
+<h3>Variables d’environnement<a class="headerlink" href="#variables-d-environnement" title="Lien vers cette rubrique"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># .env.development</span>
+<span class="nv">APP_ENV</span><span class="o">=</span>development
+<span class="nv">DEBUG</span><span class="o">=</span>True
+<span class="nv">DATABASE_URL</span><span class="o">=</span>sqlite:///data/dev.db
+<span class="nv">LOG_LEVEL</span><span class="o">=</span>DEBUG
+
+<span class="c1"># .env.production</span>
+<span class="nv">APP_ENV</span><span class="o">=</span>production
+<span class="nv">DEBUG</span><span class="o">=</span>False
+<span class="nv">DATABASE_URL</span><span class="o">=</span>postgresql://user:pass@host:5432/consultator
+<span class="nv">LOG_LEVEL</span><span class="o">=</span>INFO
+</pre></div>
+</div>
+</section>
+<section id="containerisation">
+<h3>Containerisation<a class="headerlink" href="#containerisation" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Dockerfile</strong></p>
+<div class="highlight-dockerfile notranslate"><div class="highlight"><pre><span></span><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.11-slim</span>
+
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+
+<span class="c"># Installation des dépendances système</span>
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>gcc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*
+
+<span class="c"># Installation des dépendances Python</span>
+<span class="k">COPY</span><span class="w"> </span>requirements.txt<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="c"># Copie du code</span>
+<span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>.
+
+<span class="c"># Exposition du port</span>
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">8501</span>
+
+<span class="c"># Commande de démarrage</span>
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;streamlit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;run.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--server.port=8501&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--server.address=0.0.0.0&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Docker Compose</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.8&#39;</span>
+<span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">consultator</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8501:8501&quot;</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./data:/app/data</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DATABASE_URL=sqlite:///data/consultator.db</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postgres</span>
+
+<span class="w">  </span><span class="nt">postgres</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postgres:15</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">POSTGRES_DB</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">consultator</span>
+<span class="w">      </span><span class="nt">POSTGRES_USER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">consultator</span>
+<span class="w">      </span><span class="nt">POSTGRES_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">password</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postgres_data:/var/lib/postgresql/data</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="monitoring">
+<h2>Monitoring<a class="headerlink" href="#monitoring" title="Lien vers cette rubrique"></a></h2>
+<section id="logs">
+<span id="dev-monitoring"></span><h3>Logs<a class="headerlink" href="#logs" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Configuration centralisée</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging.config</span>
+
+<span class="n">LOGGING_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;formatters&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;detailed&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;logging.FileHandler&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;logs/consultator.log&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;formatter&#39;</span><span class="p">:</span> <span class="s1">&#39;detailed&#39;</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;console&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;logging.StreamHandler&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;formatter&#39;</span><span class="p">:</span> <span class="s1">&#39;detailed&#39;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;root&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;console&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">LOGGING_CONFIG</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="metriques">
+<h3>Métriques<a class="headerlink" href="#metriques" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Performance</strong></p>
+<ul class="simple">
+<li><p>Temps de réponse des API</p></li>
+<li><p>Utilisation CPU/Mémoire</p></li>
+<li><p>Nombre de requêtes par minute</p></li>
+<li><p>Taux d’erreur</p></li>
+</ul>
+<p><strong>Métier</strong></p>
+<ul class="simple">
+<li><p>Nombre de consultants actifs</p></li>
+<li><p>CA généré</p></li>
+<li><p>Taux de satisfaction client</p></li>
+<li><p>Temps de traitement des imports</p></li>
+</ul>
+</section>
+<section id="alertes">
+<h3>Alertes<a class="headerlink" href="#alertes" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Seuils critiques</strong></p>
+<ul class="simple">
+<li><p>Erreur 5xx &gt; 5% des requêtes</p></li>
+<li><p>Temps de réponse &gt; 5 secondes</p></li>
+<li><p>Utilisation disque &gt; 90%</p></li>
+<li><p>Échec des sauvegardes</p></li>
+</ul>
+</section>
+</section>
+<section id="contribution">
+<h2>Contribution<a class="headerlink" href="#contribution" title="Lien vers cette rubrique"></a></h2>
+<section id="workflow-git">
+<span id="dev-contribution"></span><h3>Workflow Git<a class="headerlink" href="#workflow-git" title="Lien vers cette rubrique"></a></h3>
+<ol class="arabic">
+<li><p><strong>Créer une branche</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feature/nouvelle-fonctionnalite
+</pre></div>
+</div>
+</li>
+<li><p><strong>Développer</strong></p>
+<ul class="simple">
+<li><p>Écrire des tests</p></li>
+<li><p>Implémenter la fonctionnalité</p></li>
+<li><p>Respecter les standards de code</p></li>
+</ul>
+</li>
+<li><p><strong>Commiter</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: ajout nouvelle fonctionnalité</span>
+
+<span class="s2">- Description détaillée</span>
+<span class="s2">- Tests ajoutés</span>
+<span class="s2">- Documentation mise à jour&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Créer une PR</strong></p>
+<ul class="simple">
+<li><p>Push de la branche</p></li>
+<li><p>Création de la Pull Request</p></li>
+<li><p>Revue par les pairs</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="types-de-commits">
+<h3>Types de commits<a class="headerlink" href="#types-de-commits" title="Lien vers cette rubrique"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">feat:</span></code> Nouvelle fonctionnalité</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fix:</span></code> Correction de bug</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docs:</span></code> Modification de la documentation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">style:</span></code> Changement de style (formatage, etc.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">refactor:</span></code> Refactorisation du code</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test:</span></code> Ajout ou modification de tests</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chore:</span></code> Tâche de maintenance</p></li>
+</ul>
+</section>
+<section id="code-review">
+<h3>Code review<a class="headerlink" href="#code-review" title="Lien vers cette rubrique"></a></h3>
+<p><strong>Checklist</strong></p>
+<ul class="simple">
+<li><p>[ ] Tests unitaires présents et passant</p></li>
+<li><p>[ ] Code respecte les standards PEP 8</p></li>
+<li><p>[ ] Type hints présents</p></li>
+<li><p>[ ] Documentation à jour</p></li>
+<li><p>[ ] Pas de code dupliqué</p></li>
+<li><p>[ ] Performance acceptable</p></li>
+<li><p>[ ] Sécurité respectée</p></li>
+</ul>
+</section>
+</section>
+<section id="support">
+<h2>Support<a class="headerlink" href="#support" title="Lien vers cette rubrique"></a></h2>
+<p><strong>Ressources</strong></p>
+<ul class="simple">
+<li><p><strong>Wiki équipe</strong> : Guides détaillés et bonnes pratiques</p></li>
+<li><p><strong>Slack</strong> : Canal #dev pour les questions techniques</p></li>
+<li><p><strong>Issues GitHub</strong> : Bug reports et feature requests</p></li>
+</ul>
+<p><strong>Points de contact</strong></p>
+<ul class="simple">
+<li><p><strong>Tech Lead</strong> : <a class="reference external" href="mailto:jean&#46;dupont&#37;&#52;&#48;consultator&#46;com">jean<span>&#46;</span>dupont<span>&#64;</span>consultator<span>&#46;</span>com</a></p></li>
+<li><p><strong>DevOps</strong> : <a class="reference external" href="mailto:marie&#46;martin&#37;&#52;&#48;consultator&#46;com">marie<span>&#46;</span>martin<span>&#64;</span>consultator<span>&#46;</span>com</a></p></li>
+<li><p><strong>Product Owner</strong> : <a class="reference external" href="mailto:paul&#46;bernard&#37;&#52;&#48;consultator&#46;com">paul<span>&#46;</span>bernard<span>&#64;</span>consultator<span>&#46;</span>com</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pied de page">
+        <a href="features.html" class="btn btn-neutral float-left" title="Fonctionnalités" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Précédent</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Suivant <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2025, Eric Lapina.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

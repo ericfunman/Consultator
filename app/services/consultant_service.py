@@ -32,7 +32,19 @@ class ConsultantService:
     def get_all_consultants_objects(
         page: int = 1, per_page: int = 50
     ) -> List[Consultant]:
-        """Récupère tous les consultants comme objets (ancienne interface)"""
+        """
+        Récupère tous les consultants comme objets (ancienne interface)
+
+        Args:
+            page: Numéro de la page (commence à 1)
+            per_page: Nombre de consultants par page
+
+        Returns:
+            Liste d'objets Consultant détachés de la session
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+        """
         try:
             with get_database_session() as session:
                 consultants = (
@@ -361,7 +373,19 @@ class ConsultantService:
 
     @staticmethod
     def get_consultants_by_availability(available: bool = True) -> List[Dict]:
-        """Récupère les consultants selon leur disponibilité"""
+        """
+        Récupère les consultants selon leur disponibilité
+
+        Args:
+            available: True pour les consultants disponibles, False pour les occupés
+
+        Returns:
+            Liste de dictionnaires contenant les informations des consultants
+
+        Example:
+            >>> disponibles = ConsultantService.get_consultants_by_availability(True)
+            >>> print(f"Nombre de consultants disponibles: {len(disponibles)}")
+        """
         try:
             with get_database_session() as session:
                 consultants = (
@@ -498,7 +522,20 @@ class ConsultantService:
 
     @staticmethod
     def get_consultant_by_email(email: str) -> Optional[Consultant]:
-        """Récupère un consultant par son email"""
+        """
+        Récupère un consultant par son email
+
+        Args:
+            email: Adresse email du consultant (insensible à la casse)
+
+        Returns:
+            Objet Consultant si trouvé, None sinon
+
+        Example:
+            >>> consultant = ConsultantService.get_consultant_by_email("jean.dupont@email.com")
+            >>> if consultant:
+            ...     print(f"Consultant trouvé: {consultant.prenom} {consultant.nom}")
+        """
         try:
             with get_database_session() as session:
                 return (
@@ -514,7 +551,37 @@ class ConsultantService:
 
     @staticmethod
     def create_consultant(data: dict) -> bool:
-        """Crée un nouveau consultant"""
+        """
+        Crée un nouveau consultant dans la base de données
+
+        Args:
+            data: Dictionnaire contenant les données du consultant avec les clés:
+                - prenom (str): Prénom du consultant (requis)
+                - nom (str): Nom du consultant (requis)
+                - email (str): Email du consultant (requis)
+                - telephone (str, optional): Numéro de téléphone
+                - salaire (float, optional): Salaire actuel
+                - practice_id (int, optional): ID de la practice
+                - disponible (bool, optional): Disponibilité (défaut: True)
+                - notes (str, optional): Notes complémentaires
+                - societe (str, optional): Société (défaut: "Quanteam")
+                - grade (str, optional): Grade du consultant (défaut: "Junior")
+                - type_contrat (str, optional): Type de contrat (défaut: "CDI")
+
+        Returns:
+            bool: True si la création a réussi, False sinon
+
+        Example:
+            >>> data = {
+            ...     "prenom": "Jean",
+            ...     "nom": "Dupont",
+            ...     "email": "jean.dupont@email.com",
+            ...     "salaire": 45000.0,
+            ...     "grade": "Senior"
+            ... }
+            >>> success = ConsultantService.create_consultant(data)
+            >>> print("Création réussie" if success else "Échec de création")
+        """
         try:
             # Validation des champs requis
             required_fields = ["prenom", "nom", "email"]
@@ -566,7 +633,21 @@ class ConsultantService:
 
     @staticmethod
     def update_consultant(consultant_id: int, data: dict) -> bool:
-        """Met à jour un consultant existant"""
+        """
+        Met à jour un consultant existant dans la base de données
+
+        Args:
+            consultant_id: ID du consultant à mettre à jour
+            data: Dictionnaire contenant les champs à mettre à jour
+
+        Returns:
+            bool: True si la mise à jour a réussi, False sinon
+
+        Example:
+            >>> data = {"salaire": 50000.0, "disponible": False}
+            >>> success = ConsultantService.update_consultant(123, data)
+            >>> print("Mise à jour réussie" if success else "Échec de mise à jour")
+        """
         try:
             with get_database_session() as session:
                 consultant = (
@@ -609,7 +690,23 @@ class ConsultantService:
 
     @staticmethod
     def delete_consultant(consultant_id: int) -> bool:
-        """Supprime un consultant"""
+        """
+        Supprime un consultant de la base de données
+
+        Args:
+            consultant_id: ID du consultant à supprimer
+
+        Returns:
+            bool: True si la suppression a réussi, False sinon
+
+        Note:
+            Cette opération est irréversible et supprime également toutes les
+            relations associées (missions, compétences, etc.)
+
+        Example:
+            >>> success = ConsultantService.delete_consultant(123)
+            >>> print("Suppression réussie" if success else "Échec de suppression")
+        """
         try:
             with get_database_session() as session:
                 consultant = (
@@ -640,7 +737,19 @@ class ConsultantService:
 
     @staticmethod
     def search_consultants(search_term: str) -> List[Consultant]:
-        """Recherche des consultants par nom, prénom ou email"""
+        """
+        Recherche des consultants par nom, prénom ou email
+
+        Args:
+            search_term: Terme de recherche (insensible à la casse)
+
+        Returns:
+            Liste d'objets Consultant correspondant à la recherche
+
+        Example:
+            >>> consultants = ConsultantService.search_consultants("dupont")
+            >>> print(f"Trouvé {len(consultants)} consultant(s)")
+        """
         try:
             with get_database_session() as session:
                 return (
@@ -658,7 +767,16 @@ class ConsultantService:
 
     @staticmethod
     def get_available_consultants() -> List[Consultant]:
-        """Retourne les consultants disponibles"""
+        """
+        Retourne la liste des consultants actuellement disponibles
+
+        Returns:
+            Liste d'objets Consultant avec disponibilite=True
+
+        Example:
+            >>> disponibles = ConsultantService.get_available_consultants()
+            >>> print(f"{len(disponibles)} consultants disponibles pour de nouvelles missions")
+        """
         try:
             with get_database_session() as session:
                 return session.query(Consultant).filter(Consultant.disponibilite).all()
@@ -670,7 +788,20 @@ class ConsultantService:
     def _save_mission_from_analysis(
         session: Session, consultant_id: int, mission_data: Dict
     ) -> bool:
-        """Sauvegarde une mission extraite de l'analyse CV"""
+        """
+        Sauvegarde une mission extraite de l'analyse CV (méthode privée)
+
+        Args:
+            session: Session de base de données active
+            consultant_id: ID du consultant propriétaire de la mission
+            mission_data: Dictionnaire contenant les données de la mission
+
+        Returns:
+            bool: True si la mission a été sauvegardée, False sinon
+
+        Note:
+            Cette méthode vérifie les doublons et gère les conversions de dates
+        """
         try:
             client = mission_data.get("client", "").strip()
             if not client:
@@ -744,7 +875,22 @@ class ConsultantService:
     def _save_competence_from_analysis(
         session: Session, consultant_id: int, competence_name: str, type_competence: str
     ) -> bool:
-        """Sauvegarde une compétence extraite de l'analyse CV"""
+        """
+        Sauvegarde une compétence extraite de l'analyse CV (méthode privée)
+
+        Args:
+            session: Session de base de données active
+            consultant_id: ID du consultant
+            competence_name: Nom de la compétence à sauvegarder
+            type_competence: Type de compétence ("technique" ou "fonctionnelle")
+
+        Returns:
+            bool: True si la compétence a été sauvegardée, False sinon
+
+        Note:
+            Cette méthode crée automatiquement la compétence dans le référentiel
+            si elle n'existe pas déjà
+        """
         try:
             competence_name = competence_name.strip()
             if not competence_name:
@@ -801,7 +947,20 @@ class ConsultantService:
 
     @staticmethod
     def _determine_skill_category(skill_name: str, type_competence: str) -> str:
-        """Détermine automatiquement la catégorie d'une compétence"""
+        """
+        Détermine automatiquement la catégorie d'une compétence (méthode privée)
+
+        Args:
+            skill_name: Nom de la compétence à classifier
+            type_competence: Type de compétence ("technique" ou "fonctionnelle")
+
+        Returns:
+            str: Catégorie de la compétence (ex: "Frontend", "Backend", "Management", etc.)
+
+        Example:
+            >>> category = ConsultantService._determine_skill_category("React", "technique")
+            >>> print(category)  # Output: "Frontend"
+        """
         skill_lower = skill_name.lower()
 
         if type_competence == "fonctionnelle":

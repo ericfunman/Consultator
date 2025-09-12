@@ -42,7 +42,27 @@ except ImportError:
 
 
 def show_consultant_missions(consultant):
-    """Affiche les missions du consultant"""
+    """
+    Affiche la page complète des missions d'un consultant.
+
+    Interface principale pour la gestion des missions incluant :
+    - Liste des missions avec détails
+    - Statistiques générales
+    - Actions d'ajout/modification/suppression
+    - Analyses et rapports de revenus
+
+    Args:
+        consultant: Objet Consultant dont on veut afficher les missions
+
+    Raises:
+        ImportError: Si les services de base ne sont pas disponibles
+        Exception: Pour toute erreur lors de l'affichage ou des opérations DB
+
+    Example:
+        >>> consultant = ConsultantService.get_consultant_by_id(123)
+        >>> show_consultant_missions(consultant)
+        # Affiche la page complète des missions du consultant
+    """
 
     if not imports_ok:
         st.error("❌ Les services de base ne sont pas disponibles")
@@ -113,7 +133,23 @@ def show_consultant_missions(consultant):
 
 
 def show_mission_details(mission):
-    """Affiche les détails d'une mission"""
+    """
+    Affiche les détails d'une mission dans un expander Streamlit.
+
+    Présente les informations clés de la mission :
+    - Période (début/fin/statut)
+    - Informations client
+    - Rémunération (TJM, salaire mensuel)
+    - Description et compétences
+    - Actions disponibles (modifier, détails, supprimer)
+
+    Args:
+        mission: Objet Mission à afficher
+
+    Note:
+        Inclut des formulaires conditionnels pour modification
+        et affichage des détails étendus selon l'état de session_state
+    """
 
     col1, col2 = st.columns(2)
 
@@ -184,7 +220,21 @@ def show_mission_details(mission):
 
 
 def show_missions_statistics(missions):
-    """Affiche les statistiques des missions"""
+    """
+    Affiche les statistiques générales des missions d'un consultant.
+
+    Calcule et présente les métriques clés :
+    - Nombre total de missions
+    - Missions en cours vs terminées
+    - Revenus estimés totaux
+
+    Args:
+        missions: Liste des objets Mission du consultant
+
+    Note:
+        Les revenus sont estimés sur 12 mois pour les missions sans date de fin,
+        et calculés précisément pour les missions terminées.
+    """
 
     if not missions:
         return
@@ -221,7 +271,25 @@ def show_missions_statistics(missions):
 
 
 def show_add_mission_form(consultant_id: int):
-    """Affiche le formulaire d'ajout de mission"""
+    """
+    Affiche le formulaire d'ajout d'une nouvelle mission.
+
+    Formulaire complet avec validation incluant :
+    - Informations générales (titre, client, dates)
+    - Rémunération (TJM, salaire mensuel)
+    - Description et compétences requises
+    - Gestion des états (en cours/terminée)
+
+    Args:
+        consultant_id: ID du consultant pour lequel créer la mission
+
+    Raises:
+        Exception: En cas d'erreur lors du chargement des clients ou du formulaire
+
+    Note:
+        Supporte le nouveau champ TJM (V1.2.2) en plus de l'ancien taux_journalier
+        pour assurer la compatibilité ascendante.
+    """
 
     st.markdown("### ➕ Ajouter une mission")
 
@@ -372,7 +440,32 @@ def validate_mission_form(
     en_cours: bool,
     date_fin: Optional[date],
 ) -> bool:
-    """Valide les données du formulaire de mission"""
+    """
+    Valide les données du formulaire de mission.
+
+    Vérifications effectuées :
+    - Titre obligatoire et non vide
+    - Client obligatoire
+    - Date de début obligatoire
+    - Cohérence des dates (fin > début si applicable)
+
+    Args:
+        titre: Titre de la mission
+        client_id: ID du client
+        date_debut: Date de début de la mission
+        en_cours: Si la mission est en cours
+        date_fin: Date de fin (optionnel si en cours)
+
+    Returns:
+        bool: True si valide, False sinon (affiche les erreurs)
+
+    Example:
+        >>> is_valid = validate_mission_form(
+        ...     "Projet Data", 123, date(2024, 1, 1), False, date(2024, 6, 30)
+        ... )
+        >>> print(is_valid)
+        True
+    """
 
     errors = []
 
@@ -397,7 +490,41 @@ def validate_mission_form(
 
 
 def create_mission(consultant_id: int, data: Dict[str, Any]) -> bool:
-    """Crée une nouvelle mission"""
+    """
+    Crée une nouvelle mission dans la base de données.
+
+    Args:
+        consultant_id: ID du consultant propriétaire de la mission
+        data: Dictionnaire contenant les données de la mission :
+            - titre: Titre de la mission
+            - client_id: ID du client
+            - date_debut: Date de début
+            - date_fin: Date de fin (optionnel)
+            - en_cours: Statut en cours
+            - taux_journalier: TJM ancien format
+            - tjm: TJM nouveau format (V1.2.2)
+            - salaire_mensuel: Salaire mensuel fixe
+            - description: Description détaillée
+            - competences_requises: Compétences nécessaires
+
+    Returns:
+        bool: True si création réussie, False sinon
+
+    Raises:
+        Exception: En cas d'erreur de base de données
+
+    Example:
+        >>> data = {
+        ...     "titre": "Projet Analytics",
+        ...     "client_id": 123,
+        ...     "date_debut": date(2024, 1, 1),
+        ...     "en_cours": True,
+        ...     "tjm": 450
+        ... }
+        >>> success = create_mission(456, data)
+        >>> print(success)
+        True
+    """
 
     try:
         with get_database_session() as session:
@@ -437,7 +564,25 @@ def create_mission(consultant_id: int, data: Dict[str, Any]) -> bool:
 
 
 def show_edit_mission_form(mission_id: int):
-    """Affiche le formulaire de modification de mission"""
+    """
+    Affiche le formulaire de modification d'une mission existante.
+
+    Formulaire pré-rempli avec les données actuelles permettant :
+    - Modification de toutes les informations
+    - Gestion des statuts (en cours/terminée)
+    - Suppression de la mission
+    - Validation des modifications
+
+    Args:
+        mission_id: ID de la mission à modifier
+
+    Raises:
+        Exception: En cas d'erreur de chargement des données
+
+    Note:
+        Inclut une confirmation pour la suppression afin d'éviter
+        les suppressions accidentelles.
+    """
 
     st.markdown("### ✏️ Modifier une mission")
 
@@ -598,7 +743,25 @@ def show_edit_mission_form(mission_id: int):
 
 
 def update_mission(mission_id: int, data: Dict[str, Any]) -> bool:
-    """Met à jour une mission"""
+    """
+    Met à jour une mission existante dans la base de données.
+
+    Args:
+        mission_id: ID de la mission à mettre à jour
+        data: Dictionnaire contenant les nouvelles données (même format que create_mission)
+
+    Returns:
+        bool: True si mise à jour réussie, False sinon
+
+    Raises:
+        Exception: En cas d'erreur de base de données ou mission introuvable
+
+    Example:
+        >>> data = {"titre": "Nouveau titre", "en_cours": False}
+        >>> success = update_mission(123, data)
+        >>> print(success)
+        True
+    """
 
     try:
         with get_database_session() as session:
@@ -639,7 +802,27 @@ def update_mission(mission_id: int, data: Dict[str, Any]) -> bool:
 
 
 def delete_mission(mission_id: int) -> bool:
-    """Supprime une mission"""
+    """
+    Supprime une mission de la base de données.
+
+    Args:
+        mission_id: ID de la mission à supprimer
+
+    Returns:
+        bool: True si suppression réussie, False sinon
+
+    Raises:
+        Exception: En cas d'erreur de base de données
+
+    Note:
+        Opération irréversible - la mission et toutes ses données
+        associées seront définitivement supprimées.
+
+    Example:
+        >>> success = delete_mission(123)
+        >>> print(success)
+        True
+    """
 
     try:
         with get_database_session() as session:
@@ -661,7 +844,23 @@ def delete_mission(mission_id: int) -> bool:
 
 
 def show_mission_full_details(mission):
-    """Affiche les détails complets d'une mission"""
+    """
+    Affiche les détails complets et étendus d'une mission.
+
+    Vue détaillée incluant :
+    - Chronologie complète avec calcul de durée
+    - Aspects financiers détaillés avec estimations
+    - Description complète et compétences
+    - Informations complètes du client
+    - Bouton de fermeture
+
+    Args:
+        mission: Objet Mission dont afficher les détails complets
+
+    Note:
+        Calcule automatiquement la durée et les revenus estimés
+        en fonction du statut de la mission (en cours/terminée).
+    """
 
     st.markdown("### 📋 Détails complets de la mission")
 
@@ -747,7 +946,22 @@ def show_mission_full_details(mission):
 
 
 def show_missions_analysis(missions):
-    """Affiche une analyse des missions"""
+    """
+    Affiche une analyse complète des missions d'un consultant.
+
+    Analyse multi-dimensionnelle incluant :
+    - Répartition par client
+    - Répartition par statut (en cours/terminées/planifiées)
+    - Analyse temporelle par année
+    - Calcul des revenus par année
+
+    Args:
+        missions: Liste des objets Mission à analyser
+
+    Note:
+        Les analyses temporelles sont groupées par année
+        avec calcul automatique des revenus estimés.
+    """
 
     st.markdown("### 📊 Analyse des missions")
 
@@ -828,7 +1042,24 @@ def show_missions_analysis(missions):
 
 
 def show_missions_revenues(missions):
-    """Affiche l'analyse des revenus des missions"""
+    """
+    Affiche l'analyse détaillée des revenus des missions.
+
+    Présente un tableau complet avec :
+    - Revenus par mission (calculés précisément)
+    - TJM moyen global
+    - Nombre de missions actives
+    - Tri par revenus décroissants
+    - Statistiques financières globales
+
+    Args:
+        missions: Liste des objets Mission pour l'analyse financière
+
+    Note:
+        Les revenus sont calculés en jours ouvrés (5 jours/semaine)
+        pour les missions terminées et en cours.
+        Utilise pandas pour la présentation tabulaire.
+    """
 
     st.markdown("### 📈 Analyse des revenus")
 

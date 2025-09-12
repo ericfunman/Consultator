@@ -2105,8 +2105,15 @@ def show_existing_documents(consultant):
 
 
 def delete_consultant_document(file_path):
-    """Supprime un document du consultant"""
+    """
+    Supprime un document du consultant du système de fichiers
 
+    Args:
+        file_path: Chemin complet vers le fichier à supprimer
+
+    Raises:
+        OSError: En cas d'erreur lors de la suppression du fichier
+    """
     try:
         if file_path.exists():
             file_path.unlink()
@@ -2119,8 +2126,19 @@ def delete_consultant_document(file_path):
 
 
 def detect_document_type(filename):
-    """Détecte automatiquement le type de document basé sur le nom de fichier"""
+    """
+    Détecte automatiquement le type de document basé sur le nom de fichier
 
+    Args:
+        filename: Nom du fichier à analyser
+
+    Returns:
+        str: Type de document détecté ("CV", "Lettre de motivation", etc.)
+
+    Note:
+        La détection se base sur des mots-clés dans le nom du fichier
+        et sur l'extension si aucun mot-clé n'est trouvé
+    """
     filename_lower = filename.lower()
 
     # Détection basée sur le nom du fichier
@@ -2153,8 +2171,21 @@ def detect_document_type(filename):
 
 
 def get_mime_type(filename):
-    """Retourne le type MIME basé sur l'extension du fichier"""
+    """
+    Retourne le type MIME basé sur l'extension du fichier
 
+    Args:
+        filename: Nom du fichier avec son extension
+
+    Returns:
+        str: Type MIME du fichier ou "application/octet-stream" par défaut
+
+    Example:
+        >>> get_mime_type("document.pdf")
+        'application/pdf'
+        >>> get_mime_type("presentation.pptx")
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    """
     extension = filename.lower().split(".")[-1] if "." in filename else ""
 
     mime_types = {
@@ -2169,8 +2200,19 @@ def get_mime_type(filename):
 
 
 def extract_original_filename(full_filename):
-    """Extrait le nom original du fichier en enlevant les préfixes consultant"""
+    """
+    Extrait le nom original du fichier en enlevant les préfixes consultant
 
+    Args:
+        full_filename: Nom complet du fichier avec préfixes (format: ID_Prenom_Nom_FichierOriginal_Timestamp.extension)
+
+    Returns:
+        str: Nom original du fichier sans les préfixes
+
+    Note:
+        Le format attendu est: ID_Prenom_Nom_FichierOriginal_Timestamp.extension
+        Si le format n'est pas reconnu, retourne le nom complet
+    """
     # Format attendu: ID_Prenom_Nom_FichierOriginal_Timestamp.extension
     parts = full_filename.split("_")
 
@@ -2673,8 +2715,17 @@ def show_cv_missions(missions, consultant):
 
 
 def save_all_missions_to_consultant(missions, consultant):
-    """Sauvegarde toutes les missions extraites du CV dans la base de données"""
+    """
+    Sauvegarde toutes les missions extraites du CV dans la base de données
 
+    Args:
+        missions: Liste des dictionnaires de missions extraites du CV
+        consultant: Objet Consultant propriétaire des missions
+
+    Note:
+        Cette fonction valide chaque mission avant de la sauvegarder
+        et gère les erreurs individuelles sans interrompre le processus
+    """
     try:
         if not missions:
             st.warning("⚠️ Aucune mission à sauvegarder")
@@ -2745,7 +2796,18 @@ def save_all_missions_to_consultant(missions, consultant):
 
 
 def validate_mission_fields(client, titre, date_debut, mission_num):
-    """Valide les champs d'une mission et retourne les erreurs"""
+    """
+    Valide les champs d'une mission et retourne les erreurs
+
+    Args:
+        client: Nom du client
+        titre: Titre/rôle de la mission
+        date_debut: Date de début de la mission
+        mission_num: Numéro de la mission pour les messages d'erreur
+
+    Returns:
+        List[str]: Liste des champs en erreur (format: "mission_X_champ")
+    """
     errors = []
 
     if not client or client.strip() == "":
@@ -2761,7 +2823,16 @@ def validate_mission_fields(client, titre, date_debut, mission_num):
 
 
 def show_validation_errors(errors, mission_num):
-    """Affiche les erreurs de validation avec style"""
+    """
+    Affiche les erreurs de validation avec style
+
+    Args:
+        errors: Liste des erreurs de validation
+        mission_num: Numéro de la mission
+
+    Returns:
+        bool: True si des erreurs ont été affichées, False sinon
+    """
     if errors:
         st.markdown(
             """
@@ -3164,8 +3235,16 @@ def show_cv_actions(analysis, consultant):
 
 
 def import_missions_to_profile(missions, consultant):
-    """Importe toutes les missions dans le profil du consultant"""
+    """
+    Importe toutes les missions dans le profil du consultant
 
+    Args:
+        missions: Liste des dictionnaires de missions à importer
+        consultant: Objet Consultant propriétaire des missions
+
+    Note:
+        Cette fonction crée des objets Mission avec le statut "terminee" par défaut
+    """
     try:
         with get_database_session() as session:
             success_count = 0
@@ -3196,8 +3275,16 @@ def import_missions_to_profile(missions, consultant):
 
 
 def import_single_mission(mission_data, consultant):
-    """Importe une mission individuelle dans le profil"""
+    """
+    Importe une mission individuelle dans le profil
 
+    Args:
+        mission_data: Dictionnaire contenant les données de la mission
+        consultant: Objet Consultant propriétaire de la mission
+
+    Note:
+        Cette fonction crée un objet Mission avec le statut "terminee" par défaut
+    """
     try:
         with get_database_session() as session:
             mission = Mission(

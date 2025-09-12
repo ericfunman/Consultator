@@ -14,7 +14,21 @@ from services.business_manager_service import BusinessManagerService
 
 
 def show():
-    """Interface complète de gestion des Business Managers"""
+    """
+    Interface complète de gestion des Business Managers.
+
+    Page principale offrant une navigation par onglets pour :
+    - Consulter la liste des Business Managers
+    - Créer un nouveau Business Manager
+    - Visualiser les statistiques globales
+    - Accéder aux profils détaillés individuels
+
+    Cette fonction gère également l'état de session pour la navigation
+    entre les différents profils de Business Managers.
+
+    Raises:
+        Exception: En cas d'erreur lors de l'initialisation de l'interface
+    """
     st.title("👔 Gestion des Business Managers")
 
     # Vérifier si on doit afficher le profil d'un BM spécifique
@@ -36,7 +50,23 @@ def show():
 
 
 def show_bm_profile():
-    """Affiche le profil détaillé d'un Business Manager"""
+    """
+    Affiche le profil détaillé d'un Business Manager.
+
+    Interface complète incluant :
+    - Informations générales du BM (nom, email, téléphone, statut)
+    - Métriques des consultants assignés
+    - Actions de modification et suppression
+    - Gestion des assignations de consultants
+    - Historique des assignations
+
+    La fonction récupère l'ID du BM depuis l'état de session
+    et gère les erreurs de conversion d'ID.
+
+    Raises:
+        ValueError: Si l'ID du BM n'est pas convertible en entier
+        Exception: Pour toute erreur lors de la récupération des données
+    """
     bm_id = st.session_state.view_bm_profile
     
     # S'assurer que bm_id est un entier
@@ -137,7 +167,29 @@ def show_bm_profile():
 
 
 def show_edit_bm_form(bm):
-    """Formulaire de modification d'un Business Manager"""
+    """
+    Formulaire de modification d'un Business Manager existant.
+
+    Interface d'édition incluant :
+    - Pré-remplissage des champs avec les données actuelles
+    - Validation des modifications apportées
+    - Gestion des champs optionnels (téléphone, notes)
+    - Mise à jour automatique de la date de dernière modification
+    - Gestion des erreurs et confirmation de succès
+
+    Args:
+        bm (BusinessManager): Instance du Business Manager à modifier
+
+    Returns:
+        None: Affiche directement le formulaire dans l'interface Streamlit
+
+    Raises:
+        Exception: En cas d'erreur lors de la mise à jour en base de données
+
+    Note:
+        La fonction utilise une session de base de données séparée
+        pour éviter les conflits de transactions.
+    """
     st.subheader("✏️ Modifier les informations")
 
     with st.form("edit_bm_form"):
@@ -191,7 +243,29 @@ def show_edit_bm_form(bm):
 
 
 def show_delete_bm_confirmation(bm):
-    """Confirmation de suppression d'un Business Manager"""
+    """
+    Interface de confirmation de suppression d'un Business Manager.
+
+    Fonctionnalités incluses :
+    - Vérification des assignations actives avant suppression
+    - Affichage des conséquences de la suppression
+    - Clôture automatique des assignations actives
+    - Gestion des confirmations utilisateur
+    - Messages d'avertissement et d'information
+
+    Args:
+        bm (BusinessManager): Instance du Business Manager à supprimer
+
+    Returns:
+        None: Affiche directement l'interface de confirmation
+
+    Raises:
+        Exception: En cas d'erreur lors de la suppression ou de la clôture des assignations
+
+    Note:
+        La suppression clôture automatiquement toutes les assignations actives
+        avec un commentaire explicatif dans l'historique.
+    """
     st.subheader("🗑️ Confirmer la suppression")
 
     # Vérifier les assignations
@@ -291,7 +365,25 @@ def show_delete_bm_confirmation(bm):
 
 
 def show_bm_consultants_management(bm, session):
-    """Gestion des consultants assignés au Business Manager"""
+    """
+    Interface complète de gestion des consultants assignés à un Business Manager.
+
+    Organisation par onglets :
+    - Consultants actuels : liste avec actions (terminer assignation, commentaires)
+    - Nouvelle assignation : formulaire d'ajout avec gestion des transferts
+    - Historique : vue complète de toutes les assignations passées
+
+    Args:
+        bm (BusinessManager): Instance du Business Manager
+        session (Session): Session SQLAlchemy active
+
+    Returns:
+        None: Affiche directement l'interface de gestion
+
+    Note:
+        La fonction gère les transferts de consultants entre Business Managers
+        en clôturant automatiquement les assignations précédentes.
+    """
     st.subheader(f"👥 Consultants de {bm.prenom} {bm.nom}")
 
     # Onglets pour les consultants
@@ -310,7 +402,30 @@ def show_bm_consultants_management(bm, session):
 
 
 def show_current_bm_consultants(bm, session):
-    """Affiche les consultants actuellement assignés au BM"""
+    """
+    Affiche la liste des consultants actuellement assignés au Business Manager.
+
+    Fonctionnalités incluses :
+    - Liste détaillée avec informations de mission en cours
+    - Sélection interactive de consultants
+    - Actions sur les assignations (terminer, commenter)
+    - Affichage des métriques de mission (client, rôle, TJM, salaire)
+    - Gestion des commentaires sur les assignations
+
+    Args:
+        bm (BusinessManager): Instance du Business Manager
+        session (Session): Session SQLAlchemy active
+
+    Returns:
+        None: Affiche directement la liste dans l'interface Streamlit
+
+    Raises:
+        Exception: En cas d'erreur lors des requêtes de base de données
+
+    Note:
+        La fonction récupère automatiquement les informations de mission
+        en cours pour chaque consultant assigné.
+    """
     try:
         # Consultants actuels (assignations actives)
         current_assignments = (
@@ -453,7 +568,29 @@ def show_current_bm_consultants(bm, session):
 
 
 def show_add_bm_assignment(bm, session):
-    """Formulaire d'ajout d'une nouvelle assignation pour ce BM"""
+    """
+    Formulaire d'ajout d'une nouvelle assignation consultant-Business Manager.
+
+    Gestion intelligente des assignations :
+    - Séparation des consultants disponibles et déjà assignés
+    - Gestion des transferts depuis d'autres BMs
+    - Validation des dates et commentaires
+    - Clôture automatique des assignations précédentes lors de transferts
+
+    Args:
+        bm (BusinessManager): Business Manager cible de l'assignation
+        session (Session): Session SQLAlchemy active
+
+    Returns:
+        None: Affiche directement le formulaire dans l'interface Streamlit
+
+    Raises:
+        Exception: En cas d'erreur lors de la création de l'assignation
+
+    Note:
+        La fonction gère automatiquement les transferts en clôturant
+        les assignations existantes avec des commentaires explicatifs.
+    """
     try:
         # Récupérer les consultants non assignés à ce BM
         assigned_consultant_ids = [
@@ -672,7 +809,30 @@ def show_add_bm_assignment(bm, session):
 
 
 def show_bm_assignments_history(bm, session):
-    """Affiche l'historique complet des assignations du BM"""
+    """
+    Affiche l'historique complet des assignations d'un Business Manager.
+
+    Vue historique incluant :
+    - Toutes les assignations (actives et terminées)
+    - Durée des assignations calculée automatiquement
+    - Statut visuel (actif/terminé)
+    - Commentaires associés aux assignations
+    - Métriques globales (total, actives, terminées)
+
+    Args:
+        bm (BusinessManager): Instance du Business Manager
+        session (Session): Session SQLAlchemy active
+
+    Returns:
+        None: Affiche directement l'historique dans l'interface Streamlit
+
+    Raises:
+        Exception: En cas d'erreur lors des requêtes de base de données
+
+    Note:
+        L'historique est trié par date de début décroissante
+        pour afficher les assignations les plus récentes en premier.
+    """
     try:
         # Toutes les assignations (actives et terminées)
         all_assignments = (
@@ -750,7 +910,28 @@ def show_bm_assignments_history(bm, session):
 
 
 def show_business_managers_list():
-    """Affiche la liste des Business Managers avec interactions"""
+    """
+    Affiche la liste complète des Business Managers avec fonctionnalités de recherche et filtrage.
+
+    Fonctionnalités incluses :
+    - Affichage en tableau avec colonnes configurables
+    - Recherche par nom, email ou statut
+    - Filtrage par statut d'activité
+    - Tri par colonnes
+    - Pagination pour la performance
+    - Actions rapides (voir, modifier, supprimer)
+    - Métriques globales (nombre total, actifs, inactifs)
+
+    La fonction utilise st.dataframe pour un affichage interactif
+    et gère les états de chargement avec st.spinner.
+
+    Returns:
+        None: Affiche directement dans l'interface Streamlit
+
+    Note:
+        La fonction est optimisée pour les grandes listes avec pagination
+        et utilise le cache Streamlit pour les données fréquemment consultées.
+    """
 
     # Champ de recherche en temps réel
     search_term = st.text_input(
@@ -986,7 +1167,33 @@ def show_business_managers_list():
 
 
 def show_add_business_manager():
-    """Formulaire d'ajout d'un nouveau Business Manager"""
+    """
+    Formulaire d'ajout d'un nouveau Business Manager avec validation complète.
+
+    Interface de création incluant :
+    - Champs obligatoires : nom, prénom, email
+    - Champs optionnels : téléphone, notes
+    - Validation en temps réel des données saisies
+    - Vérification d'unicité de l'email
+    - Gestion des erreurs et messages utilisateur
+    - Confirmation visuelle de succès
+
+    Le formulaire utilise st.form pour une soumission atomique
+    et gère les erreurs de validation côté client et serveur.
+
+    Args:
+        None
+
+    Returns:
+        None: Affiche directement le formulaire dans l'interface Streamlit
+
+    Raises:
+        Exception: En cas d'erreur lors de la création en base de données
+
+    Note:
+        La fonction valide l'unicité de l'email avant création
+        et rafraîchit automatiquement la page après succès.
+    """
     st.subheader("➕ Nouveau Business Manager")
 
     with st.form("add_bm_form"):
@@ -1059,7 +1266,33 @@ def show_add_business_manager():
 
 
 def show_statistics():
-    """Affiche les statistiques des Business Managers"""
+    """
+    Affiche les statistiques globales et détaillées des Business Managers.
+
+    Métriques calculées :
+    - Nombre total de Business Managers
+    - Nombre de BMs actifs/inactifs
+    - Nombre d'assignations actives/totales
+    - Moyenne de consultants par BM actif
+    - Répartition des consultants par BM (graphique en barres)
+    - Évolution mensuelle des assignations (graphique linéaire)
+
+    La fonction utilise des requêtes SQL optimisées avec SQLAlchemy
+    et affiche les résultats avec les composants Streamlit appropriés.
+
+    Args:
+        None
+
+    Returns:
+        None: Affiche directement les statistiques dans l'interface Streamlit
+
+    Raises:
+        Exception: En cas d'erreur lors des requêtes de base de données
+
+    Note:
+        Les statistiques sont calculées en temps réel à partir de la base de données.
+        Les graphiques utilisent les composants natifs de Streamlit pour la visualisation.
+    """
     st.subheader("📊 Statistiques des Business Managers")
 
     try:

@@ -1993,7 +1993,34 @@ class ChatbotService:
         }
 
     def _handle_practices_question(self, entities: Dict) -> Dict[str, Any]:
-        """Gère les questions sur les practices"""
+        """
+        Gère les questions sur les practices (équipes) des consultants.
+
+        Args:
+            entities: Dictionnaire contenant les entités extraites de la question
+                     (noms, entreprises, compétences, langues, etc.)
+
+        Returns:
+            Dictionnaire contenant :
+            - response: Réponse formatée pour l'utilisateur
+            - data: Données structurées sur les practices
+            - intent: Type d'intention détecté ("practices")
+            - confidence: Niveau de confiance de la réponse (0.0 à 1.0)
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+            AttributeError: Si les données de practice sont malformées
+
+        Example:
+            >>> entities = {"practices": ["Data"]}
+            >>> result = chatbot._handle_practices_question(entities)
+            >>> print(result["response"])
+            👥 **Practice Data** :
+            📋 **5 consultant(s)** :
+            1. 🟢 **Jean Dupont** - CJM: 450 €
+            ...
+        """
+        from database.models import Practice
 
         from database.models import Practice
 
@@ -2109,7 +2136,36 @@ class ChatbotService:
                 }
 
     def _handle_cvs_question(self, entities: Dict) -> Dict[str, Any]:
-        """Gère les questions sur les CVs"""
+        """
+        Gère les questions sur les CVs des consultants.
+
+        Args:
+            entities: Dictionnaire contenant les entités extraites de la question
+                     (noms, entreprises, compétences, langues, etc.)
+
+        Returns:
+            Dictionnaire contenant :
+            - response: Réponse formatée sur les CVs
+            - data: Données structurées sur les CVs
+            - intent: Type d'intention détecté ("cvs")
+            - confidence: Niveau de confiance de la réponse (0.0 à 1.0)
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+            AttributeError: Si les données de CV sont malformées
+
+        Example:
+            >>> entities = {"noms": ["Jean Dupont"]}
+            >>> result = chatbot._handle_cvs_question(entities)
+            >>> print(result["response"])
+            📁 **CVs de Jean Dupont** :
+            1. **CV_Jean_Dupont.pdf**
+               📅 Uploadé le : 15/01/2024
+               📏 Taille : 2.5 MB
+               ✅ Contenu analysé
+            📊 **Total : 1 document(s)**
+        """
+        from database.models import CV
 
         from database.models import CV
 
@@ -2249,7 +2305,30 @@ class ChatbotService:
     # Méthodes utilitaires pour les requêtes DB
 
     def _find_consultant_by_name(self, nom_recherche: str) -> Optional[Consultant]:
-        """Trouve un consultant par son nom (flexible)"""
+        """
+        Recherche flexible d'un consultant par son nom.
+
+        Effectue d'abord une recherche exacte sur prénom, nom ou nom complet,
+        puis une recherche partielle si aucune correspondance exacte n'est trouvée.
+
+        Args:
+            nom_recherche: Nom ou prénom du consultant à rechercher (insensible à la casse)
+
+        Returns:
+            Objet Consultant si trouvé, None sinon
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+
+        Example:
+            >>> consultant = chatbot._find_consultant_by_name("Jean Dupont")
+            >>> print(consultant.prenom, consultant.nom)
+            Jean Dupont
+
+            >>> consultant = chatbot._find_consultant_by_name("Dupont")
+            >>> print(consultant.prenom, consultant.nom)
+            Jean Dupont
+        """
 
         # Essayer une correspondance exacte d'abord
         with get_database_session() as session:
@@ -2295,7 +2374,28 @@ class ChatbotService:
     def _find_consultants_by_skill(
         self, competence: str, type_competence: Optional[str] = None
     ) -> List[Any]:
-        """Trouve les consultants ayant une compétence avec filtre par type"""
+        """
+        Recherche les consultants maîtrisant une compétence spécifique.
+
+        Args:
+            competence: Nom de la compétence à rechercher (insensible à la casse)
+            type_competence: Type de compétence (technique/fonctionnelle) pour filtrer (optionnel)
+
+        Returns:
+            Liste des objets Consultant maîtrisant la compétence
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+
+        Example:
+            >>> consultants = chatbot._find_consultants_by_skill("Python", "technique")
+            >>> print(f"Trouvé {len(consultants)} consultants Python")
+
+            >>> consultants = chatbot._find_consultants_by_skill("SQL")
+            >>> print(f"Trouvé {len(consultants)} consultants SQL")
+        """
+        from database.models import Competence
+        from database.models import ConsultantCompetence
         from database.models import Competence
         from database.models import ConsultantCompetence
 
@@ -2323,7 +2423,25 @@ class ChatbotService:
         return consultants  # type: ignore[no-any-return]
 
     def _find_consultants_by_language(self, langue: str) -> List[Any]:
-        """Trouve les consultants parlant une langue"""
+        """
+        Recherche les consultants parlant une langue spécifique.
+
+        Args:
+            langue: Nom de la langue à rechercher (insensible à la casse)
+
+        Returns:
+            Liste des objets Consultant parlant la langue
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+
+        Example:
+            >>> consultants = chatbot._find_consultants_by_language("anglais")
+            >>> print(f"Trouvé {len(consultants)} consultants anglophones")
+
+            >>> consultants = chatbot._find_consultants_by_language("espagnol")
+            >>> print(f"Trouvé {len(consultants)} consultants hispanophones")
+        """
 
         # Construction de la requête de base
         with get_database_session() as session:
@@ -2342,7 +2460,22 @@ class ChatbotService:
         return consultants  # type: ignore[no-any-return]
 
     def _get_missions_by_company(self, entreprise: str) -> List[Mission]:
-        """Récupère les missions pour une entreprise"""
+        """
+        Récupère toutes les missions associées à une entreprise.
+
+        Args:
+            entreprise: Nom de l'entreprise à rechercher (insensible à la casse)
+
+        Returns:
+            Liste des objets Mission pour cette entreprise
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+
+        Example:
+            >>> missions = chatbot._get_missions_by_company("BNP Paribas")
+            >>> print(f"BNP Paribas a {len(missions)} missions")
+        """
         with get_database_session() as session:
             return (
                 session.query(Mission)
@@ -2353,7 +2486,24 @@ class ChatbotService:
             )
 
     def _get_missions_by_consultant(self, consultant_id: int) -> List[Mission]:
-        """Récupère les missions d'un consultant"""
+        """
+        Récupère toutes les missions d'un consultant spécifique.
+
+        Args:
+            consultant_id: Identifiant unique du consultant
+
+        Returns:
+            Liste des objets Mission du consultant, triés par date de début décroissante
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+
+        Example:
+            >>> missions = chatbot._get_missions_by_consultant(123)
+            >>> print(f"Consultant 123 a {len(missions)} missions")
+            >>> if missions:
+            ...     print(f"Dernière mission: {missions[0].nom_mission}")
+        """
         with get_database_session() as session:
             return (
                 session.query(Mission)
@@ -2367,7 +2517,31 @@ class ChatbotService:
     def _get_consultant_skills(
         self, consultant_id: int, type_competence: Optional[str] = None
     ) -> List[Dict[str, Any]]:
-        """Récupère les compétences d'un consultant avec leurs détails"""
+        """
+        Récupère les compétences détaillées d'un consultant.
+
+        Args:
+            consultant_id: Identifiant unique du consultant
+            type_competence: Type de compétence à filtrer (technique/fonctionnelle) (optionnel)
+
+        Returns:
+            Liste de dictionnaires contenant les détails des compétences :
+            - nom: Nom de la compétence
+            - categorie: Catégorie de la compétence
+            - type: Type de compétence (technique/fonctionnelle)
+            - niveau_maitrise: Niveau de maîtrise (débutant/intermédiaire/expert)
+            - annees_experience: Nombre d'années d'expérience
+            - description: Description de la compétence
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+
+        Example:
+            >>> skills = chatbot._get_consultant_skills(123, "technique")
+            >>> print(f"Consultant 123 a {len(skills)} compétences techniques")
+            >>> for skill in skills:
+            ...     print(f"- {skill['nom']}: {skill['niveau_maitrise']}")
+        """
         with get_database_session() as session:
 
             query = (
@@ -2400,7 +2574,25 @@ class ChatbotService:
         return skills
 
     def _get_salary_stats(self) -> Dict[str, float]:
-        """Calcule les statistiques des salaires"""
+        """
+        Calcule les statistiques des salaires des consultants.
+
+        Returns:
+            Dictionnaire contenant :
+            - moyenne: Salaire moyen
+            - mediane: Salaire médian
+            - minimum: Salaire minimum
+            - maximum: Salaire maximum
+            - total: Nombre de consultants avec salaire renseigné
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+
+        Example:
+            >>> stats = chatbot._get_salary_stats()
+            >>> print(f"Salaire moyen: {stats['moyenne']:,.0f} €")
+            >>> print(f"Salaire médian: {stats['mediane']:,.0f} €")
+        """
         with get_database_session() as session:
 
             consultants = (
@@ -2430,7 +2622,38 @@ class ChatbotService:
         }
 
     def _get_general_stats(self) -> Dict[str, Any]:
-        """Calcule les statistiques générales"""
+        """
+        Calcule les statistiques générales de la base de données.
+
+        Récupère des métriques complètes sur consultants, missions, practices,
+        CVs et données financières.
+
+        Returns:
+            Dictionnaire contenant toutes les statistiques :
+            - consultants_total: Nombre total de consultants
+            - consultants_actifs: Nombre de consultants disponibles
+            - consultants_inactifs: Nombre de consultants indisponibles
+            - missions_total: Nombre total de missions
+            - missions_en_cours: Nombre de missions en cours
+            - missions_terminees: Nombre de missions terminées
+            - practices_total: Nombre de practices actives
+            - cvs_total: Nombre total de CVs
+            - consultants_avec_cv: Nombre de consultants avec au moins un CV
+            - tjm_moyen: TJM moyen des missions
+            - salaire_moyen: Salaire moyen des consultants
+            - cjm_moyen: CJM moyen calculé
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+
+        Example:
+            >>> stats = chatbot._get_general_stats()
+            >>> print(f"Base: {stats['consultants_total']} consultants")
+            >>> print(f"Missions: {stats['missions_total']} total")
+            >>> print(f"TJM moyen: {stats['tjm_moyen']:.0f} €")
+        """
+        from database.models import CV
+        from database.models import Practice
 
         from database.models import CV
         from database.models import Practice
@@ -2515,7 +2738,36 @@ class ChatbotService:
         }
 
     def _handle_availability_question(self, entities: Dict) -> Dict[str, Any]:
-        """Gère les questions sur la disponibilité des consultants"""
+        """
+        Gère les questions sur la disponibilité des consultants (V1.2.2).
+
+        Analyse la disponibilité immédiate (ASAP) ou planifiée des consultants,
+        en tenant compte des missions en cours qui peuvent retarder la disponibilité.
+
+        Args:
+            entities: Dictionnaire contenant les entités extraites de la question
+                     (noms, entreprises, compétences, langues, etc.)
+
+        Returns:
+            Dictionnaire contenant :
+            - response: Réponse formatée sur la disponibilité
+            - data: Données structurées sur la disponibilité
+            - intent: Type d'intention détecté ("disponibilite")
+            - confidence: Niveau de confiance de la réponse (0.0 à 1.0)
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+            AttributeError: Si les données de disponibilité sont malformées
+
+        Example:
+            >>> entities = {"noms": ["Jean Dupont"]}
+            >>> result = chatbot._handle_availability_question(entities)
+            >>> print(result["response"])
+            📅 **Disponibilité de Jean Dupont** :
+            ✅ **Disponible immédiatement (ASAP)**
+            📊 **Statut actuel :** ✅ Marqué disponible
+        """
+        # Chercher un consultant spécifique
 
         # Chercher un consultant spécifique
         consultant = None
@@ -2729,7 +2981,40 @@ class ChatbotService:
                 }
 
     def _handle_mission_tjm_question(self, entities: Dict) -> Dict[str, Any]:
-        """Gère les questions sur les TJM des missions"""
+        """
+        Gère les questions sur les TJM (Taux Journalier Moyen) des missions (V1.2.2).
+
+        Analyse les TJM des missions d'un consultant spécifique ou calcule
+        les statistiques générales sur les TJM de toutes les missions.
+
+        Args:
+            entities: Dictionnaire contenant les entités extraites de la question
+                     (noms, entreprises, compétences, langues, etc.)
+
+        Returns:
+            Dictionnaire contenant :
+            - response: Réponse formatée sur les TJM
+            - data: Données structurées sur les TJM
+            - intent: Type d'intention détecté ("tjm_mission")
+            - confidence: Niveau de confiance de la réponse (0.0 à 1.0)
+
+        Raises:
+            SQLAlchemyError: En cas d'erreur de base de données
+            ZeroDivisionError: En cas de division par zéro lors des calculs
+            AttributeError: Si les données de TJM sont malformées
+
+        Example:
+            >>> entities = {"noms": ["Jean Dupont"]}
+            >>> result = chatbot._handle_mission_tjm_question(entities)
+            >>> print(result["response"])
+            💰 **TJM des missions de Jean Dupont** :
+            🎯 **Mission Data Analyst**
+               • Client: BNP Paribas
+               • TJM: 450€
+               • Période: 01/01/2024 → 31/03/2024
+            📊 **TJM moyen :** 450€ (sur 1 missions)
+        """
+        # Chercher un consultant spécifique
 
         # Chercher un consultant spécifique
         consultant = None
@@ -2918,14 +3203,30 @@ class ChatbotService:
 
     def get_response(self, question: str) -> str:
         """
-        Interface simplifiée pour obtenir une réponse textuelle
-        Compatible avec les tests existants
+        Interface simplifiée pour obtenir une réponse textuelle du chatbot.
+
+        Méthode compatible avec les tests existants qui retourne uniquement
+        la réponse textuelle sans les métadonnées structurées.
 
         Args:
-            question: Question de l'utilisateur
+            question: Question de l'utilisateur en langage naturel
 
         Returns:
-            Réponse textuelle du chatbot
+            Réponse textuelle formatée du chatbot, ou message d'erreur
+            si la question n'est pas comprise ou en cas d'exception
+
+        Raises:
+            Aucun: Les exceptions sont capturées et retournées comme messages d'erreur
+
+        Example:
+            >>> chatbot = ChatbotService()
+            >>> response = chatbot.get_response("Quel est le salaire de Jean Dupont ?")
+            >>> print(response)
+            💰 Le salaire de **Jean Dupont** est de **45,000 €** par an.
+
+            >>> response = chatbot.get_response("Question incompréhensible")
+            >>> print(response)
+            ❓ Je n'ai pas compris votre question.
         """
         try:
             result = self.process_question(question)
@@ -2939,6 +3240,12 @@ class ChatbotService:
             return "❌ Erreur: " + str(e)
 
     def __del__(self):
-        """Ferme la session DB"""
-        if hasattr(self, "session"):
-            session.close()
+        """
+        Destructeur de la classe ChatbotService.
+
+        Nettoie les ressources utilisées par le service.
+        Note: La gestion des sessions de base de données est déléguée
+        aux context managers pour éviter les fuites de mémoire.
+        """
+        # Nettoyage des ressources si nécessaire
+        pass

@@ -134,6 +134,17 @@ class Consultant(Base):
 
     @property
     def nom_complet(self) -> str:
+        """
+        Retourne le nom complet du consultant au format "Prénom Nom"
+
+        Returns:
+            str: Nom complet du consultant
+
+        Example:
+            >>> consultant.prenom = "Jean"
+            >>> consultant.nom = "Dupont"
+            >>> print(consultant.nom_complet)  # Output: "Jean Dupont"
+        """
         return f"{self.prenom} {self.nom}"
 
     @property
@@ -146,7 +157,21 @@ class Consultant(Base):
 
     @property
     def experience_annees(self) -> float:
-        """Calcule l'expérience en années depuis la première mission"""
+        """
+        Calcule l'expérience en années depuis la première mission
+
+        Returns:
+            float: Nombre d'années d'expérience (arrondi à 1 décimale)
+
+        Note:
+            Le calcul prend en compte les années bissextiles (365.25 jours/an)
+            Retourne 0 si aucune date de première mission n'est définie
+
+        Example:
+            >>> from datetime import date
+            >>> consultant.date_premiere_mission = date(2020, 1, 1)
+            >>> print(consultant.experience_annees)  # Output: 4.5 (en 2024)
+        """
         if not self.date_premiere_mission:
             return 0
 
@@ -156,7 +181,22 @@ class Consultant(Base):
 
     @property
     def statut_societe(self) -> str:
-        """Retourne le statut actuel dans la société"""
+        """
+        Retourne le statut actuel du consultant dans la société
+
+        Returns:
+            str: Statut du consultant ("En poste", "Départ prévu", ou "Parti")
+
+        Note:
+            - "En poste" : Pas de date de sortie définie
+            - "Départ prévu" : Date de sortie future
+            - "Parti" : Date de sortie passée
+
+        Example:
+            >>> from datetime import date
+            >>> consultant.date_sortie_societe = date(2025, 6, 30)
+            >>> print(consultant.statut_societe)  # Output: "Départ prévu" (si date actuelle < 2025-06-30)
+        """
         if not self.date_sortie_societe:
             return "En poste"
 
@@ -301,7 +341,19 @@ class Mission(Base):
 
     @property
     def duree_jours(self) -> Optional[int]:
-        """Calcule la durée de la mission en jours"""
+        """
+        Calcule la durée de la mission en jours
+
+        Returns:
+            Optional[int]: Nombre de jours entre date_debut et date_fin,
+                          None si les dates ne sont pas définies
+
+        Example:
+            >>> from datetime import date
+            >>> mission.date_debut = date(2024, 1, 1)
+            >>> mission.date_fin = date(2024, 3, 31)
+            >>> print(mission.duree_jours)  # Output: 90
+        """
         if self.date_fin and self.date_debut:
             return (self.date_fin - self.date_debut).days
         return None
@@ -416,7 +468,24 @@ class ConsultantLangue(Base):
 
     @property
     def niveau_label(self) -> str:
-        """Retourne le label du niveau"""
+        """
+        Retourne le label descriptif du niveau de langue
+
+        Returns:
+            str: Label du niveau avec échelle CEFR
+
+        Note:
+            Échelle utilisée :
+            - 1: Débutant (A1)
+            - 2: Élémentaire (A2)
+            - 3: Intermédiaire (B1-B2)
+            - 4: Avancé (C1)
+            - 5: Natif (C2)
+
+        Example:
+            >>> langue.niveau = 3
+            >>> print(langue.niveau_label)  # Output: "Intermédiaire (B1-B2)"
+        """
         labels = {
             1: "Débutant (A1)",
             2: "Élémentaire (A2)",
@@ -458,19 +527,52 @@ class BusinessManager(Base):
 
     @property
     def nom_complet(self) -> str:
-        """Retourne le nom complet du BM"""
+        """
+        Retourne le nom complet du Business Manager au format "Prénom Nom"
+
+        Returns:
+            str: Nom complet du Business Manager
+
+        Example:
+            >>> bm.prenom = "Marie"
+            >>> bm.nom = "Dubois"
+            >>> print(bm.nom_complet)  # Output: "Marie Dubois"
+        """
         return f"{self.prenom} {self.nom}"
 
     @property
     def consultants_actuels(self) -> List["Consultant"]:
-        """Retourne les consultants actuellement gérés par ce BM"""
+        """
+        Retourne la liste des consultants actuellement gérés par ce Business Manager
+
+        Returns:
+            List[Consultant]: Liste des consultants avec une gestion active (date_fin = None)
+
+        Note:
+            Un consultant est considéré comme "actuellement géré" si sa relation
+            ConsultantBusinessManager n'a pas de date_fin définie
+
+        Example:
+            >>> bm = BusinessManager.query.get(1)
+            >>> actifs = bm.consultants_actuels
+            >>> print(f"BM gère actuellement {len(actifs)} consultants")
+        """
         return [
             cbm.consultant for cbm in self.consultant_gestions if cbm.date_fin is None
         ]
 
     @property
     def nombre_consultants_actuels(self) -> int:
-        """Retourne le nombre de consultants actuellement gérés"""
+        """
+        Retourne le nombre de consultants actuellement gérés par ce Business Manager
+
+        Returns:
+            int: Nombre de consultants avec une gestion active
+
+        Example:
+            >>> bm = BusinessManager.query.get(1)
+            >>> print(f"BM gère {bm.nombre_consultants_actuels} consultants")
+        """
         return len(self.consultants_actuels)
 
 
@@ -510,11 +612,35 @@ class ConsultantBusinessManager(Base):
 
     @property
     def est_actuel(self) -> bool:
-        """Retourne True si cette gestion est actuellement active"""
+        """
+        Indique si cette gestion consultant-Business Manager est actuellement active
+
+        Returns:
+            bool: True si la gestion est active (date_fin = None), False sinon
+
+        Example:
+            >>> gestion = ConsultantBusinessManager.query.get(1)
+            >>> if gestion.est_actuel:
+            ...     print("Cette gestion est actuellement active")
+        """
         return self.date_fin is None
 
     @property
     def duree_jours(self) -> int:
-        """Calcule la durée de la gestion en jours"""
+        """
+        Calcule la durée de la gestion consultant-Business Manager en jours
+
+        Returns:
+            int: Nombre de jours entre date_debut et date_fin (ou date actuelle si active)
+
+        Note:
+            Pour les gestions actives (date_fin = None), utilise la date actuelle
+            comme date de fin pour le calcul
+
+        Example:
+            >>> gestion.date_debut = date(2024, 1, 1)
+            >>> gestion.date_fin = date(2024, 6, 30)
+            >>> print(f"Durée: {gestion.duree_jours} jours")  # Output: 181
+        """
         date_fin_effective = self.date_fin or datetime.now().date()
         return (date_fin_effective - self.date_debut).days
