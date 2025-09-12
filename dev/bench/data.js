@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757662882547,
+  "lastUpdate": 1757662916509,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -1119,6 +1119,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014789700651603693",
             "extra": "mean: 5.091533500000199 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "860d925996ac0eff3c21be2e4acc8af975e69cf0",
+          "message": "fix: MAJOR - Corriger .gitignore qui excluait tous les fichiers test_*.py\n\n CORRECTION CRITIQUE:\n- Le .gitignore bloquait tous les test_*.py empêchant leur versioning\n- Ajouter 38 fichiers de test qui étaient ignorés\n- Le CI ne voyait que 2 tests car les autres n'étaient pas dans le repo\n- Maintenant tous les 260+ tests seront disponibles en CI\n\nCette correction devrait résoudre le problème de collection de tests en CI/CD",
+          "timestamp": "2025-09-12T09:37:29+02:00",
+          "tree_id": "4ec99ce7b9a482c7642b148d18d3c5c007af79d4",
+          "url": "https://github.com/ericfunman/Consultator/commit/860d925996ac0eff3c21be2e4acc8af975e69cf0"
+        },
+        "date": 1757662916100,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.4935372446332,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000015327969482476497",
+            "extra": "mean: 1.062142182012838 msec\nrounds: 934"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 295373.0055492855,
+            "unit": "iter/sec",
+            "range": "stddev: 5.311370133976703e-7",
+            "extra": "mean: 3.385549732753562 usec\nrounds: 121419"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158430.43077777926,
+            "unit": "iter/sec",
+            "range": "stddev: 7.519491127752501e-7",
+            "extra": "mean: 6.311918708361269 usec\nrounds: 107551"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 34047.579378559276,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001731962046570854",
+            "extra": "mean: 29.370663590543778 usec\nrounds: 21022"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.49215384585318,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001668115457340454",
+            "extra": "mean: 5.089261736041092 msec\nrounds: 197"
           }
         ]
       }
