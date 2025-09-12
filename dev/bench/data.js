@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757662916509,
+  "lastUpdate": 1757663372054,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -1178,6 +1178,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00001668115457340454",
             "extra": "mean: 5.089261736041092 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "2f8375b70c92133b163d778718de71f69ef76cd6",
+          "message": "feat: Améliorer rapport final avec statistiques détaillées des tests\n\n- Ajouter extraction et stockage des statistiques pytest détaillées\n- Afficher le nombre réel de tests individuels exécutés (267) vs catégories (5)\n- Inclure tests réussis/échoués/ignorés dans le rapport final\n- Séparer les statistiques de catégories vs tests individuels pour plus de clarté",
+          "timestamp": "2025-09-12T09:44:56+02:00",
+          "tree_id": "ca66e8eebb809f50d8c2b5cc7057c0d51cc468ea",
+          "url": "https://github.com/ericfunman/Consultator/commit/2f8375b70c92133b163d778718de71f69ef76cd6"
+        },
+        "date": 1757663371683,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 940.8682535741523,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000029710056796181303",
+            "extra": "mean: 1.0628480620971312 msec\nrounds: 934"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 289037.07841014327,
+            "unit": "iter/sec",
+            "range": "stddev: 7.584280228896321e-7",
+            "extra": "mean: 3.4597637282404343 usec\nrounds: 113289"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158341.08567725928,
+            "unit": "iter/sec",
+            "range": "stddev: 7.899191077984653e-7",
+            "extra": "mean: 6.315480254052713 usec\nrounds: 91158"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33350.46525088984,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000018116059143999842",
+            "extra": "mean: 29.98458919469852 usec\nrounds: 19676"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.43096094889722,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000015273875374016913",
+            "extra": "mean: 5.090847161614998 msec\nrounds: 198"
           }
         ]
       }
