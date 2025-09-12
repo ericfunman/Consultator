@@ -176,6 +176,37 @@ class AutomatedQualityPipeline:
             # Compter les tests collectés
             collected_count = result.stdout.count("test_") if result.returncode == 0 else 0
             print(f"🔍 Tests collectés: {collected_count}")
+            
+            # Afficher les détails de la collecte si peu de tests
+            if collected_count < 50:
+                print("📋 Détails de la collecte:")
+                # Relancer collect-only avec plus de verbosité
+                verbose_result = subprocess.run(
+                    [
+                        "python",
+                        "-m",
+                        "pytest",
+                        "tests/",
+                        "--collect-only",
+                        "--quiet",
+                        "-v",
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                )
+                if verbose_result.returncode == 0:
+                    lines = verbose_result.stdout.strip().split('\n')
+                    test_files = [line for line in lines if 'test_' in line and '::' in line]
+                    print(f"   Fichiers de test trouvés: {len(set(line.split('::')[0] for line in test_files))}")
+                    print(f"   Tests individuels: {len(test_files)}")
+                    # Montrer quelques exemples
+                    for line in test_files[:5]:
+                        print(f"   ✅ {line}")
+                    if len(test_files) > 5:
+                        print(f"   ... et {len(test_files) - 5} autres")
+                else:
+                    print(f"   ❌ Erreur de collecte: {verbose_result.stderr[:200]}")
 
             # Maintenant exécuter les tests
             result = subprocess.run(
