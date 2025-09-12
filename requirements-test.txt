@@ -15,7 +15,7 @@ pytest-html>=3.1.0,<4.0.0
 pytest-metadata>=3.0.0,<4.0.0
 pytest-xdist>=3.0.0,<4.0.0
 pytest-asyncio>=0.21.0,<0.22.0
-pytest-faker>=15.0.0,<16.0.0
+pytest-faker>=2.0.0,<3.0.0
 requests-mock>=1.10.0,<2.0.0
 
 # Sécurité
