@@ -50,7 +50,7 @@ def test_python_version():
 
 def main():
     """Fonction principale d'exécution des tests"""
-    print("🚀 Démarrage des tests simples...")
+    print("Démarrage des tests simples...")
     print("=" * 50)
 
     tests = [
@@ -65,14 +65,14 @@ def main():
         try:
             result = test_func()
             results.append(result)
-            status = "✅ RÉUSSI" if result else "❌ ÉCHEC"
+            status = "RÉUSSI" if result else "ÉCHEC"
             print(f"   Résultat: {status}")
         except Exception as e:
-            print(f"   ❌ ERREUR: {e}")
+            print(f"   ERREUR: {e}")
             results.append(False)
 
     print("\n" + "=" * 50)
-    print("📊 RÉSULTATS FINAUX:")
+    print("RÉSULTATS FINAUX:")
 
     total_tests = len(results)
     passed_tests = sum(results)
@@ -82,10 +82,10 @@ def main():
     print(f"   Tests échoués: {total_tests - passed_tests}")
 
     if passed_tests == total_tests:
-        print("   🎉 TOUS LES TESTS RÉUSSIS !")
+        print("   TOUS LES TESTS RÉUSSIS !")
         return 0
     else:
-        print("   💥 ÉCHEC DE CERTAINS TESTS !")
+        print("   ÉCHEC DE CERTAINS TESTS !")
         return 1
 
 if __name__ == "__main__":
