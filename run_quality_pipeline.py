@@ -176,9 +176,13 @@ class AutomatedQualityPipeline:
 
             # Analyser le résultat plus finement
             if result.returncode == 0:
-                # Tests réussis
+                # Tests réussis - extraire les statistiques
                 success = True
-                print("✅ TOUS les tests réussis")
+                test_stats = self._extract_pytest_stats(result.stdout)
+                if test_stats:
+                    print(f"✅ TOUS les tests réussis - {test_stats['total']} tests exécutés")
+                else:
+                    print("✅ TOUS les tests réussis")
             elif result.returncode == 5:
                 # Code 5 = No tests collected
                 success = False
@@ -534,6 +538,43 @@ class AutomatedQualityPipeline:
             return 0.0
         except Exception:
             return 0.0
+
+    def _extract_pytest_stats(self, output):
+        """Extrait les statistiques des tests pytest du output"""
+        import re
+        try:
+            # Chercher la ligne de résumé de pytest (ex: "183 passed, 5 warnings, 5 errors")
+            lines = output.strip().split('\n')
+            for line in reversed(lines):  # Commencer par la fin
+                line = line.strip()
+                # Pattern pour les stats pytest
+                match = re.search(r'(\d+)\s+passed(?:,\s*(\d+)\s+failed)?(?:,\s*(\d+)\s+skipped)?(?:,\s*(\d+)\s+warnings?)?(?:,\s*(\d+)\s+errors?)?', line)
+                if match:
+                    passed = int(match.group(1))
+                    failed = int(match.group(2)) if match.group(2) else 0
+                    skipped = int(match.group(3)) if match.group(3) else 0
+                    warnings = int(match.group(4)) if match.group(4) else 0
+                    errors = int(match.group(5)) if match.group(5) else 0
+
+                    total = passed + failed + skipped
+                    return {
+                        'total': total,
+                        'passed': passed,
+                        'failed': failed,
+                        'skipped': skipped,
+                        'warnings': warnings,
+                        'errors': errors
+                    }
+
+            # Fallback: chercher "collected X items"
+            for line in lines:
+                match = re.search(r'collected\s+(\d+)\s+items?', line)
+                if match:
+                    return {'total': int(match.group(1)), 'passed': 0, 'failed': 0, 'skipped': 0, 'warnings': 0, 'errors': 0}
+
+            return None
+        except Exception:
+            return None
 
     def _count_flake8_issues(self):
         """Compte les problèmes Flake8"""
