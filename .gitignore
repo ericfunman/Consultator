@@ -63,8 +63,7 @@ data/uploads/*
 # Fichiers de backup
 backup_*/
 
-# Fichiers de test et développement
-test_*.py
+# Fichiers de développement temporaire
 debug_*.py
 analyze_*.py
 algorithm_summary.py
