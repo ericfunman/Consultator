@@ -37,6 +37,32 @@ class AutomatedQualityPipeline:
 
             if result.returncode == 0:
                 print("✅ Dépendances de test installées avec succès")
+                
+                # En CI, installer également les dépendances principales manquantes
+                if os.environ.get('CI') or os.environ.get('GITHUB_ACTIONS'):
+                    print("🔧 Installation des dépendances principales pour CI...")
+                    main_deps = [
+                        "streamlit>=1.28.0",
+                        "sqlalchemy>=2.0.0", 
+                        "pandas>=1.5.0",
+                        "plotly>=5.0.0",
+                    ]
+                    
+                    for dep in main_deps:
+                        try:
+                            dep_result = subprocess.run(
+                                [sys.executable, "-m", "pip", "install", dep],
+                                capture_output=True,
+                                text=True,
+                                timeout=60,
+                            )
+                            if dep_result.returncode == 0:
+                                print(f"   ✅ {dep.split('>=')[0]} installé")
+                            else:
+                                print(f"   ⚠️ Échec installation {dep}")
+                        except Exception as e:
+                            print(f"   ⚠️ Erreur {dep}: {e}")
+                
                 return True
             else:
                 print(f"❌ Erreur installation dépendances : {result.stderr}")
@@ -169,6 +195,7 @@ class AutomatedQualityPipeline:
                 "--collect-only",
                 "--quiet",
                 "--disable-warnings",
+                "-v",  # Plus verbeux pour voir tous les fichiers
             ]
             
             # En CI, ignorer le pytest.ini pour éviter les conflits
@@ -179,6 +206,7 @@ class AutomatedQualityPipeline:
                     "--override-ini=python_files=test_*.py",
                     "--override-ini=python_classes=Test*",
                     "--override-ini=python_functions=test_*",
+                    "--tb=no",  # Pas de traceback pour la collection
                 ])
                 print("🔧 Mode CI détecté pour collection - configuration simplifiée")
             
@@ -230,14 +258,26 @@ class AutomatedQualityPipeline:
                         [
                             "python", 
                             "-c", 
-                            "import sys; sys.path.insert(0, '.'); "
-                            "print('🐍 sys.path:', sys.path[:3]); "
-                            "try: import app.database.models; print('✅ app.database.models OK')\n"
-                            "except Exception as e: print(f'❌ app.database.models: {e}')\n"
-                            "try: import app.services.consultant_service; print('✅ app.services OK')\n"
-                            "except Exception as e: print(f'❌ app.services: {e}')\n"
-                            "try: import streamlit; print('✅ streamlit OK')\n"
-                            "except Exception as e: print(f'❌ streamlit: {e}')"
+                            """
+import sys
+sys.path.insert(0, '.')
+print('sys.path:', sys.path[:3])
+try:
+    import app.database.models
+    print('✅ app.database.models OK')
+except Exception as e:
+    print(f'❌ app.database.models: {e}')
+try:
+    import app.services.consultant_service
+    print('✅ app.services OK')
+except Exception as e:
+    print(f'❌ app.services: {e}')
+try:
+    import streamlit
+    print('✅ streamlit OK')
+except Exception as e:
+    print(f'❌ streamlit: {e}')
+"""
                         ],
                         capture_output=True,
                         text=True,
@@ -248,6 +288,45 @@ class AutomatedQualityPipeline:
                     if import_test.stderr:
                         print("🚨 Erreurs d'import:")
                         print(import_test.stderr[:500])
+                    
+                    # Test spécifique pour voir les fichiers de test qui ne se chargent pas
+                    print("🔍 Test de chargement des fichiers de test individuels...")
+                    test_files_check = subprocess.run(
+                        [
+                            "python", 
+                            "-c", 
+                            """
+import os
+import sys
+sys.path.insert(0, '.')
+
+test_files = []
+for root, dirs, files in os.walk('tests'):
+    for file in files:
+        if file.startswith('test_') and file.endswith('.py'):
+            test_files.append(os.path.join(root, file))
+
+print(f'Total fichiers test trouvés: {len(test_files)}')
+for i, test_file in enumerate(test_files[:10]):  # Tester les 10 premiers
+    try:
+        # Essayer d'importer le module de test
+        module_name = test_file.replace('/', '.').replace('\\\\', '.').replace('.py', '')
+        exec(f'import {module_name}')
+        print(f'✅ {test_file}')
+    except Exception as e:
+        print(f'❌ {test_file}: {str(e)[:100]}')
+if len(test_files) > 10:
+    print(f'... et {len(test_files) - 10} autres fichiers')
+"""
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=15,
+                    )
+                    print(test_files_check.stdout)
+                    if test_files_check.stderr:
+                        print("Erreurs test files:")
+                        print(test_files_check.stderr[:300])
                 
                 if verbose_result.returncode == 0:
                     lines = verbose_result.stdout.strip().split('\n')
