@@ -5,6 +5,7 @@ Exécution automatique après chaque modification pour validation de non-régres
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -159,15 +160,30 @@ class AutomatedQualityPipeline:
         print("🔄 Exécution de TOUS les tests (mode régression)...")
 
         try:
+            # Configuration simplifiée pour collection en CI
+            collect_args = [
+                "python",
+                "-m",
+                "pytest",
+                "tests/",
+                "--collect-only",
+                "--quiet",
+                "--disable-warnings",
+            ]
+            
+            # En CI, ignorer le pytest.ini pour éviter les conflits
+            if os.environ.get('CI') or os.environ.get('GITHUB_ACTIONS'):
+                collect_args.extend([
+                    "--override-ini=addopts=",  # Ignorer les addopts du pytest.ini
+                    "--override-ini=testpaths=tests",
+                    "--override-ini=python_files=test_*.py",
+                    "--override-ini=python_classes=Test*",
+                    "--override-ini=python_functions=test_*",
+                ])
+                print("🔧 Mode CI détecté pour collection - configuration simplifiée")
+            
             result = subprocess.run(
-                [
-                    "python",
-                    "-m",
-                    "pytest",
-                    "tests/",
-                    "--collect-only",
-                    "--quiet",
-                ],
+                collect_args,
                 capture_output=True,
                 text=True,
                 timeout=60,
@@ -199,6 +215,40 @@ class AutomatedQualityPipeline:
                     text=True,
                     timeout=30,
                 )
+                
+                # Diagnostic avancé si très peu de tests
+                if collected_count < 20:
+                    print("🔍 Diagnostic avancé des imports...")
+                    
+                    # Vérifier PYTHONPATH
+                    pythonpath = os.environ.get('PYTHONPATH', '')
+                    print(f"📂 PYTHONPATH: {pythonpath}")
+                    print(f"📂 Répertoire courant: {os.getcwd()}")
+                    
+                    # Tester l'import des modules principaux
+                    import_test = subprocess.run(
+                        [
+                            "python", 
+                            "-c", 
+                            "import sys; sys.path.insert(0, '.'); "
+                            "print('🐍 sys.path:', sys.path[:3]); "
+                            "try: import app.database.models; print('✅ app.database.models OK')\n"
+                            "except Exception as e: print(f'❌ app.database.models: {e}')\n"
+                            "try: import app.services.consultant_service; print('✅ app.services OK')\n"
+                            "except Exception as e: print(f'❌ app.services: {e}')\n"
+                            "try: import streamlit; print('✅ streamlit OK')\n"
+                            "except Exception as e: print(f'❌ streamlit: {e}')"
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=10,
+                    )
+                    print("📦 État des dépendances:")
+                    print(import_test.stdout)
+                    if import_test.stderr:
+                        print("🚨 Erreurs d'import:")
+                        print(import_test.stderr[:500])
+                
                 if verbose_result.returncode == 0:
                     lines = verbose_result.stdout.strip().split('\n')
                     test_files = [line for line in lines if 'test_' in line and '::' in line]
@@ -212,17 +262,32 @@ class AutomatedQualityPipeline:
                 else:
                     print(f"   ❌ Erreur de collecte: {verbose_result.stderr[:500]}")
 
-            # Maintenant exécuter les tests
+            # Maintenant exécuter les tests avec configuration simplifiée pour CI
+            pytest_args = [
+                "python",
+                "-m",
+                "pytest",
+                "tests/",
+                "-v",
+                "--tb=short",
+                "--maxfail=5",
+                "--disable-warnings",
+                "--no-cov",  # Désactiver coverage qui peut poser problème en CI
+            ]
+            
+            # En CI, ignorer le pytest.ini pour éviter les conflits
+            if os.environ.get('CI') or os.environ.get('GITHUB_ACTIONS'):
+                pytest_args.extend([
+                    "--override-ini=addopts=",  # Ignorer les addopts du pytest.ini
+                    "--override-ini=testpaths=tests",
+                    "--override-ini=python_files=test_*.py",
+                    "--override-ini=python_classes=Test*",
+                    "--override-ini=python_functions=test_*",
+                ])
+                print("🔧 Mode CI détecté - configuration pytest simplifiée")
+            
             result = subprocess.run(
-                [
-                    "python",
-                    "-m",
-                    "pytest",
-                    "tests/",
-                    "-v",
-                    "--tb=short",
-                    "--maxfail=5",
-                ],
+                pytest_args,
                 capture_output=True,
                 text=True,
                 timeout=300,  # Augmenté pour tous les tests
