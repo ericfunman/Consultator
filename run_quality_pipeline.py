@@ -524,6 +524,8 @@ class AutomatedQualityPipeline:
                 print(f"❌ Impossible d'installer bandit: {e}")
 
         return tools
+
+    def _extract_pylint_score(self, output):
         """Extrait le score Pylint du output"""
         try:
             for line in output.split("\n"):
