@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757661281745,
+  "lastUpdate": 1757661683385,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -883,6 +883,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000015120277022431718",
             "extra": "mean: 5.0905195939080485 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "1af911baebd6ba04b01d3707a884ea3731193d47",
+          "message": "fix: Rendre les imports dans conftest.py conditionnels pour éviter les erreurs de collection de tests",
+          "timestamp": "2025-09-12T09:16:58+02:00",
+          "tree_id": "b92f8bd3c627b2777b425aaa37fedb19a7fc0cfc",
+          "url": "https://github.com/ericfunman/Consultator/commit/1af911baebd6ba04b01d3707a884ea3731193d47"
+        },
+        "date": 1757661682909,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.4501272781142,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000014679230074002856",
+            "extra": "mean: 1.062191157051689 msec\nrounds: 936"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 296479.160899587,
+            "unit": "iter/sec",
+            "range": "stddev: 5.021587591254157e-7",
+            "extra": "mean: 3.372918342610545 usec\nrounds: 132909"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158139.12170385997,
+            "unit": "iter/sec",
+            "range": "stddev: 7.499863211010237e-7",
+            "extra": "mean: 6.323545933640982 usec\nrounds: 72485"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 34605.54487091992,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000016550521625452511",
+            "extra": "mean: 28.897103158757954 usec\nrounds: 21559"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.52549920495895,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000164550515663039",
+            "extra": "mean: 5.088398218274398 msec\nrounds: 197"
           }
         ]
       }
