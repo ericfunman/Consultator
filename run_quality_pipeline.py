@@ -379,12 +379,20 @@ if len(test_files) > 10:
                 test_stats = self._extract_pytest_stats(result.stdout)
                 if test_stats:
                     print(f"✅ TOUS les tests réussis - {test_stats['total']} tests exécutés")
+                    # Stocker les statistiques détaillées pour le rapport final
+                    self.test_results["regression_tests"] = {
+                        "success": True,
+                        "stats": test_stats,
+                        "output": result.stdout
+                    }
                 else:
                     print("✅ TOUS les tests réussis")
+                    self.test_results["regression_tests"] = {"success": True, "output": result.stdout}
             elif result.returncode == 5:
                 # Code 5 = No tests collected
                 success = False
                 print("❌ Aucun test trouvé")
+                self.test_results["regression_tests"] = {"success": False, "error": "No tests collected"}
             else:
                 # Autre erreur
                 success = False
@@ -394,13 +402,16 @@ if len(test_files) > 10:
                     print(f"   Sortie: {result.stdout.strip()[-500:]}")
                 if result.stderr:
                     print(f"   Erreur: {result.stderr.strip()[-500:]}")
-
-            self.test_results["regression_tests"] = {
-                "success": success,
-                "exit_code": result.returncode,
-                "output": result.stdout,
-                "error": result.stderr
-            }
+                
+                # Essayer quand même d'extraire les stats partielles
+                test_stats = self._extract_pytest_stats(result.stdout)
+                self.test_results["regression_tests"] = {
+                    "success": False,
+                    "stats": test_stats,
+                    "exit_code": result.returncode,
+                    "output": result.stdout,
+                    "error": result.stderr
+                }
 
             return success
 
@@ -1039,8 +1050,32 @@ def main():
 
     execution_time = time.time() - start_time
 
+    # Calcul des vraies statistiques de tests
+    total_individual_tests = 0
+    passed_individual_tests = 0
+    failed_individual_tests = 0
+    
+    # Extraire les stats des tests de régression si disponibles
+    regression_results = pipeline.test_results.get("regression_tests", {})
+    if "stats" in regression_results and regression_results["stats"]:
+        stats = regression_results["stats"]
+        total_individual_tests = stats.get("total", 0)
+        passed_individual_tests = stats.get("passed", 0)
+        failed_individual_tests = stats.get("failed", 0)
+        
+        print(f"\n📊 STATISTIQUES DÉTAILLÉES:")
+        print(f"   Tests individuels collectés: {total_individual_tests}")
+        print(f"   Tests réussis: {passed_individual_tests}")
+        if failed_individual_tests > 0:
+            print(f"   Tests échoués: {failed_individual_tests}")
+        if stats.get("skipped", 0) > 0:
+            print(f"   Tests ignorés: {stats['skipped']}")
+
     print(f"\n⏱️ Temps d'exécution: {execution_time:.1f}s")
-    print(f"📊 Tests réussis: {success_count}/{total_tests}")
+    print(f"📊 Catégories de tests réussies: {success_count}/{total_tests}")
+    
+    if total_individual_tests > 0:
+        print(f"📋 Tests individuels exécutés: {passed_individual_tests + failed_individual_tests}/{total_individual_tests}")
 
     if summary["overall_success"]:
         print("🎉 PIPELINE RÉUSSI - Code prêt pour production !")
