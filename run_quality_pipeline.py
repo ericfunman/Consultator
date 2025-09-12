@@ -180,6 +180,10 @@ class AutomatedQualityPipeline:
             # Afficher les détails de la collecte si peu de tests
             if collected_count < 50:
                 print("📋 Détails de la collecte:")
+                print("Sortie brute de pytest --collect-only:")
+                print(result.stdout)
+                print("--- Fin de la sortie ---")
+                
                 # Relancer collect-only avec plus de verbosité
                 verbose_result = subprocess.run(
                     [
@@ -206,7 +210,7 @@ class AutomatedQualityPipeline:
                     if len(test_files) > 5:
                         print(f"   ... et {len(test_files) - 5} autres")
                 else:
-                    print(f"   ❌ Erreur de collecte: {verbose_result.stderr[:200]}")
+                    print(f"   ❌ Erreur de collecte: {verbose_result.stderr[:500]}")
 
             # Maintenant exécuter les tests
             result = subprocess.run(
