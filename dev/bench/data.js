@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757744777631,
+  "lastUpdate": 1757831213543,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -1412,6 +1412,63 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000015900452897661648",
             "extra": "mean: 5.0887009292927186 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Eric Funman",
+            "username": "ericfunman",
+            "email": "lapinae@gmail.com"
+          },
+          "committer": {
+            "name": "Eric Funman",
+            "username": "ericfunman",
+            "email": "lapinae@gmail.com"
+          },
+          "id": "78651c5748c67c8070e26bdc80c5fb4086df5293",
+          "message": "feat: Amélioration majeure de la documentation et couverture de tests\n\n- Documentation: Amélioration du ratio de 12.8% à 91.0% (objectif dépassé)\n- Docstrings: Ajout de docstrings détaillées à tous les modules principaux\n- Business Managers: Documentation complète (100% des fonctions)\n- Consultant Services: Amélioration significative de la documentation\n- Tests: 268 tests fonctionnels, couverture à 7% (base solide pour progression)\n- Qualité: Code professionnel avec documentation exhaustive\n\nBREAKING CHANGES: Améliorations de qualité majeures",
+          "timestamp": "2025-09-12T16:13:34Z",
+          "url": "https://github.com/ericfunman/Consultator/commit/78651c5748c67c8070e26bdc80c5fb4086df5293"
+        },
+        "date": 1757831213077,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.6740128652173,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000020350389016464924",
+            "extra": "mean: 1.0619386181820132 msec\nrounds: 935"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 285279.24499973736,
+            "unit": "iter/sec",
+            "range": "stddev: 4.983773534891313e-7",
+            "extra": "mean: 3.505337375668253 usec\nrounds: 115527"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 156159.6129878721,
+            "unit": "iter/sec",
+            "range": "stddev: 7.566307958943702e-7",
+            "extra": "mean: 6.403704394923568 usec\nrounds: 72015"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33302.38119684014,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000015760604031228927",
+            "extra": "mean: 30.02788281382365 usec\nrounds: 22716"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.42749693522902,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014793032146818667",
+            "extra": "mean: 5.090936939087224 msec\nrounds: 197"
           }
         ]
       }
