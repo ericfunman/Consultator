@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757951099266,
+  "lastUpdate": 1757951105389,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -1762,6 +1762,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014704876491579814",
             "extra": "mean: 5.090292172589092 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "8b4620c1e37847c21fe6873d31c5a58405cc8c2e",
+          "message": " Amélioration majeure de la suite de tests\n\n Corrections des erreurs de syntaxe et lint\n- Correction des erreurs E722 (bare except clauses)\n- Résolution des erreurs de syntaxe dans test_skill_categories.py et test_technologies_referentiel.py\n- Amélioration de la gestion d'erreurs avec Exception explicite\n\n Amélioration des services\n- Ajout des paramètres manquants (practice_filter, grade_filter, availability_filter) dans ConsultantService\n- Correction des méthodes search_consultants_optimized et get_all_consultants_with_stats\n\n Résultats des tests\n- 412 tests collectés (vs 311 précédemment)\n- 382 tests réussis (énorme amélioration !)\n- Réduction significative des échecs (30 restants vs centaines)\n\n Amélioration de l'infrastructure de test\n- Correction des données de test avec noms uniques\n- Amélioration du nettoyage des données de test\n- Meilleure isolation des tests\n\n Prochaines étapes: Finalisation des 30 tests restants",
+          "timestamp": "2025-09-15T17:40:41+02:00",
+          "tree_id": "88286ab31a1bd2816aa4e5064b2899a6038a0404",
+          "url": "https://github.com/ericfunman/Consultator/commit/8b4620c1e37847c21fe6873d31c5a58405cc8c2e"
+        },
+        "date": 1757951104857,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 940.8586942658987,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000034211371587436607",
+            "extra": "mean: 1.0628588608412084 msec\nrounds: 927"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 274481.6833677679,
+            "unit": "iter/sec",
+            "range": "stddev: 5.43518097188701e-7",
+            "extra": "mean: 3.643230352315119 usec\nrounds: 115128"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 155402.31901768222,
+            "unit": "iter/sec",
+            "range": "stddev: 7.442029536937746e-7",
+            "extra": "mean: 6.434910407522403 usec\nrounds: 75330"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 32590.058435834373,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000002490180019965693",
+            "extra": "mean: 30.68420395651856 usec\nrounds: 20877"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.6988687843069,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000017029791127797203",
+            "extra": "mean: 5.083913324873083 msec\nrounds: 197"
           }
         ]
       }
