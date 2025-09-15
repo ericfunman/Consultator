@@ -140,7 +140,7 @@ class PracticeServiceOptimized:
                 ) mission_count ON c.id = mission_count.consultant_id
                 LEFT JOIN (
                     SELECT consultant_id, COUNT(*) as count
-                    FROM competences
+                    FROM consultant_competences
                     GROUP BY consultant_id
                 ) comp_count ON c.id = comp_count.consultant_id
                 WHERE p.actif = 1 OR p.actif IS NULL
@@ -209,7 +209,7 @@ class PracticeServiceOptimized:
                 ) mission_count ON c.id = mission_count.consultant_id
                 LEFT JOIN (
                     SELECT consultant_id, COUNT(*) as count
-                    FROM competences
+                    FROM consultant_competences
                     GROUP BY consultant_id
                 ) comp_count ON c.id = comp_count.consultant_id
                 WHERE (p.actif = 1 OR p.actif IS NULL)
@@ -285,7 +285,7 @@ class PracticeServiceOptimized:
                 ) mission_count ON c.id = mission_count.consultant_id
                 LEFT JOIN (
                     SELECT consultant_id, COUNT(*) as count
-                    FROM competences
+                    FROM consultant_competences
                     GROUP BY consultant_id
                 ) comp_count ON c.id = comp_count.consultant_id
                 WHERE COALESCE(p.nom, 'Sans Practice') = :practice_name

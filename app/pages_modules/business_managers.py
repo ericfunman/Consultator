@@ -5,12 +5,12 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy import and_
 
-from database.database import get_session
-from database.models import BusinessManager
-from database.models import Consultant
-from database.models import ConsultantBusinessManager
-from database.models import Mission
-from services.business_manager_service import BusinessManagerService
+from app.database.database import get_database_session
+from app.database.models import BusinessManager
+from app.database.models import Consultant
+from app.database.models import ConsultantBusinessManager
+from app.database.models import Mission
+from app.services.business_manager_service import BusinessManagerService
 
 
 def show():
@@ -73,14 +73,24 @@ def show_bm_profile():
     if isinstance(bm_id, str):
         try:
             bm_id = int(bm_id)
-        except ValueError:
-            st.error("❌ ID du Business Manager invalide")
+        except ValueError as e:
+            st.error(f"❌ Erreur : ID du Business Manager invalide ({bm_id})")
+            print(f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}")
+            del st.session_state.view_bm_profile
+            st.rerun()
+            return
+    elif not isinstance(bm_id, int):
+        try:
+            bm_id = int(str(bm_id))
+        except (ValueError, TypeError) as e:
+            st.error(f"❌ Erreur : ID du Business Manager invalide ({bm_id})")
+            print(f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}")
             del st.session_state.view_bm_profile
             st.rerun()
             return
 
     try:
-        with get_session() as session:
+        with get_database_session() as session:
             bm = (
                 session.query(BusinessManager)
                 .filter(BusinessManager.id == bm_id)
@@ -220,7 +230,7 @@ def show_edit_bm_form(bm):
 
         if submitted:
             try:
-                with get_session() as session:
+                with get_database_session() as session:
                     bm_to_update = session.query(BusinessManager).get(bm.id)
                     if bm_to_update:
                         bm_to_update.nom = new_nom.strip()
@@ -270,7 +280,7 @@ def show_delete_bm_confirmation(bm):
 
     # Vérifier les assignations
     try:
-        with get_session() as session:
+        with get_database_session() as session:
             assignments_count = (
                 session.query(ConsultantBusinessManager)
                 .filter(
@@ -329,7 +339,7 @@ def show_delete_bm_confirmation(bm):
 
                         # Supprimer le BM - utiliser une nouvelle session pour éviter
                         # les conflits
-                        with get_session() as delete_session:
+                        with get_database_session() as delete_session:
                             # Récupérer le BM dans la nouvelle session
                             bm_to_delete = (
                                 delete_session.query(BusinessManager)
@@ -969,7 +979,7 @@ def show_business_managers_list():
         bms_data = []
         for bm_dict in bms_data_from_service:
             # Calculer le total des assignations avec une nouvelle session
-            with get_session() as session:
+            with get_database_session() as session:
                 total_assignments = (
                     session.query(ConsultantBusinessManager)
                     .filter(
@@ -1110,8 +1120,19 @@ def show_business_managers_list():
                 
                 # Nom comme lien hypertexte cliquable
                 if st.button(f"👤 {nom_complet}", key=f"btn_bm_{row['ID']}", help=f"Voir le profil de {nom_complet}"):
-                    st.session_state.view_bm_profile = int(row['ID'])
-                    st.rerun()
+                    try:
+                        # S'assurer que l'ID est un entier valide
+                        bm_id = row['ID']
+                        if isinstance(bm_id, str):
+                            bm_id = int(bm_id)
+                        elif not isinstance(bm_id, int):
+                            bm_id = int(str(bm_id))
+                        
+                        st.session_state.view_bm_profile = bm_id
+                        st.rerun()
+                    except (ValueError, TypeError) as e:
+                        st.error(f"❌ Erreur : ID du Business Manager invalide ({row['ID']})")
+                        print(f"Erreur de conversion d'ID: {e}, valeur: {row['ID']}, type: {type(row['ID'])}")
             
             with cols[2]:
                 # Email simple non cliquable (utilisation du HTML pour éviter la détection automatique)
@@ -1227,7 +1248,7 @@ def show_add_business_manager():
                 return
 
             try:
-                with get_session() as session:
+                with get_database_session() as session:
                     # Vérifier si l'email existe déjà
                     existing = (
                         session.query(BusinessManager)
@@ -1296,7 +1317,7 @@ def show_statistics():
     st.subheader("📊 Statistiques des Business Managers")
 
     try:
-        with get_session() as session:
+        with get_database_session() as session:
             # Statistiques générales
             total_bms = session.query(BusinessManager).count()
             total_active_bms = (

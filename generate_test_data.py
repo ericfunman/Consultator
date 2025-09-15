@@ -252,6 +252,7 @@ def create_consultants(session, practices, business_managers, nb_consultants=100
     print(f"👥 Création de {nb_consultants} consultants...")
 
     consultants = []
+    email_counter = 0  # Compteur pour garantir l'unicité des emails
 
     for i in range(nb_consultants):
         if i % 100 == 0:
@@ -260,7 +261,9 @@ def create_consultants(session, practices, business_managers, nb_consultants=100
         # Générer des données consultant
         prenom = fake.first_name()
         nom = fake.last_name()
-        email = f"{prenom.lower()}.{nom.lower()}@email.com"
+        # Utiliser un compteur incrémental pour garantir l'unicité
+        email_counter += 1
+        email = f"{prenom.lower()}.{nom.lower()}.{email_counter}@email.com"
 
         consultant = Consultant(
             prenom=prenom,

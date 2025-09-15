@@ -14,9 +14,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 
-from database.database import get_database_session
-from database.models import BusinessManager
-from database.models import ConsultantBusinessManager
+from app.database.database import get_database_session
+from app.database.models import BusinessManager
+from app.database.models import ConsultantBusinessManager
 
 
 class BusinessManagerService:
@@ -45,7 +45,7 @@ class BusinessManagerService:
 
                     bm_list.append(
                         {
-                            "id": bm.id,
+                            "id": int(bm.id),  # S'assurer que l'ID est un entier
                             "prenom": bm.prenom,
                             "nom": bm.nom,
                             "email": bm.email,
@@ -95,7 +95,7 @@ class BusinessManagerService:
 
                     bm_list.append(
                         {
-                            "id": bm.id,
+                            "id": int(bm.id),  # S'assurer que l'ID est un entier
                             "prenom": bm.prenom,
                             "nom": bm.nom,
                             "email": bm.email,
