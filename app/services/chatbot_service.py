@@ -107,7 +107,15 @@ class ChatbotService:
             else:
                 return self._handle_general_question(clean_question)
 
-        except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError, KeyError, Exception) as e:
+        except (
+            SQLAlchemyError,
+            OSError,
+            ValueError,
+            TypeError,
+            AttributeError,
+            KeyError,
+            Exception,
+        ) as e:
             return {
                 "response": f"❌ Désolé, j'ai rencontré une erreur : {str(e)}",
                 "data": None,
@@ -485,7 +493,6 @@ class ChatbotService:
 
         with get_database_session() as session:
 
-
             all_competences = session.query(Competence).all()
         for competence in all_competences:
             if re.search(rf"\b{re.escape(competence.nom.lower())}\b", question):
@@ -535,7 +542,6 @@ class ChatbotService:
         from database.models import Practice
 
         with get_database_session() as session:
-
 
             all_practices = session.query(Practice).filter(Practice.actif).all()
         for practice in all_practices:
@@ -823,7 +829,14 @@ class ChatbotService:
                     else:
                         response = "❓ Aucun consultant n'a d'expérience renseignée dans la base."
 
-            except (SQLAlchemyError, OSError, ValueError, TypeError, AttributeError, KeyError) as e:
+            except (
+                SQLAlchemyError,
+                OSError,
+                ValueError,
+                TypeError,
+                AttributeError,
+                KeyError,
+            ) as e:
                 response = f"❌ Erreur lors du calcul des statistiques : {str(e)}"
 
             return {
@@ -1182,7 +1195,13 @@ class ChatbotService:
                     else:
                         response = "🤔 Précisez quel aspect du profil professionnel vous intéresse : grade, type de contrat, ou société ?"
 
-            except (SQLAlchemyError, AttributeError, ValueError, TypeError, KeyError) as e:
+            except (
+                SQLAlchemyError,
+                AttributeError,
+                ValueError,
+                TypeError,
+                KeyError,
+            ) as e:
                 response = f"❌ Erreur lors de la récupération des données : {str(e)}"
 
             return {
@@ -1843,7 +1862,9 @@ class ChatbotService:
         # Déterminer le filtre à appliquer
         if "disponibles" in question_lower or "disponible" in question_lower:
             with get_database_session() as session:
-                consultants = session.query(Consultant).filter(Consultant.disponibilite).all()
+                consultants = (
+                    session.query(Consultant).filter(Consultant.disponibilite).all()
+                )
             titre = "👥 **Consultants disponibles :**"
         elif "indisponibles" in question_lower or "indisponible" in question_lower:
             with get_database_session() as session:
@@ -1855,7 +1876,9 @@ class ChatbotService:
             titre = "👥 **Consultants indisponibles :**"
         elif "actifs" in question_lower or "actif" in question_lower:
             with get_database_session() as session:
-                consultants = session.query(Consultant).filter(Consultant.disponibilite).all()
+                consultants = (
+                    session.query(Consultant).filter(Consultant.disponibilite).all()
+                )
             titre = "👥 **Consultants actifs :**"
             titre = "👥 **Consultants actifs :**"
         else:
@@ -2022,8 +2045,6 @@ class ChatbotService:
         """
         from database.models import Practice
 
-        from database.models import Practice
-
         # Si une practice spécifique est mentionnée
         if entities["practices"]:
             practice_name: str = entities["practices"][0]
@@ -2167,8 +2188,6 @@ class ChatbotService:
         """
         from database.models import CV
 
-        from database.models import CV
-
         # Si un consultant spécifique est mentionné
         if entities["noms"]:
             nom_recherche: str = entities["noms"][0]
@@ -2252,10 +2271,8 @@ class ChatbotService:
             with get_database_session() as session:
 
                 consultants_avec_cv = (
-                        session.query(Consultant).join(CV
-
-                ).distinct().count()
-            )
+                    session.query(Consultant).join(CV).distinct().count()
+                )
 
             response = "📁 **Statistiques des CVs** :\n\n"
             response += "• Total de documents : **" + str(cvs_total) + "**\n"
@@ -2266,14 +2283,16 @@ class ChatbotService:
 
             with get_database_session() as session:
 
-
-                top_consultants = session.query(Consultant, func.count(CV.id).label("nb_cvs")
-                .join(CV)
-                .group_by(Consultant.id)
-                .order_by(func.count(CV.id).desc())
-                .limit(3)
-                .all()
-            )
+                top_consultants = session.query(
+                    Consultant,
+                    func.count(CV.id)
+                    .label("nb_cvs")
+                    .join(CV)
+                    .group_by(Consultant.id)
+                    .order_by(func.count(CV.id).desc())
+                    .limit(3)
+                    .all(),
+                )
 
             if top_consultants:
                 response += "\n🏆 **Top consultants (nombre de CVs)** :\n"
@@ -2334,21 +2353,19 @@ class ChatbotService:
         with get_database_session() as session:
 
             consultant = (
-                    session.query(Consultant)
-            .filter(
-                or_(
-                    func.lower(Consultant.nom
-
-            ) == nom_recherche.lower(),
-                    func.lower(Consultant.prenom) == nom_recherche.lower(),
-                    func.lower(func.concat(Consultant.prenom, " ", Consultant.nom))
-                    == nom_recherche.lower(),
-                    func.lower(func.concat(Consultant.nom, " ", Consultant.prenom))
-                    == nom_recherche.lower(),
+                session.query(Consultant)
+                .filter(
+                    or_(
+                        func.lower(Consultant.nom) == nom_recherche.lower(),
+                        func.lower(Consultant.prenom) == nom_recherche.lower(),
+                        func.lower(func.concat(Consultant.prenom, " ", Consultant.nom))
+                        == nom_recherche.lower(),
+                        func.lower(func.concat(Consultant.nom, " ", Consultant.prenom))
+                        == nom_recherche.lower(),
+                    )
                 )
+                .first()
             )
-            .first()
-        )
 
         if consultant:
             return consultant
@@ -2357,17 +2374,17 @@ class ChatbotService:
         with get_database_session() as session:
 
             consultant = (
-                    session.query(Consultant)
-            .filter(
-                or_(
-                    func.lower(Consultant.nom
-
-            ).like(f"%{nom_recherche.lower()}%"),
-                    func.lower(Consultant.prenom).like(f"%{nom_recherche.lower()}%"),
+                session.query(Consultant)
+                .filter(
+                    or_(
+                        func.lower(Consultant.nom).like(f"%{nom_recherche.lower()}%"),
+                        func.lower(Consultant.prenom).like(
+                            f"%{nom_recherche.lower()}%"
+                        ),
+                    )
                 )
+                .first()
             )
-            .first()
-        )
 
         return consultant
 
@@ -2396,23 +2413,19 @@ class ChatbotService:
         """
         from database.models import Competence
         from database.models import ConsultantCompetence
-        from database.models import Competence
-        from database.models import ConsultantCompetence
 
         # Construction de la requête de base
         with get_database_session() as session:
 
             query = (
-                    session.query(Consultant)
-            .join(
-                ConsultantCompetence,
-                Consultant.id == ConsultantCompetence.consultant_id,
-            
-
+                session.query(Consultant)
+                .join(
+                    ConsultantCompetence,
+                    Consultant.id == ConsultantCompetence.consultant_id,
+                )
+                .join(Competence, ConsultantCompetence.competence_id == Competence.id)
+                .filter(func.lower(Competence.nom).like(f"%{competence.lower()}%"))
             )
-            .join(Competence, ConsultantCompetence.competence_id == Competence.id)
-            .filter(func.lower(Competence.nom).like(f"%{competence.lower()}%"))
-        )
 
         # Ajouter le filtre par type si spécifié
         if type_competence:
@@ -2447,15 +2460,13 @@ class ChatbotService:
         with get_database_session() as session:
 
             consultants = (
-                    session.query(Consultant)
-            .join(ConsultantLangue, Consultant.id == ConsultantLangue.consultant_id
-
+                session.query(Consultant)
+                .join(ConsultantLangue, Consultant.id == ConsultantLangue.consultant_id)
+                .join(Langue, ConsultantLangue.langue_id == Langue.id)
+                .filter(func.lower(Langue.nom).like(f"%{langue.lower()}%"))
+                .distinct()
+                .all()
             )
-            .join(Langue, ConsultantLangue.langue_id == Langue.id)
-            .filter(func.lower(Langue.nom).like(f"%{langue.lower()}%"))
-            .distinct()
-            .all()
-        )
 
         return consultants  # type: ignore[no-any-return]
 
@@ -2545,12 +2556,10 @@ class ChatbotService:
         with get_database_session() as session:
 
             query = (
-                    session.query(ConsultantCompetence)
-            .join(Competence
-
+                session.query(ConsultantCompetence)
+                .join(Competence)
+                .filter(ConsultantCompetence.consultant_id == consultant_id)
             )
-            .filter(ConsultantCompetence.consultant_id == consultant_id)
-        )
 
         # Ajouter le filtre par type si spécifié
         if type_competence:
@@ -2596,16 +2605,15 @@ class ChatbotService:
         with get_database_session() as session:
 
             consultants = (
-                    session.query(Consultant)
-            .filter(
-                and_(
-                    Consultant.salaire_actuel.isnot(None
-
-            ), Consultant.salaire_actuel > 0
+                session.query(Consultant)
+                .filter(
+                    and_(
+                        Consultant.salaire_actuel.isnot(None),
+                        Consultant.salaire_actuel > 0,
+                    )
                 )
+                .all()
             )
-            .all()
-        )
 
         if not consultants:
             return {"moyenne": 0, "mediane": 0, "minimum": 0, "maximum": 0, "total": 0}
@@ -2655,9 +2663,6 @@ class ChatbotService:
         from database.models import CV
         from database.models import Practice
 
-        from database.models import CV
-        from database.models import Practice
-
         # Consultants
         with get_database_session() as session:
 
@@ -2665,10 +2670,8 @@ class ChatbotService:
         with get_database_session() as session:
 
             consultants_actifs = (
-                    session.query(Consultant).filter(Consultant.disponibilite
-
-            ).count()
-        )
+                session.query(Consultant).filter(Consultant.disponibilite).count()
+            )
         consultants_inactifs = consultants_total - consultants_actifs
 
         # Missions
@@ -2678,10 +2681,8 @@ class ChatbotService:
         with get_database_session() as session:
 
             missions_en_cours = (
-                    session.query(Mission).filter(Mission.statut == "en_cours"
-
-            ).count()
-        )
+                session.query(Mission).filter(Mission.statut == "en_cours").count()
+            )
         missions_terminees = missions_total - missions_en_cours
 
         # Practices
@@ -2701,25 +2702,21 @@ class ChatbotService:
         with get_database_session() as session:
 
             tjm_moyen = (
-                    session.query(func.avg(Mission.taux_journalier)
-
+                session.query(func.avg(Mission.taux_journalier))
+                .filter(Mission.taux_journalier.isnot(None))
+                .scalar()
+                or 0
             )
-            .filter(Mission.taux_journalier.isnot(None))
-            .scalar()
-            or 0
-        )
 
         # Salaire moyen et CJM moyen
         with get_database_session() as session:
 
             salaire_moyen = (
-                    session.query(func.avg(Consultant.salaire_actuel)
-
+                session.query(func.avg(Consultant.salaire_actuel))
+                .filter(Consultant.salaire_actuel.isnot(None))
+                .scalar()
+                or 0
             )
-            .filter(Consultant.salaire_actuel.isnot(None))
-            .scalar()
-            or 0
-        )
         cjm_moyen = (salaire_moyen * 1.8 / 216) if salaire_moyen > 0 else 0
 
         return {
@@ -2781,12 +2778,10 @@ class ChatbotService:
                 with get_database_session() as session:
 
                     consultant_db = (
-                            session.query(Consultant)
-                    .filter(Consultant.id == consultant.id
-
+                        session.query(Consultant)
+                        .filter(Consultant.id == consultant.id)
+                        .first()
                     )
-                    .first()
-                )
 
                 if consultant_db:
                     response = (
@@ -2900,21 +2895,15 @@ class ChatbotService:
                 with get_database_session() as session:
 
                     consultants_dispos = (
-                            session.query(Consultant)
-                    .filter(Consultant.disponibilite
-
+                        session.query(Consultant).filter(Consultant.disponibilite).all()
                     )
-                    .all()
-                )
                 with get_database_session() as session:
 
                     consultants_occupes = (
-                            session.query(Consultant)
-                    .filter(Consultant.disponibilite is False
-
+                        session.query(Consultant)
+                        .filter(Consultant.disponibilite is False)
+                        .all()
                     )
-                    .all()
-                )
 
                 response = "📅 **État des disponibilités** :\n\n"
                 response += (
@@ -3028,12 +3017,10 @@ class ChatbotService:
                 with get_database_session() as session:
 
                     consultant_db = (
-                            session.query(Consultant)
-                    .filter(Consultant.id == consultant.id
-
+                        session.query(Consultant)
+                        .filter(Consultant.id == consultant.id)
+                        .first()
                     )
-                    .first()
-                )
 
                 if consultant_db and consultant_db.missions:
                     missions_avec_tjm = [
@@ -3102,7 +3089,13 @@ class ChatbotService:
                         + "** : Aucune mission trouvée"
                     )
 
-            except (SQLAlchemyError, AttributeError, ValueError, TypeError, ZeroDivisionError) as e:
+            except (
+                SQLAlchemyError,
+                AttributeError,
+                ValueError,
+                TypeError,
+                ZeroDivisionError,
+            ) as e:
                 response = "❌ Erreur lors de la récupération des TJM : " + str(e)
 
             return {
@@ -3128,18 +3121,18 @@ class ChatbotService:
                 with get_database_session() as session:
 
                     tjm_ancien_moyen = (
-                            session.query(func.avg(Mission.taux_journalier)
-
+                        session.query(func.avg(Mission.taux_journalier))
+                        .filter(Mission.taux_journalier.isnot(None))
+                        .scalar()
+                        or 0
                     )
-                    .filter(Mission.taux_journalier.isnot(None))
-                    .scalar()
-                    or 0
-                )
 
                 # Compter les missions avec TJM
                 with get_database_session() as session:
-                    missions_nouveau_tjm = session.query(Mission).filter(Mission.tjm.isnot(None)).count()
-                
+                    missions_nouveau_tjm = (
+                        session.query(Mission).filter(Mission.tjm.isnot(None)).count()
+                    )
+
                 with get_database_session() as session:
                     missions_ancien_tjm = (
                         session.query(Mission)

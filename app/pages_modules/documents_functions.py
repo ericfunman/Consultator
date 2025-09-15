@@ -7,18 +7,18 @@ from services.document_service import DocumentService
 
 def show_consultant_documents(consultant):
     """Affiche et                 with col1:
-                    if doc_type == "CV" and st.button(
-                        " Analyser", key=f"analyze_existing_{file_path.name}"
-                    ):
-                        st.info(" Analyse de CV en cours de developpement...")
+        if doc_type == "CV" and st.button(
+            " Analyser", key=f"analyze_existing_{file_path.name}"
+        ):
+            st.info(" Analyse de CV en cours de developpement...")
 
-                with col2:
-                    if st.button(" Telecharger", key=f"download_{file_path.name}"):
-                        st.info(" Telechargement en cours de developpement...")
+    with col2:
+        if st.button(" Telecharger", key=f"download_{file_path.name}"):
+            st.info(" Telechargement en cours de developpement...")
 
-                with col3:
-                    if st.button(" Aperçu", key=f"preview_{file_path.name}"):
-                        st.info(" Aperçu en cours de developpement...")ments du consultant"""
+    with col3:
+        if st.button(" Aperçu", key=f"preview_{file_path.name}"):
+            st.info(" Aperçu en cours de developpement...")ments du consultant"""
 
     st.subheader(f" Documents de {consultant.prenom} {consultant.nom}")
 

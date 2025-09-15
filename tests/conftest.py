@@ -871,6 +871,50 @@ def mock_streamlit_singleton():
     yield
 
 
+@pytest.fixture(scope="function", autouse=True)
+def disable_streamlit_cache():
+    """Disable Streamlit caching during tests to avoid pickling mock objects"""
+    from unittest.mock import patch, MagicMock
+    
+    def mock_cache_data(*args, **kwargs):
+        """Mock cache_data decorator that just returns the original function"""
+        if len(args) == 1 and callable(args[0]):
+            # Used as @st.cache_data
+            return args[0]
+        else:
+            # Used as @st.cache_data(ttl=300)
+            def decorator(func):
+                return func
+            return decorator
+    
+    def mock_cache_resource(*args, **kwargs):
+        """Mock cache_resource decorator that just returns the original function"""
+        if len(args) == 1 and callable(args[0]):
+            # Used as @st.cache_resource
+            return args[0]
+        else:
+            # Used as @st.cache_resource
+            def decorator(func):
+                return func
+            return decorator
+    
+    patches = []
+    try:
+        patches.append(patch('streamlit.cache_data', mock_cache_data))
+        patches.append(patch('streamlit.cache_resource', mock_cache_resource))
+        
+        # Démarrer les patches
+        for p in patches:
+            p.start()
+            
+        yield
+        
+    finally:
+        # Arrêter les patches
+        for p in patches:
+            p.stop()
+
+
 @pytest.fixture(scope="function")
 def mock_session():
     """Mock de session de base de données pour les tests qui en ont besoin"""

@@ -49,7 +49,7 @@
             "detail": "Initialise la base de données SQLite"
         },
         {
-            "label": "🧹 Clean Data",
+            "label": "🧹 ⚠️ RESET Database (ATTENTION: Vide toutes les données)",
             "type": "shell",
             "command": "python",
             "args": ["-c", "from app.database.database import reset_database; reset_database()"],
@@ -60,7 +60,65 @@
                 "focus": false
             },
             "problemMatcher": [],
-            "detail": "Remet à zéro la base de données"
+            "detail": "⚠️ ATTENTION: Remet à zéro complètement la base de données et supprime TOUTES les données !"
+        },
+        {
+            "label": "💾 Backup Database",
+            "type": "shell",
+            "command": "python",
+            "args": ["-c", "import shutil; import os; from datetime import datetime; backup_name = f'test_consultator_backup_{datetime.now().strftime(\"%Y%m%d_%H%M%S\")}.db'; shutil.copy('test_consultator.db', backup_name); print(f'✅ Sauvegarde créée: {backup_name}')"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false
+            },
+            "problemMatcher": [],
+            "detail": "Crée une sauvegarde de la base de données avant les opérations dangereuses"
+        },
+        {
+            "label": "🔄 Restore Test Data",
+            "type": "shell",
+            "command": "python",
+            "args": ["generate_test_data.py"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false
+            },
+            "problemMatcher": [],
+            "detail": "Restaure les données de test (1000 consultants, missions, etc.)"
+        },
+        {
+            "label": "🧪 Run Tests (Parallel)",
+            "type": "shell",
+            "command": "python",
+            "args": ["-m", "pytest", "tests/", "-n", "auto", "--tb=short"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": [],
+            "detail": "Exécute tous les tests en parallèle avec pytest-xdist"
+        },
+        {
+            "label": "🧪 Run Tests (Sequential)",
+            "type": "shell",
+            "command": "python",
+            "args": ["-m", "pytest", "tests/", "--tb=short"],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "problemMatcher": [],
+            "detail": "Exécute tous les tests de manière séquentielle"
         }
     ]
 }

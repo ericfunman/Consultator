@@ -68,14 +68,16 @@ def show_bm_profile():
         Exception: Pour toute erreur lors de la récupération des données
     """
     bm_id = st.session_state.view_bm_profile
-    
+
     # S'assurer que bm_id est un entier
     if isinstance(bm_id, str):
         try:
             bm_id = int(bm_id)
         except ValueError as e:
             st.error(f"❌ Erreur : ID du Business Manager invalide ({bm_id})")
-            print(f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}")
+            print(
+                f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}"
+            )
             del st.session_state.view_bm_profile
             st.rerun()
             return
@@ -84,7 +86,9 @@ def show_bm_profile():
             bm_id = int(str(bm_id))
         except (ValueError, TypeError) as e:
             st.error(f"❌ Erreur : ID du Business Manager invalide ({bm_id})")
-            print(f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}")
+            print(
+                f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}"
+            )
             del st.session_state.view_bm_profile
             st.rerun()
             return
@@ -154,9 +158,7 @@ def show_bm_profile():
                         st.session_state.edit_bm_mode = True
 
                 with col_delete:
-                    if st.button(
-                        "🗑️ Supprimer", width="stretch", type="primary"
-                    ):
+                    if st.button("🗑️ Supprimer", width="stretch", type="primary"):
                         st.session_state.delete_bm_mode = True
 
             # Formulaire de modification
@@ -315,9 +317,7 @@ def show_delete_bm_confirmation(bm):
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button(
-                    "🗑️ Oui, supprimer", type="primary", width="stretch"
-                ):
+                if st.button("🗑️ Oui, supprimer", type="primary", width="stretch"):
                     try:
                         # Clôturer les assignations actives
                         active_assignments = (
@@ -463,27 +463,47 @@ def show_current_bm_consultants(bm, session):
                 .filter(
                     and_(
                         Mission.consultant_id == consultant.id,
-                        Mission.statut == "en_cours"
+                        Mission.statut == "en_cours",
                     )
                 )
                 .order_by(Mission.date_debut.desc())
                 .first()
             )
-            
+
             # Préparer les données de mission
             client_mission = mission_en_cours.client if mission_en_cours else "N/A"
-            role_mission = mission_en_cours.role if mission_en_cours and mission_en_cours.role else "N/A"
-            tjm_mission = mission_en_cours.tjm if mission_en_cours and mission_en_cours.tjm else (
-                mission_en_cours.taux_journalier if mission_en_cours and mission_en_cours.taux_journalier else "N/A"
+            role_mission = (
+                mission_en_cours.role
+                if mission_en_cours and mission_en_cours.role
+                else "N/A"
             )
-            date_debut_mission = mission_en_cours.date_debut.strftime("%d/%m/%Y") if mission_en_cours else "N/A"
-            
+            tjm_mission = (
+                mission_en_cours.tjm
+                if mission_en_cours and mission_en_cours.tjm
+                else (
+                    mission_en_cours.taux_journalier
+                    if mission_en_cours and mission_en_cours.taux_journalier
+                    else "N/A"
+                )
+            )
+            date_debut_mission = (
+                mission_en_cours.date_debut.strftime("%d/%m/%Y")
+                if mission_en_cours
+                else "N/A"
+            )
+
             # Formatage du TJM
-            tjm_display = f"{tjm_mission}€" if isinstance(tjm_mission, (int, float)) else tjm_mission
-            
+            tjm_display = (
+                f"{tjm_mission}€"
+                if isinstance(tjm_mission, (int, float))
+                else tjm_mission
+            )
+
             # Formatage du salaire
-            salaire_display = f"{consultant.salaire_actuel}€" if consultant.salaire_actuel else "N/A"
-            
+            salaire_display = (
+                f"{consultant.salaire_actuel}€" if consultant.salaire_actuel else "N/A"
+            )
+
             data.append(
                 {
                     "Consultant": f"{consultant.prenom} {consultant.nom}",
@@ -554,7 +574,7 @@ def show_current_bm_consultants(bm, session):
                             )
                             if assignment:
                                 existing_comment = assignment.commentaire or ""
-                                date_str = datetime.now().strftime('%d/%m/%Y')
+                                date_str = datetime.now().strftime("%d/%m/%Y")
                                 new_comment = (
                                     f"{existing_comment}\n{date_str}: {comment}"
                                     if existing_comment
@@ -990,7 +1010,7 @@ def show_business_managers_list():
 
             bms_data.append(
                 {
-                    "ID": bm_dict["id"],
+                    "ID": int(bm_dict["id"]),  # Force la conversion en entier
                     "Prénom": bm_dict["prenom"],
                     "Nom": bm_dict["nom"],
                     "Email": bm_dict["email"],
@@ -1009,11 +1029,16 @@ def show_business_managers_list():
         # Afficher le tableau avec noms cliquables
         df = pd.DataFrame(bms_data)
 
+        # Forcer le type de la colonne ID en entier
+        if not df.empty:
+            df["ID"] = df["ID"].astype(int)
+
         # En-tête du tableau
         st.markdown("### 📋 Liste des Business Managers")
-        
+
         # CSS pour styliser les boutons comme des liens hypertextes
-        st.markdown("""
+        st.markdown(
+            """
         <style>
         /* Style pour transformer les boutons en liens hypertextes - sélecteurs très spécifiques */
         .stButton button, 
@@ -1086,8 +1111,10 @@ def show_business_managers_list():
             color: #0d47a1 !important;
         }
         </style>
-        """, unsafe_allow_html=True)
-        
+        """,
+            unsafe_allow_html=True,
+        )
+
         # En-tête avec colonnes
         header_cols = st.columns([1, 3, 3, 2, 2, 2, 2])
         with header_cols[0]:
@@ -1104,59 +1131,73 @@ def show_business_managers_list():
             st.markdown("**📊 Total**")
         with header_cols[6]:
             st.markdown("**🔄 Statut**")
-        
+
         st.markdown("---")
 
         # Lignes de données
         for i, row in enumerate(bms_data):
             cols = st.columns([1, 3, 3, 2, 2, 2, 2])
-            
+
             with cols[0]:
                 st.write(f"`{row['ID']}`")
-            
+
             with cols[1]:
                 # Nom comme vrai lien hypertexte HTML + bouton invisible pour la navigation
                 nom_complet = f"{row['Prénom']} {row['Nom']}"
-                
+
                 # Nom comme lien hypertexte cliquable
-                if st.button(f"👤 {nom_complet}", key=f"btn_bm_{row['ID']}", help=f"Voir le profil de {nom_complet}"):
+                if st.button(
+                    f"👤 {nom_complet}",
+                    key=f"btn_bm_{row['ID']}",
+                    help=f"Voir le profil de {nom_complet}",
+                ):
                     try:
                         # S'assurer que l'ID est un entier valide
-                        bm_id = row['ID']
+                        bm_id = row["ID"]
                         if isinstance(bm_id, str):
                             bm_id = int(bm_id)
                         elif not isinstance(bm_id, int):
                             bm_id = int(str(bm_id))
-                        
+
                         st.session_state.view_bm_profile = bm_id
                         st.rerun()
                     except (ValueError, TypeError) as e:
-                        st.error(f"❌ Erreur : ID du Business Manager invalide ({row['ID']})")
-                        print(f"Erreur de conversion d'ID: {e}, valeur: {row['ID']}, type: {type(row['ID'])}")
-            
+                        st.error(
+                            f"❌ Erreur : ID du Business Manager invalide ({row['ID']})"
+                        )
+                        print(
+                            f"Erreur de conversion d'ID: {e}, valeur: {row['ID']}, type: {type(row['ID'])}"
+                        )
+
             with cols[2]:
                 # Email simple non cliquable (utilisation du HTML pour éviter la détection automatique)
-                st.markdown(f"""
+                st.markdown(
+                    f"""
                 <div style="color: #262730; font-size: 14px;">
                     {row['Email']}
                 </div>
-                """, unsafe_allow_html=True)
-            
+                """,
+                    unsafe_allow_html=True,
+                )
+
             with cols[3]:
-                st.write(row['Téléphone'])
-            
+                st.write(row["Téléphone"])
+
             with cols[4]:
                 st.write(f"**{row['Consultants actuels']}**")
-            
+
             with cols[5]:
                 st.write(f"{row['Total assignations']}")
-            
+
             with cols[6]:
-                st.write(row['Statut'])
-            
+                st.write(row["Statut"])
+
             # Ligne de séparation subtile
             if i < len(bms_data) - 1:
-                st.markdown("<hr style='margin: 0.5rem 0; border: 0; border-top: 1px solid #eee;'>", unsafe_allow_html=True)
+                st.markdown(
+                    "<hr style='margin: 0.5rem 0; border: 0; border-top: 1px solid #eee;'>",
+                    unsafe_allow_html=True,
+                )
 
         # Métriques générales
         st.markdown("---")
@@ -1323,7 +1364,9 @@ def show_statistics():
             total_active_bms = (
                 session.query(BusinessManager).filter(BusinessManager.actif).count()
             )
-            total_assignments = session.query(ConsultantBusinessManager).count()  # noqa: F841
+            total_assignments = session.query(
+                ConsultantBusinessManager
+            ).count()  # noqa: F841
             active_assignments = (
                 session.query(ConsultantBusinessManager)
                 .filter(ConsultantBusinessManager.date_fin.is_(None))

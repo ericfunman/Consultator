@@ -93,3 +93,12 @@ reports/coverage.xml
 reports/test-report.html
 reports/test-results.xml
 reports/~$*.docx
+# CI/CD et couverture
+htmlcov/
+.coverage.*
+coverage-*.xml
+# Rapports de qualité
+bandit-report.json
+complexity_report.txt
+pylint-report.json
+# Environnements virtuels

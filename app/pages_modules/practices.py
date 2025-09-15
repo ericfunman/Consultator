@@ -339,7 +339,9 @@ def show_practice_consultants_optimized(practice_name: str, consultants: list):
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("📊 Statistiques détaillées", key=f"stats_{practice_name}"):
+                if st.button(
+                    "📊 Statistiques détaillées", key=f"stats_{practice_name}"
+                ):
                     show_practice_detailed_stats_cached(practice_name)
 
             with col2:

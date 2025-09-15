@@ -283,7 +283,7 @@ def show_consultant_profile():
 
         # Bouton manuel pour retourner à la liste
         if st.button("← Retour à la liste", key="back_to_list_exception"):
-            if hasattr(st.session_state, 'view_consultant_profile'):
+            if hasattr(st.session_state, "view_consultant_profile"):
                 del st.session_state.view_consultant_profile
             st.rerun()
 
@@ -539,7 +539,12 @@ def show_consultant_info(consultant):
                         else:
                             st.error("❌ Erreur lors de la modification")
 
-                    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
+                    except (
+                        SQLAlchemyError,
+                        ValueError,
+                        TypeError,
+                        AttributeError,
+                    ) as e:
                         st.error("❌ Erreur: " + str(e))
 
     # Historique des salaires (hors formulaire principal)
@@ -1118,7 +1123,9 @@ def _add_language_form(consultant):
 
                 # Filtrer les langues non assignées
                 langues_libres = [
-                    langue for langue in langues_disponibles if langue.id not in langues_assignees
+                    langue
+                    for langue in langues_disponibles
+                    if langue.id not in langues_assignees
                 ]
 
                 if not langues_libres:
@@ -1545,45 +1552,49 @@ def show_consultants_list():
             # Actions sur sélection
             if event.selection.rows:
                 selected_row = event.selection.rows[0]
-                selected_id = consultants_data[selected_row]["ID"]
-                selected_name = f"{
-                    consultants_data[selected_row]['Prénom']} {
-                    consultants_data[selected_row]['Nom']}"
+                # Vérifier que l'index est valide
+                if selected_row < len(consultants_data):
+                    selected_id = consultants_data[selected_row]["ID"]
+                    selected_name = f"{
+                        consultants_data[selected_row]['Prénom']} {
+                        consultants_data[selected_row]['Nom']}"
 
-                st.success(f"✅ Consultant sélectionné : **{selected_name}**")
+                    st.success(f"✅ Consultant sélectionné : **{selected_name}**")
 
-                col1, col2, col3 = st.columns(3)
+                    col1, col2, col3 = st.columns(3)
 
-                with col1:
-                    if st.button(
-                        "👁️ Voir le profil",
-                        type="primary",
-                        use_container_width=True,
-                        key=f"view_{selected_id}",
-                    ):
-                        st.session_state.view_consultant_profile = selected_id
-                        st.rerun()
-
-                with col2:
-                    if st.button(
-                        "✏️ Modifier",
-                        use_container_width=True,
-                        key=f"edit_{selected_id}",
-                    ):
-                        st.session_state.view_consultant_profile = selected_id
-                        st.rerun()
-
-                with col3:
-                    if st.button(
-                        "🗑️ Supprimer",
-                        use_container_width=True,
-                        key=f"delete_{selected_id}",
-                    ):
-                        if ConsultantService.delete_consultant(selected_id):
-                            st.success("✅ Consultant supprimé !")
+                    with col1:
+                        if st.button(
+                            "👁️ Voir le profil",
+                            type="primary",
+                            use_container_width=True,
+                            key=f"view_{selected_id}",
+                        ):
+                            st.session_state.view_consultant_profile = selected_id
                             st.rerun()
-                        else:
-                            st.error("❌ Erreur lors de la suppression")
+
+                    with col2:
+                        if st.button(
+                            "✏️ Modifier",
+                            use_container_width=True,
+                            key=f"edit_{selected_id}",
+                        ):
+                            st.session_state.view_consultant_profile = selected_id
+                            st.rerun()
+
+                    with col3:
+                        if st.button(
+                            "🗑️ Supprimer",
+                            use_container_width=True,
+                            key=f"delete_{selected_id}",
+                        ):
+                            if ConsultantService.delete_consultant(selected_id):
+                                st.success("✅ Consultant supprimé !")
+                                st.rerun()
+                            else:
+                                st.error("❌ Erreur lors de la suppression")
+                else:
+                    st.error("❌ Erreur: Index de consultant invalide")
 
             # Métriques générales
             st.markdown("---")
@@ -1604,10 +1615,9 @@ def show_consultants_list():
 
             with col4:
                 if len(consultants) > 0:
-                    salaire_moyen = (
-                        sum(c.get("salaire_actuel", 0) or 0 for c in consultants)
-                        / len(consultants)
-                    )
+                    salaire_moyen = sum(
+                        c.get("salaire_actuel", 0) or 0 for c in consultants
+                    ) / len(consultants)
                 else:
                     salaire_moyen = 0
                 st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
@@ -1760,7 +1770,12 @@ def show_add_consultant_form():
                         else:
                             st.error("❌ Erreur lors de la création")
 
-                    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
+                    except (
+                        SQLAlchemyError,
+                        ValueError,
+                        TypeError,
+                        AttributeError,
+                    ) as e:
                         st.error(f"❌ Erreur lors de la création: {e}")
 
 
@@ -2231,7 +2246,7 @@ def extract_original_filename(full_filename):
 
         for i, part in enumerate(remaining_parts):
             # Vérifier si cette partie ressemble à un timestamp YYYYMMDD
-            if len(part) == 8 and part.isdigit() and part.startswith(('20', '19')):
+            if len(part) == 8 and part.isdigit() and part.startswith(("20", "19")):
                 # C'est probablement un timestamp, arrêter ici
                 original_parts = remaining_parts[:i]
                 timestamp_found = True

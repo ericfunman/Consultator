@@ -28,7 +28,7 @@ st.subheader("2. Existence des fichiers")
 files_to_check = [
     "database/models.py",
     "database/database.py",
-    "pages_modules/business_managers_simple.py"
+    "pages_modules/business_managers_simple.py",
 ]
 
 for file_path in files_to_check:
@@ -42,6 +42,7 @@ st.subheader("3. Test des imports")
 try:
     st.write("Test import database.models...")
     from database.models import BusinessManager
+
     st.success("✅ database.models importé")
 except Exception as e:
     st.error(f"❌ Erreur database.models: {e}")
@@ -49,6 +50,7 @@ except Exception as e:
 try:
     st.write("Test import database.database...")
     from database.database import get_database_session
+
     st.success("✅ database.database importé")
 except Exception as e:
     st.error(f"❌ Erreur database.database: {e}")
@@ -56,6 +58,7 @@ except Exception as e:
 try:
     st.write("Test import pages_modules...")
     from pages_modules import business_managers_simple
+
     st.success("✅ pages_modules.business_managers_simple importé")
 except Exception as e:
     st.error(f"❌ Erreur pages_modules: {e}")
@@ -74,4 +77,5 @@ try:
 except Exception as e:
     st.error(f"❌ Erreur DB: {e}")
     import traceback
+
     st.code(traceback.format_exc())

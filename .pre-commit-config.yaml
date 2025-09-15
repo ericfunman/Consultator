@@ -26,6 +26,19 @@ repos:
       - id: flake8
         args: [--max-line-length=88]
 
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ["-r", "app/"]
+        exclude: ^tests/
+
+  - repo: https://github.com/rubik/radon
+    rev: 6.0.0
+    hooks:
+      - id: radon
+        args: ["cc", "--min", "C", "--show-complexity"]
+
   - repo: local
     hooks:
       - id: pylint
@@ -34,6 +47,14 @@ repos:
         language: system
         files: \.py$
         args: [--rcfile=.pylintrc, --reports=no, --score=no]
+
+      - id: pytest
+        name: pytest
+        entry: python -m pytest
+        language: system
+        pass_filenames: false
+        args: ["tests/", "-v", "--tb=short", "--cov=app", "--cov-report=term-missing"]
+        files: ^(tests/|app/)
 
 exclude: |
   (?x)^(

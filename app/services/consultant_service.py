@@ -596,14 +596,27 @@ class ConsultantService:
                 print(f"❌ Format d'email invalide: {email}")
                 return False
 
+            # Vérifier l'unicité de l'email
+            with get_database_session() as session:
+                existing_consultant = (
+                    session.query(Consultant)
+                    .filter(Consultant.email == email.lower())
+                    .first()
+                )
+                if existing_consultant:
+                    print(f"❌ Email déjà utilisé: {email}")
+                    return False
+
             with get_database_session() as session:
                 consultant = Consultant(
                     prenom=data.get("prenom").strip(),
                     nom=data.get("nom").strip(),
                     email=email.lower(),
-                    telephone=data.get("telephone", "").strip()
-                    if data.get("telephone")
-                    else None,
+                    telephone=(
+                        data.get("telephone", "").strip()
+                        if data.get("telephone")
+                        else None
+                    ),
                     salaire_actuel=data.get("salaire"),
                     practice_id=data.get("practice_id"),
                     disponibilite=data.get("disponible", True),
@@ -728,7 +741,9 @@ class ConsultantService:
                 return True
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"❌ Erreur lors de la suppression du consultant {consultant_id}: {e}")
+            print(
+                f"❌ Erreur lors de la suppression du consultant {consultant_id}: {e}"
+            )
             print(f"Type d'erreur: {type(e).__name__}")
             import traceback
 

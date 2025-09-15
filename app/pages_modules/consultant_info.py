@@ -121,7 +121,9 @@ def show_consultant_info(consultant):
                 st.rerun()
 
         with col2:
-            if st.button("💰 Historique salaire", key=f"salary_history_{consultant.id}"):
+            if st.button(
+                "💰 Historique salaire", key=f"salary_history_{consultant.id}"
+            ):
                 st.session_state.show_salary_history = consultant.id
                 st.rerun()
 

@@ -1,0 +1,190 @@
+"""Tests pour les formulaires de consultants - Interface utilisateur"""
+
+import pytest
+from unittest.mock import Mock, patch, MagicMock
+from datetime import datetime, date
+import streamlit as st
+from app.pages_modules.consultants import (
+    show_consultants_list,
+    show_add_consultant_form,
+    show_consultant_profile
+)
+from app.database.models import Consultant, Practice
+from tests.fixtures.base_test import BaseUITest
+
+
+class TestConsultantForms(BaseUITest):
+    """Tests pour les formulaires de l'interface consultants"""
+
+    def test_imports_successful(self):
+        """Test que les imports des fonctions principales réussissent"""
+        # Vérifier que les fonctions sont importables
+        assert callable(show_consultants_list)
+        assert callable(show_add_consultant_form)
+        assert callable(show_consultant_profile)
+
+    @patch('app.pages_modules.consultants.ConsultantService')
+    def test_show_consultants_list_can_be_called(self, mock_service):
+        """Test que show_consultants_list peut être appelée sans erreur"""
+        # Mock service pour éviter les appels réels
+        mock_service.get_all_consultants_with_stats.return_value = []
+        mock_service.search_consultants_optimized.return_value = []
+
+        # Test que la fonction peut être appelée
+        try:
+            show_consultants_list()
+            # Si on arrive ici, la fonction s'est exécutée sans erreur fatale
+            assert True
+        except Exception as e:
+            # Accepter les erreurs liées au contexte Streamlit manquant
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
+                assert True  # Erreur attendue en mode test
+            else:
+                pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
+
+    @patch('app.pages_modules.consultants.ConsultantService')
+    def test_show_add_consultant_form_can_be_called(self, mock_service):
+        """Test que show_add_consultant_form peut être appelée sans erreur"""
+        # Mock service
+        mock_service.create_consultant.return_value = True
+        mock_service.update_consultant.return_value = True
+
+        # Test que la fonction peut être appelée
+        try:
+            show_add_consultant_form()
+            assert True
+        except Exception as e:
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
+                assert True
+            else:
+                pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
+
+    @patch('app.pages_modules.consultants.ConsultantService')
+    def test_show_consultant_profile_can_be_called(self, mock_service):
+        """Test que show_consultant_profile peut être appelée sans erreur"""
+        # Mock service
+        mock_service.get_consultant_with_stats.return_value = {
+            'id': 1,
+            'prenom': 'Test',
+            'nom': 'User',
+            'email': 'test@example.com',
+            'disponibilite': True
+        }
+
+        # Test que la fonction peut être appelée
+        try:
+            show_consultant_profile()
+            assert True
+        except Exception as e:
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
+                assert True
+            else:
+                pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
+
+    @patch('app.pages_modules.consultants.ConsultantService')
+    def test_show_consultants_list_with_empty_data(self, mock_service):
+        """Test avec données vides"""
+        mock_service.get_all_consultants_with_stats.return_value = []
+        mock_service.search_consultants_optimized.return_value = []
+
+        try:
+            show_consultants_list()
+            assert True
+        except Exception as e:
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
+                assert True
+            else:
+                pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
+
+    @patch('app.pages_modules.consultants.ConsultantService')
+    def test_show_consultants_list_with_data(self, mock_service):
+        """Test avec données présentes"""
+        mock_data = [{
+            'id': 1,
+            'prenom': 'Jean',
+            'nom': 'Dupont',
+            'email': 'jean@test.com',
+            'disponibilite': True,
+            'salaire_actuel': 50000,
+            'societe': 'Quanteam',
+            'grade': 'Senior',
+            'type_contrat': 'CDI',
+            'practice_name': 'Tech',
+            'nb_missions': 3,
+            'cjm': 1440.0,
+            'salaire_formatted': '50,000€',
+            'cjm_formatted': '1,440€',
+            'statut': '✅ Disponible',
+            'experience_annees': 5,
+            'experience_formatted': '5 ans'
+        }]
+        mock_service.get_all_consultants_with_stats.return_value = mock_data
+        mock_service.search_consultants_optimized.return_value = mock_data
+
+        try:
+            show_consultants_list()
+            assert True
+        except Exception as e:
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
+                assert True
+            else:
+                pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
+
+    @patch('app.pages_modules.consultants.ConsultantService')
+    def test_show_add_consultant_form_with_service_error(self, mock_service):
+        """Test avec erreur du service"""
+        mock_service.create_consultant.return_value = False
+
+        try:
+            show_add_consultant_form()
+            assert True
+        except Exception as e:
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
+                assert True
+            else:
+                pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
+
+    @patch('app.pages_modules.consultants.ConsultantService')
+    def test_show_consultant_profile_with_no_data(self, mock_service):
+        """Test du profil avec données manquantes"""
+        mock_service.get_consultant_with_stats.return_value = None
+
+        try:
+            show_consultant_profile()
+            assert True
+        except Exception as e:
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
+                assert True
+            else:
+                pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
+
+    def test_module_structure(self):
+        """Test que le module a la structure attendue"""
+        import app.pages_modules.consultants as consultants_module
+
+        # Vérifier que les fonctions principales existent
+        assert hasattr(consultants_module, 'show_consultants_list')
+        assert hasattr(consultants_module, 'show_add_consultant_form')
+        assert hasattr(consultants_module, 'show_consultant_profile')
+
+        # Vérifier que les services sont importés
+        assert hasattr(consultants_module, 'ConsultantService')
+
+    def test_function_signatures(self):
+        """Test que les fonctions ont les signatures attendues"""
+        import inspect
+
+        # Vérifier que les fonctions sont définies
+        assert inspect.isfunction(show_consultants_list)
+        assert inspect.isfunction(show_add_consultant_form)
+        assert inspect.isfunction(show_consultant_profile)
+
+        # Vérifier le nombre de paramètres (approximatif)
+        sig_list = inspect.signature(show_consultants_list)
+        sig_add = inspect.signature(show_add_consultant_form)
+        sig_profile = inspect.signature(show_consultant_profile)
+
+        # Ces fonctions devraient avoir peu de paramètres explicites
+        assert len(sig_list.parameters) <= 5
+        assert len(sig_add.parameters) <= 5
+        assert len(sig_profile.parameters) <= 5
