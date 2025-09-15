@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1757917879559,
+  "lastUpdate": 1757928539549,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -1526,6 +1526,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014519066861691013",
             "extra": "mean: 5.089284751270232 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "2c1c2607f6abe6a7e7f982dcf8d67e24bdce9279",
+          "message": " Fix: Corrections critiques pour Business Managers et Practices\n\n Corrections apportées:\n- Fix erreur 'str' object cannot be interpreted as an integer dans business_managers.py\n- Correction des imports absolus (app.database.database au lieu de database.database)\n- Remplacement de get_session() par get_database_session() dans tous les modules\n- Garantie que les IDs sont des entiers avec int(bm.id) dans les services\n- Fix requête SQL: consultant_competences au lieu de competences dans practice_service_optimized.py\n\n Données de test:\n- Correction génération 1000 consultants avec emails uniques (compteur incrémental)\n- Nouveau script create_basic_test_data.py pour génération rapide de données de test\n- Scripts fonctionnels avec toutes les relations (consultants, missions, CVs, compétences)\n\n Impact:\n- Navigation Business Managers maintenant fonctionnelle\n- Pages Practices accessibles sans erreur SQL\n- Base de données avec 1000 consultants, 12433 missions, 1986 CVs\n- Application stable et opérationnelle",
+          "timestamp": "2025-09-15T11:24:43+02:00",
+          "tree_id": "5abfef29d2fb1eba5b85115a1f561adce5b4b5fa",
+          "url": "https://github.com/ericfunman/Consultator/commit/2c1c2607f6abe6a7e7f982dcf8d67e24bdce9279"
+        },
+        "date": 1757928539016,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.6619200276491,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001505077898916033",
+            "extra": "mean: 1.0619522556148793 msec\nrounds: 935"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 279174.62100568245,
+            "unit": "iter/sec",
+            "range": "stddev: 5.187317923185793e-7",
+            "extra": "mean: 3.5819874901151767 usec\nrounds: 107435"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158191.2603558258,
+            "unit": "iter/sec",
+            "range": "stddev: 7.698011717769505e-7",
+            "extra": "mean: 6.321461740368342 usec\nrounds: 104745"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 34548.775925692695,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000016794999272954902",
+            "extra": "mean: 28.944585537582988 usec\nrounds: 22873"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.59182641701062,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000013908124804513295",
+            "extra": "mean: 5.086681467004634 msec\nrounds: 197"
           }
         ]
       }
