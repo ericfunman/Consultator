@@ -36,7 +36,7 @@ class TestPracticeService:
             mock_ordered = MagicMock()
             mock_ordered.all.return_value = [mock_practice1, mock_practice2]
             mock_filtered.order_by.return_value = mock_ordered
-            mock_session_instance.query.return_value.filter_by.return_value = mock_filtered  # Fix: use filter_by instead of filter
+            mock_session_instance.query.return_value.filter_by.return_value = mock_filtered
 
             # Test
             result = PracticeService.get_all_practices()
@@ -112,7 +112,7 @@ class TestPracticeService:
             # Mock query pour vérifier existence (retourne None = n'existe pas)
             mock_filtered = MagicMock()
             mock_filtered.first.return_value = None
-            mock_session_instance.query.return_value.filter.return_value = mock_filtered
+            mock_session_instance.query.return_value.filter_by.return_value = mock_filtered
 
             # Test
             result = PracticeService.create_practice("New Practice", "Description", "Responsable")
@@ -137,10 +137,10 @@ class TestPracticeService:
             mock_practice.id = 1
             mock_practice.nom = "Old Name"
 
-        # Mock query
-        mock_filtered = MagicMock()
-        mock_filtered.first.return_value = mock_practice
-        mock_session_instance.query.return_value.filter_by.return_value = mock_filtered  # Fix: use filter_by
+            # Mock query
+            mock_filtered = MagicMock()
+            mock_filtered.first.return_value = mock_practice
+            mock_session_instance.query.return_value.filter_by.return_value = mock_filtered
 
         # Test
         result = PracticeService.update_practice(1, nom="New Name", description="New Description")
@@ -171,8 +171,10 @@ class TestPracticeService:
             mock_practice2.responsable = "Jane Smith"
 
             # Mock queries
-            mock_session_instance.query.return_value.filter.return_value.all.return_value = [mock_practice1, mock_practice2]
-            mock_session_instance.query.return_value.filter.return_value.count.side_effect = [5, 3, 2, 1]
+            mock_query = MagicMock()
+            mock_query.filter.return_value.all.return_value = [mock_practice1, mock_practice2]
+            mock_query.filter.return_value.count.side_effect = [5, 3, 2, 1]
+            mock_session_instance.query.return_value = mock_query
 
             # Test
             result = PracticeService.get_practice_statistics()
@@ -340,7 +342,7 @@ class TestPracticeService:
 
         # Mock query qui trouve une practice existante
         mock_query = MagicMock()
-        mock_query.filter.return_value.first.return_value = mock_existing
+        mock_query.filter_by.return_value.first.return_value = mock_existing
         mock_session_instance.query.return_value = mock_query
 
         # Test
@@ -366,7 +368,7 @@ class TestPracticeService:
 
         # Mock query
         mock_query = MagicMock()
-        mock_query.filter.return_value.first.return_value = mock_practice
+        mock_query.filter_by.return_value.first.return_value = mock_practice
         mock_session_instance.query.return_value = mock_query
 
         # Mock commit
@@ -421,7 +423,7 @@ class TestPracticeService:
 
         # Mock queries
         mock_query = MagicMock()
-        mock_query.filter.return_value.first.side_effect = [mock_consultant, mock_practice]
+        mock_query.filter_by.return_value.first.side_effect = [mock_consultant, mock_practice]
         mock_session_instance.query.return_value = mock_query
 
         # Mock commit
@@ -451,7 +453,7 @@ class TestPracticeService:
 
         # Mock query pour consultant seulement (pas de practice)
         mock_query = MagicMock()
-        mock_query.filter.return_value.first.side_effect = [mock_consultant, None]
+        mock_query.filter_by.return_value.first.side_effect = [mock_consultant, None]
         mock_session_instance.query.return_value = mock_query
 
         # Mock commit
@@ -512,7 +514,7 @@ class TestPracticeService:
 
         # Mock query qui retourne liste vide (aucune practice existante)
         mock_query = MagicMock()
-        mock_query.all.return_value = []
+        mock_query.filter.return_value.all.return_value = []
         mock_session_instance.query.return_value = mock_query
 
         # Mock add et commit
@@ -540,7 +542,7 @@ class TestPracticeService:
         # Mock query qui retourne practices existantes
         mock_existing = Mock()
         mock_query = MagicMock()
-        mock_query.all.return_value = [mock_existing]  # Au moins une practice existe
+        mock_query.filter.return_value.all.return_value = [mock_existing]  # Au moins une practice existe
         mock_session_instance.query.return_value = mock_query
 
         # Test

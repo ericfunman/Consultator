@@ -116,7 +116,8 @@ def show_practice_overview_optimized():
 
         # Graphiques optimisés
         if len(df_practices) > 0:
-            col1, col2 = st.columns(2)
+            cols = st.columns(2)
+            col1, col2 = cols[0], cols[1]
 
             with col1:
                 st.subheader("📈 Répartition des Consultants")
@@ -437,7 +438,8 @@ def show_create_practice_form_optimized():
     st.markdown("#### ➕ Créer une nouvelle Practice")
 
     with st.form("create_practice_form"):
-        col1, col2 = st.columns(2)
+        cols = st.columns(2)
+        col1, col2 = cols[0], cols[1]
 
         with col1:
             nom = st.text_input(
@@ -493,7 +495,8 @@ def show_edit_practice_form_optimized(practices_cached: list):
         practice = practice_options[selected_name]
 
         with st.form(f"edit_practice_form_{practice['id']}"):
-            col1, col2 = st.columns(2)
+            cols = st.columns(2)
+            col1, col2 = cols[0], cols[1]
 
             with col1:
                 new_nom = st.text_input("Nom de la Practice *", value=practice["nom"])

@@ -273,8 +273,22 @@ class TestShowFunction(BaseUITest):
         mock_st.dataframe = MagicMock()
         mock_st.bar_chart = MagicMock()
         mock_st.info = MagicMock()
-        mock_st.selectbox = MagicMock(return_value="Data Engineering")
+        mock_st.selectbox = MagicMock()
         mock_st.button = MagicMock(return_value=False)
+
+        # Configure selectbox to return different values based on call arguments
+        selectbox_call_count = 0
+        def selectbox_side_effect(*args, **kwargs):
+            nonlocal selectbox_call_count
+            selectbox_call_count += 1
+            if "par page" in str(args):
+                return 25
+            elif "Filtrer par Practice" in str(args):
+                return "Toutes"
+            else:
+                return "Data Engineering"
+
+        mock_st.selectbox.side_effect = selectbox_side_effect
 
         # Mock PracticeServiceOptimized to return serializable data
         with patch('app.pages_modules.practices.PracticeServiceOptimized') as mock_service:
@@ -286,6 +300,8 @@ class TestShowFunction(BaseUITest):
                     {"nom": "Data Science", "total_consultants": 5, "consultants_actifs": 3}
                 ]
             }
+            mock_service.get_all_practices_cached.return_value = SAMPLE_PRACTICES
+            mock_service.get_consultants_by_practice_paginated.return_value = (SAMPLE_CONSULTANTS, len(SAMPLE_CONSULTANTS))
 
             # Execute
             show()
@@ -333,8 +349,22 @@ class TestShowFunction(BaseUITest):
         mock_st.dataframe = MagicMock()
         mock_st.bar_chart = MagicMock()
         mock_st.info = MagicMock()
-        mock_st.selectbox = MagicMock(return_value="Data Engineering")
+        mock_st.selectbox = MagicMock()
         mock_st.button = MagicMock(return_value=False)
+
+        # Configure selectbox to return different values based on call arguments
+        selectbox_call_count = 0
+        def selectbox_side_effect(*args, **kwargs):
+            nonlocal selectbox_call_count
+            selectbox_call_count += 1
+            if "par page" in str(args):
+                return 25
+            elif "Filtrer par Practice" in str(args):
+                return "Toutes"
+            else:
+                return "Data Engineering"
+
+        mock_st.selectbox.side_effect = selectbox_side_effect
 
         # Mock PracticeServiceOptimized to return serializable data
         with patch('app.pages_modules.practices.PracticeServiceOptimized') as mock_service:
@@ -346,6 +376,8 @@ class TestShowFunction(BaseUITest):
                     {"nom": "Data Science", "total_consultants": 5, "consultants_actifs": 3}
                 ]
             }
+            mock_service.get_all_practices_cached.return_value = SAMPLE_PRACTICES
+            mock_service.get_consultants_by_practice_paginated.return_value = (SAMPLE_CONSULTANTS, len(SAMPLE_CONSULTANTS))
 
             # Execute
             show()
@@ -365,7 +397,7 @@ class TestShowPracticeOverviewOptimized(BaseUITest):
 
         # Mock UI components
         mock_st.spinner = MagicMock()
-        mock_st.columns = MagicMock(side_effect=lambda *args: [MagicMock() for _ in range(len(args[0]) if len(args) == 1 and isinstance(args[0], list) else (args[0] if len(args) == 1 and isinstance(args[0], int) else 3))])
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
         mock_st.metric = MagicMock()
         mock_st.markdown = MagicMock()
         mock_st.subheader = MagicMock()
@@ -433,7 +465,7 @@ class TestShowConsultantsByPracticeOptimized(BaseUITest):
         mock_consultants = SAMPLE_CONSULTANTS
 
         mock_service.get_all_practices_cached.return_value = mock_practices
-        mock_service.get_consultants_by_practice_paginated.return_value = (mock_consultants, 1)
+        mock_service.get_consultants_by_practice_paginated.return_value = (mock_consultants, len(mock_consultants))
 
         # Mock session state
         class MockSessionState(dict):
@@ -457,7 +489,7 @@ class TestShowConsultantsByPracticeOptimized(BaseUITest):
         mock_st.session_state = mock_session_state
 
         # Mock UI components
-        mock_st.selectbox = MagicMock(return_value="Toutes")
+        mock_st.selectbox = MagicMock()
         mock_st.button = MagicMock(return_value=False)
         mock_st.spinner = MagicMock()
         mock_st.info = MagicMock()
@@ -468,10 +500,21 @@ class TestShowConsultantsByPracticeOptimized(BaseUITest):
         mock_st.code = MagicMock()
         mock_st.success = MagicMock()
         mock_st.warning = MagicMock()
-        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])  # Fix: return exactly 3 columns
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
 
-        # Mock selectbox to return int for per_page
-        mock_st.selectbox.side_effect = lambda *args, **kwargs: 25 if "par page" in str(args) else "Toutes"
+        # Configure selectbox to return different values based on call arguments
+        selectbox_call_count = 0
+        def selectbox_side_effect(*args, **kwargs):
+            nonlocal selectbox_call_count
+            selectbox_call_count += 1
+            if "par page" in str(args):
+                return 25
+            elif "Filtrer par Practice" in str(args):
+                return "Toutes"
+            else:
+                return "Toutes"
+
+        mock_st.selectbox.side_effect = selectbox_side_effect
 
         # Execute
         show_consultants_by_practice_optimized()
@@ -488,11 +531,25 @@ class TestShowConsultantsByPracticeOptimized(BaseUITest):
         mock_service.get_all_practices_cached.return_value = []
         mock_service.get_consultants_by_practice_paginated.return_value = ([], 0)
 
-        mock_st.selectbox = MagicMock(return_value="Toutes")
+        mock_st.selectbox = MagicMock()
         mock_st.button = MagicMock(return_value=False)
         mock_st.spinner = MagicMock()
         mock_st.info = MagicMock()
-        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])  # Fix: return exactly 3 columns
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
+
+        # Configure selectbox to return different values based on call arguments
+        selectbox_call_count = 0
+        def selectbox_side_effect(*args, **kwargs):
+            nonlocal selectbox_call_count
+            selectbox_call_count += 1
+            if "par page" in str(args):
+                return 25
+            elif "Filtrer par Practice" in str(args):
+                return "Toutes"
+            else:
+                return "Toutes"
+
+        mock_st.selectbox.side_effect = selectbox_side_effect
 
         # Execute
         show_consultants_by_practice_optimized()
@@ -516,7 +573,7 @@ class TestShowPracticeConsultantsOptimized(BaseUITest):
         mock_st.dataframe = MagicMock()
         mock_st.expander = MagicMock()
         mock_st.button = MagicMock(return_value=False)
-        mock_st.columns = MagicMock(side_effect=lambda *args: [MagicMock() for _ in range(args[0] if len(args) == 1 and isinstance(args[0], int) else (sum(args[0]) if len(args) == 1 and isinstance(args[0], list) else 3))])
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
         mock_st.metric = MagicMock()
 
         # Execute
@@ -551,7 +608,7 @@ class TestShowPracticeDetailedStatsCached(BaseUITest):
 
         mock_st.subheader = MagicMock()
         mock_st.spinner = MagicMock()
-        mock_st.columns = MagicMock(side_effect=lambda *args: [MagicMock() for _ in range(args[0] if len(args) == 1 and isinstance(args[0], int) else (sum(args[0]) if len(args) == 1 and isinstance(args[0], list) else 3))])
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock(), MagicMock()])
         mock_st.metric = MagicMock()
 
         # Execute
@@ -593,6 +650,20 @@ class TestShowPracticeManagementOptimized(BaseUITest):
         with patch('app.pages_modules.practices.ConsultantService') as mock_consultant_service:
             mock_consultant_service.get_all_consultants.return_value = SAMPLE_CONSULTANTS
 
+            # Mock selectbox for the assign form - configure to return different values
+            selectbox_call_count = 0
+            def selectbox_side_effect(*args, **kwargs):
+                nonlocal selectbox_call_count
+                selectbox_call_count += 1
+                if "Sélectionner le consultant" in str(args):
+                    return "Jean Dupont (jean.dupont@email.com)"
+                elif "Nouvelle practice" in str(args):
+                    return "Data Engineering"
+                else:
+                    return "Data Engineering"
+
+            mock_st.selectbox.side_effect = selectbox_side_effect
+
             # Execute
             show_practice_management_optimized()
 
@@ -607,7 +678,7 @@ class TestShowCreatePracticeFormOptimized(BaseUITest):
         """Test affichage formulaire de création"""
         mock_st.markdown = MagicMock()
         mock_st.form = MagicMock()
-        mock_st.columns = MagicMock(side_effect=lambda *args: [MagicMock() for _ in range(args[0] if len(args) == 1 and isinstance(args[0], int) else (sum(args[0]) if len(args) == 1 and isinstance(args[0], list) else 3))])
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock()])
         mock_st.text_input = MagicMock(return_value="")
         mock_st.text_area = MagicMock(return_value="")
         mock_st.form_submit_button = MagicMock(return_value=False)
@@ -628,7 +699,7 @@ class TestShowCreatePracticeFormOptimized(BaseUITest):
 
             mock_st.markdown = MagicMock()
             mock_st.form = MagicMock()
-            mock_st.columns = MagicMock(side_effect=lambda *args: [MagicMock() for _ in range(args[0] if len(args) == 1 and isinstance(args[0], int) else (sum(args[0]) if len(args) == 1 and isinstance(args[0], list) else 3))])
+            mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock()])
             mock_st.text_input = MagicMock(return_value="Test Practice")
             mock_st.text_area = MagicMock(return_value="Description test")
             mock_st.form_submit_button = MagicMock(return_value=True)
@@ -648,7 +719,7 @@ class TestShowCreatePracticeFormOptimized(BaseUITest):
         """Test validation formulaire de création"""
         mock_st.markdown = MagicMock()
         mock_st.form = MagicMock()
-        mock_st.columns = MagicMock(side_effect=lambda *args: [MagicMock() for _ in range(args[0] if len(args) == 1 and isinstance(args[0], int) else (sum(args[0]) if len(args) == 1 and isinstance(args[0], list) else 3))])
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock()])
         mock_st.text_input = MagicMock(return_value="")  # Empty name
         mock_st.text_area = MagicMock(return_value="")
         mock_st.form_submit_button = MagicMock(return_value=True)
@@ -684,9 +755,9 @@ class TestShowEditPracticeFormOptimized(BaseUITest):
             mock_practice_service.update_practice.return_value = True
 
             mock_st.markdown = MagicMock()
-            mock_st.selectbox = MagicMock(return_value="Cloud & DevOps")  # Fix: use existing practice name from SAMPLE_PRACTICES
+            mock_st.selectbox = MagicMock(return_value="Data Engineering")
             mock_st.form = MagicMock()
-            mock_st.columns = MagicMock(side_effect=lambda *args: [MagicMock() for _ in range(args[0] if len(args) == 1 and isinstance(args[0], int) else (sum(args[0]) if len(args) == 1 and isinstance(args[0], list) else 3))])
+            mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock()])
             mock_st.text_input = MagicMock(side_effect=["New DevOps", "New Responsable"])
             mock_st.text_area = MagicMock(return_value="New description")
             mock_st.checkbox = MagicMock(return_value=True)
@@ -738,7 +809,7 @@ class TestShowAssignConsultantFormOptimized(BaseUITest):
             mock_practice_service.assign_consultant_to_practice.return_value = True
 
             mock_st.markdown = MagicMock()
-            mock_st.selectbox = MagicMock(side_effect=["Jean Dupont (jean.dupont@email.com)", "Cloud & DevOps"])  # Fix: use correct email format and existing practice
+            mock_st.selectbox = MagicMock(side_effect=["Jean Dupont (jean.dupont@email.com)", "Data Engineering"])
             mock_st.info = MagicMock()
             mock_st.button = MagicMock(return_value=True)
             mock_st.success = MagicMock()

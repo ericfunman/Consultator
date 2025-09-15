@@ -112,7 +112,12 @@ class ConsultantService:
     @staticmethod
     @st.cache_data(ttl=300)  # Cache pendant 5 minutes
     def search_consultants_optimized(
-        search_term: str, page: int = 1, per_page: int = 50
+        search_term: str, 
+        page: int = 1, 
+        per_page: int = 50,
+        practice_filter: Optional[str] = None,
+        grade_filter: Optional[str] = None,
+        availability_filter: Optional[bool] = None
     ) -> List[Dict]:
         """Recherche optimisée avec cache pour de gros volumes - avec statistiques intégrées"""
         try:
@@ -140,6 +145,16 @@ class ConsultantService:
                     .outerjoin(Practice, Consultant.practice_id == Practice.id)
                     .outerjoin(Mission, Consultant.id == Mission.consultant_id)
                 )
+
+                # Appliquer les filtres
+                if practice_filter:
+                    query = query.filter(Practice.nom == practice_filter)
+                
+                if grade_filter:
+                    query = query.filter(Consultant.grade == grade_filter)
+                
+                if availability_filter is not None:
+                    query = query.filter(Consultant.disponibilite == availability_filter)
 
                 if search_term:
                     search_filter = f"%{search_term}%"
@@ -234,7 +249,13 @@ class ConsultantService:
 
     @staticmethod
     @st.cache_data(ttl=300)  # Cache pendant 5 minutes
-    def get_all_consultants_with_stats(page: int = 1, per_page: int = 50) -> List[Dict]:
+    def get_all_consultants_with_stats(
+        page: int = 1, 
+        per_page: int = 50,
+        practice_filter: Optional[str] = None,
+        grade_filter: Optional[str] = None,
+        availability_filter: Optional[bool] = None
+    ) -> List[Dict]:
         """
         Récupère tous les consultants avec leurs statistiques en une seule requête optimisée
         Résout le problème N+1 des requêtes pour compter les missions
@@ -265,7 +286,20 @@ class ConsultantService:
                     )
                     .outerjoin(Practice, Consultant.practice_id == Practice.id)
                     .outerjoin(Mission, Consultant.id == Mission.consultant_id)
-                    .group_by(
+                )
+
+                # Appliquer les filtres
+                if practice_filter:
+                    query = query.filter(Practice.nom == practice_filter)
+                
+                if grade_filter:
+                    query = query.filter(Consultant.grade == grade_filter)
+                
+                if availability_filter is not None:
+                    query = query.filter(Consultant.disponibilite == availability_filter)
+
+                query = (
+                    query.group_by(
                         Consultant.id,
                         Consultant.prenom,
                         Consultant.nom,
