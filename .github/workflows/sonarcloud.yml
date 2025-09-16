@@ -33,8 +33,15 @@ jobs:
         pytest --cov=app --cov-report=xml:reports/coverage.xml --cov-report=term-missing --cov-report=html:reports/htmlcov
       continue-on-error: true
 
+    - name: Setup SonarQube Scanner
+      run: |
+        dotnet tool install --global dotnet-sonarscanner
+
     - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        dotnet sonarscanner begin /k:"ericfunman_Consultator" /o:"ericfunman" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.python.coverage.reportPaths="reports/coverage.xml" /d:sonar.sources="app" /d:sonar.tests="tests" /d:sonar.exclusions="**/test_*.py,**/*_test.py,**/conftest.py,**/migrations/**"
+        dotnet build
+        dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
