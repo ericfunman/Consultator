@@ -3174,8 +3174,7 @@ def show_cv_skills(analysis):
         ):
             if competences:
                 st.success(
-                    f"✅ {
-                        len(competences)} compétence(s) prête(s) à être ajoutée(s)"
+                    f"✅ {len(competences)} compétence(s) prête(s) à être ajoutée(s)"
                 )
                 st.info(
                     "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement"

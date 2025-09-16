@@ -683,8 +683,7 @@ class ChatbotService:
                                     response += f"🏢 **Société :** {consultant_db.societe}\n"
 
                                 if consultant_db.date_entree_societe:
-                                    response += f"📅 **Date d'entrée société :** {
-                                        consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
+                                    response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
 
                                 # Calculer l'ancienneté dans la société
                                 if consultant_db.date_entree_societe:
