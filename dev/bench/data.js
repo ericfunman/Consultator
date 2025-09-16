@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758022986588,
+  "lastUpdate": 1758022987412,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -2466,6 +2466,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00001458038141869515",
             "extra": "mean: 5.091516444443214 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "f02a412f5cced96486e2664e4d6c76e6c7b3327e",
+          "message": "Fix SonarCloud scanner version for Java 11 compatibility\n\n- Downgrade sonar-scanner-cli from 4.8.0 to 4.7.0 (Java 11 compatible)\n- Version 4.8.0 requires Java 17, but GitHub Actions uses Java 11\n- This should resolve the UnsupportedClassVersionError",
+          "timestamp": "2025-09-16T13:38:31+02:00",
+          "tree_id": "02c64bc6cd40da8fc308bef86b2ed762432128e1",
+          "url": "https://github.com/ericfunman/Consultator/commit/f02a412f5cced96486e2664e4d6c76e6c7b3327e"
+        },
+        "date": 1758022986558,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.395730439472,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000017508568025116293",
+            "extra": "mean: 1.0622525338341717 msec\nrounds: 931"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 297929.8420289122,
+            "unit": "iter/sec",
+            "range": "stddev: 5.656609323081724e-7",
+            "extra": "mean: 3.3564949156820494 usec\nrounds: 106406"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 156931.6486776932,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000010438795651684322",
+            "extra": "mean: 6.372200944971933 usec\nrounds: 108144"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 31738.548611173548,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000004742242735225376",
+            "extra": "mean: 31.50742689122055 usec\nrounds: 26358"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.48953159328113,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000018031666213317102",
+            "extra": "mean: 5.089329654823171 msec\nrounds: 197"
           }
         ]
       }
