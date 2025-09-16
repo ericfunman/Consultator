@@ -148,8 +148,7 @@ def show_consultant_skills(consultant):
         with col2:
             if st.button(
                 "📊 Analyse compétences",
-                key=f"analyze_skills_{
-                    consultant.id}",
+                key=f"analyze_skills_{consultant.id}",
             ):
                 show_skills_analysis(consultant_competences)
 

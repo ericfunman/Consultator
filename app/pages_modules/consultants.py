@@ -1704,9 +1704,7 @@ def show_consultants_list_classic():
                 # Vérifier que l'index est valide
                 if selected_row < len(consultants_data):
                     selected_id = consultants_data[selected_row]["ID"]
-                    selected_name = f"{
-                        consultants_data[selected_row]['Prénom']} {
-                        consultants_data[selected_row]['Nom']}"
+                    selected_name = f"{consultants_data[selected_row]['Prénom']} {consultants_data[selected_row]['Nom']}"
 
                     st.success(f"✅ Consultant sélectionné : **{selected_name}**")
 

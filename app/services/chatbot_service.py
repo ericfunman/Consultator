@@ -594,9 +594,7 @@ class ChatbotService:
                         response += "\n⚠️ Attention : ce consultant est actuellement indisponible."
                 else:
                     if is_cjm_question:
-                        response = f"❓ Désolé, le CJM de **{
-                            consultant.prenom} {
-                            consultant.nom}** ne peut pas être calculé car le salaire n'est pas renseigné."
+                        response = f"❓ Désolé, le CJM de **{consultant.prenom} {consultant.nom}** ne peut pas être calculé car le salaire n'est pas renseigné."
                     else:
                         response = f"❓ Désolé, le salaire de **{
                             consultant.prenom} {
