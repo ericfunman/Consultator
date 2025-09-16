@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758029946954,
+  "lastUpdate": 1758029962813,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -4000,6 +4000,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00002155172857774369",
             "extra": "mean: 5.088499979695031 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "bef10f5c135e0580b109c70888413328c9df2cce",
+          "message": "fix: Corriger les erreurs de syntaxe f-string restantes\n\n- Correction de la f-string malformée dans chatbot_service.py ligne 675\n- Correction de la f-string malformée dans consultant_skills.py ligne 244\n- Correction de la f-string malformée dans consultants.py ligne 2851\n- Suppression définitive des fichiers de test corrompus\n- Nettoyage complet des caches pytest\n- Tests passent maintenant : 469 tests réussis\n\nToutes les erreurs de syntaxe f-string ont été résolues.",
+          "timestamp": "2025-09-16T15:33:47+02:00",
+          "tree_id": "c2b477ffec1c972d5f0a85bef066ba7dedd0e5d7",
+          "url": "https://github.com/ericfunman/Consultator/commit/bef10f5c135e0580b109c70888413328c9df2cce"
+        },
+        "date": 1758029961767,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.5229510349941,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000002395338932775085",
+            "extra": "mean: 1.062108999999122 msec\nrounds: 928"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 260485.65701443297,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000011611471020910848",
+            "extra": "mean: 3.8389829653637784 usec\nrounds: 117703"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 157193.79724751163,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001056080991239604",
+            "extra": "mean: 6.361574168384242 usec\nrounds: 75558"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33137.71929010967,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000003049514898899802",
+            "extra": "mean: 30.177091888712493 usec\nrounds: 27294"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.47203504254998,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001474682845972898",
+            "extra": "mean: 5.089782878176173 msec\nrounds: 197"
           }
         ]
       }
