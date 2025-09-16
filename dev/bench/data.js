@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758023526510,
+  "lastUpdate": 1758023573645,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -2820,6 +2820,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014196193296344333",
             "extra": "mean: 5.08914755329958 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "e68ad01e0db046894b910f3a98c995d3f3d3d39a",
+          "message": "Fix pypdf version requirement for Python 3.8 compatibility\n\n- Change pypdf>=6.0.0 to pypdf>=5.9.0 (version 6.0.0 doesn't exist)\n- Latest available version is 5.9.0, compatible with Python 3.8+\n- Resolves CI/CD pipeline failure in test job for Python 3.8",
+          "timestamp": "2025-09-16T13:47:48+02:00",
+          "tree_id": "d52fac764e8cbeeff6c6256d94f962314b3acee6",
+          "url": "https://github.com/ericfunman/Consultator/commit/e68ad01e0db046894b910f3a98c995d3f3d3d39a"
+        },
+        "date": 1758023572596,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 940.5503632985317,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000032628678564421834",
+            "extra": "mean: 1.0632072869473752 msec\nrounds: 927"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 287143.7920272743,
+            "unit": "iter/sec",
+            "range": "stddev: 5.269307803349113e-7",
+            "extra": "mean: 3.4825757260495296 usec\nrounds: 112524"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 145576.17811513107,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000002701215616160802",
+            "extra": "mean: 6.869255759751677 usec\nrounds: 75047"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33598.844591926194,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000002742449671980148",
+            "extra": "mean: 29.76292822403483 usec\nrounds: 25496"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 195.81465459083157,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000025669311537701203",
+            "extra": "mean: 5.106870076142003 msec\nrounds: 197"
           }
         ]
       }
