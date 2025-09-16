@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758020770604,
+  "lastUpdate": 1758022069789,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -2053,6 +2053,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00001578619554532993",
             "extra": "mean: 5.081381540401482 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "d928792c14b16532d2c92c830499ed69cf17eab0",
+          "message": " Correction SonarCloud - Configuration couverture de code\n\n Correction de l'intégration SonarCloud pour la couverture de code :\n\n1. **Workflow SonarCloud corrigé** :\n   - Génération du rapport XML dans \reports/coverage.xml (au lieu du répertoire racine)\n   - Ajout de mkdir -p reports pour s'assurer que le répertoire existe\n   - Génération du rapport HTML en complément\n   - Version Python alignée sur 3.10 (comme dans CI principal)\n\n2. **Dépendances de test ajoutées** :\n   - pytest-xdist pour l'exécution parallèle\n   - \faker pour les données de test\n\n3. **Configuration validée** :\n   - Rapport XML généré au bon endroit (\reports/coverage.xml)\n   - Compatible avec sonar.python.coverage.reportPaths=reports/coverage.xml\n   - Tests locaux :  couverture détectée et rapport généré\n\n Résultat attendu :\n- SonarCloud détectera maintenant la couverture de code (au lieu de 0%)\n- Métriques de couverture précises (~36% global)\n- Visibilité des zones couvertes/non couvertes par module\n\n Prochaine analyse SonarCloud devrait afficher la couverture correcte",
+          "timestamp": "2025-09-16T13:23:05+02:00",
+          "tree_id": "f939da1887252fc31b2cc48340a345e0fd9d90be",
+          "url": "https://github.com/ericfunman/Consultator/commit/d928792c14b16532d2c92c830499ed69cf17eab0"
+        },
+        "date": 1758022069189,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.2201676250929,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000002886143951162945",
+            "extra": "mean: 1.0624506724321703 msec\nrounds: 925"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 274504.4623444847,
+            "unit": "iter/sec",
+            "range": "stddev: 9.404667609043322e-7",
+            "extra": "mean: 3.6429280291446307 usec\nrounds: 114338"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158333.49542677632,
+            "unit": "iter/sec",
+            "range": "stddev: 9.105127015524798e-7",
+            "extra": "mean: 6.315783007913604 usec\nrounds: 77436"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 32671.26004653319,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000018386360723991192",
+            "extra": "mean: 30.60794100306247 usec\nrounds: 27459"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.44307915590198,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000015639163361103677",
+            "extra": "mean: 5.090533116752745 msec\nrounds: 197"
           }
         ]
       }
