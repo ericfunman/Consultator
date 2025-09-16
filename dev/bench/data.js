@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758024645477,
+  "lastUpdate": 1758024769050,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -3351,6 +3351,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014026273362568315",
             "extra": "mean: 5.0883564923856515 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "28fe37d31f62e5e3564b55ba3c790e0d57ec1689",
+          "message": "fix: Corriger le formatage des imports avec isort\n\n- Tri et formatage corrects des imports dans cache_service.py\n- Tri et formatage corrects des imports dans enhanced_ui.py\n- Tri et formatage corrects des imports dans consultants.py\n- Respect des standards de formatage pour éviter les erreurs CI/CD",
+          "timestamp": "2025-09-16T14:08:17+02:00",
+          "tree_id": "ab462b5ed69321c4e247ec5d6531997cce6b31af",
+          "url": "https://github.com/ericfunman/Consultator/commit/28fe37d31f62e5e3564b55ba3c790e0d57ec1689"
+        },
+        "date": 1758024768668,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.7039658562552,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000002087658694652617",
+            "extra": "mean: 1.0619048408601939 msec\nrounds: 930"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 288587.1037424064,
+            "unit": "iter/sec",
+            "range": "stddev: 5.262040257827774e-7",
+            "extra": "mean: 3.4651583076026937 usec\nrounds: 118554"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158368.42067735668,
+            "unit": "iter/sec",
+            "range": "stddev: 7.351144418828512e-7",
+            "extra": "mean: 6.314390177807581 usec\nrounds: 79656"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 32930.884577827695,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000018257725346993731",
+            "extra": "mean: 30.366630378137433 usec\nrounds: 27612"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.70861022452087,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014784913591849363",
+            "extra": "mean: 5.083661558376178 msec\nrounds: 197"
           }
         ]
       }
