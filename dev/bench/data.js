@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758023904392,
+  "lastUpdate": 1758023911107,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -3056,6 +3056,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000017331286006600738",
             "extra": "mean: 5.089049553298722 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "32f97c18c287b8684aeb7548e98942702851de4a",
+          "message": "Fix Black code formatting in cache_service.py\n\n- Reformatted long function parameters to multiple lines\n- Changed single quotes to double quotes for consistency\n- Added proper spacing and line breaks\n- Made code compliant with Black formatting standards\n- Resolves CI/CD quality check failure",
+          "timestamp": "2025-09-16T13:53:56+02:00",
+          "tree_id": "9b04aa998f76c7bea69c30fe0526c49affbb12b3",
+          "url": "https://github.com/ericfunman/Consultator/commit/32f97c18c287b8684aeb7548e98942702851de4a"
+        },
+        "date": 1758023910517,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.0325208550062,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000004299817157226368",
+            "extra": "mean: 1.0626625306120314 msec\nrounds: 931"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 287574.4371794108,
+            "unit": "iter/sec",
+            "range": "stddev: 5.233660643599232e-7",
+            "extra": "mean: 3.4773605394422598 usec\nrounds: 119532"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 160167.59902547483,
+            "unit": "iter/sec",
+            "range": "stddev: 7.036755068982168e-7",
+            "extra": "mean: 6.243460013663243 usec\nrounds: 78902"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33652.43197068822,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000017133793465958909",
+            "extra": "mean: 29.715534403903266 usec\nrounds: 27773"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.5739093427267,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000013592377793022963",
+            "extra": "mean: 5.0871451015226015 msec\nrounds: 197"
           }
         ]
       }
