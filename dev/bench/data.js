@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758022458903,
+  "lastUpdate": 1758022481109,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -2230,6 +2230,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000015961307447570974",
             "extra": "mean: 5.088351746199957 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "30e7147182ba7354f6bff841bbc7efb8cd562463",
+          "message": "Fix SonarCloud workflow: use .NET scanner CLI instead of GitHub action\n\n- Replace problematic GitHub action with direct .NET SonarScanner CLI\n- Configure proper coverage report path and project settings\n- Ensure SonarCloud can read coverage.xml from reports/ directory",
+          "timestamp": "2025-09-16T13:29:51+02:00",
+          "tree_id": "b703d2daacd5ab32267415e3648d2965233bbe76",
+          "url": "https://github.com/ericfunman/Consultator/commit/30e7147182ba7354f6bff841bbc7efb8cd562463"
+        },
+        "date": 1758022480598,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.2718594502345,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000024830106733789073",
+            "extra": "mean: 1.0623923258303574 msec\nrounds: 933"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 283716.29283896985,
+            "unit": "iter/sec",
+            "range": "stddev: 5.159840996198993e-7",
+            "extra": "mean: 3.5246477739915156 usec\nrounds: 129133"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 159084.75878189286,
+            "unit": "iter/sec",
+            "range": "stddev: 7.042386963636301e-7",
+            "extra": "mean: 6.285957295073202 usec\nrounds: 81747"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33370.60600360788,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000002134174133919444",
+            "extra": "mean: 29.966492064659676 usec\nrounds: 28543"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.42502231754054,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001626367291752568",
+            "extra": "mean: 5.09100107614294 msec\nrounds: 197"
           }
         ]
       }
