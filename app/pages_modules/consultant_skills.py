@@ -573,7 +573,7 @@ def show_skills_evolution(consultant_id: int):
                 session.query(ConsultantCompetence)
                 .join(Competence)
                 .filter(ConsultantCompetence.consultant_id == consultant_id)
-                .order_by(ConsultantCompetence.date_acquisition)
+                .order_by(ConsultantCompetence.date_ajout)
                 .all()
             )
 

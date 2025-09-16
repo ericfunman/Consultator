@@ -21,6 +21,8 @@ if parent_dir not in sys.path:
 ConsultantService = None
 get_database_session = None
 Consultant = None
+ConsultantLangue = None
+Langue = None
 imports_ok = False
 
 try:

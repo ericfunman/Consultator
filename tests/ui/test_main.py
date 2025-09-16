@@ -296,9 +296,9 @@ class TestMainModule(BaseUITest):
 
         # Les options devraient être définies dans la fonction
         # Ce test passe si la fonction peut être appelée sans erreur de configuration
-        with patch('streamlit.sidebar'):
-            with patch('streamlit_option_menu.option_menu') as mock_option_menu:
-                mock_option_menu.return_value = "🏠 Accueil"
+        with patch('streamlit.sidebar') as mock_sidebar, \
+             patch('streamlit_option_menu.option_menu') as mock_option_menu:
+            mock_option_menu.return_value = "🏠 Accueil"
 
-                result = main_module.show_navigation()
-                assert result == "home"
+            result = main_module.show_navigation()
+            assert result == "home"

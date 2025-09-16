@@ -1487,7 +1487,145 @@ def show_add_mission_form(consultant):
 
 
 def show_consultants_list():
-    """Affiche la liste des consultants avec interactions optimisée"""
+    """Affiche la liste des consultants avec interactions optimisée et filtres avancés"""
+
+    # Import des nouveaux composants UI
+    try:
+        from app.ui.enhanced_ui import (
+            AdvancedUIFilters,
+            RealTimeSearch,
+            DataTableEnhancer,
+            LoadingSpinner,
+            NotificationManager
+        )
+        enhanced_ui_available = True
+    except ImportError:
+        enhanced_ui_available = False
+        st.warning("⚠️ Composants UI avancés non disponibles. Utilisation du mode classique.")
+
+    if enhanced_ui_available:
+        # Utilisation des nouveaux composants améliorés
+        return show_consultants_list_enhanced()
+    else:
+        # Fallback vers l'ancienne méthode
+        return show_consultants_list_classic()
+
+
+def show_consultants_list_enhanced():
+    """Version améliorée de la liste des consultants avec filtres avancés"""
+
+    from app.ui.enhanced_ui import (
+        AdvancedUIFilters,
+        RealTimeSearch,
+        DataTableEnhancer,
+        LoadingSpinner,
+        NotificationManager
+    )
+
+    # Initialisation des composants
+    filters = AdvancedUIFilters()
+    search = RealTimeSearch()
+    enhancer = DataTableEnhancer()
+
+    # Titre principal
+    st.title("👥 Gestion des consultants - Version Améliorée")
+
+    # Recherche en temps réel
+    search_term = st.text_input(
+        "🔍 Recherche en temps réel",
+        placeholder="Tapez pour rechercher instantanément...",
+        help="La recherche se met à jour automatiquement pendant que vous tapez"
+    )
+
+    # Chargement des données avec cache
+    with LoadingSpinner.show_loading("Chargement des données..."):
+        try:
+            if search_term and search.should_search():
+                consultants = ConsultantService.search_consultants_optimized(search_term.strip())
+            else:
+                consultants = ConsultantService.get_all_consultants_with_stats()
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des données: {str(e)}")
+            return
+
+    # Appliquer les filtres avancés
+    if consultants:
+        # Convertir les données pour les filtres
+        consultants_data = []
+        for consultant in consultants:
+            consultants_data.append({
+                'id': consultant['id'],
+                'prenom': consultant['prenom'],
+                'nom': consultant['nom'],
+                'email': consultant['email'],
+                'societe': consultant['societe'],
+                'grade': consultant['grade'],
+                'type_contrat': consultant['type_contrat'],
+                'salaire_actuel': consultant.get('salaire_actuel', 0),
+                'disponibilite': consultant.get('disponibilite', False),
+                'practice_name': consultant.get('practice_name', ''),
+                'experience_annees': consultant.get('experience_annees', 0),
+                'nb_missions': consultant.get('nb_missions', 0),
+                'salaire_formatted': consultant.get('salaire_formatted', '0€'),
+                'cjm_formatted': consultant.get('cjm_formatted', '0€'),
+                'experience_formatted': consultant.get('experience_formatted', '0 ans'),
+                'statut': consultant.get('statut', 'N/A')
+            })
+
+        # Appliquer les filtres
+        filtered_data = filters.apply_filters(consultants_data)
+
+        # Afficher les métriques
+        if filtered_data:
+            col1, col2, col3, col4 = st.columns(4)
+
+            with col1:
+                st.metric("👥 Total filtré", len(filtered_data))
+
+            with col2:
+                disponibles = len([c for c in filtered_data if c.get('disponibilite', False)])
+                st.metric("✅ Disponibles", disponibles)
+
+            with col3:
+                st.metric("🔴 Occupés", len(filtered_data) - disponibles)
+
+            with col4:
+                salaire_moyen = sum(c.get('salaire_actuel', 0) for c in filtered_data) / len(filtered_data) if filtered_data else 0
+                st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
+
+        # Afficher le tableau amélioré
+        event = enhancer.render_enhanced_table(filtered_data, "consultants_enhanced")
+
+        # Gérer les actions sur la sélection
+        if event and event.selection.rows:
+            selected_idx = event.selection.rows[0]
+            if selected_idx < len(filtered_data):
+                selected_consultant = filtered_data[selected_idx]
+
+                action = enhancer.render_action_buttons(
+                    selected_consultant,
+                    ["view", "edit", "delete"]
+                )
+
+                if action == "view":
+                    st.session_state.view_consultant_profile = selected_consultant['id']
+                    st.rerun()
+                elif action == "edit":
+                    st.session_state.view_consultant_profile = selected_consultant['id']
+                    st.rerun()
+                elif action == "delete":
+                    if ConsultantService.delete_consultant(selected_consultant['id']):
+                        NotificationManager.show_success("Consultant supprimé avec succès!")
+                        st.rerun()
+                    else:
+                        NotificationManager.show_error("Erreur lors de la suppression")
+    else:
+        st.info("📝 Aucun consultant enregistré")
+        st.markdown("💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil")
+
+
+def show_consultants_list_classic():
+    """Version classique de la liste des consultants (fallback)"""
 
     # Champ de recherche en temps réel
     search_term = st.text_input(

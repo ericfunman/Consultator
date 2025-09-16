@@ -407,31 +407,23 @@ def categorize_skill(skill):
     """Catégorise une compétence"""
     skill_lower = skill.lower()
 
-    if any(
-        keyword in skill_lower
-        for keyword in [
-            "python",
-            "java",
-            "javascript",
-            "c++",
-            "php",
-            "ruby",
-            "go",
-            "rust",
-        ]
-    ):
+    # Check for exact matches first, then substrings
+    if any(keyword == skill_lower for keyword in ["python", "java", "javascript", "c++", "php", "ruby", "go", "rust", "c#", ".net"]):
         return "💻 Langages de programmation"
-    elif any(
-        keyword in skill_lower
-        for keyword in ["sql", "mysql", "postgresql", "mongodb", "oracle"]
-    ):
+    elif any(keyword == skill_lower for keyword in ["sql", "mysql", "postgresql", "mongodb", "oracle", "sqlite", "redis"]):
         return "🗄️ Bases de données"
-    elif any(
-        keyword in skill_lower
-        for keyword in ["aws", "azure", "gcp", "docker", "kubernetes"]
-    ):
+    elif any(keyword == skill_lower for keyword in ["aws", "azure", "gcp", "docker", "kubernetes", "terraform", "jenkins"]):
         return "☁️ Cloud & DevOps"
-    elif any(keyword in skill_lower for keyword in ["agile", "scrum", "kanban", "uml"]):
+    elif any(keyword == skill_lower for keyword in ["agile", "scrum", "kanban", "uml", "merise"]):
+        return "📋 Méthodologies"
+    # Then check for substrings
+    elif any(keyword in skill_lower for keyword in ["python", "java", "javascript", "c++", "php", "ruby", "golang", "rust", "csharp", "dotnet"]):
+        return "💻 Langages de programmation"
+    elif any(keyword in skill_lower for keyword in ["sql", "mysql", "postgres", "mongo", "oracle", "sqlite", "redis"]):
+        return "🗄️ Bases de données"
+    elif any(keyword in skill_lower for keyword in ["aws", "azure", "gcp", "docker", "kubernetes", "terraform", "jenkins", "devops", "cloud"]):
+        return "☁️ Cloud & DevOps"
+    elif any(keyword in skill_lower for keyword in ["agile", "scrum", "kanban", "uml", "merise", "methodology"]):
         return "📋 Méthodologies"
     else:
         return "🛠️ Autres technologies"
@@ -461,10 +453,12 @@ def calculate_cv_quality_score(analysis):
 
     # Contact (20 points)
     contact = analysis.get("contact", {})
-    contact_score = sum(
-        [5 for field in ["email", "phone", "linkedin"] if contact.get(field)]
-    )
-    score += contact_score
+    contact_fields = ["email", "phone", "linkedin"]
+    filled_fields = sum([1 for field in contact_fields if contact.get(field)])
+    if filled_fields == 3:
+        score += 20
+    elif filled_fields >= 1:
+        score += 10
 
     # Résumé (20 points)
     if analysis.get("resume"):
