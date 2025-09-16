@@ -578,9 +578,7 @@ class ChatbotService:
                             + f"{cjm:,.0f}"
                             + " €**."
                         )
-                        response += f"\n💡 Calcul : {
-                            consultant.salaire_actuel:,.0f} € × 1.8 ÷ 216 = {
-                            cjm:,.0f} €"
+                        response += f"\n💡 Calcul : {consultant.salaire_actuel:,.0f} € × 1.8 ÷ 216 = {cjm:,.0f} €"
                     else:
                         response = (
                             "💰 Le salaire de **"

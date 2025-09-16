@@ -219,10 +219,7 @@ def create_consultant(data: Dict[str, Any]) -> bool:
             session.commit()
 
             st.info(
-                f"✅ Consultant {
-                    consultant.prenom} {
-                    consultant.nom} créé avec l'ID {
-                    consultant.id}"
+                f"✅ Consultant {consultant.prenom} {consultant.nom} créé avec l'ID {consultant.id}"
             )
             return True
 
