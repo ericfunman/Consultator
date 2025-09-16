@@ -241,8 +241,7 @@ def show_add_skill_form(consultant_id: int):
         with st.form(f"add_skill_form_{consultant_id}", clear_on_submit=True):
             # Sélection de la compétence
             skill_options = {
-                c.id: f"{c.nom} ({c.categorie})"
-                for c in available_competences
+                c.id: f"{c.nom} ({c.categorie})" for c in available_competences
             }
             selected_skill = st.selectbox(
                 "Compétence *",

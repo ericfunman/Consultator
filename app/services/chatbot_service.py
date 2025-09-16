@@ -1374,9 +1374,7 @@ class ChatbotService:
                     for consultant in consultants:
                         for cl in consultant.langues:
                             if cl.langue.nom.lower() == langue_recherchee.lower():
-                                response += f"\n  • **{consultant.prenom} {
-                                    consultant.nom}** : {
-                                    cl.niveau_label}"
+                                response += f"\n  • **{consultant.prenom} {consultant.nom}** : {cl.niveau_label}"
                                 if cl.commentaire:
                                     response += f" - {cl.commentaire}"
                                 break
@@ -1576,10 +1574,8 @@ class ChatbotService:
             elif missions:
                 response = f"🏢 **Missions chez {entreprise.title()} :**\n\n"
                 for mission in missions[:5]:  # Limiter à 5 résultats
-                    consultant_nom = f"{mission.consultant.prenom} {
-                        mission.consultant.nom}"
-                    response += f"• **{consultant_nom}** - {mission.nom_mission} ({
-                        mission.date_debut.strftime('%Y')})\n"
+                    consultant_nom = f"{mission.consultant.prenom} {mission.consultant.nom}"
+                    response += f"• **{consultant_nom}** - {mission.nom_mission} ({mission.date_debut.strftime('%Y')})\n"
 
                 if len(missions) > 5:
                     response += f"\n... et {len(missions) - 5} autres missions"

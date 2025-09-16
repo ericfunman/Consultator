@@ -334,7 +334,9 @@ def show_delete_bm_confirmation(bm):
 
                         for assignment in active_assignments:
                             assignment.date_fin = datetime.now().date()
-                            assignment.commentaire = f"BM supprimé le {datetime.now().strftime('%d/%m/%Y')}"
+                            assignment.commentaire = (
+                                f"BM supprimé le {datetime.now().strftime('%d/%m/%Y')}"
+                            )
 
                         # Supprimer le BM - utiliser une nouvelle session pour éviter
                         # les conflits
