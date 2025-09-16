@@ -60,9 +60,9 @@ class CacheService:
         args_str = json.dumps(args, default=str, sort_keys=True)
         kwargs_str = json.dumps(kwargs, default=str, sort_keys=True)
 
-        # Créer un hash unique
+        # Créer un hash unique avec SHA-256 (plus sécurisé que MD5)
         key_content = f"{func_name}:{args_str}:{kwargs_str}"
-        key_hash = hashlib.md5(key_content.encode()).hexdigest()
+        key_hash = hashlib.sha256(key_content.encode()).hexdigest()
 
         return f"consultator:{func_name}:{key_hash}"
 
