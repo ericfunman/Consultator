@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758022830716,
+  "lastUpdate": 1758022835836,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -2348,6 +2348,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000015162106863870314",
             "extra": "mean: 5.088945318182541 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "f9b65722371c988b57657fe39cb62dd5e4da39cf",
+          "message": "Fix SonarCloud workflow: use Java-based scanner for Python project\n\n- Replace .NET scanner with official SonarQube CLI scanner\n- Remove dotnet build step (not needed for Python)\n- Use proper sonar-scanner command for Python analysis\n- Configure correct coverage report path for Python",
+          "timestamp": "2025-09-16T13:32:58+02:00",
+          "tree_id": "1ab3804e1623235672066e6616f85ae53bc9db91",
+          "url": "https://github.com/ericfunman/Consultator/commit/f9b65722371c988b57657fe39cb62dd5e4da39cf"
+        },
+        "date": 1758022834914,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.382294455369,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00000200044289874105",
+            "extra": "mean: 1.0622676949522871 msec\nrounds: 931"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 295081.0620953577,
+            "unit": "iter/sec",
+            "range": "stddev: 5.169589892747747e-7",
+            "extra": "mean: 3.3888992838071132 usec\nrounds: 116605"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158669.48844273612,
+            "unit": "iter/sec",
+            "range": "stddev: 7.410027564753684e-7",
+            "extra": "mean: 6.302408924453679 usec\nrounds: 78660"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33417.8624047184,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000004846376029298311",
+            "extra": "mean: 29.924116267197455 usec\nrounds: 27626"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.20894439903674,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000010888612295468857",
+            "extra": "mean: 5.096607614208791 msec\nrounds: 197"
           }
         ]
       }
