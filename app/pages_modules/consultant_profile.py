@@ -408,22 +408,102 @@ def categorize_skill(skill):
     skill_lower = skill.lower()
 
     # Check for exact matches first, then substrings
-    if any(keyword == skill_lower for keyword in ["python", "java", "javascript", "c++", "php", "ruby", "go", "rust", "c#", ".net"]):
+    if any(
+        keyword == skill_lower
+        for keyword in [
+            "python",
+            "java",
+            "javascript",
+            "c++",
+            "php",
+            "ruby",
+            "go",
+            "rust",
+            "c#",
+            ".net",
+        ]
+    ):
         return "💻 Langages de programmation"
-    elif any(keyword == skill_lower for keyword in ["sql", "mysql", "postgresql", "mongodb", "oracle", "sqlite", "redis"]):
+    elif any(
+        keyword == skill_lower
+        for keyword in [
+            "sql",
+            "mysql",
+            "postgresql",
+            "mongodb",
+            "oracle",
+            "sqlite",
+            "redis",
+        ]
+    ):
         return "🗄️ Bases de données"
-    elif any(keyword == skill_lower for keyword in ["aws", "azure", "gcp", "docker", "kubernetes", "terraform", "jenkins"]):
+    elif any(
+        keyword == skill_lower
+        for keyword in [
+            "aws",
+            "azure",
+            "gcp",
+            "docker",
+            "kubernetes",
+            "terraform",
+            "jenkins",
+        ]
+    ):
         return "☁️ Cloud & DevOps"
-    elif any(keyword == skill_lower for keyword in ["agile", "scrum", "kanban", "uml", "merise"]):
+    elif any(
+        keyword == skill_lower
+        for keyword in ["agile", "scrum", "kanban", "uml", "merise"]
+    ):
         return "📋 Méthodologies"
     # Then check for substrings
-    elif any(keyword in skill_lower for keyword in ["python", "java", "javascript", "c++", "php", "ruby", "golang", "rust", "csharp", "dotnet"]):
+    elif any(
+        keyword in skill_lower
+        for keyword in [
+            "python",
+            "java",
+            "javascript",
+            "c++",
+            "php",
+            "ruby",
+            "golang",
+            "rust",
+            "csharp",
+            "dotnet",
+        ]
+    ):
         return "💻 Langages de programmation"
-    elif any(keyword in skill_lower for keyword in ["sql", "mysql", "postgres", "mongo", "oracle", "sqlite", "redis"]):
+    elif any(
+        keyword in skill_lower
+        for keyword in [
+            "sql",
+            "mysql",
+            "postgres",
+            "mongo",
+            "oracle",
+            "sqlite",
+            "redis",
+        ]
+    ):
         return "🗄️ Bases de données"
-    elif any(keyword in skill_lower for keyword in ["aws", "azure", "gcp", "docker", "kubernetes", "terraform", "jenkins", "devops", "cloud"]):
+    elif any(
+        keyword in skill_lower
+        for keyword in [
+            "aws",
+            "azure",
+            "gcp",
+            "docker",
+            "kubernetes",
+            "terraform",
+            "jenkins",
+            "devops",
+            "cloud",
+        ]
+    ):
         return "☁️ Cloud & DevOps"
-    elif any(keyword in skill_lower for keyword in ["agile", "scrum", "kanban", "uml", "merise", "methodology"]):
+    elif any(
+        keyword in skill_lower
+        for keyword in ["agile", "scrum", "kanban", "uml", "merise", "methodology"]
+    ):
         return "📋 Méthodologies"
     else:
         return "🛠️ Autres technologies"
