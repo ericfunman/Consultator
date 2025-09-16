@@ -712,17 +712,12 @@ class ChatbotService:
                                     response += f"❌ **Statut :** {statut}"
 
                             else:
-                                response = f"❓ L'expérience de **{
-                                    consultant.prenom} {
-                                    consultant.nom}** ne peut pas être calculée car la date de première mission n'est pas renseignée."
+                                response = f"❓ L'expérience de **{consultant.prenom} {consultant.nom}** ne peut pas être calculée car la date de première mission n'est pas renseignée."
                         else:
-                            response = f"❌ Impossible de récupérer les données de **{
-                                consultant.prenom} {
-                                consultant.nom}**."
+                            response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {consultant.nom}**."
 
                 except (ValueError, TypeError, AttributeError, KeyError) as e:
-                    response = f"❌ Erreur lors de la récupération des données d'expérience : {
-                        str(e)}"
+                    response = f"❌ Erreur lors de la récupération des données d'expérience : {str(e)}"
 
                 return {
                     "response": response,
@@ -867,8 +862,7 @@ class ChatbotService:
                                 word in question_lower
                                 for word in ["grade", "niveau", "poste", "fonction"]
                             ):
-                                response = f"🎯 **Grade de {
-                                    consultant.prenom} {
+                                response = f"🎯 **Grade de {consultant.prenom} {
                                     consultant.nom}** : **{
                                     consultant_db.grade or 'Non renseigné'}**"
 
@@ -876,8 +870,7 @@ class ChatbotService:
                                 word in question_lower
                                 for word in ["contrat", "type contrat", "cdi", "cdd"]
                             ):
-                                response = f"📋 **Type de contrat de {
-                                    consultant.prenom} {
+                                response = f"📋 **Type de contrat de {consultant.prenom} {
                                     consultant.nom}** : **{
                                     consultant_db.type_contrat or 'Non renseigné'}**"
 
@@ -891,44 +884,34 @@ class ChatbotService:
                                     "asigma",
                                 ]
                             ):
-                                response = f"🏢 **Société de {
-                                    consultant.prenom} {
+                                response = f"🏢 **Société de {consultant.prenom} {
                                     consultant.nom}** : **{
                                     consultant_db.societe or 'Non renseigné'}**"
                                 if consultant_db.date_entree_societe:
-                                    response += f"\n📅 **Date d'entrée :** {
-                                        consultant_db.date_entree_societe.strftime('%d/%m/%Y')}"
+                                    response += f"\n📅 **Date d'entrée :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}"
                                 if consultant_db.date_sortie_societe:
-                                    response += f"\n📅 **Date de sortie :** {
-                                        consultant_db.date_sortie_societe.strftime('%d/%m/%Y')}"
+                                    response += f"\n📅 **Date de sortie :** {consultant_db.date_sortie_societe.strftime('%d/%m/%Y')}"
                                 else:
                                     response += "\n✅ **Toujours en poste**"
 
                             else:
                                 # Profil complet
-                                response = f"👔 **Profil professionnel de {
-                                    consultant.prenom} {
+                                response = f"👔 **Profil professionnel de {consultant.prenom} {
                                     consultant.nom}** :\n\n"
-                                response += f"🎯 **Grade :** {
-                                    consultant_db.grade or 'Non renseigné'}\n"
-                                response += f"📋 **Type de contrat :** {
-                                    consultant_db.type_contrat or 'Non renseigné'}\n"
-                                response += f"🏢 **Société :** {
-                                    consultant_db.societe or 'Non renseigné'}\n"
+                                response += f"🎯 **Grade :** {consultant_db.grade or 'Non renseigné'}\n"
+                                response += f"📋 **Type de contrat :** {consultant_db.type_contrat or 'Non renseigné'}\n"
+                                response += f"🏢 **Société :** {consultant_db.societe or 'Non renseigné'}\n"
 
                                 if consultant_db.date_entree_societe:
-                                    response += f"📅 **Date d'entrée société :** {
-                                        consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
+                                    response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
 
                                 if consultant_db.date_sortie_societe:
-                                    response += f"📅 **Date de sortie société :** {
-                                        consultant_db.date_sortie_societe.strftime('%d/%m/%Y')}\n"
+                                    response += f"📅 **Date de sortie société :** {consultant_db.date_sortie_societe.strftime('%d/%m/%Y')}\n"
                                 else:
                                     response += "✅ **Statut :** Toujours en poste\n"
 
                                 if consultant_db.experience_annees:
-                                    response += f"⏱️ **Expérience :** {
-                                        consultant_db.experience_annees} années\n"
+                                    response += f"⏱️ **Expérience :** {consultant_db.experience_annees} années\n"
 
                                 # Informations salariales si disponibles
                                 if consultant_db.salaire_actuel:
@@ -942,8 +925,7 @@ class ChatbotService:
                                         "📈 **CJM :** " + f"{cjm:,.0f}" + " €/jour"
                                     )
                         else:
-                            response = f"❌ Impossible de récupérer les données de **{
-                                consultant.prenom} {
+                            response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {
                                 consultant.nom}**."
 
                 except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
@@ -1015,8 +997,7 @@ class ChatbotService:
 
                             response = "🎯 **Répartition par grade :**\n\n"
                             for grade, consultants_list in grades_count.items():
-                                response += f"• **{grade}** : {
-                                    len(consultants_list)} consultant(s)\n"
+                                response += f"• **{grade}** : {len(consultants_list)} consultant(s)\n"
                                 if (
                                     len(consultants_list) <= 5
                                 ):  # Afficher les noms si pas trop nombreux
@@ -1045,8 +1026,7 @@ class ChatbotService:
                                     if c.type_contrat
                                     and c.type_contrat.upper() == "CDI"
                                 ]
-                                response = f"📋 **{
-                                    len(consultants_cdi)} consultant(s) en CDI**"
+                                response = f"📋 **{len(consultants_cdi)} consultant(s) en CDI**"
                             elif "cdd" in question_lower:
                                 consultants_cdd = [
                                     c
@@ -1054,8 +1034,7 @@ class ChatbotService:
                                     if c.type_contrat
                                     and c.type_contrat.upper() == "CDD"
                                 ]
-                                response = f"📋 **{
-                                    len(consultants_cdd)} consultant(s) en CDD**"
+                                response = f"📋 **{len(consultants_cdd)} consultant(s) en CDD**"
                             elif "stagiaire" in question_lower:
                                 consultants_stagiaire = [
                                     c
@@ -1063,8 +1042,7 @@ class ChatbotService:
                                     if c.type_contrat
                                     and c.type_contrat.lower() == "stagiaire"
                                 ]
-                                response = f"📋 **{
-                                    len(consultants_stagiaire)} consultant(s) stagiaire(s)**"
+                                response = f"📋 **{len(consultants_stagiaire)} consultant(s) stagiaire(s)**"
                             else:
                                 # Statistiques complètes
                                 contrats_count: Dict[str, int] = {}
@@ -1093,8 +1071,7 @@ class ChatbotService:
                                     "📋 **Répartition par type de contrat :**\n\n"
                                 )
                                 for contrat, consultants_list in contrats_list.items():
-                                    response += f"• **{contrat}** : {
-                                        len(consultants_list)} consultant(s)\n"
+                                    response += f"• **{contrat}** : {len(consultants_list)} consultant(s)\n"
                                     if (
                                         len(consultants_list) <= 5
                                     ):  # Afficher les noms si pas trop nombreux
@@ -1142,8 +1119,7 @@ class ChatbotService:
                                     status_icon = (
                                         "🟢" if consultant.disponibilite else "🔴"
                                     )
-                                    response += f"{i}. {status_icon} **{
-                                        consultant.prenom} {
+                                    response += f"{i}. {status_icon} **{consultant.prenom} {
                                         consultant.nom}**"
                                     if consultant.grade:
                                         response += f" - {consultant.grade}"
@@ -1170,8 +1146,7 @@ class ChatbotService:
 
                                 response = "🏢 **Répartition par société :**\n\n"
                                 for societe, consultants_list in societes_count.items():
-                                    response += f"• **{societe}** : {
-                                        len(consultants_list)} consultant(s)\n"
+                                    response += f"• **{societe}** : {len(consultants_list)} consultant(s)\n"
                                     if (
                                         len(consultants_list) <= 5
                                     ):  # Afficher les noms si pas trop nombreux
@@ -1298,8 +1273,7 @@ class ChatbotService:
 
                 if consultants:
                     noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-                    response = f"🎯 Consultants maîtrisant **{
-                        competence_found.title()}** :\n\n"
+                    response = f"🎯 Consultants maîtrisant **{competence_found.title()}** :\n\n"
                     response += "\n".join([f"• {nom}" for nom in noms])
                     response += (
                         "\n\n📊 **"
@@ -1329,8 +1303,7 @@ class ChatbotService:
                 skills = self._get_consultant_skills(consultant.id, type_competence)
 
                 if skills:
-                    response = f"🎯 **Compétences de {
-                        consultant.prenom} {
+                    response = f"🎯 **Compétences de {consultant.prenom} {
                         consultant.nom} :**\n\n"
 
                     # Grouper par catégorie
@@ -1357,21 +1330,17 @@ class ChatbotService:
                                 and comp["annees_experience"] > 0
                             ):
                                 if comp["annees_experience"] == 1:
-                                    experience_text = f" ({
-                                        comp['annees_experience']} an)"
+                                    experience_text = f" ({comp['annees_experience']} an)"
                                 else:
-                                    experience_text = f" ({
-                                        comp['annees_experience']:.0f} ans)"
+                                    experience_text = f" ({comp['annees_experience']:.0f} ans)"
 
-                            response += f"  {niveau_emoji} **{
-                                comp['nom']}** - {
+                            response += f"  {niveau_emoji} **{comp['nom']}** - {
                                 comp['niveau_maitrise'].title()}{experience_text}\n"
                         response += "\n"
 
                     response += f"� **Total : {len(skills)} compétence(s)**"
                 else:
-                    response = f"❌ Aucune compétence enregistrée pour **{
-                        consultant.prenom} {
+                    response = f"❌ Aucune compétence enregistrée pour **{consultant.prenom} {
                         consultant.nom}**."
             else:
                 response = f"❌ Consultant **{nom}** introuvable."
@@ -1403,8 +1372,7 @@ class ChatbotService:
 
             if consultants:
                 noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-                response = f"🌍 Consultants parlant **{
-                    langue_recherchee.title()}** :\n\n"
+                response = f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
                 response += "\n".join([f"• {nom}" for nom in noms])
 
                 # Ajouter les détails des niveaux
@@ -1418,8 +1386,7 @@ class ChatbotService:
                     for consultant in consultants:
                         for cl in consultant.langues:
                             if cl.langue.nom.lower() == langue_recherchee.lower():
-                                response += f"\n  • **{
-                                    consultant.prenom} {
+                                response += f"\n  • **{consultant.prenom} {
                                     consultant.nom}** : {
                                     cl.niveau_label}"
                                 if cl.commentaire:
@@ -1512,8 +1479,7 @@ class ChatbotService:
                             + " langue(s)**"
                         )
                     else:
-                        response = f"❌ Aucune langue enregistrée pour **{
-                            consultant.prenom} {
+                        response = f"❌ Aucune langue enregistrée pour **{consultant.prenom} {
                             consultant.nom}**."
                 else:
                     response = f"❌ Consultant **{nom}** introuvable."
@@ -1623,11 +1589,9 @@ class ChatbotService:
             elif missions:
                 response = f"🏢 **Missions chez {entreprise.title()} :**\n\n"
                 for mission in missions[:5]:  # Limiter à 5 résultats
-                    consultant_nom = f"{
-                        mission.consultant.prenom} {
+                    consultant_nom = f"{mission.consultant.prenom} {
                         mission.consultant.nom}"
-                    response += f"• **{consultant_nom}** - {
-                        mission.nom_mission} ({
+                    response += f"• **{consultant_nom}** - {mission.nom_mission} ({
                         mission.date_debut.strftime('%Y')})\n"
 
                 if len(missions) > 5:
@@ -1671,8 +1635,7 @@ class ChatbotService:
                                 " (dont " + str(len(missions_en_cours)) + " en cours)"
                             )
                 elif missions:
-                    response = f"💼 **Missions de {
-                        consultant.prenom} {
+                    response = f"💼 **Missions de {consultant.prenom} {
                         consultant.nom} :**\n\n"
                     for mission in missions:
                         status_icon = "🟢" if mission.statut == "en_cours" else "✅"
@@ -1690,8 +1653,7 @@ class ChatbotService:
 
                     response += "📊 **Total : " + str(len(missions)) + " mission(s)**"
                 else:
-                    response = f"❌ Aucune mission trouvée pour **{
-                        consultant.prenom} {
+                    response = f"❌ Aucune mission trouvée pour **{consultant.prenom} {
                         consultant.nom}**."
             else:
                 response = f"❌ Consultant **{nom}** introuvable."
@@ -1724,8 +1686,7 @@ class ChatbotService:
                 "consultant" in self.last_question
                 and "mission" not in self.last_question
             ):
-                response = f"👥 **Vous avez {
-                    stats['consultants_total']} consultants** dans votre base de données.\n\n"
+                response = f"👥 **Vous avez {stats['consultants_total']} consultants** dans votre base de données.\n\n"
                 response += (
                     "📊 Détail : "
                     + str(stats["consultants_actifs"])
@@ -1786,38 +1747,32 @@ class ChatbotService:
 
                 if any(word in question_lower for word in ["mail", "email", "e-mail"]):
                     if consultant.email:
-                        response = f"📧 L'email de **{
-                            consultant.prenom} {
+                        response = f"📧 L'email de **{consultant.prenom} {
                             consultant.nom}** est : **{
                             consultant.email}**"
                     else:
-                        response = f"❓ Désolé, l'email de **{
-                            consultant.prenom} {
+                        response = f"❓ Désolé, l'email de **{consultant.prenom} {
                             consultant.nom}** n'est pas renseigné dans la base."
 
                 elif any(
                     word in question_lower for word in ["téléphone", "tel", "numéro"]
                 ):
                     if consultant.telephone:
-                        response = f"📞 Le téléphone de **{
-                            consultant.prenom} {
+                        response = f"📞 Le téléphone de **{consultant.prenom} {
                             consultant.nom}** est : **{
                             consultant.telephone}**"
                     else:
-                        response = f"❓ Désolé, le téléphone de **{
-                            consultant.prenom} {
+                        response = f"❓ Désolé, le téléphone de **{consultant.prenom} {
                             consultant.nom}** n'est pas renseigné dans la base."
 
                 else:
                     # Information de contact complète
-                    response = f"📞 **Contact de {
-                        consultant.prenom} {
+                    response = f"📞 **Contact de {consultant.prenom} {
                         consultant.nom} :**\n\n"
                     response += (
                         f"📧 Email : **{consultant.email or 'Non renseigné'}**\n"
                     )
-                    response += f"📞 Téléphone : **{
-                        consultant.telephone or 'Non renseigné'}**"
+                    response += f"📞 Téléphone : **{consultant.telephone or 'Non renseigné'}**"
 
                 return {
                     "response": response,
@@ -2068,8 +2023,7 @@ class ChatbotService:
                     if practice.responsable:
                         response += f"\n👨‍💼 **Responsable** : {practice.responsable}"
                 else:
-                    response = f"📋 **Practice {
-                        practice.nom}** : Aucun consultant assigné"
+                    response = f"📋 **Practice {practice.nom}** : Aucun consultant assigné"
 
                 return {
                     "response": response,
@@ -2115,8 +2069,7 @@ class ChatbotService:
                         [c for c in practice.consultants if c.disponibilite]
                     )
 
-                    response += f"• **{
-                        practice.nom}** : {nb_consultants} consultant(s) ({nb_disponibles} disponible(s))\n"
+                    response += f"• **{practice.nom}** : {nb_consultants} consultant(s) ({nb_disponibles} disponible(s))\n"
                     if practice.responsable:
                         response += f"  👨‍💼 Responsable : {practice.responsable}\n"
 

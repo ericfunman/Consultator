@@ -334,8 +334,7 @@ def show_delete_bm_confirmation(bm):
 
                         for assignment in active_assignments:
                             assignment.date_fin = datetime.now().date()
-                            assignment.commentaire = f"BM supprimé le {
-                                datetime.now().strftime('%d/%m/%Y')}"
+                            assignment.commentaire = f"BM supprimé le {datetime.now().strftime('%d/%m/%Y')}"
 
                         # Supprimer le BM - utiliser une nouvelle session pour éviter
                         # les conflits
@@ -351,8 +350,7 @@ def show_delete_bm_confirmation(bm):
                                 delete_session.commit()
 
                         st.success(
-                            f"✅ Business Manager {
-                                bm.prenom} {
+                            f"✅ Business Manager {bm.prenom} {
                                 bm.nom} supprimé avec succès !"
                         )
                         del st.session_state.view_bm_profile
@@ -545,8 +543,7 @@ def show_current_bm_consultants(bm, session):
                 if st.button("🔚 Terminer l'assignation", type="primary"):
                     try:
                         assignment_to_end.date_fin = datetime.now().date()
-                        assignment_to_end.commentaire = f"Assignation terminée le {
-                            datetime.now().strftime('%d/%m/%Y')}"
+                        assignment_to_end.commentaire = f"Assignation terminée le {datetime.now().strftime('%d/%m/%Y')}"
                         session.commit()
                         st.success("✅ Assignation terminée avec succès !")
                         st.rerun()
@@ -683,8 +680,7 @@ def show_add_bm_assignment(bm, session):
             if available_consultants:
                 st.write("**🟢 Consultants disponibles :**")
                 for consultant in available_consultants:
-                    key = f"🟢 {
-                        consultant.prenom} {
+                    key = f"🟢 {consultant.prenom} {
                         consultant.nom} ({
                         consultant.email}) - DISPONIBLE"
                     consultant_options[key] = {
@@ -701,8 +697,7 @@ def show_add_bm_assignment(bm, session):
                 )
                 for consultant, current_bm, existing_assignment in assigned_to_other_bm:
                     since_date = existing_assignment.date_debut.strftime("%d/%m/%Y")
-                    key = f"🔄 {
-                        consultant.prenom} {
+                    key = f"🔄 {consultant.prenom} {
                         consultant.nom} ({
                         consultant.email}) - Actuellement avec {
                         current_bm.prenom} {
@@ -737,8 +732,7 @@ def show_add_bm_assignment(bm, session):
             # Afficher un avertissement si le consultant est déjà assigné
             if selected_data["status"] == "assigned":
                 st.warning(
-                    f"⚠️ **ATTENTION :** Ce consultant est actuellement assigné à {
-                        selected_data['current_bm'].prenom} {
+                    f"⚠️ **ATTENTION :** Ce consultant est actuellement assigné à {selected_data['current_bm'].prenom} {
                         selected_data['current_bm'].nom}"
                 )
                 st.info(
@@ -774,8 +768,7 @@ def show_add_bm_assignment(bm, session):
 
                         # Ajouter le commentaire de clôture
                         existing_comment = existing_assignment.commentaire or ""
-                        new_comment = f"Transfert vers {
-                            bm.prenom} {
+                        new_comment = f"Transfert vers {bm.prenom} {
                             bm.nom} le {
                             date_debut.strftime('%d/%m/%Y')}"
                         if cloture_comment:
@@ -812,16 +805,14 @@ def show_add_bm_assignment(bm, session):
 
                     if selected_data["status"] == "assigned":
                         st.success(
-                            f"✅ Transfert réussi ! {
-                                consultant.prenom} {
+                            f"✅ Transfert réussi ! {consultant.prenom} {
                                 consultant.nom} est maintenant assigné(e) à {
                                 bm.prenom} {
                                 bm.nom}"
                         )
                     else:
                         st.success(
-                            f"✅ Assignation créée ! {
-                                consultant.prenom} {
+                            f"✅ Assignation créée ! {consultant.prenom} {
                                 consultant.nom} est maintenant assigné(e) à {
                                 bm.prenom} {
                                 bm.nom}"
@@ -979,8 +970,7 @@ def show_business_managers_list():
             )
             if bms_data_from_service:
                 st.info(
-                    f"🔍 {
-                        len(bms_data_from_service)} Business Manager(s) trouvé(s) pour '{search_term}'"
+                    f"🔍 {len(bms_data_from_service)} Business Manager(s) trouvé(s) pour '{search_term}'"
                 )
             else:
                 st.warning(f"❌ Aucun Business Manager trouvé pour '{search_term}'")

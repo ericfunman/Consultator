@@ -265,8 +265,7 @@ def show_consultants_list_optimized():
                     st.download_button(
                         label="💾 Télécharger CSV",
                         data=csv,
-                        file_name=f"consultants_page_{
-                            st.session_state.consultant_page}.csv",
+                        file_name=f"consultants_page_{st.session_state.consultant_page}.csv",
                         mime="text/csv",
                     )
 

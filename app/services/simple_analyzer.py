@@ -202,8 +202,7 @@ class SimpleDocumentAnalyzer:
             }
 
             st.success(
-                f"✅ Analyse terminée: {
-                    len(missions)} missions, {
+                f"✅ Analyse terminée: {len(missions)} missions, {
                     len(technologies_found)} technologies"
             )
 

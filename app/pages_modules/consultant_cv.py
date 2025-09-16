@@ -118,9 +118,7 @@ def show_cv_skills(analysis: Dict):
 
                 if st.button(
                     f"{skill} ({status})",
-                    key=f"skill_{category}_{i}_{
-                        st.session_state.get(
-                            'view_consultant_profile',
+                    key=f"skill_{category}_{i}_{st.session_state.get('view_consultant_profile',
                             0)}",
                 ):
                     if not existing:
@@ -760,8 +758,7 @@ def generate_cv_analysis_report(analysis: Dict, consultant):
         st.download_button(
             label="📥 Télécharger le rapport",
             data=report,
-            file_name=f"analyse_cv_{
-                consultant.prenom}_{
+            file_name=f"analyse_cv_{consultant.prenom}_{
                 consultant.nom}_{
                 datetime.now().strftime('%Y%m%d')}.md",
             mime="text/markdown",

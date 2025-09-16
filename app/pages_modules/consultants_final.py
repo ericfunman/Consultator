@@ -77,8 +77,7 @@ def show_consultant_profile():
     with col1:
         st.metric(
             "💰 Salaire annuel",
-            f"{
-                consultant.salaire_actuel or 0:,}€",
+            f"{consultant.salaire_actuel or 0:,}€",
             delta=None,
         )
 

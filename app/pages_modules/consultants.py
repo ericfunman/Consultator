@@ -3279,8 +3279,7 @@ def show_cv_actions(analysis, consultant):
         st.markdown("")
         if missions:
             st.info(
-                f"💡 {
-                    len(missions)} mission(s) peuvent être ajoutée(s) individuellement dans l'onglet 'Missions'"
+                f"💡 {len(missions)} mission(s) peuvent être ajoutée(s) individuellement dans l'onglet 'Missions'"
             )
 
     with col2:
@@ -3305,8 +3304,7 @@ def show_cv_actions(analysis, consultant):
         st.markdown("")
         if technologies:
             st.info(
-                f"💡 {
-                    len(technologies)} technologie(s) peuvent être ajoutée(s) manuellement"
+                f"💡 {len(technologies)} technologie(s) peuvent être ajoutée(s) manuellement"
             )
 
     # Export et outils avancés

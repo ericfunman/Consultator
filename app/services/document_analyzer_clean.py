@@ -132,8 +132,7 @@ class DocumentAnalyzer:
 
                 if text_parts:
                     st.success(
-                        f"✅ {
-                            len(text_parts)} sections extraites avec pdfplumber"
+                        f"✅ {len(text_parts)} sections extraites avec pdfplumber"
                     )
                     return "\n\n".join(text_parts)
 
@@ -199,8 +198,7 @@ class DocumentAnalyzer:
 
             result = "\n\n".join(text_parts)
             st.success(
-                f"✅ {
-                    len(text_parts)} éléments extraits ({
+                f"✅ {len(text_parts)} éléments extraits ({
                     len(result)} caractères)"
             )
             return result
@@ -303,10 +301,7 @@ class DocumentAnalyzer:
             )
 
             st.success(
-                f"✅ Analyse terminée: {
-                    len(missions)} missions, {
-                    len(
-                        analysis['langages_techniques'])} technologies"
+                f"✅ Analyse terminée: {len(missions)} missions, {len(analysis['langages_techniques'])} technologies"
             )
 
         except (OSError, ValueError, TypeError, AttributeError, KeyError) as e:

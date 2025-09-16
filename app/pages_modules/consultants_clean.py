@@ -86,8 +86,7 @@ def show_consultant_profile():
     with col1:
         st.metric(
             "💰 Salaire annuel",
-            f"{
-                consultant.salaire_actuel or 0:,}€",
+            f"{consultant.salaire_actuel or 0:,}€",
             delta=None,
         )
 
@@ -140,8 +139,7 @@ def show_consultant_skills(consultant):
     # Debug forcé pour vérifier que cette fonction est appelée
     st.error("🔥 DEBUG: Cette fonction est bien appelée !")
     st.write(
-        f"🔍 Consultant ID: {
-            consultant.id}, Nom: {
+        f"🔍 Consultant ID: {consultant.id}, Nom: {
             consultant.nom} {
                 consultant.prenom}"
     )
@@ -208,8 +206,7 @@ def get_consultant_technologies_from_missions(consultant_id):
 
             # Debug temporaire
             st.write(
-                f"🔍 Debug: {
-                    len(missions)} missions trouvées pour consultant ID {consultant_id}"
+                f"🔍 Debug: {len(missions)} missions trouvées pour consultant ID {consultant_id}"
             )
 
             for mission in missions:

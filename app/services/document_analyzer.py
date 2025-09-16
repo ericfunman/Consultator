@@ -296,8 +296,7 @@ class DocumentAnalyzer:
 
                 if text_parts:
                     st.success(
-                        f"✅ {
-                            len(text_parts)} sections extraites avec pdfplumber"
+                        f"✅ {len(text_parts)} sections extraites avec pdfplumber"
                     )
                     return "\n\n".join(text_parts)
 
@@ -363,8 +362,7 @@ class DocumentAnalyzer:
 
             result = "\n\n".join(text_parts)
             st.success(
-                f"✅ {
-                    len(text_parts)} éléments extraits ({
+                f"✅ {len(text_parts)} éléments extraits ({
                     len(result)} caractères)"
             )
             return result
@@ -467,10 +465,7 @@ class DocumentAnalyzer:
             )
 
             st.success(
-                f"✅ Analyse terminée: {
-                    len(missions)} missions, {
-                    len(
-                        analysis['langages_techniques'])} technologies"
+                f"✅ Analyse terminée: {len(missions)} missions, {len(analysis['langages_techniques'])} technologies"
             )
 
         except (ValueError, TypeError, AttributeError, KeyError) as e:
@@ -564,8 +559,7 @@ class DocumentAnalyzer:
         missions.extend(missions_quanteam)
 
         st.info(
-            f"🚀 {
-                len(missions)} missions brutes trouvées avant nettoyage (dont {
+            f"🚀 {len(missions)} missions brutes trouvées avant nettoyage (dont {
                 len(missions_powerpoint)} PowerPoint optimisées et {
                 len(missions_quanteam)} Quanteam corrigées)"
         )
@@ -1066,8 +1060,7 @@ class DocumentAnalyzer:
             # Clé unique basée sur client + dates + début du résumé pour éviter les
             # vrais doublons
             resume_start = resume[:50] if resume else ""
-            key = f"{
-                client.lower().strip()}_{date_debut}_{date_fin}_{
+            key = f"{client.lower().strip()}_{date_debut}_{date_fin}_{
                 resume_start.lower()}"
 
             # Exception pour les missions PowerPoint optimisées : les garder TOUJOURS
