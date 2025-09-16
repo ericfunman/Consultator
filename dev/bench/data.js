@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758004807344,
+  "lastUpdate": 1758020769300,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -1935,6 +1935,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014481519047094051",
             "extra": "mean: 5.0900993484836965 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "22438679749605b6d7e3c98aece41c8ceb9d3267",
+          "message": " Correction CI/CD - Tests simples et dépendances\n\n Corrections des erreurs CI/CD GitHub Actions :\n\n1. **Correction test_simple.py** :\n   - Fonctions de test retournent maintenant True/False au lieu de None\n   - Gestion correcte des résultats dans sum(results)\n   - Évite TypeError: unsupported operand type(s) for +: 'int' and 'NoneType'\n\n2. **Ajout dépendance manquante** :\n   - Ajout de openpyxl>=3.1.0 dans requirements.txt\n   - Corrige les tests d'export Excel qui échouaient dans CI\n\n3. **Résultats attendus** :\n   -  Tests unitaires : OK\n   -  Tests de fumée : OK\n   -  Tests de régression : OK\n   -  Pipeline qualité complet : OK\n\n Le CI/CD devrait maintenant passer avec succès sur GitHub Actions",
+          "timestamp": "2025-09-16T12:50:45+02:00",
+          "tree_id": "7701b036153701b0e7219fbcb1c8d9c6e077c0a2",
+          "url": "https://github.com/ericfunman/Consultator/commit/22438679749605b6d7e3c98aece41c8ceb9d3267"
+        },
+        "date": 1758020768928,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.4737247814519,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000022168578536939375",
+            "extra": "mean: 1.0621645338345838 msec\nrounds: 931"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 289055.71369710955,
+            "unit": "iter/sec",
+            "range": "stddev: 5.295547165752841e-7",
+            "extra": "mean: 3.459540678887468 usec\nrounds: 113302"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 160698.49068227565,
+            "unit": "iter/sec",
+            "range": "stddev: 7.407048024061564e-7",
+            "extra": "mean: 6.222833803567862 usec\nrounds: 79033"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33639.63720316864,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000017236301634429679",
+            "extra": "mean: 29.726836646912663 usec\nrounds: 28117"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.4183428258282,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000018632999522608046",
+            "extra": "mean: 5.091174203046499 msec\nrounds: 197"
           }
         ]
       }
