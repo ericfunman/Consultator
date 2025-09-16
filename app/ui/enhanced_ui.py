@@ -10,7 +10,10 @@ from typing import List, Dict, Any, Optional
 import time
 
 from app.services.consultant_service import ConsultantService
-from app.services.cache_service import get_cached_consultants_list, get_cached_search_results
+from app.services.cache_service import (
+    get_cached_consultants_list,
+    get_cached_search_results,
+)
 
 
 class AdvancedUIFilters:
@@ -18,18 +21,18 @@ class AdvancedUIFilters:
 
     def __init__(self):
         self.filters = {
-            'search_term': '',
-            'practice_filter': None,
-            'grade_filter': None,
-            'availability_filter': None,
-            'salaire_min': None,
-            'salaire_max': None,
-            'experience_min': None,
-            'experience_max': None,
-            'societe_filter': None,
-            'type_contrat_filter': None,
-            'date_entree_min': None,
-            'date_entree_max': None,
+            "search_term": "",
+            "practice_filter": None,
+            "grade_filter": None,
+            "availability_filter": None,
+            "salaire_min": None,
+            "salaire_max": None,
+            "experience_min": None,
+            "experience_max": None,
+            "societe_filter": None,
+            "type_contrat_filter": None,
+            "date_entree_min": None,
+            "date_entree_max": None,
         }
 
     def render_filters_sidebar(self) -> Dict[str, Any]:
@@ -37,10 +40,10 @@ class AdvancedUIFilters:
         st.sidebar.header("🔍 Filtres Avancés")
 
         # Recherche textuelle
-        self.filters['search_term'] = st.sidebar.text_input(
+        self.filters["search_term"] = st.sidebar.text_input(
             "Rechercher",
             placeholder="Nom, prénom, email, société...",
-            help="Recherche dans tous les champs textuels"
+            help="Recherche dans tous les champs textuels",
         )
 
         st.sidebar.markdown("---")
@@ -50,18 +53,20 @@ class AdvancedUIFilters:
 
         col1, col2 = st.sidebar.columns(2)
         with col1:
-            self.filters['availability_filter'] = st.sidebar.selectbox(
+            self.filters["availability_filter"] = st.sidebar.selectbox(
                 "Disponibilité",
                 options=[None, True, False],
-                format_func=lambda x: "Tous" if x is None else ("Disponible" if x else "Occupé"),
-                help="Filtrer par disponibilité"
+                format_func=lambda x: (
+                    "Tous" if x is None else ("Disponible" if x else "Occupé")
+                ),
+                help="Filtrer par disponibilité",
             )
 
         with col2:
-            self.filters['practice_filter'] = st.sidebar.selectbox(
+            self.filters["practice_filter"] = st.sidebar.selectbox(
                 "Practice",
-                options=[None] + self._get_unique_values('practice_name'),
-                help="Filtrer par practice"
+                options=[None] + self._get_unique_values("practice_name"),
+                help="Filtrer par practice",
             )
 
         # Filtres professionnels
@@ -69,23 +74,23 @@ class AdvancedUIFilters:
 
         col1, col2 = st.sidebar.columns(2)
         with col1:
-            self.filters['grade_filter'] = st.sidebar.selectbox(
+            self.filters["grade_filter"] = st.sidebar.selectbox(
                 "Grade",
-                options=[None] + self._get_unique_values('grade'),
-                help="Filtrer par grade"
+                options=[None] + self._get_unique_values("grade"),
+                help="Filtrer par grade",
             )
 
         with col2:
-            self.filters['type_contrat_filter'] = st.sidebar.selectbox(
+            self.filters["type_contrat_filter"] = st.sidebar.selectbox(
                 "Type de contrat",
-                options=[None] + self._get_unique_values('type_contrat'),
-                help="Filtrer par type de contrat"
+                options=[None] + self._get_unique_values("type_contrat"),
+                help="Filtrer par type de contrat",
             )
 
-        self.filters['societe_filter'] = st.sidebar.selectbox(
+        self.filters["societe_filter"] = st.sidebar.selectbox(
             "Société",
-            options=[None] + self._get_unique_values('societe'),
-            help="Filtrer par société"
+            options=[None] + self._get_unique_values("societe"),
+            help="Filtrer par société",
         )
 
         # Filtres de salaire
@@ -93,21 +98,17 @@ class AdvancedUIFilters:
 
         col1, col2 = st.sidebar.columns(2)
         with col1:
-            self.filters['salaire_min'] = st.sidebar.number_input(
-                "Min",
-                min_value=0,
-                value=0,
-                step=5000,
-                help="Salaire minimum annuel"
+            self.filters["salaire_min"] = st.sidebar.number_input(
+                "Min", min_value=0, value=0, step=5000, help="Salaire minimum annuel"
             )
 
         with col2:
-            self.filters['salaire_max'] = st.sidebar.number_input(
+            self.filters["salaire_max"] = st.sidebar.number_input(
                 "Max",
                 min_value=0,
                 value=200000,
                 step=5000,
-                help="Salaire maximum annuel"
+                help="Salaire maximum annuel",
             )
 
         # Filtres d'expérience
@@ -115,23 +116,23 @@ class AdvancedUIFilters:
 
         col1, col2 = st.sidebar.columns(2)
         with col1:
-            self.filters['experience_min'] = st.sidebar.number_input(
+            self.filters["experience_min"] = st.sidebar.number_input(
                 "Min",
                 min_value=0.0,
                 max_value=50.0,
                 value=0.0,
                 step=0.5,
-                help="Expérience minimum en années"
+                help="Expérience minimum en années",
             )
 
         with col2:
-            self.filters['experience_max'] = st.sidebar.number_input(
+            self.filters["experience_max"] = st.sidebar.number_input(
                 "Max",
                 min_value=0.0,
                 max_value=50.0,
                 value=50.0,
                 step=0.5,
-                help="Expérience maximum en années"
+                help="Expérience maximum en années",
             )
 
         # Filtres de date d'entrée
@@ -139,17 +140,13 @@ class AdvancedUIFilters:
 
         col1, col2 = st.sidebar.columns(2)
         with col1:
-            self.filters['date_entree_min'] = st.sidebar.date_input(
-                "De",
-                value=None,
-                help="Date d'entrée minimum"
+            self.filters["date_entree_min"] = st.sidebar.date_input(
+                "De", value=None, help="Date d'entrée minimum"
             )
 
         with col2:
-            self.filters['date_entree_max'] = st.sidebar.date_input(
-                "À",
-                value=None,
-                help="Date d'entrée maximum"
+            self.filters["date_entree_max"] = st.sidebar.date_input(
+                "À", value=None, help="Date d'entrée maximum"
             )
 
         # Boutons d'action
@@ -162,7 +159,9 @@ class AdvancedUIFilters:
                 st.rerun()
 
         with col2:
-            if st.sidebar.button("📊 Appliquer", type="primary", use_container_width=True):
+            if st.sidebar.button(
+                "📊 Appliquer", type="primary", use_container_width=True
+            ):
                 st.rerun()
 
         return self.filters
@@ -173,10 +172,10 @@ class AdvancedUIFilters:
             # Pour les données de test, on retourne des valeurs par défaut
             # En production, ceci serait récupéré de la base de données
             defaults = {
-                'practice_name': ['Digital', 'Data', 'Cloud', 'Cybersecurity'],
-                'grade': ['Junior', 'Confirmé', 'Senior', 'Expert'],
-                'type_contrat': ['CDI', 'CDD', 'Freelance', 'Stagiaire'],
-                'societe': ['Quanteam', 'Asigma', 'Autres']
+                "practice_name": ["Digital", "Data", "Cloud", "Cybersecurity"],
+                "grade": ["Junior", "Confirmé", "Senior", "Expert"],
+                "type_contrat": ["CDI", "CDD", "Freelance", "Stagiaire"],
+                "societe": ["Quanteam", "Asigma", "Autres"],
             }
             return defaults.get(field, [])
         except Exception:
@@ -185,15 +184,15 @@ class AdvancedUIFilters:
     def reset_filters(self):
         """Réinitialise tous les filtres"""
         for key in self.filters:
-            if key.endswith('_filter') or key.endswith('_min') or key.endswith('_max'):
+            if key.endswith("_filter") or key.endswith("_min") or key.endswith("_max"):
                 self.filters[key] = None
-            elif key == 'search_term':
-                self.filters[key] = ''
-            elif key in ['salaire_min', 'experience_min']:
+            elif key == "search_term":
+                self.filters[key] = ""
+            elif key in ["salaire_min", "experience_min"]:
                 self.filters[key] = 0
-            elif key == 'salaire_max':
+            elif key == "salaire_max":
                 self.filters[key] = 200000
-            elif key == 'experience_max':
+            elif key == "experience_max":
                 self.filters[key] = 50.0
 
     def apply_filters(self, data: List[Dict]) -> List[Dict]:
@@ -204,69 +203,82 @@ class AdvancedUIFilters:
         filtered_data = data.copy()
 
         # Filtre de recherche textuelle
-        if self.filters['search_term']:
-            search_term = self.filters['search_term'].lower()
+        if self.filters["search_term"]:
+            search_term = self.filters["search_term"].lower()
             filtered_data = [
-                item for item in filtered_data
-                if any(search_term in str(value).lower()
-                      for value in item.values() if value)
+                item
+                for item in filtered_data
+                if any(
+                    search_term in str(value).lower()
+                    for value in item.values()
+                    if value
+                )
             ]
 
         # Filtres spécifiques
-        if self.filters['practice_filter']:
+        if self.filters["practice_filter"]:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('practice_name') == self.filters['practice_filter']
+                item
+                for item in filtered_data
+                if item.get("practice_name") == self.filters["practice_filter"]
             ]
 
-        if self.filters['grade_filter']:
+        if self.filters["grade_filter"]:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('grade') == self.filters['grade_filter']
+                item
+                for item in filtered_data
+                if item.get("grade") == self.filters["grade_filter"]
             ]
 
-        if self.filters['availability_filter'] is not None:
+        if self.filters["availability_filter"] is not None:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('disponibilite') == self.filters['availability_filter']
+                item
+                for item in filtered_data
+                if item.get("disponibilite") == self.filters["availability_filter"]
             ]
 
-        if self.filters['societe_filter']:
+        if self.filters["societe_filter"]:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('societe') == self.filters['societe_filter']
+                item
+                for item in filtered_data
+                if item.get("societe") == self.filters["societe_filter"]
             ]
 
-        if self.filters['type_contrat_filter']:
+        if self.filters["type_contrat_filter"]:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('type_contrat') == self.filters['type_contrat_filter']
+                item
+                for item in filtered_data
+                if item.get("type_contrat") == self.filters["type_contrat_filter"]
             ]
 
         # Filtres de salaire
-        if self.filters['salaire_min'] is not None:
+        if self.filters["salaire_min"] is not None:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('salaire_actuel', 0) >= self.filters['salaire_min']
+                item
+                for item in filtered_data
+                if item.get("salaire_actuel", 0) >= self.filters["salaire_min"]
             ]
 
-        if self.filters['salaire_max'] is not None:
+        if self.filters["salaire_max"] is not None:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('salaire_actuel', 0) <= self.filters['salaire_max']
+                item
+                for item in filtered_data
+                if item.get("salaire_actuel", 0) <= self.filters["salaire_max"]
             ]
 
         # Filtres d'expérience
-        if self.filters['experience_min'] is not None:
+        if self.filters["experience_min"] is not None:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('experience_annees', 0) >= self.filters['experience_min']
+                item
+                for item in filtered_data
+                if item.get("experience_annees", 0) >= self.filters["experience_min"]
             ]
 
-        if self.filters['experience_max'] is not None:
+        if self.filters["experience_max"] is not None:
             filtered_data = [
-                item for item in filtered_data
-                if item.get('experience_annees', 0) <= self.filters['experience_max']
+                item
+                for item in filtered_data
+                if item.get("experience_annees", 0) <= self.filters["experience_max"]
             ]
 
         return filtered_data
@@ -299,7 +311,9 @@ class DataTableEnhancer:
     """Classe pour améliorer l'affichage des tableaux de données"""
 
     @staticmethod
-    def render_enhanced_table(data: List[Dict], key_prefix: str = "table") -> Optional[Dict]:
+    def render_enhanced_table(
+        data: List[Dict], key_prefix: str = "table"
+    ) -> Optional[Dict]:
         """Affiche un tableau amélioré avec sélection et actions"""
         if not data:
             st.info("📝 Aucune donnée à afficher")
@@ -310,23 +324,23 @@ class DataTableEnhancer:
 
         # Renommer les colonnes pour un meilleur affichage
         column_mapping = {
-            'id': 'ID',
-            'prenom': 'Prénom',
-            'nom': 'Nom',
-            'email': 'Email',
-            'telephone': 'Téléphone',
-            'salaire_actuel': 'Salaire Actuel',
-            'disponibilite': 'Disponible',
-            'practice_name': 'Practice',
-            'grade': 'Grade',
-            'type_contrat': 'Contrat',
-            'societe': 'Société',
-            'experience_annees': 'Années Exp.',
-            'nb_missions': 'Missions',
-            'cjm_formatted': 'CJM',
-            'salaire_formatted': 'Salaire Formaté',
-            'experience_formatted': 'Expérience Formatée',
-            'statut': 'Statut'
+            "id": "ID",
+            "prenom": "Prénom",
+            "nom": "Nom",
+            "email": "Email",
+            "telephone": "Téléphone",
+            "salaire_actuel": "Salaire Actuel",
+            "disponibilite": "Disponible",
+            "practice_name": "Practice",
+            "grade": "Grade",
+            "type_contrat": "Contrat",
+            "societe": "Société",
+            "experience_annees": "Années Exp.",
+            "nb_missions": "Missions",
+            "cjm_formatted": "CJM",
+            "salaire_formatted": "Salaire Formaté",
+            "experience_formatted": "Expérience Formatée",
+            "statut": "Statut",
         }
 
         # Appliquer le mapping des colonnes
@@ -334,8 +348,18 @@ class DataTableEnhancer:
 
         # Sélectionner les colonnes à afficher
         display_columns = [
-            'ID', 'Prénom', 'Nom', 'Email', 'Société', 'Grade', 'Contrat',
-            'Salaire Actuel', 'CJM', 'Années Exp.', 'Statut', 'Missions'
+            "ID",
+            "Prénom",
+            "Nom",
+            "Email",
+            "Société",
+            "Grade",
+            "Contrat",
+            "Salaire Actuel",
+            "CJM",
+            "Années Exp.",
+            "Statut",
+            "Missions",
         ]
 
         # Garder seulement les colonnes qui existent
@@ -354,11 +378,15 @@ class DataTableEnhancer:
                 "Prénom": st.column_config.TextColumn("Prénom", width="medium"),
                 "Nom": st.column_config.TextColumn("Nom", width="medium"),
                 "Email": st.column_config.TextColumn("Email", width="large"),
-                "Salaire Actuel": st.column_config.TextColumn("Salaire Actuel", width="medium"),
+                "Salaire Actuel": st.column_config.TextColumn(
+                    "Salaire Actuel", width="medium"
+                ),
                 "CJM": st.column_config.TextColumn("CJM", width="medium"),
-                "Années Exp.": st.column_config.TextColumn("Années Exp.", width="small"),
+                "Années Exp.": st.column_config.TextColumn(
+                    "Années Exp.", width="small"
+                ),
                 "Missions": st.column_config.NumberColumn("Missions", width="small"),
-            }
+            },
         )
 
         return event
@@ -369,14 +397,18 @@ class DataTableEnhancer:
         if not selected_data:
             return None
 
-        st.success(f"✅ Sélectionné : {selected_data.get('prenom', '')} {selected_data.get('nom', '')}")
+        st.success(
+            f"✅ Sélectionné : {selected_data.get('prenom', '')} {selected_data.get('nom', '')}"
+        )
 
         col1, col2, col3 = st.columns(3)
 
         action_performed = None
 
         with col1:
-            if "view" in actions and st.button("👁️ Voir profil", type="primary", use_container_width=True):
+            if "view" in actions and st.button(
+                "👁️ Voir profil", type="primary", use_container_width=True
+            ):
                 action_performed = "view"
 
         with col2:
@@ -384,7 +416,9 @@ class DataTableEnhancer:
                 action_performed = "edit"
 
         with col3:
-            if "delete" in actions and st.button("🗑️ Supprimer", use_container_width=True):
+            if "delete" in actions and st.button(
+                "🗑️ Supprimer", use_container_width=True
+            ):
                 action_performed = "delete"
 
         return action_performed
@@ -460,7 +494,7 @@ def create_enhanced_consultants_view():
     search_term = st.text_input(
         "🔍 Recherche en temps réel",
         placeholder="Tapez pour rechercher instantanément...",
-        help="La recherche se met à jour automatiquement pendant que vous tapez"
+        help="La recherche se met à jour automatiquement pendant que vous tapez",
     )
 
     # Chargement des données avec cache
@@ -482,14 +516,16 @@ def create_enhanced_consultants_view():
             st.metric("👥 Total", len(data))
 
         with col2:
-            disponibles = len([c for c in data if c.get('disponibilite', False)])
+            disponibles = len([c for c in data if c.get("disponibilite", False)])
             st.metric("✅ Disponibles", disponibles)
 
         with col3:
             st.metric("🔴 Occupés", len(data) - disponibles)
 
         with col4:
-            salaire_moyen = sum(c.get('salaire_actuel', 0) for c in data) / len(data) if data else 0
+            salaire_moyen = (
+                sum(c.get("salaire_actuel", 0) for c in data) / len(data) if data else 0
+            )
             st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
 
     # Afficher le tableau amélioré
@@ -502,18 +538,17 @@ def create_enhanced_consultants_view():
             selected_consultant = data[selected_idx]
 
             action = enhancer.render_action_buttons(
-                selected_consultant,
-                ["view", "edit", "delete"]
+                selected_consultant, ["view", "edit", "delete"]
             )
 
             if action == "view":
-                st.session_state.view_consultant_profile = selected_consultant['id']
+                st.session_state.view_consultant_profile = selected_consultant["id"]
                 st.rerun()
             elif action == "edit":
-                st.session_state.view_consultant_profile = selected_consultant['id']
+                st.session_state.view_consultant_profile = selected_consultant["id"]
                 st.rerun()
             elif action == "delete":
-                if ConsultantService.delete_consultant(selected_consultant['id']):
+                if ConsultantService.delete_consultant(selected_consultant["id"]):
                     NotificationManager.show_success("Consultant supprimé avec succès!")
                     st.rerun()
                 else:
@@ -522,10 +557,10 @@ def create_enhanced_consultants_view():
 
 # Export des classes pour utilisation externe
 __all__ = [
-    'AdvancedUIFilters',
-    'RealTimeSearch',
-    'DataTableEnhancer',
-    'LoadingSpinner',
-    'NotificationManager',
-    'create_enhanced_consultants_view'
+    "AdvancedUIFilters",
+    "RealTimeSearch",
+    "DataTableEnhancer",
+    "LoadingSpinner",
+    "NotificationManager",
+    "create_enhanced_consultants_view",
 ]

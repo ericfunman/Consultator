@@ -396,7 +396,9 @@ def show_practice_detailed_stats_cached(practice_name: str):
             st.metric("🎯 Total Missions", stats["total_missions"])
 
         # Métriques supplémentaires
-        col5, col6 = st.columns([1, 1])  # Utiliser une liste pour spécifier les proportions
+        col5, col6 = st.columns(
+            [1, 1]
+        )  # Utiliser une liste pour spécifier les proportions
 
         with col5:
             st.metric("🔧 Total Compétences", stats["total_competences"])
