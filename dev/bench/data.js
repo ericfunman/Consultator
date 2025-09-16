@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758030984078,
+  "lastUpdate": 1758031327165,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -4295,6 +4295,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.0000093192089950858",
             "extra": "mean: 5.096569573603756 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "e94eae001ded5504b26c9af8ae3996bd6836268c",
+          "message": " Correction massive f-strings multi-lignes - Compatibilité Python 3.10\n\n Script automatique appliqué sur 11 fichiers :\n- business_managers.py\n- consultants.py\n- consultants_clean.py\n- consultants_final.py\n- consultants_optimized.py\n- consultant_cv.py\n- practices_optimized.py\n- chatbot_service.py\n- document_analyzer.py\n- document_analyzer_clean.py\n- simple_analyzer.py\n\n Objectif : Résoudre ALL les erreurs de syntaxe f-strings pour Python 3.10/Linux\n Pipeline CI/CD maintenant 100% compatible",
+          "timestamp": "2025-09-16T15:57:31+02:00",
+          "tree_id": "f943cdd85baec08d116cbb903f0313db44ef58cf",
+          "url": "https://github.com/ericfunman/Consultator/commit/e94eae001ded5504b26c9af8ae3996bd6836268c"
+        },
+        "date": 1758031326056,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 940.7573495621573,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000045431177842988365",
+            "extra": "mean: 1.0629733591402877 msec\nrounds: 930"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 290765.18437678384,
+            "unit": "iter/sec",
+            "range": "stddev: 5.506349010836704e-7",
+            "extra": "mean: 3.439201299644474 usec\nrounds: 115261"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158429.29983943544,
+            "unit": "iter/sec",
+            "range": "stddev: 7.593851422912622e-7",
+            "extra": "mean: 6.311963765625915 usec\nrounds: 79593"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33911.35285452582,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001668067641854413",
+            "extra": "mean: 29.48864954724269 usec\nrounds: 15129"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.92763626758364,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001529234259869825",
+            "extra": "mean: 5.078007429293511 msec\nrounds: 198"
           }
         ]
       }
