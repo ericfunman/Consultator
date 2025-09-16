@@ -868,9 +868,7 @@ class ChatbotService:
                                 word in question_lower
                                 for word in ["contrat", "type contrat", "cdi", "cdd"]
                             ):
-                                response = f"📋 **Type de contrat de {consultant.prenom} {
-                                    consultant.nom}** : **{
-                                    consultant_db.type_contrat or 'Non renseigné'}**"
+                                response = f"📋 **Type de contrat de {consultant.prenom} {consultant.nom}** : **{consultant_db.type_contrat or 'Non renseigné'}**"
 
                             elif any(
                                 word in question_lower

@@ -118,8 +118,7 @@ def show_cv_skills(analysis: Dict):
 
                 if st.button(
                     f"{skill} ({status})",
-                    key=f"skill_{category}_{i}_{st.session_state.get('view_consultant_profile',
-                            0)}",
+                    key=f"skill_{category}_{i}_{st.session_state.get('view_consultant_profile', 0)}",
                 ):
                     if not existing:
                         add_skill_from_cv(
