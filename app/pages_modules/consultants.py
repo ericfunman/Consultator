@@ -613,8 +613,7 @@ def show_consultant_info(consultant):
 
         if st.button(
             "📈 Afficher l'évolution des salaires",
-            key=f"show_salary_graph_{
-                consultant.id}",
+            key=f"show_salary_graph_{consultant.id}",
         ):
             dates = [s.date_debut for s in salaires_sorted]
             values = [s.salaire for s in salaires_sorted]
@@ -639,20 +638,17 @@ def show_consultant_info(consultant):
                 "Nouveau salaire (€)",
                 min_value=0,
                 step=1000,
-                key=f"salaire_{
-                    consultant.id}",
+                key=f"salaire_{consultant.id}",
             )
             new_date_debut = st.date_input(
                 "Date de début",
                 value=datetime.today(),
-                key=f"date_debut_{
-                    consultant.id}",
+                key=f"date_debut_{consultant.id}",
             )
             new_commentaire = st.text_input(
                 "Commentaire",
                 value="",
-                key=f"commentaire_{
-                    consultant.id}",
+                key=f"commentaire_{consultant.id}",
             )
             add_salary_submitted = st.form_submit_button(
                 "Ajouter l'évolution de salaire"
@@ -1496,12 +1492,15 @@ def show_consultants_list():
             RealTimeSearch,
             DataTableEnhancer,
             LoadingSpinner,
-            NotificationManager
+            NotificationManager,
         )
+
         enhanced_ui_available = True
     except ImportError:
         enhanced_ui_available = False
-        st.warning("⚠️ Composants UI avancés non disponibles. Utilisation du mode classique.")
+        st.warning(
+            "⚠️ Composants UI avancés non disponibles. Utilisation du mode classique."
+        )
 
     if enhanced_ui_available:
         # Utilisation des nouveaux composants améliorés
@@ -1519,7 +1518,7 @@ def show_consultants_list_enhanced():
         RealTimeSearch,
         DataTableEnhancer,
         LoadingSpinner,
-        NotificationManager
+        NotificationManager,
     )
 
     # Initialisation des composants
@@ -1534,14 +1533,16 @@ def show_consultants_list_enhanced():
     search_term = st.text_input(
         "🔍 Recherche en temps réel",
         placeholder="Tapez pour rechercher instantanément...",
-        help="La recherche se met à jour automatiquement pendant que vous tapez"
+        help="La recherche se met à jour automatiquement pendant que vous tapez",
     )
 
     # Chargement des données avec cache
     with LoadingSpinner.show_loading("Chargement des données..."):
         try:
             if search_term and search.should_search():
-                consultants = ConsultantService.search_consultants_optimized(search_term.strip())
+                consultants = ConsultantService.search_consultants_optimized(
+                    search_term.strip()
+                )
             else:
                 consultants = ConsultantService.get_all_consultants_with_stats()
         except Exception as e:
@@ -1553,24 +1554,28 @@ def show_consultants_list_enhanced():
         # Convertir les données pour les filtres
         consultants_data = []
         for consultant in consultants:
-            consultants_data.append({
-                'id': consultant['id'],
-                'prenom': consultant['prenom'],
-                'nom': consultant['nom'],
-                'email': consultant['email'],
-                'societe': consultant['societe'],
-                'grade': consultant['grade'],
-                'type_contrat': consultant['type_contrat'],
-                'salaire_actuel': consultant.get('salaire_actuel', 0),
-                'disponibilite': consultant.get('disponibilite', False),
-                'practice_name': consultant.get('practice_name', ''),
-                'experience_annees': consultant.get('experience_annees', 0),
-                'nb_missions': consultant.get('nb_missions', 0),
-                'salaire_formatted': consultant.get('salaire_formatted', '0€'),
-                'cjm_formatted': consultant.get('cjm_formatted', '0€'),
-                'experience_formatted': consultant.get('experience_formatted', '0 ans'),
-                'statut': consultant.get('statut', 'N/A')
-            })
+            consultants_data.append(
+                {
+                    "id": consultant["id"],
+                    "prenom": consultant["prenom"],
+                    "nom": consultant["nom"],
+                    "email": consultant["email"],
+                    "societe": consultant["societe"],
+                    "grade": consultant["grade"],
+                    "type_contrat": consultant["type_contrat"],
+                    "salaire_actuel": consultant.get("salaire_actuel", 0),
+                    "disponibilite": consultant.get("disponibilite", False),
+                    "practice_name": consultant.get("practice_name", ""),
+                    "experience_annees": consultant.get("experience_annees", 0),
+                    "nb_missions": consultant.get("nb_missions", 0),
+                    "salaire_formatted": consultant.get("salaire_formatted", "0€"),
+                    "cjm_formatted": consultant.get("cjm_formatted", "0€"),
+                    "experience_formatted": consultant.get(
+                        "experience_formatted", "0 ans"
+                    ),
+                    "statut": consultant.get("statut", "N/A"),
+                }
+            )
 
         # Appliquer les filtres
         filtered_data = filters.apply_filters(consultants_data)
@@ -1583,14 +1588,21 @@ def show_consultants_list_enhanced():
                 st.metric("👥 Total filtré", len(filtered_data))
 
             with col2:
-                disponibles = len([c for c in filtered_data if c.get('disponibilite', False)])
+                disponibles = len(
+                    [c for c in filtered_data if c.get("disponibilite", False)]
+                )
                 st.metric("✅ Disponibles", disponibles)
 
             with col3:
                 st.metric("🔴 Occupés", len(filtered_data) - disponibles)
 
             with col4:
-                salaire_moyen = sum(c.get('salaire_actuel', 0) for c in filtered_data) / len(filtered_data) if filtered_data else 0
+                salaire_moyen = (
+                    sum(c.get("salaire_actuel", 0) for c in filtered_data)
+                    / len(filtered_data)
+                    if filtered_data
+                    else 0
+                )
                 st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
 
         # Afficher le tableau amélioré
@@ -1603,25 +1615,28 @@ def show_consultants_list_enhanced():
                 selected_consultant = filtered_data[selected_idx]
 
                 action = enhancer.render_action_buttons(
-                    selected_consultant,
-                    ["view", "edit", "delete"]
+                    selected_consultant, ["view", "edit", "delete"]
                 )
 
                 if action == "view":
-                    st.session_state.view_consultant_profile = selected_consultant['id']
+                    st.session_state.view_consultant_profile = selected_consultant["id"]
                     st.rerun()
                 elif action == "edit":
-                    st.session_state.view_consultant_profile = selected_consultant['id']
+                    st.session_state.view_consultant_profile = selected_consultant["id"]
                     st.rerun()
                 elif action == "delete":
-                    if ConsultantService.delete_consultant(selected_consultant['id']):
-                        NotificationManager.show_success("Consultant supprimé avec succès!")
+                    if ConsultantService.delete_consultant(selected_consultant["id"]):
+                        NotificationManager.show_success(
+                            "Consultant supprimé avec succès!"
+                        )
                         st.rerun()
                     else:
                         NotificationManager.show_error("Erreur lors de la suppression")
     else:
         st.info("📝 Aucun consultant enregistré")
-        st.markdown("💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil")
+        st.markdown(
+            "💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil"
+        )
 
 
 def show_consultants_list_classic():
@@ -2061,9 +2076,7 @@ def save_consultant_document(uploaded_file, consultant, document_type, descripti
         file_extension = DocumentService.get_file_extension(uploaded_file.name)
 
         # Nom du fichier: consultant_nom_type_timestamp.extension
-        safe_name = f"{
-            consultant.prenom}_{
-            consultant.nom}_{document_type}_{timestamp}.{file_extension}"
+        safe_name = f"{consultant.prenom}_{consultant.nom}_{document_type}_{timestamp}.{file_extension}"
         safe_name = safe_name.replace(" ", "_").replace("-", "_")
 
         file_path = upload_dir / safe_name
@@ -2110,16 +2123,10 @@ def save_consultant_document_simple(uploaded_file, consultant):
         if len(name_parts) == 2:
             name, extension = name_parts
             # Nom final: ID_Nom_Prenom_FichierOriginal_Timestamp.extension
-            safe_name = f"{
-                consultant.id}_{
-                consultant.prenom}_{
-                consultant.nom}_{name}_{timestamp}.{extension}"
+            safe_name = f"{consultant.id}_{consultant.prenom}_{consultant.nom}_{name}_{timestamp}.{extension}"
         else:
             # Pas d'extension
-            safe_name = f"{
-                consultant.id}_{
-                consultant.prenom}_{
-                consultant.nom}_{original_name}_{timestamp}"
+            safe_name = f"{consultant.id}_{consultant.prenom}_{consultant.nom}_{original_name}_{timestamp}"
 
         # Nettoyer le nom de fichier
         safe_name = safe_name.replace(" ", "_").replace("-", "_")
@@ -2220,8 +2227,7 @@ def show_existing_documents(consultant):
             with col1:
                 st.write(f"� **{display_name}**")
                 st.caption(
-                    f"{doc_type} • {size_display} • {
-                        modified_time.strftime('%d/%m/%Y')}"
+                    f"{doc_type} • {size_display} • {modified_time.strftime('%d/%m/%Y')}"
                 )
 
             with col2:
