@@ -1111,8 +1111,7 @@ class ChatbotService:
                                     status_icon = (
                                         "🟢" if consultant.disponibilite else "🔴"
                                     )
-                                    response += f"{i}. {status_icon} **{consultant.prenom} {
-                                        consultant.nom}**"
+                                    response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
                                     if consultant.grade:
                                         response += f" - {consultant.grade}"
                                     if consultant.type_contrat:
@@ -1295,8 +1294,7 @@ class ChatbotService:
                 skills = self._get_consultant_skills(consultant.id, type_competence)
 
                 if skills:
-                    response = f"🎯 **Compétences de {consultant.prenom} {
-                        consultant.nom} :**\n\n"
+                    response = f"🎯 **Compétences de {consultant.prenom} {consultant.nom} :**\n\n"
 
                     # Grouper par catégorie
                     categories: Dict[str, List[Dict[str, Any]]] = {}
@@ -1326,14 +1324,12 @@ class ChatbotService:
                                 else:
                                     experience_text = f" ({comp['annees_experience']:.0f} ans)"
 
-                            response += f"  {niveau_emoji} **{comp['nom']}** - {
-                                comp['niveau_maitrise'].title()}{experience_text}\n"
+                            response += f"  {niveau_emoji} **{comp['nom']}** - {comp['niveau_maitrise'].title()}{experience_text}\n"
                         response += "\n"
 
                     response += f"� **Total : {len(skills)} compétence(s)**"
                 else:
-                    response = f"❌ Aucune compétence enregistrée pour **{consultant.prenom} {
-                        consultant.nom}**."
+                    response = f"❌ Aucune compétence enregistrée pour **{consultant.prenom} {consultant.nom}**."
             else:
                 response = f"❌ Consultant **{nom}** introuvable."
 
@@ -1471,8 +1467,7 @@ class ChatbotService:
                             + " langue(s)**"
                         )
                     else:
-                        response = f"❌ Aucune langue enregistrée pour **{consultant.prenom} {
-                            consultant.nom}**."
+                        response = f"❌ Aucune langue enregistrée pour **{consultant.prenom} {consultant.nom}**."
                 else:
                     response = f"❌ Consultant **{nom}** introuvable."
 
@@ -1627,8 +1622,7 @@ class ChatbotService:
                                 " (dont " + str(len(missions_en_cours)) + " en cours)"
                             )
                 elif missions:
-                    response = f"💼 **Missions de {consultant.prenom} {
-                        consultant.nom} :**\n\n"
+                    response = f"💼 **Missions de {consultant.prenom} {consultant.nom} :**\n\n"
                     for mission in missions:
                         status_icon = "🟢" if mission.statut == "en_cours" else "✅"
                         response += f"{status_icon} **{mission.client}** - {mission.nom_mission}\n"
@@ -1645,8 +1639,7 @@ class ChatbotService:
 
                     response += "📊 **Total : " + str(len(missions)) + " mission(s)**"
                 else:
-                    response = f"❌ Aucune mission trouvée pour **{consultant.prenom} {
-                        consultant.nom}**."
+                    response = f"❌ Aucune mission trouvée pour **{consultant.prenom} {consultant.nom}**."
             else:
                 response = f"❌ Consultant **{nom}** introuvable."
 
@@ -1739,28 +1732,21 @@ class ChatbotService:
 
                 if any(word in question_lower for word in ["mail", "email", "e-mail"]):
                     if consultant.email:
-                        response = f"📧 L'email de **{consultant.prenom} {
-                            consultant.nom}** est : **{
-                            consultant.email}**"
+                        response = f"📧 L'email de **{consultant.prenom} {consultant.nom}** est : **{consultant.email}**"
                     else:
-                        response = f"❓ Désolé, l'email de **{consultant.prenom} {
-                            consultant.nom}** n'est pas renseigné dans la base."
+                        response = f"❓ Désolé, l'email de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
 
                 elif any(
                     word in question_lower for word in ["téléphone", "tel", "numéro"]
                 ):
                     if consultant.telephone:
-                        response = f"📞 Le téléphone de **{consultant.prenom} {
-                            consultant.nom}** est : **{
-                            consultant.telephone}**"
+                        response = f"📞 Le téléphone de **{consultant.prenom} {consultant.nom}** est : **{consultant.telephone}**"
                     else:
-                        response = f"❓ Désolé, le téléphone de **{consultant.prenom} {
-                            consultant.nom}** n'est pas renseigné dans la base."
+                        response = f"❓ Désolé, le téléphone de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
 
                 else:
                     # Information de contact complète
-                    response = f"📞 **Contact de {consultant.prenom} {
-                        consultant.nom} :**\n\n"
+                    response = f"📞 **Contact de {consultant.prenom} {consultant.nom} :**\n\n"
                     response += (
                         f"📧 Email : **{consultant.email or 'Non renseigné'}**\n"
                     )

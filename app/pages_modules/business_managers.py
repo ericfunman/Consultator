@@ -694,11 +694,7 @@ def show_add_bm_assignment(bm, session):
                 )
                 for consultant, current_bm, existing_assignment in assigned_to_other_bm:
                     since_date = existing_assignment.date_debut.strftime("%d/%m/%Y")
-                    key = f"🔄 {consultant.prenom} {
-                        consultant.nom} ({
-                        consultant.email}) - Actuellement avec {
-                        current_bm.prenom} {
-                        current_bm.nom} depuis le {since_date}"
+                    key = f"🔄 {consultant.prenom} {consultant.nom} ({consultant.email}) - Actuellement avec {current_bm.prenom} {current_bm.nom} depuis le {since_date}"
                     consultant_options[key] = {
                         "consultant": consultant,
                         "status": "assigned",
@@ -729,8 +725,7 @@ def show_add_bm_assignment(bm, session):
             # Afficher un avertissement si le consultant est déjà assigné
             if selected_data["status"] == "assigned":
                 st.warning(
-                    f"⚠️ **ATTENTION :** Ce consultant est actuellement assigné à {selected_data['current_bm'].prenom} {
-                        selected_data['current_bm'].nom}"
+                    f"⚠️ **ATTENTION :** Ce consultant est actuellement assigné à {selected_data['current_bm'].prenom} {selected_data['current_bm'].nom}"
                 )
                 st.info(
                     "✅ En confirmant, l'assignation actuelle sera automatiquement clôturée et une nouvelle assignation sera créée."
@@ -765,9 +760,7 @@ def show_add_bm_assignment(bm, session):
 
                         # Ajouter le commentaire de clôture
                         existing_comment = existing_assignment.commentaire or ""
-                        new_comment = f"Transfert vers {bm.prenom} {
-                            bm.nom} le {
-                            date_debut.strftime('%d/%m/%Y')}"
+                        new_comment = f"Transfert vers {bm.prenom} {bm.nom} le {date_debut.strftime('%d/%m/%Y')}"
                         if cloture_comment:
                             new_comment += f" - Raison: {cloture_comment}"
 
@@ -802,17 +795,11 @@ def show_add_bm_assignment(bm, session):
 
                     if selected_data["status"] == "assigned":
                         st.success(
-                            f"✅ Transfert réussi ! {consultant.prenom} {
-                                consultant.nom} est maintenant assigné(e) à {
-                                bm.prenom} {
-                                bm.nom}"
+                            f"✅ Transfert réussi ! {consultant.prenom} {consultant.nom} est maintenant assigné(e) à {bm.prenom} {bm.nom}"
                         )
                     else:
                         st.success(
-                            f"✅ Assignation créée ! {consultant.prenom} {
-                                consultant.nom} est maintenant assigné(e) à {
-                                bm.prenom} {
-                                bm.nom}"
+                            f"✅ Assignation créée ! {consultant.prenom} {consultant.nom} est maintenant assigné(e) à {bm.prenom} {bm.nom}"
                         )
 
                     st.balloons()
