@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758023152661,
+  "lastUpdate": 1758023427696,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -2643,6 +2643,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014874738575275456",
             "extra": "mean: 5.0904964619282245 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "b52e54e34ba7e422d7a57feb5854884e34c30c45",
+          "message": "Fix deprecated actions/cache@v2 in CI pipeline\n\n- Update actions/cache from v2 to v4 to avoid workflow failures\n- Resolves 'deprecated version' error in CI/CD pipeline\n- Maintains pip dependency caching functionality",
+          "timestamp": "2025-09-16T13:45:56+02:00",
+          "tree_id": "2ff9f6952fa4c70845af43de332b69fa4717c85c",
+          "url": "https://github.com/ericfunman/Consultator/commit/b52e54e34ba7e422d7a57feb5854884e34c30c45"
+        },
+        "date": 1758023427116,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.447990619779,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000015962228582712428",
+            "extra": "mean: 1.0621935677420424 msec\nrounds: 930"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 289901.978746979,
+            "unit": "iter/sec",
+            "range": "stddev: 4.977877017021054e-7",
+            "extra": "mean: 3.449441788297628 usec\nrounds: 56389"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 159383.42973281172,
+            "unit": "iter/sec",
+            "range": "stddev: 7.566028312731926e-7",
+            "extra": "mean: 6.274177947333588 usec\nrounds: 77197"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 31765.798888763995,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000005380358648748861",
+            "extra": "mean: 31.480398257942564 usec\nrounds: 27324"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.45857666522028,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000015034778076208986",
+            "extra": "mean: 5.090131553299772 msec\nrounds: 197"
           }
         ]
       }
