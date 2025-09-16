@@ -271,8 +271,7 @@ def show_practice_consultants_optimized(practice_name: str, consultants: list):
         return
 
     st.markdown(
-        f"### 🏢 {practice_name} ({len(consultants)} consultant{
-            's' if len(consultants) > 1 else ''})"
+        f"### 🏢 {practice_name} ({len(consultants)} consultant{'s' if len(consultants) > 1 else ''})"
     )
 
     # Créer un DataFrame optimisé (données déjà préparées)

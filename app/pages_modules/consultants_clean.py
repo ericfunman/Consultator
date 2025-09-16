@@ -139,9 +139,7 @@ def show_consultant_skills(consultant):
     # Debug forcé pour vérifier que cette fonction est appelée
     st.error("🔥 DEBUG: Cette fonction est bien appelée !")
     st.write(
-        f"🔍 Consultant ID: {consultant.id}, Nom: {
-            consultant.nom} {
-                consultant.prenom}"
+        f"🔍 Consultant ID: {consultant.id}, Nom: {consultant.nom} {consultant.prenom}"
     )
 
     # Récupérer les technologies des missions du consultant

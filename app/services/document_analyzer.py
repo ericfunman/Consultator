@@ -362,8 +362,7 @@ class DocumentAnalyzer:
 
             result = "\n\n".join(text_parts)
             st.success(
-                f"✅ {len(text_parts)} éléments extraits ({
-                    len(result)} caractères)"
+                f"✅ {len(text_parts)} éléments extraits ({len(result)} caractères)"
             )
             return result
 
@@ -559,9 +558,7 @@ class DocumentAnalyzer:
         missions.extend(missions_quanteam)
 
         st.info(
-            f"🚀 {len(missions)} missions brutes trouvées avant nettoyage (dont {
-                len(missions_powerpoint)} PowerPoint optimisées et {
-                len(missions_quanteam)} Quanteam corrigées)"
+            f"🚀 {len(missions)} missions brutes trouvées avant nettoyage (dont {len(missions_powerpoint)} PowerPoint optimisées et {len(missions_quanteam)} Quanteam corrigées)"
         )
 
         # Nettoyer et dédupliquer
@@ -1060,8 +1057,7 @@ class DocumentAnalyzer:
             # Clé unique basée sur client + dates + début du résumé pour éviter les
             # vrais doublons
             resume_start = resume[:50] if resume else ""
-            key = f"{client.lower().strip()}_{date_debut}_{date_fin}_{
-                resume_start.lower()}"
+            key = f"{client.lower().strip()}_{date_debut}_{date_fin}_{resume_start.lower()}"
 
             # Exception pour les missions PowerPoint optimisées : les garder TOUJOURS
             # (chacune est unique)

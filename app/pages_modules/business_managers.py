@@ -350,8 +350,7 @@ def show_delete_bm_confirmation(bm):
                                 delete_session.commit()
 
                         st.success(
-                            f"✅ Business Manager {bm.prenom} {
-                                bm.nom} supprimé avec succès !"
+                            f"✅ Business Manager {bm.prenom} {bm.nom} supprimé avec succès !"
                         )
                         del st.session_state.view_bm_profile
                         del st.session_state.delete_bm_mode
@@ -680,9 +679,7 @@ def show_add_bm_assignment(bm, session):
             if available_consultants:
                 st.write("**🟢 Consultants disponibles :**")
                 for consultant in available_consultants:
-                    key = f"🟢 {consultant.prenom} {
-                        consultant.nom} ({
-                        consultant.email}) - DISPONIBLE"
+                    key = f"🟢 {consultant.prenom} {consultant.nom} ({consultant.email}) - DISPONIBLE"
                     consultant_options[key] = {
                         "consultant": consultant,
                         "status": "available",

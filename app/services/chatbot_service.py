@@ -862,9 +862,7 @@ class ChatbotService:
                                 word in question_lower
                                 for word in ["grade", "niveau", "poste", "fonction"]
                             ):
-                                response = f"🎯 **Grade de {consultant.prenom} {
-                                    consultant.nom}** : **{
-                                    consultant_db.grade or 'Non renseigné'}**"
+                                response = f"🎯 **Grade de {consultant.prenom} {consultant.nom}** : **{consultant_db.grade or 'Non renseigné'}**"
 
                             elif any(
                                 word in question_lower

@@ -198,8 +198,7 @@ class DocumentAnalyzer:
 
             result = "\n\n".join(text_parts)
             st.success(
-                f"✅ {len(text_parts)} éléments extraits ({
-                    len(result)} caractères)"
+                f"✅ {len(text_parts)} éléments extraits ({len(result)} caractères)"
             )
             return result
 

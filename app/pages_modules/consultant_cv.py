@@ -758,9 +758,7 @@ def generate_cv_analysis_report(analysis: Dict, consultant):
         st.download_button(
             label="📥 Télécharger le rapport",
             data=report,
-            file_name=f"analyse_cv_{consultant.prenom}_{
-                consultant.nom}_{
-                datetime.now().strftime('%Y%m%d')}.md",
+            file_name=f"analyse_cv_{consultant.prenom}_{consultant.nom}_{datetime.now().strftime('%Y%m%d')}.md",
             mime="text/markdown",
             key="download_analysis_report",
         )
