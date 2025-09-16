@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758023573645,
+  "lastUpdate": 1758023748447,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -2879,6 +2879,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000025669311537701203",
             "extra": "mean: 5.106870076142003 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "f8b4e9302e62a6b09bfb599bfeca3b22e5d8de11",
+          "message": "Fix Black code formatting in consultant_profile.py\n\n- Reformatted long any() expressions to multiple lines for better readability\n- Changed single quotes to double quotes where appropriate\n- Made code compliant with Black formatting standards\n- Resolves CI/CD quality check failure",
+          "timestamp": "2025-09-16T13:51:23+02:00",
+          "tree_id": "1ee5a8e579f65bd83debf3812e9962cf26b91a3a",
+          "url": "https://github.com/ericfunman/Consultator/commit/f8b4e9302e62a6b09bfb599bfeca3b22e5d8de11"
+        },
+        "date": 1758023748047,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.2786809530279,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000033905515947722854",
+            "extra": "mean: 1.0623846266097496 msec\nrounds: 932"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 287150.3614808185,
+            "unit": "iter/sec",
+            "range": "stddev: 5.037510479235287e-7",
+            "extra": "mean: 3.482496051347648 usec\nrounds: 119532"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 161465.9367349722,
+            "unit": "iter/sec",
+            "range": "stddev: 8.403434389731927e-7",
+            "extra": "mean: 6.193256734027965 usec\nrounds: 77072"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 32612.29028046441,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000016794863106415371",
+            "extra": "mean: 30.66328649107559 usec\nrounds: 27596"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.9449257300671,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001493884668807739",
+            "extra": "mean: 5.0775616395956344 msec\nrounds: 197"
           }
         ]
       }
