@@ -13,6 +13,7 @@ from typing import Any, Dict, Optional, Union
 
 try:
     import redis
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -22,7 +23,9 @@ except ImportError:
 class CacheService:
     """Service de cache multi-niveaux pour optimiser les performances"""
 
-    def __init__(self, redis_url: str = "redis://localhost:6379/0", default_ttl: int = 300):
+    def __init__(
+        self, redis_url: str = "redis://localhost:6379/0", default_ttl: int = 300
+    ):
         """
         Initialise le service de cache
 
@@ -61,7 +64,7 @@ class CacheService:
 
     def _is_expired(self, cache_entry: Dict[str, Any]) -> bool:
         """Vérifie si une entrée de cache a expiré"""
-        return time.time() > cache_entry.get('expires_at', 0)
+        return time.time() > cache_entry.get("expires_at", 0)
 
     def get(self, key: str) -> Optional[Any]:
         """Récupère une valeur du cache"""
@@ -78,7 +81,7 @@ class CacheService:
         if key in self.memory_cache:
             cache_entry = self.memory_cache[key]
             if not self._is_expired(cache_entry):
-                return cache_entry['data']
+                return cache_entry["data"]
             else:
                 # Supprimer l'entrée expirée
                 del self.memory_cache[key]
@@ -91,9 +94,9 @@ class CacheService:
         expires_at = time.time() + ttl
 
         cache_entry = {
-            'data': value,
-            'expires_at': expires_at,
-            'created_at': time.time()
+            "data": value,
+            "expires_at": expires_at,
+            "created_at": time.time(),
         }
 
         # Stocker dans Redis
@@ -142,7 +145,9 @@ class CacheService:
                 print(f"⚠️ Erreur Redis CLEAR: {e}")
 
         # Supprimer du cache mémoire
-        keys_to_delete = [k for k in self.memory_cache.keys() if pattern.replace('*', '') in k]
+        keys_to_delete = [
+            k for k in self.memory_cache.keys() if pattern.replace("*", "") in k
+        ]
         for key in keys_to_delete:
             del self.memory_cache[key]
             deleted_count += 1
@@ -155,38 +160,33 @@ class CacheService:
         memory_size = sum(len(str(entry)) for entry in self.memory_cache.values())
 
         stats = {
-            'memory_cache': {
-                'entries': memory_entries,
-                'estimated_size_kb': memory_size / 1024,
-                'hit_rate': 0  # À implémenter avec des compteurs
+            "memory_cache": {
+                "entries": memory_entries,
+                "estimated_size_kb": memory_size / 1024,
+                "hit_rate": 0,  # À implémenter avec des compteurs
             }
         }
 
         if self.redis_client:
             try:
                 redis_info = self.redis_client.info()
-                stats['redis'] = {
-                    'connected': True,
-                    'used_memory_human': redis_info.get('used_memory_human', 'N/A'),
-                    'connected_clients': redis_info.get('connected_clients', 0),
-                    'uptime_days': redis_info.get('uptime_in_days', 0)
+                stats["redis"] = {
+                    "connected": True,
+                    "used_memory_human": redis_info.get("used_memory_human", "N/A"),
+                    "connected_clients": redis_info.get("connected_clients", 0),
+                    "uptime_days": redis_info.get("uptime_in_days", 0),
                 }
             except Exception as e:
-                stats['redis'] = {
-                    'connected': False,
-                    'error': str(e)
-                }
+                stats["redis"] = {"connected": False, "error": str(e)}
         else:
-            stats['redis'] = {
-                'connected': False,
-                'reason': 'Redis non installé'
-            }
+            stats["redis"] = {"connected": False, "reason": "Redis non installé"}
 
         return stats
 
 
 # Instance globale du service de cache
 _cache_service = None
+
 
 def get_cache_service() -> CacheService:
     """Retourne l'instance globale du service de cache"""
@@ -204,6 +204,7 @@ def cached(ttl: Optional[int] = None, key_prefix: str = ""):
         ttl: Time To Live en secondes (utilise la valeur par défaut si None)
         key_prefix: Préfixe pour la clé de cache
     """
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -227,6 +228,7 @@ def cached(ttl: Optional[int] = None, key_prefix: str = ""):
             return result
 
         return wrapper
+
     return decorator
 
 
@@ -268,6 +270,7 @@ def invalidate_search_cache():
 def get_cached_consultant_stats():
     """Cache les statistiques des consultants"""
     from services.consultant_service import ConsultantService
+
     return ConsultantService.get_consultant_summary_stats()
 
 
@@ -275,6 +278,7 @@ def get_cached_consultant_stats():
 def get_cached_consultants_list(page: int = 1, per_page: int = 50):
     """Cache la liste des consultants"""
     from services.consultant_service import ConsultantService
+
     return ConsultantService.get_all_consultants_with_stats(page, per_page)
 
 
@@ -282,4 +286,5 @@ def get_cached_consultants_list(page: int = 1, per_page: int = 50):
 def get_cached_search_results(search_term: str, page: int = 1, per_page: int = 50):
     """Cache les résultats de recherche"""
     from services.consultant_service import ConsultantService
+
     return ConsultantService.search_consultants_optimized(search_term, page, per_page)
