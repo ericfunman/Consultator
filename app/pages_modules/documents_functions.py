@@ -103,9 +103,7 @@ def save_consultant_document(uploaded_file, consultant, document_type, descripti
         file_extension = DocumentService.get_file_extension(uploaded_file.name)
 
         # Nom du fichier: consultant_nom_type_timestamp.extension
-        safe_name = f"{
-            consultant.prenom}_{
-            consultant.nom}_{document_type}_{timestamp}.{file_extension}"
+        safe_name = f"{consultant.prenom}_{consultant.nom}_{document_type}_{timestamp}.{file_extension}"
         safe_name = safe_name.replace(" ", "_").replace("-", "_")
 
         file_path = upload_dir / safe_name

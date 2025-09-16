@@ -214,9 +214,7 @@ def show_consultants_list():
                 selected_consultant_data = filtered_df.iloc[selected_row]
                 # S'assurer que c'est un int
                 selected_id = int(selected_consultant_data["ID"])
-                selected_name = f"{
-                    selected_consultant_data['Prénom']} {
-                    selected_consultant_data['Nom']}"
+                selected_name = f"{selected_consultant_data['Prénom']} {selected_consultant_data['Nom']}"
 
                 st.success(
                     f"✅ Consultant sélectionné : **{selected_name}** (ID: {selected_id})"

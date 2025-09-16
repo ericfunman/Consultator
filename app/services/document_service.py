@@ -427,14 +427,9 @@ class DocumentService:
                 return [
                     {
                         "id": consultant.id,
-                        "name": f"{
-                            consultant.prenom} {
-                            consultant.nom}",
+                        "name": f"{consultant.prenom} {consultant.nom}",
                         "email": consultant.email,
-                        "display": f"{
-                            consultant.prenom} {
-                            consultant.nom} ({
-                            consultant.email})",
+                        "display": f"{consultant.prenom} {consultant.nom} ({consultant.email})",
                     }
                     for consultant in consultants
                 ]

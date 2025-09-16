@@ -68,8 +68,7 @@ def show_cv_missions(missions: List[Dict], consultant):
             with col1:
                 if st.button(
                     "➕ Créer mission",
-                    key=f"create_mission_{i}_{
-                        consultant.id}",
+                    key=f"create_mission_{i}_{consultant.id}",
                 ):
                     create_mission_from_cv(mission, consultant)
 

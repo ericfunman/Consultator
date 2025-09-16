@@ -110,8 +110,7 @@ Que souhaitez-vous savoir ? 😊""",
                     # Afficher des métadonnées en mode debug (optionnel)
                     if st.session_state.get("debug_mode", False):
                         st.caption(
-                            f"🎯 Intention: {intent} | 📊 Confiance: {
-                                confidence:.1%}"
+                            f"🎯 Intention: {intent} | 📊 Confiance: {confidence:.1%}"
                         )
 
                     # Si des données sont retournées, les afficher

@@ -677,12 +677,10 @@ class ChatbotService:
 
                                 # Ajouter des informations contextuelles
                                 if consultant_db.grade:
-                                    response += f"🎯 **Grade actuel :** {
-                                        consultant_db.grade}\n"
+                                    response += f"🎯 **Grade actuel :** {consultant_db.grade}\n"
 
                                 if consultant_db.societe:
-                                    response += f"🏢 **Société :** {
-                                        consultant_db.societe}\n"
+                                    response += f"🏢 **Société :** {consultant_db.societe}\n"
 
                                 if consultant_db.date_entree_societe:
                                     response += f"📅 **Date d'entrée société :** {
