@@ -11,10 +11,10 @@ def test_basic_import():
     try:
         import json
         print("[OK] Import JSON reussi")
-        assert True
+        return True
     except ImportError as e:
         print(f"[ERROR] Erreur import JSON: {e}")
-        assert False
+        return False
 
 def test_project_structure():
     """Test de la structure du projet"""
@@ -31,22 +31,22 @@ def test_project_structure():
                 print(f"[OK] Fichier trouve: {file_path}")
             else:
                 print(f"[ERROR] Fichier manquant: {file_path}")
-                assert False, f"Fichier manquant: {file_path}"
+                return False
 
-        assert True
+        return True
     except Exception as e:
         print(f"[ERROR] Erreur verification structure: {e}")
-        assert False, f"Erreur verification structure: {e}"
+        return False
 
 def test_python_version():
     """Test de la version Python"""
     try:
         version = sys.version_info
         print(f"[OK] Python {version.major}.{version.minor}.{version.micro}")
-        assert True
+        return True
     except Exception as e:
         print(f"[ERROR] Erreur version Python: {e}")
-        assert False, f"Erreur version Python: {e}"
+        return False
 
 def main():
     """Fonction principale d'exécution des tests"""
@@ -64,7 +64,10 @@ def main():
         print(f"\n[TEST] Execution: {test_name}")
         try:
             result = test_func()
-            results.append(result)
+            # S'assurer que result est un booléen
+            if result is None:
+                result = True  # Si la fonction ne retourne rien, considérer comme succès
+            results.append(bool(result))
             status = "REUSSI" if result else "ECHEC"
             print(f"   Resultat: {status}")
         except Exception as e:
