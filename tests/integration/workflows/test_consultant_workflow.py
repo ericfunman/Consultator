@@ -186,7 +186,7 @@ class TestConsultantWorkflowIntegration:
             print("=== PHASE 6: Test de disponibilité ===")
 
             # Rendre le consultant indisponible
-            ConsultantService.update_consultant(consultant_id, {"disponible": False})
+            ConsultantService.update_consultant(consultant_id, {"disponibilite": False})
 
             # Vérifier qu'il n'est plus dans les disponibles
             available = ConsultantService.get_consultants_by_availability(True)
@@ -278,7 +278,7 @@ class TestConsultantWorkflowIntegration:
             assert results[0].prenom == "Alice"
 
             # Test de recherche par société
-            results = ConsultantService.search_consultants("TestCorp")
+            results = ConsultantService.search_consultants("TechCorp")
             assert len(results) == 2
 
             # Test de filtrage par disponibilité

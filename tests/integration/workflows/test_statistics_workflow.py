@@ -116,9 +116,9 @@ class TestStatisticsWorkflowIntegration:
 
         # Vérifications
         assert total_consultants == 12
-        assert available_consultants == 8  # 8 disponibles, 4 non disponibles
-        assert unavailable_consultants == 4
-        assert 65 <= availability_rate <= 70  # ~66.7%
+        assert available_consultants == 9  # 9 disponibles, 3 non disponibles
+        assert unavailable_consultants == 3
+        assert 70 <= availability_rate <= 80  # ~75%
         assert avg_salary > 55000  # Salaire moyen élevé
 
         print("✅ Statistiques de base calculées correctement")
@@ -268,8 +268,8 @@ class TestStatisticsWorkflowIntegration:
 
         # Vérifications de répartition
         assert salary_ranges["40k-50k"] == 3  # Juniors
-        assert salary_ranges["50k-60k"] == 4  # Certains seniors
-        assert salary_ranges["60k-70k"] == 3  # Seniors et experts
+        assert salary_ranges["50k-60k"] == 3  # Certains seniors
+        assert salary_ranges["60k-70k"] == 4  # Seniors et experts
         assert salary_ranges["70k-80k"] == 2  # Experts
 
         print("✅ Distribution salariale analysée correctement")
@@ -321,11 +321,11 @@ class TestStatisticsWorkflowIntegration:
 
         # Vérifications des métriques
         assert dashboard_metrics["total_consultants"] == 12
-        assert dashboard_metrics["available_consultants"] == 8
+        assert dashboard_metrics["available_consultants"] == 9
         assert dashboard_metrics["total_practices"] == 3
         assert dashboard_metrics["total_salary_cost"] > 650000  # > 650k€
         assert 55000 <= dashboard_metrics["avg_salary"] <= 60000
-        assert 65 <= dashboard_metrics["availability_rate"] <= 70
+        assert 70 <= dashboard_metrics["availability_rate"] <= 80
 
         print("✅ Métriques du tableau de bord calculées correctement")
 

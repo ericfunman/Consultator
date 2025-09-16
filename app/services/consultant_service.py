@@ -66,7 +66,6 @@ class ConsultantService:
             return []
 
     @staticmethod
-    @st.cache_data(ttl=300)  # Cache pendant 5 minutes
     def get_all_consultants(page: int = 1, per_page: int = 50) -> List[Dict]:
         """Récupère tous les consultants avec pagination optimisée"""
         try:
@@ -110,7 +109,6 @@ class ConsultantService:
             return []
 
     @staticmethod
-    @st.cache_data(ttl=300)  # Cache pendant 5 minutes
     def search_consultants_optimized(
         search_term: str, 
         page: int = 1, 
@@ -162,6 +160,7 @@ class ConsultantService:
                         (Consultant.nom.ilike(search_filter))
                         | (Consultant.prenom.ilike(search_filter))
                         | (Consultant.email.ilike(search_filter))
+                        | (Consultant.societe.ilike(search_filter))
                     )
 
                 query = (
@@ -237,7 +236,6 @@ class ConsultantService:
             return []
 
     @staticmethod
-    @st.cache_data(ttl=600)  # Cache pendant 10 minutes
     def get_consultants_count() -> int:
         """Retourne le nombre total de consultants avec cache"""
         try:
@@ -248,7 +246,6 @@ class ConsultantService:
             return 0
 
     @staticmethod
-    @st.cache_data(ttl=300)  # Cache pendant 5 minutes
     def get_all_consultants_with_stats(
         page: int = 1, 
         per_page: int = 50,
@@ -374,7 +371,6 @@ class ConsultantService:
             return []
 
     @staticmethod
-    @st.cache_data(ttl=300)  # Cache pendant 5 minutes
     def get_consultant_summary_stats() -> Dict[str, int]:
         """Récupère les statistiques générales avec cache pour tableau de bord"""
         try:
@@ -651,9 +647,9 @@ class ConsultantService:
                         if data.get("telephone")
                         else None
                     ),
-                    salaire_actuel=data.get("salaire"),
+                    salaire_actuel=data.get("salaire_actuel") or data.get("salaire"),
                     practice_id=data.get("practice_id"),
-                    disponibilite=data.get("disponible", True),
+                    disponibilite=data.get("disponibilite", True),
                     notes=data.get("notes", "").strip() if data.get("notes") else None,
                     date_creation=datetime.now(),
                     derniere_maj=datetime.now(),
@@ -710,7 +706,7 @@ class ConsultantService:
                 # Mapping des attributs pour éviter les erreurs
                 attribute_mapping = {
                     "salaire": "salaire_actuel",
-                    "disponible": "disponibilite",
+                    "disponibilite": "disponibilite",
                     "date_mise_a_jour": "derniere_maj",
                 }
 
@@ -807,6 +803,7 @@ class ConsultantService:
                         (Consultant.nom.ilike(f"%{search_term}%"))
                         | (Consultant.prenom.ilike(f"%{search_term}%"))
                         | (Consultant.email.ilike(f"%{search_term}%"))
+                        | (Consultant.societe.ilike(f"%{search_term}%"))
                     )
                     .all()
                 )

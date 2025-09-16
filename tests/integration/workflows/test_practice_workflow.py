@@ -241,7 +241,7 @@ class TestPracticeWorkflowIntegration:
             backend_avg_salary = sum(c["salaire_actuel"] for c in backend_consultants) / len(backend_consultants)
 
             assert frontend_avg_salary == 53500  # (55000 + 52000) / 2
-            assert backend_avg_salary == 57333.33  # (60000 + 58000 + 54000) / 3, approximatif
+            assert backend_avg_salary == pytest.approx(57333.33, abs=0.01)  # (60000 + 58000 + 54000) / 3
 
             print("✅ Statistiques des practices calculées correctement")
 

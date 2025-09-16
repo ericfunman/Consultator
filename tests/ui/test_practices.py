@@ -308,7 +308,7 @@ class TestShowFunction(BaseUITest):
 
             # Verify
             mock_st.title.assert_called_once_with("🏢 Gestion des Practices")
-            mock_st.tabs.assert_called_once()
+            assert mock_st.tabs.call_count == 2  # One in main show(), one in show_practice_management_optimized()
             mock_st.caption.assert_called_once()
 
     @patch('app.pages_modules.practices.st')
@@ -608,7 +608,15 @@ class TestShowPracticeDetailedStatsCached(BaseUITest):
 
         mock_st.subheader = MagicMock()
         mock_st.spinner = MagicMock()
-        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock(), MagicMock()])
+        
+        # Configure columns mock to return correct number of elements
+        def columns_side_effect(n):
+            if isinstance(n, list):
+                return [MagicMock() for _ in range(len(n))]
+            else:
+                return [MagicMock() for _ in range(n)]
+        
+        mock_st.columns = MagicMock(side_effect=columns_side_effect)
         mock_st.metric = MagicMock()
 
         # Execute
@@ -640,7 +648,7 @@ class TestShowPracticeManagementOptimized(BaseUITest):
     @patch('app.pages_modules.practices.PracticeServiceOptimized')
     def test_show_practice_management(self, mock_service, mock_st):
         """Test interface de gestion des practices"""
-        mock_service.get_all_practices_cached.return_value = []
+        mock_service.get_all_practices_cached.return_value = SAMPLE_PRACTICES[:2]  # Return some practices
 
         mock_st.subheader = MagicMock()
         mock_st.tabs = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
@@ -658,7 +666,7 @@ class TestShowPracticeManagementOptimized(BaseUITest):
                 if "Sélectionner le consultant" in str(args):
                     return "Jean Dupont (jean.dupont@email.com)"
                 elif "Nouvelle practice" in str(args):
-                    return "Data Engineering"
+                    return "Data Engineering"  # This should match one of the practices
                 else:
                     return "Data Engineering"
 
@@ -669,7 +677,7 @@ class TestShowPracticeManagementOptimized(BaseUITest):
 
             # Verify
             mock_service.get_all_practices_cached.assert_called_once()
-            mock_st.tabs.assert_called_once()
+            assert mock_st.tabs.call_count == 1  # Only one tabs call in this function
 
 
 class TestShowCreatePracticeFormOptimized(BaseUITest):

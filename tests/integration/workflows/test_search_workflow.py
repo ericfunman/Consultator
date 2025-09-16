@@ -106,8 +106,10 @@ class TestSearchWorkflowIntegration:
 
         # Recherche par nom
         data_results = ConsultantService.search_consultants_optimized("Data", page=1, per_page=50)
-        assert len(data_results) == 1  # Alice Data
-        assert data_results[0]["nom"] == "Data"
+        assert len(data_results) == 3  # Alice Data (nom), Bob AI (societe=DataCorp), Claire ML (societe=DataCorp)
+        # Vérifier qu'Alice Data est dans les résultats
+        alice_in_results = any(r["nom"] == "Data" and r["prenom"] == "Alice" for r in data_results)
+        assert alice_in_results
 
         # Recherche par société
         webcorp_results = ConsultantService.search_consultants_optimized("WebCorp", page=1, per_page=50)
@@ -140,7 +142,7 @@ class TestSearchWorkflowIntegration:
         senior_results = ConsultantService.search_consultants_optimized(
             "", page=1, per_page=50, grade_filter="Senior"
         )
-        assert len(senior_results) == 6  # Bob, Claire, David, Felix, Henry, Iris, Kate
+        assert len(senior_results) == 7  # Bob, Claire, David, Felix, Henry, Iris, Kate
 
         # Filtre par disponibilité
         available_results = ConsultantService.search_consultants_optimized(
@@ -174,7 +176,7 @@ class TestSearchWorkflowIntegration:
             practice_filter="Frontend",
             availability_filter=True
         )
-        assert len(frontend_available) == 2  # David, Emma
+        assert len(frontend_available) == 2  # David, Emma (Felix n'est pas disponible)
 
         # Grade + Disponibilité
         senior_available = ConsultantService.search_consultants_optimized(
