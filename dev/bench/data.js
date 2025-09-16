@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758030714931,
+  "lastUpdate": 1758030716785,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -4118,6 +4118,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00001660294551863036",
             "extra": "mean: 5.078407172588706 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "910f95fddaf9174d01d67e3ef236726564b58344",
+          "message": " Correction finale des erreurs de syntaxe f-strings - Pipeline CI/CD réparé",
+          "timestamp": "2025-09-16T15:46:04+02:00",
+          "tree_id": "78927ba7813b52564720bd020f2db7117e766d1c",
+          "url": "https://github.com/ericfunman/Consultator/commit/910f95fddaf9174d01d67e3ef236726564b58344"
+        },
+        "date": 1758030716222,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.0376467550025,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000015515290427225144",
+            "extra": "mean: 1.0626567422125124 msec\nrounds: 931"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 294043.4000159543,
+            "unit": "iter/sec",
+            "range": "stddev: 5.252898848810053e-7",
+            "extra": "mean: 3.4008585125384267 usec\nrounds: 127976"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158998.4273584226,
+            "unit": "iter/sec",
+            "range": "stddev: 8.16498457359194e-7",
+            "extra": "mean: 6.289370383178365 usec\nrounds: 81143"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33237.94807222605,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00000393341978066761",
+            "extra": "mean: 30.08609309536799 usec\nrounds: 19668"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.56505990225952,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014573536992967905",
+            "extra": "mean: 5.087374126903542 msec\nrounds: 197"
           }
         ]
       }
