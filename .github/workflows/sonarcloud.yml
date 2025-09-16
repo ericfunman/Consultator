@@ -33,12 +33,19 @@ jobs:
         pytest --cov=app --cov-report=xml:reports/coverage.xml --cov-report=term-missing --cov-report=html:reports/htmlcov
       continue-on-error: true
 
+    - name: Setup Java
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-17-jdk
+        echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+        echo "/usr/lib/jvm/java-17-openjdk-amd64/bin" >> $GITHUB_PATH
+
     - name: Setup SonarQube Scanner
       run: |
-        wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+        wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
         unzip sonar-scanner.zip
-        echo "SONAR_SCANNER_HOME=$(pwd)/sonar-scanner-4.7.0.2747-linux" >> $GITHUB_ENV
-        echo "$(pwd)/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
+        echo "SONAR_SCANNER_HOME=$(pwd)/sonar-scanner-4.6.2.2472-linux" >> $GITHUB_ENV
+        echo "$(pwd)/sonar-scanner-4.6.2.2472-linux/bin" >> $GITHUB_PATH
 
     - name: SonarCloud Scan
       env:
