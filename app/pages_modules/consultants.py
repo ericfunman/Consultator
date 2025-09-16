@@ -2848,8 +2848,7 @@ def show_cv_missions(missions, consultant):
             # Afficher un aperçu rapide de ce qui sera sauvegardé
             if client and titre and date_debut:
                 st.info(
-                    f"✅ Prêt à sauvegarder: {titre} chez {client} (début: {
-                        date_debut.strftime('%d/%m/%Y')})"
+                    f"✅ Prêt à sauvegarder: {titre} chez {client} (début: {date_debut.strftime('%d/%m/%Y')})"
                 )
             else:
                 missing = []

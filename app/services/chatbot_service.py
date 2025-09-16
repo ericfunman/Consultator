@@ -672,8 +672,7 @@ class ChatbotService:
                                     + consultant.nom
                                     + "** :\n\n"
                                 )
-                                response += f"🚀 **Première mission :** {
-                                    consultant_db.date_premiere_mission.strftime('%d/%m/%Y')}\n"
+                                response += f"🚀 **Première mission :** {consultant_db.date_premiere_mission.strftime('%d/%m/%Y')}\n"
                                 response += f"⏱️ **Expérience totale :** **{experience_annees} années**\n"
 
                                 # Ajouter des informations contextuelles
