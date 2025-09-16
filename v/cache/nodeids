@@ -1,0 +1,8 @@
+[
+  "tests/unit/utils/test_minimal.py::test_basic",
+  "tests/unit/utils/test_minimal.py::test_import_app",
+  "tests/unit/utils/test_minimal.py::test_import_sys",
+  "tests/unit/utils/test_simple_categories.py::TestSkillCategories::test_simple_assertion",
+  "tests/unit/utils/test_skill_categories.py::test_dummy",
+  "tests/unit/utils/test_technologies_referentiel.py::test_dummy"
+]

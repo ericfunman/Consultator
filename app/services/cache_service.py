@@ -48,7 +48,7 @@ class CacheService:
                 # Test de connexion
                 self.redis_client.ping()
                 print("✅ Redis connecté avec succès")
-            except (redis.ConnectionError, redis.AuthenticationError) as e:
+            except Exception as e:
                 print(f"⚠️ Redis non disponible: {e}")
                 self.redis_client = None
         else:
@@ -149,8 +149,9 @@ class CacheService:
                 print(f"⚠️ Erreur Redis CLEAR: {e}")
 
         # Supprimer du cache mémoire
+        import fnmatch
         keys_to_delete = [
-            k for k in self.memory_cache.keys() if pattern.replace("*", "") in k
+            k for k in self.memory_cache.keys() if fnmatch.fnmatch(k, pattern)
         ]
         for key in keys_to_delete:
             del self.memory_cache[key]
@@ -273,7 +274,7 @@ def invalidate_search_cache():
 @cached(ttl=60)  # Cache 1 minute pour les stats
 def get_cached_consultant_stats():
     """Cache les statistiques des consultants"""
-    from services.consultant_service import ConsultantService
+    from app.services.consultant_service import ConsultantService
 
     return ConsultantService.get_consultant_summary_stats()
 
@@ -281,7 +282,7 @@ def get_cached_consultant_stats():
 @cached(ttl=300)  # Cache 5 minutes pour les listes
 def get_cached_consultants_list(page: int = 1, per_page: int = 50):
     """Cache la liste des consultants"""
-    from services.consultant_service import ConsultantService
+    from app.services.consultant_service import ConsultantService
 
     return ConsultantService.get_all_consultants_with_stats(page, per_page)
 
@@ -289,6 +290,6 @@ def get_cached_consultants_list(page: int = 1, per_page: int = 50):
 @cached(ttl=60)  # Cache 1 minute pour les recherches
 def get_cached_search_results(search_term: str, page: int = 1, per_page: int = 50):
     """Cache les résultats de recherche"""
-    from services.consultant_service import ConsultantService
+    from app.services.consultant_service import ConsultantService
 
     return ConsultantService.search_consultants_optimized(search_term, page, per_page)
