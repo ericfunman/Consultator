@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758024643671,
+  "lastUpdate": 1758024645477,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -3292,6 +3292,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000014589180576442629",
             "extra": "mean: 5.089274717171649 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "b3f2b6a142125a82ec7d9e5c5ffef42087957a65",
+          "message": "fix: Corriger les erreurs de syntaxe dans consultants.py et appliquer le formatage Black\n\n- Correction des f-strings malformées dans show_existing_documents()\n- Correction des f-strings dans les fonctions de nommage de documents\n- Application du formatage Black pour respecter les standards de code\n- Résolution des erreurs de syntaxe bloquant le CI/CD",
+          "timestamp": "2025-09-16T14:04:21+02:00",
+          "tree_id": "94c4b9ea43382f189cd32b3c6f0da050fcbd3fe8",
+          "url": "https://github.com/ericfunman/Consultator/commit/b3f2b6a142125a82ec7d9e5c5ffef42087957a65"
+        },
+        "date": 1758024644522,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.1515847493955,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000036416893487821758",
+            "extra": "mean: 1.0625280945218556 msec\nrounds: 931"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 293178.66361581103,
+            "unit": "iter/sec",
+            "range": "stddev: 5.270260604079111e-7",
+            "extra": "mean: 3.4108894135298535 usec\nrounds: 114996"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 157304.6920196725,
+            "unit": "iter/sec",
+            "range": "stddev: 7.260174126784777e-7",
+            "extra": "mean: 6.357089462245284 usec\nrounds: 75965"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33256.44271898895,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001832097013367718",
+            "extra": "mean: 30.06936155047679 usec\nrounds: 26934"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.52711076679196,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014026273362568315",
+            "extra": "mean: 5.0883564923856515 msec\nrounds: 197"
           }
         ]
       }
