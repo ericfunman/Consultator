@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758033427071,
+  "lastUpdate": 1758033441406,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -4826,6 +4826,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00001452661814811543",
             "extra": "mean: 5.087983464645134 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "a7cb413a8213d041a703bd2ac5e5320a101e6794",
+          "message": " Fix CRITIQUE: Correction 3 f-strings manquées chatbot_service.py - Fix définitif CI/CD",
+          "timestamp": "2025-09-16T16:32:38+02:00",
+          "tree_id": "5d8301b3d0c59d466f364ccb029f57ad4dd21403",
+          "url": "https://github.com/ericfunman/Consultator/commit/a7cb413a8213d041a703bd2ac5e5320a101e6794"
+        },
+        "date": 1758033440940,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 939.8652324406618,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000005645646731529074",
+            "extra": "mean: 1.0639823301083062 msec\nrounds: 930"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 282525.63237592974,
+            "unit": "iter/sec",
+            "range": "stddev: 6.924594479480983e-7",
+            "extra": "mean: 3.539501855425975 usec\nrounds: 98630"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 157329.8404278172,
+            "unit": "iter/sec",
+            "range": "stddev: 7.525009796082683e-7",
+            "extra": "mean: 6.35607331248009 usec\nrounds: 80232"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 31404.776390373805,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000016946753212515025",
+            "extra": "mean: 31.84229008892164 usec\nrounds: 26940"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.56407356392486,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001500382943855691",
+            "extra": "mean: 5.087399654824455 msec\nrounds: 197"
           }
         ]
       }
