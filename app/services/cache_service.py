@@ -7,9 +7,13 @@ Optimisé pour les requêtes fréquentes de consultants et missions
 import hashlib
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 from functools import wraps
-from typing import Any, Dict, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Union
 
 try:
     import redis

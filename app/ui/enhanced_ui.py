@@ -3,17 +3,20 @@ Améliorations de l'interface utilisateur pour Consultator
 Filtres avancés, recherche en temps réel, et UX améliorée
 """
 
-import streamlit as st
-import pandas as pd
-from datetime import datetime, date
-from typing import List, Dict, Any, Optional
 import time
+from datetime import date
+from datetime import datetime
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
+import pandas as pd
+import streamlit as st
+
+from app.services.cache_service import get_cached_consultants_list
+from app.services.cache_service import get_cached_search_results
 from app.services.consultant_service import ConsultantService
-from app.services.cache_service import (
-    get_cached_consultants_list,
-    get_cached_search_results,
-)
 
 
 class AdvancedUIFilters:

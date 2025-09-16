@@ -1487,13 +1487,11 @@ def show_consultants_list():
 
     # Import des nouveaux composants UI
     try:
-        from app.ui.enhanced_ui import (
-            AdvancedUIFilters,
-            RealTimeSearch,
-            DataTableEnhancer,
-            LoadingSpinner,
-            NotificationManager,
-        )
+        from app.ui.enhanced_ui import AdvancedUIFilters
+        from app.ui.enhanced_ui import DataTableEnhancer
+        from app.ui.enhanced_ui import LoadingSpinner
+        from app.ui.enhanced_ui import NotificationManager
+        from app.ui.enhanced_ui import RealTimeSearch
 
         enhanced_ui_available = True
     except ImportError:
@@ -1513,13 +1511,11 @@ def show_consultants_list():
 def show_consultants_list_enhanced():
     """Version améliorée de la liste des consultants avec filtres avancés"""
 
-    from app.ui.enhanced_ui import (
-        AdvancedUIFilters,
-        RealTimeSearch,
-        DataTableEnhancer,
-        LoadingSpinner,
-        NotificationManager,
-    )
+    from app.ui.enhanced_ui import AdvancedUIFilters
+    from app.ui.enhanced_ui import DataTableEnhancer
+    from app.ui.enhanced_ui import LoadingSpinner
+    from app.ui.enhanced_ui import NotificationManager
+    from app.ui.enhanced_ui import RealTimeSearch
 
     # Initialisation des composants
     filters = AdvancedUIFilters()
