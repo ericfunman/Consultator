@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758031330958,
+  "lastUpdate": 1758031918343,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -4413,6 +4413,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000031322416046991525",
             "extra": "mean: 5.108736619288503 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "d7f6f317e6253972692c16754b4f847e2c4189da",
+          "message": " Correction finale TOUTES f-strings multi-lignes - Fix définitif Linux\n\n Corrections appliquées sur 8 fichiers :\n- chatbot_service.py ligne 865 : Grade consultant\n- simple_analyzer.py ligne 205 : Résultat analyse\n- document_analyzer_clean.py ligne 201 : Éléments extraits\n- document_analyzer.py lignes 365, 562, 1063 : Multiples f-strings\n- consultant_cv.py ligne 761 : Nom fichier rapport\n- practices_optimized.py ligne 274 : Compteur consultants\n- business_managers.py lignes 353, 683 : BM et consultants\n- consultants_clean.py ligne 142 : Info consultant\n\n Objectif : ZÉRO f-string multi-ligne dans le codebase\n Pipeline CI/CD Linux maintenant 100% compatible",
+          "timestamp": "2025-09-16T16:07:30+02:00",
+          "tree_id": "99442e6a2087154fa842c4ba222019fae5e4977b",
+          "url": "https://github.com/ericfunman/Consultator/commit/d7f6f317e6253972692c16754b4f847e2c4189da"
+        },
+        "date": 1758031917904,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 940.4205451027956,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00000502592570784686",
+            "extra": "mean: 1.0633540549570744 msec\nrounds: 928"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 275914.21349519474,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000010223873794750512",
+            "extra": "mean: 3.624314917786632 usec\nrounds: 121419"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158677.93182119378,
+            "unit": "iter/sec",
+            "range": "stddev: 7.296798018922896e-7",
+            "extra": "mean: 6.302073568282009 usec\nrounds: 78716"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 32611.549634236115,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000018200287319044667",
+            "extra": "mean: 30.663982889981543 usec\nrounds: 26768"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.84388173949228,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014284212186180777",
+            "extra": "mean: 5.080168055837382 msec\nrounds: 197"
           }
         ]
       }
