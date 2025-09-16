@@ -880,9 +880,7 @@ class ChatbotService:
                                     "asigma",
                                 ]
                             ):
-                                response = f"🏢 **Société de {consultant.prenom} {
-                                    consultant.nom}** : **{
-                                    consultant_db.societe or 'Non renseigné'}**"
+                                response = f"🏢 **Société de {consultant.prenom} {consultant.nom}** : **{consultant_db.societe or 'Non renseigné'}**"
                                 if consultant_db.date_entree_societe:
                                     response += f"\n📅 **Date d'entrée :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}"
                                 if consultant_db.date_sortie_societe:
@@ -892,8 +890,7 @@ class ChatbotService:
 
                             else:
                                 # Profil complet
-                                response = f"👔 **Profil professionnel de {consultant.prenom} {
-                                    consultant.nom}** :\n\n"
+                                response = f"👔 **Profil professionnel de {consultant.prenom} {consultant.nom}** :\n\n"
                                 response += f"🎯 **Grade :** {consultant_db.grade or 'Non renseigné'}\n"
                                 response += f"📋 **Type de contrat :** {consultant_db.type_contrat or 'Non renseigné'}\n"
                                 response += f"🏢 **Société :** {consultant_db.societe or 'Non renseigné'}\n"
@@ -921,8 +918,7 @@ class ChatbotService:
                                         "📈 **CJM :** " + f"{cjm:,.0f}" + " €/jour"
                                     )
                         else:
-                            response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {
-                                consultant.nom}**."
+                            response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {consultant.nom}**."
 
                 except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
                     response = f"❌ Erreur lors de la récupération du profil : {str(e)}"
