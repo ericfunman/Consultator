@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758036157616,
+  "lastUpdate": 1758036159706,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -5180,6 +5180,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000015452901613077302",
             "extra": "mean: 5.092726411167724 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "d8a15c13e66393c9176d0c4f04d22248c3a1210e",
+          "message": "fix: Remplacer MD5 par SHA-256 dans le service de cache\n\n- Correction du hotspot de sécurité SonarQube\n- Remplacement de hashlib.md5() par hashlib.sha256()\n- Algorithme plus sécurisé pour la génération des clés de cache\n- Compatibilité maintenue, tests passent (469/469)",
+          "timestamp": "2025-09-16T17:15:53+02:00",
+          "tree_id": "e0710a55e6eab5cad650e1f507d5ca0306708772",
+          "url": "https://github.com/ericfunman/Consultator/commit/d8a15c13e66393c9176d0c4f04d22248c3a1210e"
+        },
+        "date": 1758036159275,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.3566121373912,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000015480588447470308",
+            "extra": "mean: 1.0622966759955683 msec\nrounds: 929"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 288379.1442920669,
+            "unit": "iter/sec",
+            "range": "stddev: 5.245576554052455e-7",
+            "extra": "mean: 3.467657144398806 usec\nrounds: 111038"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 158700.95332379374,
+            "unit": "iter/sec",
+            "range": "stddev: 7.461697360569349e-7",
+            "extra": "mean: 6.301159375896905 usec\nrounds: 79027"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 32624.7863871277,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001705276100681271",
+            "extra": "mean: 30.651541687781158 usec\nrounds: 27634"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.5664400863643,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000015420887055891748",
+            "extra": "mean: 5.087338406091272 msec\nrounds: 197"
           }
         ]
       }
