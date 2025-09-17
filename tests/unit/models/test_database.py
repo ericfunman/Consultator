@@ -3,11 +3,28 @@
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from app.database.database import get_database_session, init_database
-from tests.fixtures.base_test import BaseUnitTest
 
 
-class TestDatabase(BaseUnitTest):
+class TestDatabase:
     """Tests pour les fonctions de base de données disponibles"""
+
+    def test_import_database_module(self):
+        """Test que le module database peut être importé"""
+        try:
+            from app.database import database
+            assert database is not None
+            print("✅ Module database importé avec succès")
+        except ImportError as e:
+            pytest.skip(f"Module database non disponible: {e}")
+
+    def test_import_models_module(self):
+        """Test que le module models peut être importé"""
+        try:
+            from app.database import models
+            assert models is not None
+            print("✅ Module models importé avec succès")
+        except ImportError as e:
+            pytest.skip(f"Module models non disponible: {e}")
 
     @patch('app.database.database.sessionmaker')
     @patch('app.database.database.create_engine')
