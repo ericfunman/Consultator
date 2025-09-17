@@ -1095,11 +1095,11 @@ class ConsultantService:
                     .first()
                 )
                 if not consultant:
-                    st.error(f"â Consultant avec ID {consultant_id} introuvable")
+                    st.error(f"❌ Consultant avec ID {consultant_id} introuvable")
                     return False
 
                 st.info(
-                    f"ð¾ Sauvegarde de l'analyse CV pour {consultant.prenom} {consultant.nom}"
+                    f"💾 Sauvegarde de l'analyse CV pour {consultant.prenom} {consultant.nom}"
                 )
 
                 missions_count = 0
@@ -1117,7 +1117,7 @@ class ConsultantService:
                         or mission_data.get("date_debut") == ""
                     ):
                         st.warning(
-                            f"â ï¸ Mission {mission_data['client']} ignorÃ©e - dates manquantes"
+                            f"⚠️ Mission {mission_data['client']} ignorée - dates manquantes"
                         )
                         continue
 
@@ -1160,7 +1160,7 @@ class ConsultantService:
                                 date_fin = None
                         except ValueError:
                             st.warning(
-                                f"â ï¸ Mission {mission_data['client']} ignorÃ©e - format de date invalide"
+                                f"⚠️ Mission {mission_data['client']} ignorée - format de date invalide"
                             )
                             continue
 
@@ -1182,7 +1182,7 @@ class ConsultantService:
 
                         session.add(new_mission)
                         missions_count += 1
-                        st.success("â Mission ajoutÃ©e: " + mission_data["client"])
+                        st.success("✅ Mission ajoutée: " + mission_data["client"])
 
                 # 2. Sauvegarder les compÃ©tences techniques
                 technical_skills = analysis_data.get("langages_techniques", [])
@@ -1232,7 +1232,7 @@ class ConsultantService:
                         )
                         session.add(consultant_skill)
                         skills_count += 1
-                        st.success("â CompÃ©tence technique ajoutÃ©e: " + skill_name)
+                        st.success("✅ Compétence technique ajoutée: " + skill_name)
 
                 # 3. Sauvegarder les compÃ©tences fonctionnelles
                 functional_skills = analysis_data.get("competences_fonctionnelles", [])
@@ -1282,7 +1282,7 @@ class ConsultantService:
                         )
                         session.add(consultant_skill)
                         skills_count += 1
-                        st.success("â CompÃ©tence fonctionnelle ajoutÃ©e: " + skill_name)
+                        st.success("✅ Compétence fonctionnelle ajoutée: " + skill_name)
 
                 # 4. Mettre Ã  jour la date de derniÃ¨re modification du consultant
                 consultant.derniere_maj = datetime.now()
@@ -1290,15 +1290,15 @@ class ConsultantService:
                 # Committer toutes les modifications
                 session.commit()
 
-                st.success("ð Analyse CV sauvegardÃ©e avec succÃ¨s !")
+                st.success("🎉 Analyse CV sauvegardée avec succès !")
                 st.info(
-                    f"ð **RÃ©sumÃ©**: {missions_count} missions ajoutÃ©es, {skills_count} compÃ©tences ajoutÃ©es"
+                    f"📊 **Résumé**: {missions_count} missions ajoutées, {skills_count} compétences ajoutées"
                 )
 
                 return True
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            st.error("â Erreur lors de la sauvegarde de l'analyse CV: " + str(e))
+            st.error("❌ Erreur lors de la sauvegarde de l'analyse CV: " + str(e))
             print(f"Erreur dÃ©taillÃ©e: {e}")
             import traceback
 

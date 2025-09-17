@@ -29,8 +29,8 @@ class TestConsultantList:
 
         show_consultants_list()
 
-        # V�rifier qu'une erreur est affich�e
-        mock_st.error.assert_called_with("? Erreur lors du chargement de la liste des consultants: Erreur DB")
+        # Vérifier qu'une erreur est affichée
+        mock_st.error.assert_called_with("❌ Erreur lors du chargement de la liste des consultants: Erreur DB")
 
 
 class TestConsultantProfile:
@@ -75,8 +75,8 @@ class TestConsultantProfile:
 
             show_consultant_profile()
 
-            # V�rifier qu'une erreur est affich�e
-            mock_st.error.assert_called_with("? Consultant introuvable (ID: 999)")
+            # Vérifier qu'une erreur est affichée
+            mock_st.error.assert_called_with("❌ Consultant introuvable (ID: 999)")
 
     @patch('app.pages_modules.consultant_profile.st')
     def test_show_consultant_profile_error(self, mock_st):
@@ -92,5 +92,5 @@ class TestConsultantProfile:
 
             show_consultant_profile()
 
-            # V�rifier qu'une erreur est affich�e
-            mock_st.error.assert_called()
+            # Vérifier qu'une erreur est affichée
+            mock_st.error.assert_called_with("❌ Erreur lors du chargement du profil consultant: Erreur DB")

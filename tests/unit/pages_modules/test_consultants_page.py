@@ -54,7 +54,7 @@ class TestConsultantsPage:
 
         _delete_consultant_competence(1)
 
-        mock_success.assert_called_once_with("? Compétence supprimée!")
+        mock_success.assert_called_once_with("✅ Compétence supprimée!")
         mock_rerun.assert_called_once()
         mock_session.delete.assert_called_once_with(mock_competence)
         mock_session.commit.assert_called_once()
@@ -77,7 +77,7 @@ class TestConsultantsPage:
 
         _delete_consultant_language(1)
 
-        mock_success.assert_called_once_with("? Langue supprimée!")
+        mock_success.assert_called_once_with("✅ Langue supprimée!")
         mock_rerun.assert_called_once()
         mock_session.delete.assert_called_once_with(mock_langue)
         mock_session.commit.assert_called_once()
