@@ -73,7 +73,7 @@ class TestConsultantProfile(BaseUITest):
     def test_show_consultant_profile_not_found(self, mock_session_state, mock_session):
         """Test d'affichage du profil quand consultant non trouvé"""
         mock_session_state.view_consultant_profile = 1
-        
+
         mock_session_instance = Mock()
         mock_session_instance.query.return_value.options.return_value.filter.return_value.first.return_value = None
         mock_session_instance.query.return_value.all.return_value = []
@@ -96,7 +96,7 @@ class TestConsultantProfile(BaseUITest):
     def test_show_consultant_profile_success(self, mock_session_state, mock_session):
         """Test d'affichage réussi du profil consultant"""
         mock_session_state.view_consultant_profile = 1
-        
+
         # Mock consultant
         mock_consultant = Mock()
         mock_consultant.id = 1
@@ -224,11 +224,11 @@ class TestConsultantProfile(BaseUITest):
         """Test onglet résumé CV"""
         # Create context manager mocks using MagicMock
         from unittest.mock import MagicMock
-        
+
         mock_col1 = MagicMock()
-        mock_col2 = MagicMock() 
+        mock_col2 = MagicMock()
         mock_col3 = MagicMock()
-        
+
         # Configure the mock to return the column mocks
         mock_columns.return_value = (mock_col1, mock_col2, mock_col3)
 

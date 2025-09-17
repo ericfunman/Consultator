@@ -118,7 +118,7 @@ class TestConsultantWorkflowIntegration:
                 competence = session.query(Competence).filter(
                     Competence.nom == sample_competence_data["nom"]
                 ).first()
-                
+
                 if not competence:
                     competence = Competence(
                         nom=sample_competence_data["nom"],
@@ -127,7 +127,7 @@ class TestConsultantWorkflowIntegration:
                     )
                     session.add(competence)
                     session.commit()
-                
+
                 competence_id = competence.id
 
             # Ajouter la compétence au consultant

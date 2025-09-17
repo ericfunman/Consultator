@@ -17,11 +17,11 @@ class TestConsultantService(BaseServiceTest):
         data_incomplete = {"prenom": "Jean"}
         result = ConsultantService.create_consultant(data_incomplete)
         assert result is False
-        
+
         # Test avec email invalide
         data_invalid_email = {
             "prenom": "Jean",
-            "nom": "Dupont", 
+            "nom": "Dupont",
             "email": "invalid_email"
         }
         result = ConsultantService.create_consultant(data_invalid_email)
@@ -33,18 +33,18 @@ class TestConsultantService(BaseServiceTest):
         # Mock session
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
-        
+
         # Mock consultant
         mock_consultant = Mock()
         mock_consultant.id = 1
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
-        
+
         mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = mock_consultant
-        
+
         # Test
         result = ConsultantService.get_consultant_by_id(1)
-        
+
         # Vérifications
         assert result is not None
         assert result.prenom == "Jean"
@@ -56,12 +56,12 @@ class TestConsultantService(BaseServiceTest):
         # Mock session
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
-        
+
         mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = None
-        
+
         # Test
         result = ConsultantService.get_consultant_by_id(999)
-        
+
         # Vérifications
         assert result is None
 
@@ -71,10 +71,10 @@ class TestConsultantService(BaseServiceTest):
         # Mock session
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
-        
+
         # Mock pour vérifier que l'email n'existe pas
         mock_db.query.return_value.filter.return_value.first.return_value = None
-        
+
         # Données de test
         data = {
             "prenom": "Marie",
@@ -85,10 +85,10 @@ class TestConsultantService(BaseServiceTest):
             "practice_id": 1,
             "disponible": True
         }
-        
+
         # Test
         result = ConsultantService.create_consultant(data)
-        
+
         # Vérifications
         assert result is True
         mock_db.add.assert_called_once()
@@ -100,24 +100,24 @@ class TestConsultantService(BaseServiceTest):
         # Mock session
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
-        
+
         # Mock consultant existant
         mock_consultant = Mock()
         mock_consultant.id = 1
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
-        
+
         mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
-        
+
         # Données de mise à jour
         data = {
             "telephone": "0987654321",
             "salaire": 60000
         }
-        
+
         # Test
         result = ConsultantService.update_consultant(1, data)
-        
+
         # Vérifications
         assert result is True
         mock_db.commit.assert_called_once()
@@ -128,18 +128,18 @@ class TestConsultantService(BaseServiceTest):
         # Mock session
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
-        
+
         # Mock consultant
         mock_consultant = Mock()
         mock_consultant.id = 1
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
-        
+
         mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
-        
+
         # Test
         result = ConsultantService.delete_consultant(1)
-        
+
         # Vérifications
         assert result is True
         mock_db.delete.assert_called_once_with(mock_consultant)
@@ -151,17 +151,17 @@ class TestConsultantService(BaseServiceTest):
         # Mock session
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
-        
+
         # Mock consultant trouvé
         mock_consultant = Mock()
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
-        
+
         mock_db.query.return_value.filter.return_value.all.return_value = [mock_consultant]
-        
+
         # Test
         result = ConsultantService.search_consultants("Jean")
-        
+
         # Vérifications
         assert len(result) == 1
         assert result[0].prenom == "Jean"
@@ -172,12 +172,12 @@ class TestConsultantService(BaseServiceTest):
         # Mock session
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
-        
+
         mock_db.query.return_value.count.return_value = 42
-        
+
         # Test
         result = ConsultantService.get_consultants_count()
-        
+
         # Vérifications
         assert result == 42
 

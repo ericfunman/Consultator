@@ -38,7 +38,7 @@ def init_competences_fonctionnelles():
             print(f"\n📂 Catégorie: {categorie}")
 
             for competence_nom in competences_list:
-                # Vérifier si la compétence existe déjà
+                # Vérifier si la compétence existe déj�
                 existing = (
                     session.query(Competence)
                     .filter(

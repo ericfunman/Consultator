@@ -1017,7 +1017,7 @@ def show_business_managers_list():
             """
         <style>
         /* Style pour transformer les boutons en liens hypertextes - sélecteurs très spécifiques */
-        .stButton button, 
+        .stButton button,
         .stButton > div > button,
         div[data-testid="column"] button,
         div[data-testid="column"] > div button,
@@ -1043,8 +1043,8 @@ def show_business_managers_list():
             border-width: 0 !important;
             outline: none !important;
         }
-        
-        .stButton button:hover, 
+
+        .stButton button:hover,
         .stButton > div > button:hover,
         div[data-testid="column"] button:hover,
         div[data-testid="column"] > div button:hover,
@@ -1058,8 +1058,8 @@ def show_business_managers_list():
             border: none !important;
             box-shadow: none !important;
         }
-        
-        .stButton button:focus, 
+
+        .stButton button:focus,
         .stButton > div > button:focus,
         div[data-testid="column"] button:focus,
         div[data-testid="column"] > div button:focus,
@@ -1072,8 +1072,8 @@ def show_business_managers_list():
             box-shadow: none !important;
             outline: 1px dotted #1f77b4 !important;
         }
-        
-        .stButton button:active, 
+
+        .stButton button:active,
         .stButton > div > button:active,
         div[data-testid="column"] button:active,
         div[data-testid="column"] > div button:active,
@@ -1266,7 +1266,7 @@ def show_add_business_manager():
 
             try:
                 with get_database_session() as session:
-                    # Vérifier si l'email existe déjà
+                    # Vérifier si l'email existe déj�
                     existing = (
                         session.query(BusinessManager)
                         .filter(BusinessManager.email == email.strip().lower())

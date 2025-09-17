@@ -1,7 +1,7 @@
 """
 Service de gestion des consultants
-CRUD operations pour les consultants avec la base de données
-Optimisé pour gérer 1000+ consultants avec cache et pagination efficace
+CRUD operations pour les consultants avec la base de donnÃ©es
+OptimisÃ© pour gÃ©rer 1000+ consultants avec cache et pagination efficace
 """
 
 from datetime import date
@@ -26,24 +26,24 @@ from database.models import Practice
 
 
 class ConsultantService:
-    """Service pour la gestion des consultants optimisé pour de gros volumes"""
+    """Service pour la gestion des consultants optimisÃ© pour de gros volumes"""
 
     @staticmethod
     def get_all_consultants_objects(
         page: int = 1, per_page: int = 50
     ) -> List[Consultant]:
         """
-        Récupère tous les consultants comme objets (ancienne interface)
+        RÃ©cupÃ¨re tous les consultants comme objets (ancienne interface)
 
         Args:
-            page: Numéro de la page (commence à 1)
+            page: NumÃ©ro de la page (commence Ã  1)
             per_page: Nombre de consultants par page
 
         Returns:
-            Liste d'objets Consultant détachés de la session
+            Liste d'objets Consultant dÃ©tachÃ©s de la session
 
         Raises:
-            SQLAlchemyError: En cas d'erreur de base de données
+            SQLAlchemyError: En cas d'erreur de base de donnÃ©es
         """
         try:
             with get_database_session() as session:
@@ -55,19 +55,19 @@ class ConsultantService:
                     .all()
                 )
 
-                # Détacher les instances de la session pour éviter les erreurs
+                # DÃ©tacher les instances de la session pour Ã©viter les erreurs
                 # DetachedInstance
                 for consultant in consultants:
                     session.expunge(consultant)
 
                 return consultants
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la récupération des consultants: {e}")
+            print(f"Erreur lors de la rÃ©cupÃ©ration des consultants: {e}")
             return []
 
     @staticmethod
     def get_all_consultants(page: int = 1, per_page: int = 50) -> List[Dict]:
-        """Récupère tous les consultants avec pagination optimisée"""
+        """RÃ©cupÃ¨re tous les consultants avec pagination optimisÃ©e"""
         try:
             with get_database_session() as session:
                 consultants = (
@@ -78,7 +78,7 @@ class ConsultantService:
                     .all()
                 )
 
-                # Convertir en dictionnaires pour éviter les erreurs de session
+                # Convertir en dictionnaires pour Ã©viter les erreurs de session
                 consultant_list = []
                 for consultant in consultants:
                     consultant_dict = {
@@ -105,7 +105,7 @@ class ConsultantService:
 
                 return consultant_list
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la récupération des consultants: {e}")
+            print(f"Erreur lors de la rÃ©cupÃ©ration des consultants: {e}")
             return []
 
     @staticmethod
@@ -117,10 +117,10 @@ class ConsultantService:
         grade_filter: Optional[str] = None,
         availability_filter: Optional[bool] = None,
     ) -> List[Dict]:
-        """Recherche optimisée avec cache pour de gros volumes - avec statistiques intégrées"""
+        """Recherche optimisÃ©e avec cache pour de gros volumes - avec statistiques intÃ©grÃ©es"""
         try:
             with get_database_session() as session:
-                # Requête optimisée avec JOIN pour éviter les requêtes N+1
+                # RequÃªte optimisÃ©e avec JOIN pour Ã©viter les requÃªtes N+1
                 query = (
                     session.query(
                         Consultant.id,
@@ -189,13 +189,13 @@ class ConsultantService:
 
                 results = query.all()
 
-                # Convertir en dictionnaires avec calculs optimisés
+                # Convertir en dictionnaires avec calculs optimisÃ©s
                 consultant_list = []
                 for row in results:
                     salaire = row.salaire_actuel or 0
                     cjm = (salaire * 1.8 / 216) if salaire else 0
 
-                    # Calcul de l'expérience
+                    # Calcul de l'expÃ©rience
                     experience_annees = 0
                     if row.date_premiere_mission:
                         from datetime import date
@@ -214,13 +214,13 @@ class ConsultantService:
                         "disponibilite": row.disponibilite,
                         "grade": row.grade or "Junior",
                         "type_contrat": row.type_contrat or "CDI",
-                        "practice_name": row.practice_name or "Non affecté",
+                        "practice_name": row.practice_name or "Non affectÃ©",
                         "date_creation": row.date_creation,
                         "nb_missions": row.nb_missions,
                         "cjm": cjm,
-                        "salaire_formatted": f"{salaire:,}€",
-                        "cjm_formatted": f"{cjm:,.0f}€",
-                        "statut": "✅ Disponible" if row.disponibilite else "🔴 Occupé",
+                        "salaire_formatted": f"{salaire:,}â¬",
+                        "cjm_formatted": f"{cjm:,.0f}â¬",
+                        "statut": "â Disponible" if row.disponibilite else "ð´ OccupÃ©",
                         # Nouveaux champs V1.2
                         "societe": row.societe or "Quanteam",
                         "experience_annees": experience_annees,
@@ -234,7 +234,7 @@ class ConsultantService:
 
                 return consultant_list
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la recherche optimisée: {e}")
+            print(f"Erreur lors de la recherche optimisÃ©e: {e}")
             return []
 
     @staticmethod
@@ -256,12 +256,12 @@ class ConsultantService:
         availability_filter: Optional[bool] = None,
     ) -> List[Dict]:
         """
-        Récupère tous les consultants avec leurs statistiques en une seule requête optimisée
-        Résout le problème N+1 des requêtes pour compter les missions
+        RÃ©cupÃ¨re tous les consultants avec leurs statistiques en une seule requÃªte optimisÃ©e
+        RÃ©sout le problÃ¨me N+1 des requÃªtes pour compter les missions
         """
         try:
             with get_database_session() as session:
-                # Une seule requête avec LEFT JOIN pour récupérer consultants + nombre
+                # Une seule requÃªte avec LEFT JOIN pour rÃ©cupÃ©rer consultants + nombre
                 # de missions
                 query = (
                     session.query(
@@ -324,13 +324,13 @@ class ConsultantService:
 
                 results = query.all()
 
-                # Convertir en dictionnaires avec calculs optimisés
+                # Convertir en dictionnaires avec calculs optimisÃ©s
                 consultant_list = []
                 for row in results:
                     salaire = row.salaire_actuel or 0
                     cjm = (salaire * 1.8 / 216) if salaire else 0
 
-                    # Calcul de l'expérience
+                    # Calcul de l'expÃ©rience
                     experience_annees = 0
                     if row.date_premiere_mission:
                         from datetime import date
@@ -347,14 +347,14 @@ class ConsultantService:
                         "telephone": row.telephone,
                         "salaire_actuel": salaire,
                         "disponibilite": row.disponibilite,
-                        "practice_name": row.practice_name or "Non affecté",
+                        "practice_name": row.practice_name or "Non affectÃ©",
                         "date_creation": row.date_creation,
                         "derniere_maj": row.derniere_maj,
                         "nb_missions": row.nb_missions,
                         "cjm": cjm,
-                        "salaire_formatted": f"{salaire:,}€",
-                        "cjm_formatted": f"{cjm:,.0f}€",
-                        "statut": "✅ Disponible" if row.disponibilite else "🔴 Occupé",
+                        "salaire_formatted": f"{salaire:,}â¬",
+                        "cjm_formatted": f"{cjm:,.0f}â¬",
+                        "statut": "â Disponible" if row.disponibilite else "ð´ OccupÃ©",
                         # Nouveaux champs V1.2
                         "societe": row.societe or "Quanteam",
                         "experience_annees": experience_annees,
@@ -371,12 +371,12 @@ class ConsultantService:
 
                 return consultant_list
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la récupération optimisée des consultants: {e}")
+            print(f"Erreur lors de la rÃ©cupÃ©ration optimisÃ©e des consultants: {e}")
             return []
 
     @staticmethod
     def get_consultant_summary_stats() -> Dict[str, int]:
-        """Récupère les statistiques générales avec cache pour tableau de bord"""
+        """RÃ©cupÃ¨re les statistiques gÃ©nÃ©rales avec cache pour tableau de bord"""
         try:
             with get_database_session() as session:
                 total_consultants = session.query(Consultant).count()
@@ -396,7 +396,7 @@ class ConsultantService:
                     "busy_consultants": total_consultants - available_consultants,
                 }
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la récupération des stats: {e}")
+            print(f"Erreur lors de la rÃ©cupÃ©ration des stats: {e}")
             return {
                 "total_consultants": 0,
                 "available_consultants": 0,
@@ -408,10 +408,10 @@ class ConsultantService:
     @staticmethod
     def get_consultants_by_availability(available: bool = True) -> List[Dict]:
         """
-        Récupère les consultants selon leur disponibilité
+        RÃ©cupÃ¨re les consultants selon leur disponibilitÃ©
 
         Args:
-            available: True pour les consultants disponibles, False pour les occupés
+            available: True pour les consultants disponibles, False pour les occupÃ©s
 
         Returns:
             Liste de dictionnaires contenant les informations des consultants
@@ -443,9 +443,9 @@ class ConsultantService:
                             "grade": consultant.grade,
                             "type_contrat": consultant.type_contrat,
                             "statut": (
-                                "✅ Disponible"
+                                "â Disponible"
                                 if consultant.disponibilite
-                                else "🔴 Occupé"
+                                else "ð´ OccupÃ©"
                             ),
                         }
                     )
@@ -453,13 +453,13 @@ class ConsultantService:
                 return result
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(
-                f"Erreur lors de la récupération des consultants par disponibilité: {e}"
+                f"Erreur lors de la rÃ©cupÃ©ration des consultants par disponibilitÃ©: {e}"
             )
             return []
 
     @staticmethod
     def get_consultant_by_id(consultant_id: int) -> Optional[Consultant]:
-        """Récupère un consultant par son ID avec toutes ses relations"""
+        """RÃ©cupÃ¨re un consultant par son ID avec toutes ses relations"""
         try:
             with get_database_session() as session:
                 consultant = (
@@ -472,19 +472,19 @@ class ConsultantService:
                     .first()
                 )
 
-                # Détacher l'objet de la session pour éviter les erreurs de session
-                # fermée
+                # DÃ©tacher l'objet de la session pour Ã©viter les erreurs de session
+                # fermÃ©e
                 if consultant:
                     session.expunge(consultant)
 
                 return consultant
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la récupération du consultant {consultant_id}: {e}")
+            print(f"Erreur lors de la rÃ©cupÃ©ration du consultant {consultant_id}: {e}")
             return None
 
     @staticmethod
     def get_consultant_with_stats(consultant_id: int) -> Optional[Dict[str, Any]]:
-        """Récupère un consultant avec ses statistiques pour éviter les problèmes de session"""
+        """RÃ©cupÃ¨re un consultant avec ses statistiques pour Ã©viter les problÃ¨mes de session"""
         try:
             with get_database_session() as session:
                 consultant = (
@@ -508,7 +508,7 @@ class ConsultantService:
                 )
                 missions_count = len(consultant.missions) if consultant.missions else 0
 
-                # Convertir en dictionnaire avec toutes les données nécessaires
+                # Convertir en dictionnaire avec toutes les donnÃ©es nÃ©cessaires
                 consultant_data = {
                     "id": consultant.id,
                     "prenom": consultant.prenom,
@@ -550,25 +550,25 @@ class ConsultantService:
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(
-                f"Erreur lors de la récupération du consultant avec stats {consultant_id}: {e}"
+                f"Erreur lors de la rÃ©cupÃ©ration du consultant avec stats {consultant_id}: {e}"
             )
             return None
 
     @staticmethod
     def get_consultant_by_email(email: str) -> Optional[Consultant]:
         """
-        Récupère un consultant par son email
+        RÃ©cupÃ¨re un consultant par son email
 
         Args:
-            email: Adresse email du consultant (insensible à la casse)
+            email: Adresse email du consultant (insensible Ã  la casse)
 
         Returns:
-            Objet Consultant si trouvé, None sinon
+            Objet Consultant si trouvÃ©, None sinon
 
         Example:
             >>> consultant = ConsultantService.get_consultant_by_email("jean.dupont@email.com")
             >>> if consultant:
-            ...     print(f"Consultant trouvé: {consultant.prenom} {consultant.nom}")
+            ...     print(f"Consultant trouvÃ©: {consultant.prenom} {consultant.nom}")
         """
         try:
             with get_database_session() as session:
@@ -579,31 +579,31 @@ class ConsultantService:
                 )
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(
-                f"Erreur lors de la récupération du consultant par email {email}: {e}"
+                f"Erreur lors de la rÃ©cupÃ©ration du consultant par email {email}: {e}"
             )
             return None
 
     @staticmethod
     def create_consultant(data: dict) -> bool:
         """
-        Crée un nouveau consultant dans la base de données
+        CrÃ©e un nouveau consultant dans la base de donnÃ©es
 
         Args:
-            data: Dictionnaire contenant les données du consultant avec les clés:
-                - prenom (str): Prénom du consultant (requis)
+            data: Dictionnaire contenant les donnÃ©es du consultant avec les clÃ©s:
+                - prenom (str): PrÃ©nom du consultant (requis)
                 - nom (str): Nom du consultant (requis)
                 - email (str): Email du consultant (requis)
-                - telephone (str, optional): Numéro de téléphone
+                - telephone (str, optional): NumÃ©ro de tÃ©lÃ©phone
                 - salaire (float, optional): Salaire actuel
                 - practice_id (int, optional): ID de la practice
-                - disponible (bool, optional): Disponibilité (défaut: True)
-                - notes (str, optional): Notes complémentaires
-                - societe (str, optional): Société (défaut: "Quanteam")
-                - grade (str, optional): Grade du consultant (défaut: "Junior")
-                - type_contrat (str, optional): Type de contrat (défaut: "CDI")
+                - disponible (bool, optional): DisponibilitÃ© (dÃ©faut: True)
+                - notes (str, optional): Notes complÃ©mentaires
+                - societe (str, optional): SociÃ©tÃ© (dÃ©faut: "Quanteam")
+                - grade (str, optional): Grade du consultant (dÃ©faut: "Junior")
+                - type_contrat (str, optional): Type de contrat (dÃ©faut: "CDI")
 
         Returns:
-            bool: True si la création a réussi, False sinon
+            bool: True si la crÃ©ation a rÃ©ussi, False sinon
 
         Example:
             >>> data = {
@@ -614,23 +614,23 @@ class ConsultantService:
             ...     "grade": "Senior"
             ... }
             >>> success = ConsultantService.create_consultant(data)
-            >>> print("Création réussie" if success else "Échec de création")
+            >>> print("CrÃ©ation rÃ©ussie" if success else "Ãchec de crÃ©ation")
         """
         try:
             # Validation des champs requis
             required_fields = ["prenom", "nom", "email"]
             for field in required_fields:
                 if not data.get(field) or str(data.get(field, "")).strip() == "":
-                    print(f"❌ Champ requis manquant ou vide: {field}")
+                    print(f"â Champ requis manquant ou vide: {field}")
                     return False
 
             # Validation de l'email
             email = data.get("email", "").strip()
             if "@" not in email or "." not in email:
-                print(f"❌ Format d'email invalide: {email}")
+                print(f"â Format d'email invalide: {email}")
                 return False
 
-            # Vérifier l'unicité de l'email
+            # VÃ©rifier l'unicitÃ© de l'email
             with get_database_session() as session:
                 existing_consultant = (
                     session.query(Consultant)
@@ -638,7 +638,7 @@ class ConsultantService:
                     .first()
                 )
                 if existing_consultant:
-                    print(f"❌ Email déjà utilisé: {email}")
+                    print(f"â Email dÃ©jÃ  utilisÃ©: {email}")
                     return False
 
             with get_database_session() as session:
@@ -670,30 +670,30 @@ class ConsultantService:
                 session.add(consultant)
                 session.commit()
                 print(
-                    f"✅ Consultant {data.get('prenom')} {data.get('nom')} créé avec succès"
+                    f"â Consultant {data.get('prenom')} {data.get('nom')} crÃ©Ã© avec succÃ¨s"
                 )
                 return True
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"❌ Erreur lors de la création du consultant: {e}")
+            print(f"â Erreur lors de la crÃ©ation du consultant: {e}")
             return False
 
     @staticmethod
     def update_consultant(consultant_id: int, data: dict) -> bool:
         """
-        Met à jour un consultant existant dans la base de données
+        Met Ã  jour un consultant existant dans la base de donnÃ©es
 
         Args:
-            consultant_id: ID du consultant à mettre à jour
-            data: Dictionnaire contenant les champs à mettre à jour
+            consultant_id: ID du consultant Ã  mettre Ã  jour
+            data: Dictionnaire contenant les champs Ã  mettre Ã  jour
 
         Returns:
-            bool: True si la mise à jour a réussi, False sinon
+            bool: True si la mise Ã  jour a rÃ©ussi, False sinon
 
         Example:
             >>> data = {"salaire": 50000.0, "disponible": False}
             >>> success = ConsultantService.update_consultant(123, data)
-            >>> print("Mise à jour réussie" if success else "Échec de mise à jour")
+            >>> print("Mise Ã  jour rÃ©ussie" if success else "Ãchec de mise Ã  jour")
         """
         try:
             with get_database_session() as session:
@@ -704,55 +704,55 @@ class ConsultantService:
                 )
 
                 if not consultant:
-                    print(f"❌ Consultant avec l'ID {consultant_id} non trouvé")
+                    print(f"â Consultant avec l'ID {consultant_id} non trouvÃ©")
                     return False
 
-                # Mapping des attributs pour éviter les erreurs
+                # Mapping des attributs pour Ã©viter les erreurs
                 attribute_mapping = {
                     "salaire": "salaire_actuel",
                     "disponibilite": "disponibilite",
                     "date_mise_a_jour": "derniere_maj",
                 }
 
-                # Mise à jour des champs
+                # Mise Ã  jour des champs
                 for key, value in data.items():
-                    # Utiliser le mapping si nécessaire
+                    # Utiliser le mapping si nÃ©cessaire
                     attr_name = attribute_mapping.get(key, key)
 
                     if hasattr(consultant, attr_name):
                         setattr(consultant, attr_name, value)
                     else:
                         print(
-                            f"⚠️ Attribut {attr_name} non trouvé sur le modèle Consultant"
+                            f"â ï¸ Attribut {attr_name} non trouvÃ© sur le modÃ¨le Consultant"
                         )
 
                 consultant.derniere_maj = datetime.now()
                 session.commit()
-                print(f"✅ Consultant {consultant_id} mis à jour avec succès")
+                print(f"â Consultant {consultant_id} mis Ã  jour avec succÃ¨s")
                 return True
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"❌ Erreur lors de la mise à jour du consultant: {e}")
+            print(f"â Erreur lors de la mise Ã  jour du consultant: {e}")
             return False
 
     @staticmethod
     def delete_consultant(consultant_id: int) -> bool:
         """
-        Supprime un consultant de la base de données
+        Supprime un consultant de la base de donnÃ©es
 
         Args:
-            consultant_id: ID du consultant à supprimer
+            consultant_id: ID du consultant Ã  supprimer
 
         Returns:
-            bool: True si la suppression a réussi, False sinon
+            bool: True si la suppression a rÃ©ussi, False sinon
 
         Note:
-            Cette opération est irréversible et supprime également toutes les
-            relations associées (missions, compétences, etc.)
+            Cette opÃ©ration est irrÃ©versible et supprime Ã©galement toutes les
+            relations associÃ©es (missions, compÃ©tences, etc.)
 
         Example:
             >>> success = ConsultantService.delete_consultant(123)
-            >>> print("Suppression réussie" if success else "Échec de suppression")
+            >>> print("Suppression rÃ©ussie" if success else "Ãchec de suppression")
         """
         try:
             with get_database_session() as session:
@@ -763,20 +763,20 @@ class ConsultantService:
                 )
 
                 if not consultant:
-                    print(f"❌ Consultant avec l'ID {consultant_id} non trouvé")
+                    print(f"â Consultant avec l'ID {consultant_id} non trouvÃ©")
                     return False
 
                 print(
-                    f"🔄 Suppression en cours du consultant {consultant.prenom} {consultant.nom} (ID: {consultant_id})"
+                    f"ð Suppression en cours du consultant {consultant.prenom} {consultant.nom} (ID: {consultant_id})"
                 )
                 session.delete(consultant)
                 session.commit()
-                print(f"✅ Consultant {consultant_id} supprimé avec succès")
+                print(f"â Consultant {consultant_id} supprimÃ© avec succÃ¨s")
                 return True
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             print(
-                f"❌ Erreur lors de la suppression du consultant {consultant_id}: {e}"
+                f"â Erreur lors de la suppression du consultant {consultant_id}: {e}"
             )
             print(f"Type d'erreur: {type(e).__name__}")
             import traceback
@@ -787,17 +787,17 @@ class ConsultantService:
     @staticmethod
     def search_consultants(search_term: str) -> List[Consultant]:
         """
-        Recherche des consultants par nom, prénom ou email
+        Recherche des consultants par nom, prÃ©nom ou email
 
         Args:
-            search_term: Terme de recherche (insensible à la casse)
+            search_term: Terme de recherche (insensible Ã  la casse)
 
         Returns:
-            Liste d'objets Consultant correspondant à la recherche
+            Liste d'objets Consultant correspondant Ã  la recherche
 
         Example:
             >>> consultants = ConsultantService.search_consultants("dupont")
-            >>> print(f"Trouvé {len(consultants)} consultant(s)")
+            >>> print(f"TrouvÃ© {len(consultants)} consultant(s)")
         """
         try:
             with get_database_session() as session:
@@ -831,7 +831,7 @@ class ConsultantService:
             with get_database_session() as session:
                 return session.query(Consultant).filter(Consultant.disponibilite).all()
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la récupération des consultants disponibles: {e}")
+            print(f"Erreur lors de la rÃ©cupÃ©ration des consultants disponibles: {e}")
             return []
 
     @staticmethod
@@ -839,29 +839,29 @@ class ConsultantService:
         session: Session, consultant_id: int, mission_data: Dict
     ) -> bool:
         """
-        Sauvegarde une mission extraite de l'analyse CV (méthode privée)
+        Sauvegarde une mission extraite de l'analyse CV (mÃ©thode privÃ©e)
 
         Args:
-            session: Session de base de données active
-            consultant_id: ID du consultant propriétaire de la mission
-            mission_data: Dictionnaire contenant les données de la mission
+            session: Session de base de donnÃ©es active
+            consultant_id: ID du consultant propriÃ©taire de la mission
+            mission_data: Dictionnaire contenant les donnÃ©es de la mission
 
         Returns:
-            bool: True si la mission a été sauvegardée, False sinon
+            bool: True si la mission a Ã©tÃ© sauvegardÃ©e, False sinon
 
         Note:
-            Cette méthode vérifie les doublons et gère les conversions de dates
+            Cette mÃ©thode vÃ©rifie les doublons et gÃ¨re les conversions de dates
         """
         try:
             client = mission_data.get("client", "").strip()
             if not client:
                 return False
 
-            # Vérifier si cette mission existe déjà (même client + même année)
+            # VÃ©rifier si cette mission existe dÃ©jÃ  (mÃªme client + mÃªme annÃ©e)
             date_debut_str = mission_data.get("date_debut", "")
             if date_debut_str and date_debut_str != "En cours":
                 try:
-                    if len(date_debut_str) == 4:  # Année seulement
+                    if len(date_debut_str) == 4:  # AnnÃ©e seulement
                         date_debut = date(int(date_debut_str), 1, 1)
                     else:
                         date_debut = datetime.strptime(
@@ -872,7 +872,7 @@ class ConsultantService:
             else:
                 date_debut = None
 
-            # Vérifier doublons
+            # VÃ©rifier doublons
             if date_debut:
                 existing = (
                     session.query(Mission)
@@ -885,7 +885,7 @@ class ConsultantService:
                 )
 
                 if existing:
-                    print(f"Mission {client} {date_debut} déjà existante, ignorée")
+                    print(f"Mission {client} {date_debut} dÃ©jÃ  existante, ignorÃ©e")
                     return False
 
             # Date de fin
@@ -893,14 +893,14 @@ class ConsultantService:
             date_fin = None
             if date_fin_str and date_fin_str != "En cours":
                 try:
-                    if len(date_fin_str) == 4:  # Année seulement
+                    if len(date_fin_str) == 4:  # AnnÃ©e seulement
                         date_fin = date(int(date_fin_str), 12, 31)
                     else:
                         date_fin = datetime.strptime(date_fin_str, "%Y-%m-%d").date()
                 except BaseException:
                     date_fin = None
 
-            # Créer la mission
+            # CrÃ©er la mission
             mission = Mission(
                 consultant_id=consultant_id,
                 nom_mission=mission_data.get("resume", f"Mission chez {client}")[:200],
@@ -926,27 +926,27 @@ class ConsultantService:
         session: Session, consultant_id: int, competence_name: str, type_competence: str
     ) -> bool:
         """
-        Sauvegarde une compétence extraite de l'analyse CV (méthode privée)
+        Sauvegarde une compÃ©tence extraite de l'analyse CV (mÃ©thode privÃ©e)
 
         Args:
-            session: Session de base de données active
+            session: Session de base de donnÃ©es active
             consultant_id: ID du consultant
-            competence_name: Nom de la compétence à sauvegarder
-            type_competence: Type de compétence ("technique" ou "fonctionnelle")
+            competence_name: Nom de la compÃ©tence Ã  sauvegarder
+            type_competence: Type de compÃ©tence ("technique" ou "fonctionnelle")
 
         Returns:
-            bool: True si la compétence a été sauvegardée, False sinon
+            bool: True si la compÃ©tence a Ã©tÃ© sauvegardÃ©e, False sinon
 
         Note:
-            Cette méthode crée automatiquement la compétence dans le référentiel
-            si elle n'existe pas déjà
+            Cette mÃ©thode crÃ©e automatiquement la compÃ©tence dans le rÃ©fÃ©rentiel
+            si elle n'existe pas dÃ©jÃ
         """
         try:
             competence_name = competence_name.strip()
             if not competence_name:
                 return False
 
-            # Chercher ou créer la compétence
+            # Chercher ou crÃ©er la compÃ©tence
             competence = (
                 session.query(Competence)
                 .filter(Competence.nom == competence_name)
@@ -954,7 +954,7 @@ class ConsultantService:
             )
 
             if not competence:
-                # Déterminer la catégorie automatiquement
+                # DÃ©terminer la catÃ©gorie automatiquement
                 categorie = ConsultantService._determine_skill_category(
                     competence_name, type_competence
                 )
@@ -967,7 +967,7 @@ class ConsultantService:
                 session.add(competence)
                 session.flush()  # Pour obtenir l'ID
 
-            # Vérifier si le consultant a déjà cette compétence
+            # VÃ©rifier si le consultant a dÃ©jÃ  cette compÃ©tence
             existing_consultant_competence = (
                 session.query(ConsultantCompetence)
                 .filter(
@@ -978,34 +978,34 @@ class ConsultantService:
             )
 
             if not existing_consultant_competence:
-                # Ajouter la relation consultant-compétence
+                # Ajouter la relation consultant-compÃ©tence
                 consultant_competence = ConsultantCompetence(
                     consultant_id=consultant_id,
                     competence_id=competence.id,
-                    annees_experience=1.0,  # Valeur par défaut
-                    niveau_maitrise="intermediaire",  # Valeur par défaut
+                    annees_experience=1.0,  # Valeur par dÃ©faut
+                    niveau_maitrise="intermediaire",  # Valeur par dÃ©faut
                 )
                 session.add(consultant_competence)
                 return True
             else:
-                # Compétence déjà existante
+                # CompÃ©tence dÃ©jÃ  existante
                 return False
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur sauvegarde compétence {competence_name}: {e}")
+            print(f"Erreur sauvegarde compÃ©tence {competence_name}: {e}")
             return False
 
     @staticmethod
     def _determine_skill_category(skill_name: str, type_competence: str) -> str:
         """
-        Détermine automatiquement la catégorie d'une compétence (méthode privée)
+        DÃ©termine automatiquement la catÃ©gorie d'une compÃ©tence (mÃ©thode privÃ©e)
 
         Args:
-            skill_name: Nom de la compétence à classifier
-            type_competence: Type de compétence ("technique" ou "fonctionnelle")
+            skill_name: Nom de la compÃ©tence Ã  classifier
+            type_competence: Type de compÃ©tence ("technique" ou "fonctionnelle")
 
         Returns:
-            str: Catégorie de la compétence (ex: "Frontend", "Backend", "Management", etc.)
+            str: CatÃ©gorie de la compÃ©tence (ex: "Frontend", "Backend", "Management", etc.)
 
         Example:
             >>> category = ConsultantService._determine_skill_category("React", "technique")
@@ -1031,7 +1031,7 @@ class ConsultantService:
             else:
                 return "Fonctionnelle"
 
-        # Compétences techniques
+        # CompÃ©tences techniques
         frontend_keywords = [
             "react",
             "angular",
@@ -1077,29 +1077,29 @@ class ConsultantService:
     @staticmethod
     def save_cv_analysis(consultant_id: int, analysis_data: Dict[str, Any]) -> bool:
         """
-        Sauvegarde les résultats d'analyse de CV dans le profil du consultant
+        Sauvegarde les rÃ©sultats d'analyse de CV dans le profil du consultant
 
         Args:
             consultant_id: ID du consultant
-            analysis_data: Dictionnaire contenant les données d'analyse (missions, compétences, etc.)
+            analysis_data: Dictionnaire contenant les donnÃ©es d'analyse (missions, compÃ©tences, etc.)
 
         Returns:
-            bool: True si succès, False sinon
+            bool: True si succÃ¨s, False sinon
         """
         try:
             with get_database_session() as session:
-                # Vérifier que le consultant existe
+                # VÃ©rifier que le consultant existe
                 consultant = (
                     session.query(Consultant)
                     .filter(Consultant.id == consultant_id)
                     .first()
                 )
                 if not consultant:
-                    st.error(f"❌ Consultant avec ID {consultant_id} introuvable")
+                    st.error(f"â Consultant avec ID {consultant_id} introuvable")
                     return False
 
                 st.info(
-                    f"💾 Sauvegarde de l'analyse CV pour {consultant.prenom} {consultant.nom}"
+                    f"ð¾ Sauvegarde de l'analyse CV pour {consultant.prenom} {consultant.nom}"
                 )
 
                 missions_count = 0
@@ -1117,11 +1117,11 @@ class ConsultantService:
                         or mission_data.get("date_debut") == ""
                     ):
                         st.warning(
-                            f"⚠️ Mission {mission_data['client']} ignorée - dates manquantes"
+                            f"â ï¸ Mission {mission_data['client']} ignorÃ©e - dates manquantes"
                         )
                         continue
 
-                    # Vérifier si la mission existe déjà (éviter les doublons)
+                    # VÃ©rifier si la mission existe dÃ©jÃ  (Ã©viter les doublons)
                     existing_mission = (
                         session.query(Mission)
                         .filter(
@@ -1133,7 +1133,7 @@ class ConsultantService:
                     )
 
                     if not existing_mission:
-                        # Convertir les dates si nécessaire
+                        # Convertir les dates si nÃ©cessaire
                         date_debut = mission_data.get("date_debut")
                         date_fin = mission_data.get("date_fin")
 
@@ -1147,7 +1147,7 @@ class ConsultantService:
                                 else:
                                     continue  # Ignorer si format de date invalide
                             else:
-                                continue  # Ignorer si pas de date de début
+                                continue  # Ignorer si pas de date de dÃ©but
 
                             if date_fin and date_fin != "En cours":
                                 if len(date_fin) >= 10:  # Format YYYY-MM-DD
@@ -1160,11 +1160,11 @@ class ConsultantService:
                                 date_fin = None
                         except ValueError:
                             st.warning(
-                                f"⚠️ Mission {mission_data['client']} ignorée - format de date invalide"
+                                f"â ï¸ Mission {mission_data['client']} ignorÃ©e - format de date invalide"
                             )
                             continue
 
-                        # Créer la nouvelle mission
+                        # CrÃ©er la nouvelle mission
                         new_mission = Mission(
                             consultant_id=consultant_id,
                             nom_mission=f"Mission chez {mission_data['client']}",
@@ -1177,14 +1177,14 @@ class ConsultantService:
                             technologies_utilisees=", ".join(
                                 mission_data.get("langages_techniques", [])
                             ),
-                            revenus_generes=0,  # À compléter manuellement
+                            revenus_generes=0,  # Ã complÃ©ter manuellement
                         )
 
                         session.add(new_mission)
                         missions_count += 1
-                        st.success("✅ Mission ajoutée: " + mission_data["client"])
+                        st.success("â Mission ajoutÃ©e: " + mission_data["client"])
 
-                # 2. Sauvegarder les compétences techniques
+                # 2. Sauvegarder les compÃ©tences techniques
                 technical_skills = analysis_data.get("langages_techniques", [])
                 for skill_name in technical_skills:
                     if not skill_name or len(skill_name.strip()) < 2:
@@ -1192,7 +1192,7 @@ class ConsultantService:
 
                     skill_name = skill_name.strip()
 
-                    # Vérifier si la compétence existe déjà dans le référentiel
+                    # VÃ©rifier si la compÃ©tence existe dÃ©jÃ  dans le rÃ©fÃ©rentiel
                     competence = (
                         session.query(Competence)
                         .filter(Competence.nom.ilike(f"%{skill_name}%"))
@@ -1200,19 +1200,19 @@ class ConsultantService:
                     )
 
                     if not competence:
-                        # Créer la compétence dans le référentiel
+                        # CrÃ©er la compÃ©tence dans le rÃ©fÃ©rentiel
                         competence = Competence(
                             nom=skill_name,
                             type_competence="technique",
                             categorie=ConsultantService._determine_skill_category(
                                 skill_name, "technique"
                             ),
-                            description="Compétence technique extraite automatiquement du CV",
+                            description="CompÃ©tence technique extraite automatiquement du CV",
                         )
                         session.add(competence)
                         session.flush()  # Pour obtenir l'ID
 
-                    # Vérifier si le consultant a déjà cette compétence
+                    # VÃ©rifier si le consultant a dÃ©jÃ  cette compÃ©tence
                     existing_skill = (
                         session.query(ConsultantCompetence)
                         .filter(
@@ -1223,18 +1223,18 @@ class ConsultantService:
                     )
 
                     if not existing_skill:
-                        # Ajouter la compétence au consultant
+                        # Ajouter la compÃ©tence au consultant
                         consultant_skill = ConsultantCompetence(
                             consultant_id=consultant_id,
                             competence_id=competence.id,
-                            niveau_maitrise="intermediaire",  # Par défaut
-                            annees_experience=2.0,  # Estimation par défaut
+                            niveau_maitrise="intermediaire",  # Par dÃ©faut
+                            annees_experience=2.0,  # Estimation par dÃ©faut
                         )
                         session.add(consultant_skill)
                         skills_count += 1
-                        st.success("✅ Compétence technique ajoutée: " + skill_name)
+                        st.success("â CompÃ©tence technique ajoutÃ©e: " + skill_name)
 
-                # 3. Sauvegarder les compétences fonctionnelles
+                # 3. Sauvegarder les compÃ©tences fonctionnelles
                 functional_skills = analysis_data.get("competences_fonctionnelles", [])
                 for skill_name in functional_skills:
                     if not skill_name or len(skill_name.strip()) < 2:
@@ -1242,7 +1242,7 @@ class ConsultantService:
 
                     skill_name = skill_name.strip()
 
-                    # Vérifier si la compétence existe déjà dans le référentiel
+                    # VÃ©rifier si la compÃ©tence existe dÃ©jÃ  dans le rÃ©fÃ©rentiel
                     competence = (
                         session.query(Competence)
                         .filter(Competence.nom.ilike(f"%{skill_name}%"))
@@ -1250,19 +1250,19 @@ class ConsultantService:
                     )
 
                     if not competence:
-                        # Créer la compétence dans le référentiel
+                        # CrÃ©er la compÃ©tence dans le rÃ©fÃ©rentiel
                         competence = Competence(
                             nom=skill_name,
                             type_competence="fonctionnelle",
                             categorie=ConsultantService._determine_skill_category(
                                 skill_name, "fonctionnelle"
                             ),
-                            description="Compétence fonctionnelle extraite automatiquement du CV",
+                            description="CompÃ©tence fonctionnelle extraite automatiquement du CV",
                         )
                         session.add(competence)
                         session.flush()  # Pour obtenir l'ID
 
-                    # Vérifier si le consultant a déjà cette compétence
+                    # VÃ©rifier si le consultant a dÃ©jÃ  cette compÃ©tence
                     existing_skill = (
                         session.query(ConsultantCompetence)
                         .filter(
@@ -1273,33 +1273,33 @@ class ConsultantService:
                     )
 
                     if not existing_skill:
-                        # Ajouter la compétence au consultant
+                        # Ajouter la compÃ©tence au consultant
                         consultant_skill = ConsultantCompetence(
                             consultant_id=consultant_id,
                             competence_id=competence.id,
-                            niveau_maitrise="intermediaire",  # Par défaut
-                            annees_experience=2.0,  # Estimation par défaut
+                            niveau_maitrise="intermediaire",  # Par dÃ©faut
+                            annees_experience=2.0,  # Estimation par dÃ©faut
                         )
                         session.add(consultant_skill)
                         skills_count += 1
-                        st.success("✅ Compétence fonctionnelle ajoutée: " + skill_name)
+                        st.success("â CompÃ©tence fonctionnelle ajoutÃ©e: " + skill_name)
 
-                # 4. Mettre à jour la date de dernière modification du consultant
+                # 4. Mettre Ã  jour la date de derniÃ¨re modification du consultant
                 consultant.derniere_maj = datetime.now()
 
                 # Committer toutes les modifications
                 session.commit()
 
-                st.success("🎉 Analyse CV sauvegardée avec succès !")
+                st.success("ð Analyse CV sauvegardÃ©e avec succÃ¨s !")
                 st.info(
-                    f"📊 **Résumé**: {missions_count} missions ajoutées, {skills_count} compétences ajoutées"
+                    f"ð **RÃ©sumÃ©**: {missions_count} missions ajoutÃ©es, {skills_count} compÃ©tences ajoutÃ©es"
                 )
 
                 return True
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            st.error("❌ Erreur lors de la sauvegarde de l'analyse CV: " + str(e))
-            print(f"Erreur détaillée: {e}")
+            st.error("â Erreur lors de la sauvegarde de l'analyse CV: " + str(e))
+            print(f"Erreur dÃ©taillÃ©e: {e}")
             import traceback
 
             traceback.print_exc()

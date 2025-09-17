@@ -57,7 +57,7 @@ def init_business_managers():
     print("👥 Initialisation des Business Managers...")
 
     for bm_data in bms_base:
-        # Vérifier si le BM existe déjà
+        # Vérifier si le BM existe déj�
         existing = (
             session.query(BusinessManager)
             .filter(BusinessManager.email == bm_data["email"])

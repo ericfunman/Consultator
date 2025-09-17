@@ -20,18 +20,18 @@ def test_path_setup():
 
 class TestCIEnvironment:
     """Tests d'environnement CI"""
-    
+
     def test_imports_basic(self):
         """Test imports Python de base"""
         import json
         import datetime
         assert True
-        
+
     def test_directory_structure(self):
         """Test structure répertoire"""
         assert os.path.exists("tests")
         assert os.path.exists("app") or True  # Peut ne pas exister en CI
-        
+
     def test_ci_environment_vars(self):
         """Test variables CI"""
         ci_vars = ['CI', 'GITHUB_ACTIONS', 'GITHUB_WORKFLOW']

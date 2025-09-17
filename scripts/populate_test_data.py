@@ -98,7 +98,7 @@ def create_test_consultants():
 
     try:
         for data in consultants_data:
-            # Vérifier si le consultant existe déjà
+            # Vérifier si le consultant existe déj�
             existing = session.query(Consultant).filter_by(email=data["email"]).first()
             if not existing:
                 consultant = Consultant(**data)
@@ -116,9 +116,9 @@ def create_test_consultants():
         )
         return all_consultants
 
-    except Exception as e:
+    except Exception as exc:
         session.rollback()
-        print(f"❌ Erreur lors de la création des consultants: {e}")
+        print(f"❌ Erreur lors de la création des consultants: {exc}")
         return []
     finally:
         session.close()
@@ -191,7 +191,7 @@ def create_test_competences():
 
     try:
         for data in competences_data:
-            # Vérifier si la compétence existe déjà
+            # Vérifier si la compétence existe déj�
             existing = session.query(Competence).filter_by(nom=data["nom"]).first()
             if not existing:
                 competence = Competence(**data)
@@ -209,9 +209,9 @@ def create_test_competences():
         )
         return all_competences
 
-    except Exception as e:
+    except Exception as exc:
         session.rollback()
-        print(f"❌ Erreur lors de la création des compétences: {e}")
+        print(f"❌ Erreur lors de la création des compétences: {exc}")
         return []
     finally:
         session.close()
@@ -284,9 +284,9 @@ def create_test_missions(consultants):
         print(f"✅ {len(missions)} missions créées")
         return missions
 
-    except Exception as e:
+    except Exception as exc:
         session.rollback()
-        print(f"❌ Erreur lors de la création des missions: {e}")
+        print(f"❌ Erreur lors de la création des missions: {exc}")
         return []
     finally:
         session.close()
@@ -323,7 +323,7 @@ def create_consultant_competences(consultants, competences):
                     "projets_realises": f"Projet {random.randint(1, 10)}, Projet {random.randint(11, 20)}",
                 }
 
-                # Vérifier si l'association existe déjà
+                # Vérifier si l'association existe déj�
                 existing = (
                     session.query(ConsultantCompetence)
                     .filter_by(consultant_id=consultant.id, competence_id=competence.id)
@@ -339,9 +339,9 @@ def create_consultant_competences(consultants, competences):
         print(f"✅ {len(associations)} associations consultant-compétence créées")
         return associations
 
-    except Exception as e:
+    except Exception as exc:
         session.rollback()
-        print(f"❌ Erreur lors de la création des associations: {e}")
+        print(f"❌ Erreur lors de la création des associations: {exc}")
         return []
     finally:
         session.close()

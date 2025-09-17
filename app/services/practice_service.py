@@ -68,7 +68,7 @@ class PracticeService:
         """Crée une nouvelle practice"""
         session = get_session()
         try:
-            # Vérifier si la practice existe déjà
+            # Vérifier si la practice existe déj�
             existing = session.query(Practice).filter(Practice.nom == nom).first()
             if existing:
                 st.error(f"La practice '{nom}' existe déjà")
@@ -316,7 +316,7 @@ class PracticeService:
         """Initialise les practices par défaut (Data et Quant)"""
         session = get_session()
         try:
-            # Vérifier si les practices existent déjà
+            # Vérifier si les practices existent déj�
             existing_practices = session.query(Practice).all()
 
             if not existing_practices:

@@ -5,6 +5,7 @@ Application Streamlit pour la gestion de consultants
 """
 
 import importlib
+import traceback
 
 import streamlit as st
 from streamlit_option_menu import option_menu
@@ -48,8 +49,8 @@ def load_module_safe(module_name):
         st.session_state.modules_cache[module_name] = module
         return module
 
-    except (ImportError, ModuleNotFoundError, AttributeError) as e:
-        st.error(f"❌ Erreur lors du chargement du module {module_name}: {e}")
+    except (ImportError, ModuleNotFoundError, AttributeError) as exc:
+        st.error(f"❌ Erreur lors du chargement du module {module_name}: {exc}")
         return None
 
 
@@ -68,7 +69,8 @@ def show_navigation():
                 "🔧 Technologies",
                 "🤖 Assistant IA",
             ],
-            icons=["house", "people", "briefcase", "building", "tools", "robot"],
+            icons=["house", "people", "briefcase", "building",
+                   "tools", "robot"],
             menu_icon="list",
             default_index=0,
             styles={
@@ -117,12 +119,10 @@ def main():
         if module and hasattr(module, "show"):
             try:
                 module.show()
-            except (AttributeError, TypeError, ValueError) as e:
-                st.error(f"❌ Erreur lors de l'affichage de la page: {e}")
+            except (AttributeError, TypeError, ValueError) as exc:
+                st.error(f"❌ Erreur lors de l'affichage de la page: {exc}")
                 st.info("🔄 Essayez de recharger la page")
                 # Afficher les détails de l'erreur
-                import traceback
-
                 with st.expander("🔍 Détails de l'erreur"):
                     st.code(traceback.format_exc())
         else:
@@ -136,8 +136,8 @@ def main():
                 st.markdown("### Application de gestion de consultants")
                 st.info("Sélectionnez une page dans le menu à gauche")
 
-    except (RuntimeError, SystemError, KeyboardInterrupt) as e:
-        st.error(f"❌ Erreur critique: {e}")
+    except (RuntimeError, SystemError, KeyboardInterrupt) as exc:
+        st.error(f"❌ Erreur critique: {exc}")
         st.info("🔄 Rechargez l'application")
 
 

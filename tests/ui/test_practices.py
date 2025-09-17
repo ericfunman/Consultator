@@ -608,14 +608,14 @@ class TestShowPracticeDetailedStatsCached(BaseUITest):
 
         mock_st.subheader = MagicMock()
         mock_st.spinner = MagicMock()
-        
+
         # Configure columns mock to return correct number of elements
         def columns_side_effect(n):
             if isinstance(n, list):
                 return [MagicMock() for _ in range(len(n))]
             else:
                 return [MagicMock() for _ in range(n)]
-        
+
         mock_st.columns = MagicMock(side_effect=columns_side_effect)
         mock_st.metric = MagicMock()
 

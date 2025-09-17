@@ -25,7 +25,7 @@ def migrate_add_practice_column():
         conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
 
-        # Vérifier si la colonne practice_id existe déjà
+        # Vérifier si la colonne practice_id existe déj�
         cursor.execute("PRAGMA table_info(consultants)")
         columns = [column[1] for column in cursor.fetchall()]
 
@@ -51,7 +51,7 @@ def migrate_add_practice_column():
     # Créer les practices par défaut
     try:
         with get_database_session() as session:
-            # Vérifier si les practices existent déjà
+            # Vérifier si les practices existent déj�
             existing_practices = session.query(Practice).all()
 
             if not existing_practices:

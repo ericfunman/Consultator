@@ -116,8 +116,8 @@ def add_performance_indexes():
             conn.commit()
             print("✅ Tous les index ont été ajoutés avec succès !")
 
-        except Exception as e:
-            print(f"❌ Erreur lors de l'ajout des index: {e}")
+        except Exception as exc:
+            print(f"❌ Erreur lors de l'ajout des index: {exc}")
             conn.rollback()
 
 

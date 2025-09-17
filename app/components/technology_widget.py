@@ -39,7 +39,7 @@ def technology_multiselect(
             tech.strip() for tech in current_technologies.split(",") if tech.strip()
         ]
 
-        # Matcher les technologies actuelles avec celles disponibles (insensible Ã 
+        # Matcher les technologies actuelles avec celles disponibles (insensible Ã
         # la casse)
         all_techs_lower = {tech.lower(): tech for tech in all_techs}
 

@@ -42,7 +42,7 @@ def init_langues():
     print("🌍 Initialisation des langues...")
 
     for langue_data in langues_base:
-        # Vérifier si la langue existe déjà
+        # Vérifier si la langue existe déj�
         existing = (
             session.query(Langue).filter(Langue.nom == langue_data["nom"]).first()
         )

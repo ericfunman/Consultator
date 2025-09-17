@@ -23,7 +23,7 @@ class TestConsultantService:
         # Mock de la session
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        
+
         # Mock des objets consultant retournés par la requête
         mock_consultant1 = Mock()
         mock_consultant1.id = 1
@@ -36,7 +36,7 @@ class TestConsultantService:
         mock_consultant1.practice = Mock()
         mock_consultant1.practice.nom = "Technology"
         mock_consultant1.date_creation = "2023-01-01"
-        
+
         mock_consultant2 = Mock()
         mock_consultant2.id = 2
         mock_consultant2.prenom = "Martin"
@@ -48,7 +48,7 @@ class TestConsultantService:
         mock_consultant2.practice = Mock()
         mock_consultant2.practice.nom = "Finance"
         mock_consultant2.date_creation = "2023-02-01"
-        
+
         # Mock de la query pour retourner les résultats
         mock_query = Mock()
         mock_session.query.return_value = mock_query
@@ -226,16 +226,16 @@ class TestPracticeService:
         """Test récupération de toutes les practices"""
         # Mock de la session
         mock_session = Mock()
-        
+
         # Mock des objets practice
         mock_practice1 = Mock()
         mock_practice1.nom = "Technology"
         mock_practice1.actif = True
-        
+
         mock_practice2 = Mock()
         mock_practice2.nom = "Finance"
         mock_practice2.actif = True
-        
+
         # Mock de la query
         mock_query = Mock()
         mock_session.query.return_value = mock_query
@@ -648,11 +648,11 @@ class TestServiceIntegration:
         mock_consultant_context.__enter__.return_value = mock_consultant_session
         mock_consultant_context.__exit__.return_value = None
         mock_consultant_get_session.return_value = mock_consultant_context
-        
+
         mock_consultant = Mock()
         mock_consultant.id = 1
         mock_consultant.nom = "Dupont"
-        
+
         mock_consultant_query = Mock()
         mock_consultant_session.query.return_value = mock_consultant_query
         mock_consultant_query.filter.return_value = mock_consultant_query
@@ -664,11 +664,11 @@ class TestServiceIntegration:
         mock_technology_context.__enter__.return_value = mock_technology_session
         mock_technology_context.__exit__.return_value = None
         mock_technology_get_session.return_value = mock_technology_context
-        
+
         mock_technology = Mock()
         mock_technology.nom = "Python"
         mock_technology.categorie = "Language"
-        
+
         mock_technology_query = Mock()
         mock_technology_session.query.return_value = mock_technology_query
         mock_technology_query.all.return_value = [mock_technology]
@@ -693,11 +693,11 @@ class TestServiceIntegration:
         mock_practice_context.__enter__.return_value = mock_practice_session
         mock_practice_context.__exit__.return_value = None
         mock_practice_get_session.return_value = mock_practice_context
-        
+
         mock_practice = Mock()
         mock_practice.id = 1
         mock_practice.nom = "Technology"
-        
+
         mock_practice_query = Mock()
         mock_practice_session.query.return_value = mock_practice_query
         mock_practice_query.filter.return_value = mock_practice_query
@@ -709,11 +709,11 @@ class TestServiceIntegration:
         mock_consultant_context.__enter__.return_value = mock_consultant_session
         mock_consultant_context.__exit__.return_value = None
         mock_consultant_get_session.return_value = mock_consultant_context
-        
+
         mock_consultant = Mock()
         mock_consultant.nom = "Dupont"
         mock_consultant.practice = mock_practice
-        
+
         mock_consultant_query = Mock()
         mock_consultant_session.query.return_value = mock_consultant_query
         mock_consultant_query.all.return_value = [mock_consultant]

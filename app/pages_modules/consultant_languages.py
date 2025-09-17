@@ -445,7 +445,7 @@ def add_language_to_consultant(consultant_id: int, data: Dict[str, Any]) -> bool
 
     try:
         with get_database_session() as session:
-            # Vérifier que la langue n'existe pas déjà
+            # Vérifier que la langue n'existe pas déj�
             existing = (
                 session.query(ConsultantLangue)
                 .filter(

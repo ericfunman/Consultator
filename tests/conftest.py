@@ -48,7 +48,7 @@ def test_db():
         try:
             Base.metadata.drop_all(engine)
             engine.dispose()  # Fermer toutes les connexions
-        except Exception:
+        except Exception as exc:
             pass  # Ignore les erreurs de cleanup
     except ImportError as e:
         # Si les modules de l'app ne sont pas disponibles, retourner un mock
@@ -65,18 +65,18 @@ def db_session(test_db):
         yield session
         # Commit des changements si pas d'erreur
         session.commit()
-    except Exception:
+    except Exception as exc:
         # En cas d'erreur, faire un rollback explicite
         try:
             session.rollback()
-        except Exception:
+        except Exception as exc:
             pass  # Ignorer les erreurs de rollback
         raise
     finally:
         try:
             session.expunge_all()  # Détacher tous les objets
             session.close()
-        except Exception:
+        except Exception as exc:
             pass  # Ignorer les erreurs de fermeture
 
 
@@ -875,7 +875,7 @@ def mock_streamlit_singleton():
 def disable_streamlit_cache():
     """Disable Streamlit caching during tests to avoid pickling mock objects"""
     from unittest.mock import patch, MagicMock
-    
+
     def mock_cache_data(*args, **kwargs):
         """Mock cache_data decorator that just returns the original function"""
         if len(args) == 1 and callable(args[0]):
@@ -886,7 +886,7 @@ def disable_streamlit_cache():
             def decorator(func):
                 return func
             return decorator
-    
+
     def mock_cache_resource(*args, **kwargs):
         """Mock cache_resource decorator that just returns the original function"""
         if len(args) == 1 and callable(args[0]):
@@ -897,18 +897,18 @@ def disable_streamlit_cache():
             def decorator(func):
                 return func
             return decorator
-    
+
     patches = []
     try:
         patches.append(patch('streamlit.cache_data', mock_cache_data))
         patches.append(patch('streamlit.cache_resource', mock_cache_resource))
-        
+
         # Démarrer les patches
         for p in patches:
             p.start()
-            
+
         yield
-        
+
     finally:
         # Arrêter les patches
         for p in patches:

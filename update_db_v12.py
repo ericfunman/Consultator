@@ -33,14 +33,14 @@ def update_database_v12():
                 try:
                     session.execute(text(update_sql))
                     print(f"✅ Exécuté: {update_sql}")
-                except Exception as e:
+                except Exception as exc:
                     if (
-                        "duplicate column name" in str(e).lower()
-                        or "already exists" in str(e).lower()
+                        "duplicate column name" in str(exc).lower()
+                        or "already exists" in str(exc).lower()
                     ):
                         print(f"⚠️  Colonne déjà existante: {update_sql}")
                     else:
-                        print(f"❌ Erreur: {update_sql} - {e}")
+                        print(f"❌ Erreur: {update_sql} - {exc}")
 
             session.commit()
             print("✅ Base de données mise à jour avec succès pour V1.2!")
@@ -61,8 +61,8 @@ def update_database_v12():
                 else:
                     print(f"❌ Colonne '{col}' manquante")
 
-    except Exception as e:
-        print(f"❌ Erreur lors de la mise à jour: {e}")
+    except Exception as exc:
+        print(f"❌ Erreur lors de la mise à jour: {exc}")
         return False
 
     return True

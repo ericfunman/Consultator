@@ -23,7 +23,7 @@ def migrate_add_practices():
 
     try:
         with get_database_session() as session:
-            # Vérifier si les practices existent déjà
+            # Vérifier si les practices existent déj�
             existing_practices = session.query(Practice).all()
 
             if not existing_practices:

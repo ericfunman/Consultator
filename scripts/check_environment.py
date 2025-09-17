@@ -36,8 +36,8 @@ def check_database():
 
         return True
 
-    except Exception as e:
-        print(f"❌ Erreur lors de la vérification de la BD: {e}")
+    except Exception as exc:
+        print(f"❌ Erreur lors de la vérification de la BD: {exc}")
         return False
 
 
@@ -62,8 +62,8 @@ def check_test_data():
                 print(f"✅ {consultant_count} consultant(s) trouvé(s) dans la base")
                 return True
 
-    except Exception as e:
-        print(f"❌ Erreur lors de la vérification des données: {e}")
+    except Exception as exc:
+        print(f"❌ Erreur lors de la vérification des données: {exc}")
         return False
 
 

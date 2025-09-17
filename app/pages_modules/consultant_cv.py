@@ -331,7 +331,7 @@ def add_skill_from_cv(skill_name: str, consultant_id: Optional[int]):
                 session.add(competence)
                 session.flush()
 
-            # Vérifier si l'association existe déjà
+            # Vérifier si l'association existe déj�
             existing_assoc = (
                 session.query(ConsultantCompetence)
                 .filter(

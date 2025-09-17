@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script de mise à jour de la base de données pour la V1.2.2
+Script de mise à     except Exception as exc:
+        print(f"❌ Erreur lors de la mise à jour: {exc}")
+        return Falser de la base de données pour la V1.2.2
 Ajoute le champ TJM aux missions et améliore la gestion de disponibilité
 """
 
@@ -33,16 +35,16 @@ def update_database_v122():
                 try:
                     session.execute(text(update_sql))
                     print(f"✅ Exécuté: {update_sql}")
-                except Exception as e:
+                except Exception as exc:
                     if (
-                        "duplicate column name" in str(e).lower()
-                        or "already exists" in str(e).lower()
+                        "duplicate column name" in str(exc).lower()
+                        or "already exists" in str(exc).lower()
                     ):
                         print(f"⚠️  Colonne déjà existante: {update_sql}")
-                    elif "comment" in str(e).lower():
+                    elif "comment" in str(exc).lower():
                         print(f"⚠️  Commentaire non supporté (SQLite): {update_sql}")
                     else:
-                        print(f"❌ Erreur: {update_sql} - {e}")
+                        print(f"❌ Erreur: {update_sql} - {exc}")
 
             # Migrer les données existantes si le champ taux_journalier existe
             try:
@@ -52,8 +54,8 @@ def update_database_v122():
                     )
                 )
                 print("✅ Migration des données TJM existantes effectuée")
-            except Exception as e:
-                print(f"⚠️  Pas de migration des données TJM nécessaire: {e}")
+            except Exception as exc:
+                print(f"⚠️  Pas de migration des données TJM nécessaire: {exc}")
 
             session.commit()
             print("✅ Base de données mise à jour avec succès pour V1.2.2!")
@@ -69,8 +71,8 @@ def update_database_v122():
                 else:
                     print(f"❌ Colonne '{col}' manquante dans la table missions")
 
-    except Exception as e:
-        print(f"❌ Erreur lors de la mise à jour: {e}")
+    except Exception as exc:
+        print(f"❌ Erreur lors de la mise à jour: {exc}")
         return False
 
     return True

@@ -164,16 +164,16 @@ class TestConsultantInfoUpdate:
         # Configurer les mocks pour les différents appels query
         mock_query = MagicMock()
         mock_session.query.return_value = mock_query
-        
+
         # Premier appel: récupérer le consultant
         mock_filter1 = MagicMock()
         mock_query.filter.return_value = mock_filter1
         mock_filter1.first.return_value = mock_consultant
-        
+
         # Mock pour vérifier l'unicité de l'email (pas de conflit)
         # On utilise side_effect pour gérer les appels multiples
         mock_filter1.first.side_effect = [mock_consultant, None]
-        
+
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         data = {

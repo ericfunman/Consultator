@@ -29,8 +29,8 @@ def test_imports():
         )
         print("✅ Tous les imports réussis")
         return True
-    except ImportError as e:
-        print(f"❌ Erreur d'import: {e}")
+    except ImportError as exc:
+        print(f"❌ Erreur d'import: {exc}")
         print(f"   Python path: {sys.path[:3]}")
         return False
 
@@ -46,8 +46,8 @@ def test_cache_service():
         data = get_cached_consultants_list(page=1, per_page=5)
         print(f"✅ Récupération données: {len(data)} éléments")
         return True
-    except Exception as e:
-        print(f"❌ Erreur cache: {e}")
+    except Exception as exc:
+        print(f"❌ Erreur cache: {exc}")
         return False
 
 def test_consultant_service():
@@ -61,8 +61,8 @@ def test_consultant_service():
         # Test basique sans base de données
         print("✅ Service consultant importé (test sans DB)")
         return True
-    except Exception as e:
-        print(f"❌ Erreur service consultant: {e}")
+    except Exception as exc:
+        print(f"❌ Erreur service consultant: {exc}")
         return False
 
 def test_ui_components():
@@ -102,8 +102,8 @@ def test_ui_components():
         print(f"✅ Filtres appliqués - {len(filtered)} résultats")
 
         return True
-    except Exception as e:
-        print(f"❌ Erreur composants UI: {e}")
+    except Exception as exc:
+        print(f"❌ Erreur composants UI: {exc}")
         return False
 
 def test_demo_script():
@@ -120,8 +120,8 @@ def test_demo_script():
             demo_module = importlib.util.module_from_spec(spec)
             print("✅ Script de démonstration importable")
             return True
-        except Exception as e:
-            print(f"⚠️ Script trouvé mais problème d'import: {e}")
+        except Exception as exc:
+            print(f"⚠️ Script trouvé mais problème d'import: {exc}")
             return True  # On considère que c'est ok car le fichier existe
     else:
         print("❌ Script de démonstration manquant")
@@ -172,8 +172,8 @@ def main():
         try:
             result = test_func()
             results.append((test_name, result))
-        except Exception as e:
-            print(f"❌ Erreur lors du test {test_name}: {e}")
+        except Exception as exc:
+            print(f"❌ Erreur lors du test {test_name}: {exc}")
             results.append((test_name, False))
 
     # Résumé
