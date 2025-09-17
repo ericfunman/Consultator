@@ -2,108 +2,80 @@ name: SonarCloud Analysis
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
 jobs:
   sonarcloud:
-    name: SonarCloud
+    name: SonarCloud Analysis
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+    - name: Checkout code
+      run: |
+        git clone https://github.com/${{ github.repository }}.git .
+        git checkout ${{ github.sha }}
 
     - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      run: |
+        python3 --version
+        pip3 install --upgrade pip
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov
+        pip3 install -r requirements.txt
+        pip3 install -r requirements-test.txt
 
-    - name: Create coverage directory and minimal file
-      run: |
-        mkdir -p reports
-        cat > reports/coverage.xml << 'EOF'
-        <?xml version="1.0" encoding="UTF-8"?>
-        <coverage version="7.10.6" timestamp="1758100000000" lines-valid="1000" lines-covered="50" line-rate="0.05" branches-covered="0" branches-valid="0" branch-rate="0" complexity="0">
-          <sources>
-            <source>.</source>
-          </sources>
-          <packages>
-            <package name="app" line-rate="0.05" branch-rate="0" complexity="0">
-              <classes>
-                <class name="main" filename="app/main.py" complexity="0" line-rate="0.05" branch-rate="0">
-                  <methods/>
-                  <lines>
-                    <line number="1" hits="1"/>
-                    <line number="2" hits="1"/>
-                    <line number="3" hits="1"/>
-                    <line number="4" hits="1"/>
-                    <line number="5" hits="1"/>
-                  </lines>
-                </class>
-              </classes>
-            </package>
-          </packages>
-        </coverage>
-        EOF
+    - name: Create reports directory
+      run: mkdir -p reports
 
-    - name: Run basic tests
-      continue-on-error: true
+    - name: Initialize database
       run: |
-        echo "Running basic coverage tests..."
-        python -m pytest tests/unit/test_basic_coverage.py -v || echo "Basic tests failed but continuing..."
+        python3 -c "from app.database.database import init_database; init_database()" || echo "Database init failed but continuing..."
 
-    - name: Update coverage with real results
-      continue-on-error: true
+    - name: Run tests with coverage
       run: |
-        echo "Attempting to update coverage with real test results..."
-        python -m pytest tests/unit/test_basic_coverage.py tests/unit/test_force_coverage.py --cov=app --cov-report=xml:reports/coverage.xml --cov-report=term-missing -v || echo "Coverage update failed but continuing..."
+        echo "🚀 Running tests with coverage..."
+        python3 -m pytest tests/unit/test_basic_coverage.py tests/unit/test_force_coverage.py --cov=app --cov-report=xml:reports/coverage.xml --cov-report=term-missing -v --tb=short
 
-    - name: Ensure coverage file exists and show content
+    - name: Verify coverage file
       run: |
-        echo "=== COVERAGE FILE STATUS ==="
+        echo "=== COVERAGE FILE VERIFICATION ==="
         if [ -f reports/coverage.xml ]; then
           echo "✅ Coverage file exists"
           echo "File size: $(wc -c < reports/coverage.xml) bytes"
-          echo "First 5 lines:"
-          head -5 reports/coverage.xml
-          echo ""
-          echo "Coverage percentage in file:"
+          echo "Coverage percentage:"
           grep -o 'line-rate="[^"]*"' reports/coverage.xml || echo "No line-rate found"
+          head -5 reports/coverage.xml
         else
           echo "❌ Coverage file missing!"
           ls -la reports/
           exit 1
         fi
 
+    - name: Install SonarQube scanner
+      run: |
+        echo "🔧 Installing SonarQube scanner..."
+        wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+        unzip -q sonar-scanner-cli-4.8.0.2856-linux.zip
+        export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
+        echo "✅ SonarQube scanner installed"
+
     - name: SonarCloud Scan
-      if: always()
       run: |
         echo "=== STARTING SONARQUBE ANALYSIS ==="
-        echo "Checking if SONAR_TOKEN is available..."
+        export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
+
         if [ -z "$SONAR_TOKEN" ]; then
           echo "❌ SONAR_TOKEN not found - skipping SonarQube analysis"
           echo "Please configure SONAR_TOKEN secret in GitHub repository settings"
-          exit 0
+          exit 1
         fi
 
         echo "✅ SONAR_TOKEN found"
-        echo "Installing SonarQube scanner..."
+        echo "🔍 Running SonarQube scanner..."
 
-        # Install SonarQube scanner
-        wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-        unzip -q sonar-scanner-cli-5.0.1.3006-linux.zip
-        export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006-linux/bin
-
-        echo "Running SonarQube scanner..."
         sonar-scanner \
           -Dsonar.projectKey=ericfunman_Consultator \
           -Dsonar.organization=ericfunman \
@@ -112,7 +84,7 @@ jobs:
           -Dsonar.python.coverage.reportPaths=reports/coverage.xml \
           -Dsonar.sources=app \
           -Dsonar.tests=tests \
-          -Dsonar.exclusions=**/test_*.py,**/*_test.py,**/conftest.py
+          -Dsonar.exclusions=**/test_*.py,**/*_test.py,**/conftest.py,**/__pycache__/**
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
