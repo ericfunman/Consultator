@@ -192,7 +192,7 @@ def create_consultant(data: Dict[str, Any]) -> bool:
 
     try:
         with get_database_session() as session:
-            # Vérifier si l'email existe déj�
+            # Vérifier si l'email existe déjà
             existing = (
                 session.query(Consultant)
                 .filter(Consultant.email == data["email"])

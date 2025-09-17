@@ -320,7 +320,7 @@ def add_skill_to_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
 
     try:
         with get_database_session() as session:
-            # Vérifier que la compétence n'existe pas déj�
+            # Vérifier que la compétence n'existe pas déjà
             existing = (
                 session.query(ConsultantCompetence)
                 .filter(

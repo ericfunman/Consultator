@@ -307,7 +307,7 @@ def show_delete_bm_confirmation(bm):
                 st.info("La suppression clôturera automatiquement ces assignations.")
 
             if total_assignments > 0:
-                st.info(f"� Historique total : **{total_assignments}** assignation(s)")
+                st.info(f"📋 Historique total : **{total_assignments}** assignation(s)")
 
             st.error(
                 f"🚨 **Êtes-vous sûr de vouloir supprimer {bm.prenom} {bm.nom} ?**"
@@ -1266,7 +1266,7 @@ def show_add_business_manager():
 
             try:
                 with get_database_session() as session:
-                    # Vérifier si l'email existe déj�
+                    # Vérifier si l'email existe déj�
                     existing = (
                         session.query(BusinessManager)
                         .filter(BusinessManager.email == email.strip().lower())

@@ -6,7 +6,7 @@ import sys
 import os
 from unittest.mock import Mock, patch, MagicMock
 
-# Ajouter le r�pertoire parent au path pour les imports
+# Ajouter le répertoire parent au path pour les imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:

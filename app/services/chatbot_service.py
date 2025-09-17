@@ -1306,7 +1306,7 @@ class ChatbotService:
 
                     # Afficher par catégorie
                     for categorie, competences in categories.items():
-                        response += f"**� {categorie.title()} :**\n"
+                        response += f"**🔹 {categorie.title()} :**\n"
                         for comp in competences:
                             niveau_emoji = {
                                 "debutant": "🟡",

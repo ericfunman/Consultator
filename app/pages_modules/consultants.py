@@ -922,7 +922,7 @@ def _add_functional_skill_form(consultant):
 
     # Champs optionnels
     certifications = st.text_input("🏆 Certifications (optionnel)")
-    projets = st.text_area("� Projets/missions réalisés (optionnel)")
+    projets = st.text_area("📁 Projets/missions réalisés (optionnel)")
 
     submitted = st.form_submit_button("➕ Ajouter la compétence fonctionnelle")
 
