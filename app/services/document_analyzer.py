@@ -712,62 +712,68 @@ class DocumentAnalyzer:
             matches = re.finditer(pattern, text, re.IGNORECASE)
 
             for match in matches:
-                if pattern_type == "dmy":
-                    day, month, year = match.groups()
-                    date_str = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
-                elif pattern_type == "my":
-                    month, year = match.groups()
-                    date_str = f"{year}-{month.zfill(2)}-01"
-                elif pattern_type == "ym":
-                    year, month = match.groups()
-                    date_str = f"{year}-{month.zfill(2)}-01"
-                elif pattern_type == "range":
-                    start_year, end_year = match.groups()
-                    dates.extend([f"{start_year}-01-01", f"{end_year}-12-31"])
-                    continue
-                elif pattern_type == "ongoing":
-                    start_year = match.group(1)
-                    dates.extend([f"{start_year}-01-01", "En cours"])
-                    continue
-                elif pattern_type in ["since", "year"]:
-                    year = match.group(1)
-                    date_str = f"{year}-01-01"
-                elif pattern_type == "month_current":
-                    month_name, year = match.groups()
-                    month_num = DocumentAnalyzer._month_name_to_number(
-                        month_name.lower()
-                    )
-                    dates.extend([f"{year}-{month_num}-01", "En cours"])
-                    continue
-                elif pattern_type in ["month_fr", "month_abbr"]:
-                    month_name, year = match.groups()
-                    month_num = DocumentAnalyzer._month_name_to_number(
-                        month_name.lower()
-                    )
-                    date_str = f"{year}-{month_num}-01"
-                elif pattern_type == "to_date":
-                    year = match.group(1)
-                    dates.extend([f"{year}-01-01", "En cours"])
-                    continue
-                elif pattern_type == "since_month":
-                    month_name, year = match.groups()
-                    month_num = DocumentAnalyzer._month_name_to_number(
-                        month_name.lower()
-                    )
-                    dates.extend([f"{year}-{month_num}-01", "En cours"])
-                    continue
-                elif pattern_type == "month_ongoing":
-                    month_name, year = match.groups()
-                    month_num = DocumentAnalyzer._month_name_to_number(
-                        month_name.lower()
-                    )
-                    dates.extend([f"{year}-{month_num}-01", "En cours"])
-                    continue
-                else:
-                    continue
+                try:
+                    if pattern_type == "dmy":
+                        day, month, year = match.groups()
+                        date_str = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                    elif pattern_type == "my":
+                        month, year = match.groups()
+                        date_str = f"{year}-{month.zfill(2)}-01"
+                    elif pattern_type == "ym":
+                        year, month = match.groups()
+                        date_str = f"{year}-{month.zfill(2)}-01"
+                    elif pattern_type == "range":
+                        start_year, end_year = match.groups()
+                        dates.extend([f"{start_year}-01-01", f"{end_year}-12-31"])
+                        continue
+                    elif pattern_type == "ongoing":
+                        start_year = match.group(1)
+                        dates.extend([f"{start_year}-01-01", "En cours"])
+                        continue
+                    elif pattern_type in ["since", "year"]:
+                        year = match.group(1)
+                        date_str = f"{year}-01-01"
+                    elif pattern_type == "month_current":
+                        month_name, year = match.groups()
+                        month_num = DocumentAnalyzer._month_name_to_number(
+                            month_name.lower()
+                        )
+                        dates.extend([f"{year}-{month_num}-01", "En cours"])
+                        continue
+                    elif pattern_type in ["month_fr", "month_abbr"]:
+                        month_name, year = match.groups()
+                        month_num = DocumentAnalyzer._month_name_to_number(
+                            month_name.lower()
+                        )
+                        date_str = f"{year}-{month_num}-01"
+                    elif pattern_type == "to_date":
+                        year = match.group(1)
+                        dates.extend([f"{year}-01-01", "En cours"])
+                        continue
+                    elif pattern_type == "since_month":
+                        month_name, year = match.groups()
+                        month_num = DocumentAnalyzer._month_name_to_number(
+                            month_name.lower()
+                        )
+                        dates.extend([f"{year}-{month_num}-01", "En cours"])
+                        continue
+                    elif pattern_type == "month_ongoing":
+                        month_name, year = match.groups()
+                        month_num = DocumentAnalyzer._month_name_to_number(
+                            month_name.lower()
+                        )
+                        dates.extend([f"{year}-{month_num}-01", "En cours"])
+                        continue
+                    else:
+                        continue
 
-                if date_str and date_str not in dates:
-                    dates.append(date_str)
+                    if date_str and date_str not in dates:
+                        dates.append(date_str)
+
+                except ValueError as e:
+                    # Gestion des erreurs d'unpacking (nombre de groupes incorrect)
+                    print(f"Erreur d'unpacking pour pattern {pattern_type}: {e}")
+                    continue
 
         # Trier les dates et retourner
         valid_dates = [d for d in dates if d and d != "En cours"]
@@ -843,8 +849,8 @@ class DocumentAnalyzer:
             r"\b(Société\s+[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,40})",
             r"\b(Groupe\s+[A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{3,40})",
             r"^([A-ZÀ-Ÿ][A-Za-zÀ-ÿ\s&\-\.]{5,50})\s*[-–—:]",
-            # Pattern spécial pour les titres
-            r"\b([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)\s*[-–—]\s*(?:Directeur|Chef|Manager|Responsable|Lead)",
+            # Pattern spécial pour les titres - Plus strict pour éviter les faux positifs
+            r"\b([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)\s*[-–—]\s*(?:Directeur|Chef|Manager|Responsable|Lead)\b",
         ]
 
         for pattern in client_patterns:
@@ -854,6 +860,15 @@ class DocumentAnalyzer:
                 client = re.sub(r"\s*[-–—:]\s*.*$", "", client)
                 client = re.sub(r"\s*\([^)]*\)\s*", "", client)
                 client = DocumentAnalyzer._clean_client_name(client)
+
+                # Filtre pour éviter les faux positifs
+                client_lower = client.lower()
+                if any(word in client_lower for word in [
+                    "particulier", "spécifique", "général", "simple", "basique",
+                    "standard", "classique", "ordinaire", "commun", "habituel",
+                    "typique", "normal", "ordinaire", "banal"
+                ]):
+                    continue
 
                 if 3 < len(client) < 60:
                     return client

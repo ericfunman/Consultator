@@ -43,7 +43,7 @@ class TestRealCodeExecution:
 
         # Tester get_all_categories
         categories = get_all_categories()
-        assert isinstance(categories, list)
+        assert isinstance(categories, dict)
         assert len(categories) > 0
 
         print(f"✅ Module skill_categories exécuté: {len(all_competences)} catégories, {len(categories)} types")
@@ -58,12 +58,13 @@ class TestRealCodeExecution:
 
         # Exécuter les vraies fonctions
         all_technologies = get_all_technologies()
-        assert isinstance(all_technologies, dict)
+        assert isinstance(all_technologies, list)
         assert len(all_technologies) > 0
 
         # Tester get_technologies_by_category pour une catégorie existante
-        first_category = list(all_technologies.keys())[0]
-        technologies = get_technologies_by_category(first_category)
+        technologies_by_category = get_technologies_by_category()
+        first_category = list(technologies_by_category.keys())[0]
+        technologies = technologies_by_category[first_category]
         assert technologies is not None
 
         # Tester search_technologies

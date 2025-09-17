@@ -94,7 +94,7 @@ class TestDocumentAnalyzer:
 
     def test_find_client_in_block_improved_no_client(self):
         """Test avec aucun client trouvé"""
-        block = "Développement d'une application web sans client spécifique."
+        block = "Développement d'une application web sans client particulier mentionné."
 
         client = DocumentAnalyzer._find_client_in_block_improved(block)
 

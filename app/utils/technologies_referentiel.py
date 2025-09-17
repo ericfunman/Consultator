@@ -168,6 +168,7 @@ TECHNOLOGIES_REFERENTIEL: Dict[str, List[str]] = {
         "RDS",
         "CloudFormation",
         "Microsoft Azure",
+        "Azure",
         "Azure Functions",
         "Azure SQL",
         "Azure DevOps",

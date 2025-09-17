@@ -2,8 +2,8 @@
 Tests pour les modèles de base de données
 """
 import pytest
-from datetime import date, datetime
-from unittest.mock import Mock
+from datetime import date, datetime, timedelta
+from unittest.mock import Mock, patch
 
 from app.database.models import (
     Practice,
@@ -29,7 +29,8 @@ class TestPracticeModel:
         practice = Practice(
             nom="Data Science",
             description="Practice spécialisée en data science",
-            responsable="Jean Dupont"
+            responsable="Jean Dupont",
+            actif=True
         )
 
         assert practice.nom == "Data Science"
@@ -46,14 +47,12 @@ class TestPracticeModel:
         """Test de la propriété nombre_consultants"""
         practice = Practice()
 
-        # Mock des consultants
-        consultant1 = Mock()
-        consultant1.disponibilite = True
-        consultant2 = Mock()
-        consultant2.disponibilite = False
-        consultant3 = Mock()
-        consultant3.disponibilite = True
+        # Créer des objets Consultant réels pour le test
+        consultant1 = Consultant(nom="Dupont", prenom="Jean", email="jean@test.com", disponibilite=True)
+        consultant2 = Consultant(nom="Martin", prenom="Marie", email="marie@test.com", disponibilite=False)
+        consultant3 = Consultant(nom="Bernard", prenom="Pierre", email="pierre@test.com", disponibilite=True)
 
+        # Simuler la relation
         practice.consultants = [consultant1, consultant2, consultant3]
 
         assert practice.nombre_consultants == 2
@@ -136,34 +135,47 @@ class TestConsultantModel:
         """Test de date_disponibilite avec missions futures"""
         consultant = Consultant(disponibilite=False)
 
-        # Mock des missions
+        # Mock des missions avec des dates valides
         mission1 = Mock()
-        mission1.date_fin = date.today().replace(day=date.today().day + 30)
+        mission1.date_fin = date.today() + timedelta(days=30)
+        mission1._sa_instance_state = Mock()
+        mission1._sa_instance_state.manager = {'consultant': Mock(impl=Mock())}
+        mission1._sa_instance_state.parents = {}
+
         mission2 = Mock()
-        mission2.date_fin = date.today().replace(day=date.today().day + 60)
+        mission2.date_fin = date.today() + timedelta(days=60)
+        mission2._sa_instance_state = Mock()
+        mission2._sa_instance_state.manager = {'consultant': Mock(impl=Mock())}
+        mission2._sa_instance_state.parents = {}
 
-        consultant.missions = [mission1, mission2]
-
-        # Devrait retourner la date la plus tardive
-        expected_date = mission2.date_fin.strftime("%d/%m/%Y")
-        assert consultant.date_disponibilite == expected_date
+        # Patcher directement la propriété missions
+        with patch.object(consultant, 'missions', [mission1, mission2]):
+            # Devrait retourner la date la plus tardive
+            expected_date = mission2.date_fin.strftime("%d/%m/%Y")
+            assert consultant.date_disponibilite == expected_date
 
     def test_consultant_business_manager_actuel(self):
         """Test de business_manager_actuel"""
         consultant = Consultant()
 
         # Mock des gestions BM
-        bm1 = Mock()
-        bm1.date_fin = None
-        bm1.business_manager = "BM Actuel"
+        gestion1 = Mock()
+        gestion1.date_fin = None
+        gestion1.business_manager = "BM Actuel"
+        gestion1._sa_instance_state = Mock()
+        gestion1._sa_instance_state.manager = {'consultant': Mock(impl=Mock())}
+        gestion1._sa_instance_state.parents = {}
 
-        bm2 = Mock()
-        bm2.date_fin = date.today()
-        bm2.business_manager = "Ancien BM"
+        gestion2 = Mock()
+        gestion2.date_fin = date.today()
+        gestion2.business_manager = "Ancien BM"
+        gestion2._sa_instance_state = Mock()
+        gestion2._sa_instance_state.manager = {'consultant': Mock(impl=Mock())}
+        gestion2._sa_instance_state.parents = {}
 
-        consultant.business_manager_gestions = [bm1, bm2]
-
-        assert consultant.business_manager_actuel == "BM Actuel"
+        # Patcher directement la propriété business_manager_gestions
+        with patch.object(consultant, 'business_manager_gestions', [gestion1, gestion2]):
+            assert consultant.business_manager_actuel == "BM Actuel"
 
 
 class TestCompetenceModel:
@@ -384,16 +396,22 @@ class TestBusinessManagerModel:
         gestion1 = Mock()
         gestion1.date_fin = None
         gestion1.consultant = "Consultant Actif"
+        gestion1._sa_instance_state = Mock()
+        gestion1._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion1._sa_instance_state.parents = {}
 
         gestion2 = Mock()
         gestion2.date_fin = date.today()
         gestion2.consultant = "Consultant Inactif"
+        gestion2._sa_instance_state = Mock()
+        gestion2._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion2._sa_instance_state.parents = {}
 
-        bm.consultant_gestions = [gestion1, gestion2]
-
-        consultants = bm.consultants_actuels
-        assert len(consultants) == 1
-        assert consultants[0] == "Consultant Actif"
+        # Patcher directement la propriété consultant_gestions
+        with patch.object(bm, 'consultant_gestions', [gestion1, gestion2]):
+            consultants = bm.consultants_actuels
+            assert len(consultants) == 1
+            assert consultants[0] == "Consultant Actif"
 
     def test_business_manager_nombre_consultants_actuels(self):
         """Test de la propriété nombre_consultants_actuels"""
@@ -402,16 +420,25 @@ class TestBusinessManagerModel:
         # Mock des gestions
         gestion1 = Mock()
         gestion1.date_fin = None
+        gestion1._sa_instance_state = Mock()
+        gestion1._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion1._sa_instance_state.parents = {}
 
         gestion2 = Mock()
         gestion2.date_fin = None
+        gestion2._sa_instance_state = Mock()
+        gestion2._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion2._sa_instance_state.parents = {}
 
         gestion3 = Mock()
         gestion3.date_fin = date.today()
+        gestion3._sa_instance_state = Mock()
+        gestion3._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion3._sa_instance_state.parents = {}
 
-        bm.consultant_gestions = [gestion1, gestion2, gestion3]
-
-        assert bm.nombre_consultants_actuels == 2
+        # Patcher directement la propriété consultant_gestions
+        with patch.object(bm, 'consultant_gestions', [gestion1, gestion2, gestion3]):
+            assert bm.nombre_consultants_actuels == 2
 
 
 class TestConsultantBusinessManagerModel:
@@ -459,7 +486,7 @@ class TestConsultantBusinessManagerModel:
     def test_consultant_business_manager_duree_jours_active(self):
         """Test de duree_jours pour une gestion active"""
         gestion = ConsultantBusinessManager()
-        gestion.date_debut = date.today().replace(day=date.today().day - 10)
+        gestion.date_debut = date.today() - timedelta(days=10)  # Utiliser timedelta pour éviter les erreurs de date
         gestion.date_fin = None  # Gestion active
 
         # Devrait utiliser la date actuelle

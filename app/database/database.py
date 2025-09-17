@@ -104,7 +104,7 @@ def init_database():
         print(f"✅ Base de données initialisée: {DATABASE_PATH}")
         return True
 
-    except (SQLAlchemyError, OSError) as e:
+    except Exception as e:
         print(f"❌ Erreur lors de l'initialisation de la base de données: {e}")
         return False
 
@@ -125,9 +125,6 @@ def reset_database():
 
         # Réinitialiser le flag
         _database_initialized = True
-
-        # Vider le cache
-        is_database_initialized.clear()
 
         print("✅ Base de données remise à zéro")
         return True

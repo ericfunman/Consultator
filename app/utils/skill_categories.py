@@ -20,7 +20,6 @@ COMPETENCES_TECHNIQUES = {
         "FastAPI",
         "ASP.NET",
         "Express.js",
-        "Microservices",
         "API REST",
         "GraphQL",
         "gRPC",
@@ -377,8 +376,10 @@ def search_competences(query, category_type=None):
     query_lower = query.lower()
 
     for category, competences in competences_dict.items():
-        for competence in competences:
-            if query_lower in competence.lower():
+        # Chercher aussi dans le nom de la catégorie
+        if query_lower in category.lower():
+            # Ajouter toutes les compétences de cette catégorie
+            for competence in competences:
                 results.append(
                     {
                         "nom": competence,
@@ -391,5 +392,21 @@ def search_competences(query, category_type=None):
                         ),
                     }
                 )
+        else:
+            # Chercher dans les compétences individuelles
+            for competence in competences:
+                if query_lower in competence.lower():
+                    results.append(
+                        {
+                            "nom": competence,
+                            "categorie": category,
+                            "type": category_type
+                            or (
+                                "techniques"
+                                if category in COMPETENCES_TECHNIQUES
+                                else "fonctionnelles"
+                            ),
+                        }
+                    )
 
     return results
