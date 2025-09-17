@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758090934903,
+  "lastUpdate": 1758091231365,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -5532,6 +5532,63 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00001709616814617938",
             "extra": "mean: 5.0830424141416515 msec\nrounds: 198"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Eric Funman",
+            "username": "ericfunman",
+            "email": "lapinae@gmail.com"
+          },
+          "committer": {
+            "name": "Eric Funman",
+            "username": "ericfunman",
+            "email": "lapinae@gmail.com"
+          },
+          "id": "8798f92ae190e539e7e56177b030a7513f0609f8",
+          "message": "fix: Correction des workflows CI/CD pour la couverture SonarQube\n\n- Correction du workflow SonarCloud pour utiliser pytest.ini et générer les rapports de couverture\n- Ajout d'exclusions des fichiers de test corrompus dans les workflows CI et SonarCloud\n- Assurance que les rapports de couverture sont générés même en cas d'échec partiel des tests\n- Configuration pour éviter les conflits de noms de fichiers de test\n\nRésout le problème de couverture repassée à 0% sur SonarQube",
+          "timestamp": "2025-09-17T06:30:52Z",
+          "url": "https://github.com/ericfunman/Consultator/commit/8798f92ae190e539e7e56177b030a7513f0609f8"
+        },
+        "date": 1758091230306,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.4213989168002,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000021230489665603616",
+            "extra": "mean: 1.0622235708160026 msec\nrounds: 932"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 293760.94102937315,
+            "unit": "iter/sec",
+            "range": "stddev: 4.929693395871105e-7",
+            "extra": "mean: 3.4041285287822185 usec\nrounds: 120121"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 157924.76562432252,
+            "unit": "iter/sec",
+            "range": "stddev: 7.010498473596224e-7",
+            "extra": "mean: 6.332129074541977 usec\nrounds: 77676"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33394.43777425979,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000002229331133149488",
+            "extra": "mean: 29.945106630026668 usec\nrounds: 27497"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.6767619384735,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000016306978047162156",
+            "extra": "mean: 5.084484766496362 msec\nrounds: 197"
           }
         ]
       }
