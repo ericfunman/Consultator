@@ -161,17 +161,29 @@ class TestConsultantInfoUpdate:
         mock_consultant.salaire_actuel = 50000
 
         mock_session = MagicMock()
-        # Mock pour trouver le consultant
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_consultant
+        # Configurer les mocks pour les différents appels query
+        mock_query = MagicMock()
+        mock_session.query.return_value = mock_query
+        
+        # Premier appel: récupérer le consultant
+        mock_filter1 = MagicMock()
+        mock_query.filter.return_value = mock_filter1
+        mock_filter1.first.return_value = mock_consultant
+        
         # Mock pour vérifier l'unicité de l'email (pas de conflit)
-        mock_session.query.return_value.filter.return_value.first.side_effect = [mock_consultant, None]
+        # On utilise side_effect pour gérer les appels multiples
+        mock_filter1.first.side_effect = [mock_consultant, None]
+        
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         data = {
             "prenom": "John",
             "nom": "Doe",
             "email": "john@example.com",
+            "telephone": "0123456789",
             "salaire_actuel": 60000,
+            "disponibilite": True,
+            "notes": "Test notes",
             "commentaire": "Augmentation méritée"
         }
 

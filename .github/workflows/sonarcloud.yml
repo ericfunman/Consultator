@@ -27,14 +27,14 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-cov pytest-xdist faker
 
+    - name: Initialize database
+      run: |
+        python -c "from app.database.database import init_database; init_database()"
+
     - name: Run tests with coverage
       run: |
         mkdir -p reports
-        pytest --ignore=tests/unit/utils/test_skill_categories.py --ignore=tests/unit/utils/test_technologies_referentiel.py || true
-        # Générer le rapport de couverture même si les tests ont échoué
-        coverage xml -o reports/coverage.xml
-        coverage html -d reports/htmlcov
-      continue-on-error: true
+        pytest --ignore=tests/unit/utils/test_skill_categories.py --ignore=tests/unit/utils/test_technologies_referentiel.py --cov=app --cov-report=xml:reports/coverage.xml --cov-report=html:reports/htmlcov --tb=no -q || echo "Tests failed but continuing with coverage report"
 
     - name: Setup Java
       run: |
