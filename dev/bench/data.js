@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758092387036,
+  "lastUpdate": 1758096275631,
   "repoUrl": "https://github.com/ericfunman/Consultator",
   "entries": {
     "Benchmark": [
@@ -5707,6 +5707,65 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000015102245334500786",
             "extra": "mean: 5.087926593908596 msec\nrounds: 197"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "committer": {
+            "email": "lapinae@gmail.com",
+            "name": "Eric Funman",
+            "username": "ericfunman"
+          },
+          "distinct": true,
+          "id": "9dfdcdaf6c411d6e9d6fa43925178bacc5f3da2b",
+          "message": "feat: Amélioration significative de la couverture de tests pour conformité SonarQube\n\n- Expansion majeure des tests unitaires pour ChatbotService (36+ tests)\n- Création complète de tests pour DocumentAnalyzer (15 tests)\n- Tests exhaustifs pour SimpleDocumentAnalyzer (extraction fichiers)\n- Tests complets pour TechnologyService avec gestion d'erreurs\n- Tests UI pour TechnologyWidget avec mocking Streamlit\n- Correction des erreurs SQLAlchemy dans les tests\n- Amélioration du mocking pour les interactions DB et UI\n- Couverture de tests dépassant 80% pour tous les services critiques\n- Préparation pour analyse SonarQube et validation qualité code",
+          "timestamp": "2025-09-17T09:53:44+02:00",
+          "tree_id": "a3ae445a1896ce216b80bf351c6323ec6146b1bc",
+          "url": "https://github.com/ericfunman/Consultator/commit/9dfdcdaf6c411d6e9d6fa43925178bacc5f3da2b"
+        },
+        "date": 1758096275037,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_database_connection_speed",
+            "value": 941.153355059152,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000001871216341639926",
+            "extra": "mean: 1.062526095906176 msec\nrounds: 928"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_data_processing_speed",
+            "value": 291725.4076080782,
+            "unit": "iter/sec",
+            "range": "stddev: 5.822549342244813e-7",
+            "extra": "mean: 3.4278810618493036 usec\nrounds: 112033"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_ui_rendering_simulation",
+            "value": 156620.5389287797,
+            "unit": "iter/sec",
+            "range": "stddev: 7.907046342062078e-7",
+            "extra": "mean: 6.384858632460277 usec\nrounds: 72591"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_memory_usage_simulation",
+            "value": 33347.46527891053,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000022800880001317277",
+            "extra": "mean: 29.98728663891633 usec\nrounds: 27512"
+          },
+          {
+            "name": "tests/test_performance_v14.py::TestPerformance::test_api_response_simulation",
+            "value": 196.5304490579347,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014520327609471762",
+            "extra": "mean: 5.08827006091668 msec\nrounds: 197"
           }
         ]
       }
