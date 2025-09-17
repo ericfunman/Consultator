@@ -265,10 +265,25 @@ class TestBusinessManagersCoverage:
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
 
-        # Mock consultants disponibles
-        mock_session.query().filter().all.return_value = []  # Aucune assignation existante
-        mock_session.query().all.return_value = [mock_consultant]
-        mock_session.query().filter().first.return_value = None  # Consultant disponible
+        # Mock des requêtes dans l'ordre attendu par la fonction
+        # 1. Consultants assignés à ce BM (vide)
+        mock_query_assignments = Mock()
+        mock_query_assignments.filter.return_value.all.return_value = []
+        
+        # 2. Tous les consultants
+        mock_query_all_consultants = Mock()
+        mock_query_all_consultants.all.return_value = [mock_consultant]
+        
+        # 3. Vérification assignation existante (None)
+        mock_query_existing = Mock()
+        mock_query_existing.filter.return_value.first.return_value = None
+
+        # Configurer les appels de session.query selon l'ordre
+        mock_session.query.side_effect = [
+            mock_query_assignments,  # Premier appel : ConsultantBusinessManager
+            mock_query_all_consultants,  # Deuxième appel : Consultant
+            mock_query_existing  # Troisième appel : ConsultantBusinessManager pour vérification
+        ]
 
         # Mock st.columns pour retourner deux objets mock (ligne 541)
         mock_col1 = Mock()
@@ -279,8 +294,10 @@ class TestBusinessManagersCoverage:
         mock_col2.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = (mock_col1, mock_col2)
 
-        # Mock du formulaire
+        # Mock du formulaire avec context manager
         mock_form = Mock()
+        mock_form.__enter__ = Mock(return_value=mock_form)
+        mock_form.__exit__ = Mock(return_value=None)
         mock_st.form.return_value = mock_form
         mock_st.form_submit_button.return_value = True
 
@@ -301,9 +318,7 @@ class TestBusinessManagersCoverage:
             mock_st.form.assert_called()
             mock_session.add.assert_called_once()
             mock_session.commit.assert_called_once()
-            mock_st.success.assert_called()
-
-    @patch('app.pages_modules.business_managers.st')
+            mock_st.success.assert_called()    @patch('app.pages_modules.business_managers.st')
     @patch('app.pages_modules.business_managers.get_database_session')
     def test_show_bm_assignments_history_with_data(self, mock_get_session, mock_st, mock_business_manager, mock_consultant, mock_assignment):
         """Test de l'historique des assignations avec données"""

@@ -2408,7 +2408,7 @@ class ChatbotService:
             return (
                 session.query(Mission)
                 .filter(  # type: ignore[no-any-return]
-                    func.lower(Mission.entreprise).like(f"%{entreprise.lower()}%")
+                    func.lower(Mission.client).like(f"%{entreprise.lower()}%")
                 )
                 .all()
             )
