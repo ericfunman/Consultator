@@ -2221,7 +2221,7 @@ def show_existing_documents(consultant):
             col1, col2, col3, col4, col5, col6 = st.columns([3, 1, 1, 1, 1, 1])
 
             with col1:
-                st.write(f"� **{display_name}**")
+                st.write(f"📄 **{display_name}**")
                 st.caption(
                     f"{doc_type} • {size_display} • {modified_time.strftime('%d/%m/%Y')}"
                 )

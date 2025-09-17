@@ -20,7 +20,7 @@ class TestConsultantList:
     @patch("app.pages_modules.consultant_list.get_database_session")
     def test_show_consultants_list_error(self, mock_get_session, mock_st):
         """Test de l'affichage avec erreur du service"""
-        # Mock de la session qui l�ve une exception
+        # Mock de la session qui lève une exception
         mock_session = MagicMock()
         mock_get_session.return_value.__enter__.return_value = mock_session
         mock_session.query.side_effect = Exception("Erreur DB")

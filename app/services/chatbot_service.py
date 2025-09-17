@@ -1327,7 +1327,7 @@ class ChatbotService:
                             response += f"  {niveau_emoji} **{comp['nom']}** - {comp['niveau_maitrise'].title()}{experience_text}\n"
                         response += "\n"
 
-                    response += f"� **Total : {len(skills)} compétence(s)**"
+                    response += f"📊 **Total : {len(skills)} compétence(s)**"
                 else:
                     response = f"❌ Aucune compétence enregistrée pour **{consultant.prenom} {consultant.nom}**."
             else:

@@ -1266,7 +1266,7 @@ def show_add_business_manager():
 
             try:
                 with get_database_session() as session:
-                    # Vérifier si l'email existe déj�
+                    # Vérifier si l'email existe déjà
                     existing = (
                         session.query(BusinessManager)
                         .filter(BusinessManager.email == email.strip().lower())
