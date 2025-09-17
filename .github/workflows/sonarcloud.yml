@@ -65,7 +65,7 @@ jobs:
       continue-on-error: true
       run: |
         echo "Attempting to update coverage with real test results..."
-        python -m pytest tests/unit/test_basic_coverage.py --cov=app --cov-report=xml:reports/coverage.xml --cov-report=term-missing || echo "Coverage update failed but continuing..."
+        python -m pytest tests/unit/test_basic_coverage.py tests/unit/test_force_coverage.py --cov=app --cov-report=xml:reports/coverage.xml --cov-report=term-missing -v || echo "Coverage update failed but continuing..."
 
     - name: Ensure coverage file exists and show content
       run: |
