@@ -1,0 +1,121 @@
+........................................................................ [ 11%]
+........................................................................ [ 22%]
+........................................................................ [ 33%]
+........................................................................ [ 44%]
+........................................................................ [ 55%]
+........................................................................ [ 67%]
+........................................................................ [ 78%]
+..............................................F....F.................... [ 89%]
+...................................................................      [100%]
+============================== warnings summary ===============================
+test_ui_enhancements.py::test_imports
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but test_ui_enhancements.py::test_imports returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+test_ui_enhancements.py::test_cache_service
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but test_ui_enhancements.py::test_cache_service returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+test_ui_enhancements.py::test_consultant_service
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but test_ui_enhancements.py::test_consultant_service returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+test_ui_enhancements.py::test_ui_components
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but test_ui_enhancements.py::test_ui_components returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+test_ui_enhancements.py::test_demo_script
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but test_ui_enhancements.py::test_demo_script returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+test_ui_enhancements.py::test_file_structure
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but test_ui_enhancements.py::test_file_structure returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+tests/test_simple.py::test_basic_import
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but tests/test_simple.py::test_basic_import returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+tests/test_simple.py::test_project_structure
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but tests/test_simple.py::test_project_structure returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+tests/test_simple.py::test_python_version
+  C:\Users\b302gja\Documents\Consultator en cours\Consultator\.venv_backup\Lib\site-packages\_pytest\python.py:198: PytestReturnNotNoneWarning: Expected None, but tests/test_simple.py::test_python_version returned True, which will be an error in a future version of pytest.  Did you mean to use `assert` instead of `return`?
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+---------- coverage: platform win32, python 3.13.5-final-0 -----------
+Name                                            Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------
+app\components\technology_widget.py                95     49    48%   118-120, 132-213
+app\database\database.py                           78     18    77%   71, 76, 91-109, 135-137, 149, 166-167
+app\database\models.py                            225     35    84%   28, 58, 148, 153-156, 178-180, 200-206, 221-233, 357-359, 489-496, 541, 560, 576, 626, 645-646
+app\main.py                                        69     28    59%   27-53, 120-127
+app\main_new.py                                    69     69     0%   7-162
+app\main_optimized.py                              96     96     0%   6-219
+app\main_optimized_simple.py                       96     96     0%   6-219
+app\main_original_backup.py                       140    140     0%   8-303
+app\main_preloading.py                            140    140     0%   8-303
+app\main_simple.py                                  0      0   100%
+app\main_test.py                                   11      0   100%
+app\pages_modules\__init__.py                      34     15    56%   16-17, 21-25, 29-30, 34-35, 39-40, 44-45
+app\pages_modules\business_managers.py            496    496     0%   1-1446
+app\pages_modules\business_managers_simple.py      51     47     8%   13-82
+app\pages_modules\chatbot.py                      113      6    95%   18-21, 72-73, 213
+app\pages_modules\consultant_cv.py                406    111    73%   19, 30-35, 73, 77, 81, 93-94, 123-128, 170, 172, 187, 191, 195-196, 205, 209, 298, 320-362, 500-502, 541-564, 570-619, 637-640, 703-704, 745, 751, 767-768, 778-779, 790-825, 861-862, 877, 880, 907-908
+app\pages_modules\consultant_documents.py         391    157    60%   20, 32-36, 50-51, 66-101, 155-158, 165, 169-170, 174-175, 179-180, 187, 278-296, 299-301, 317-361, 376-388, 400-424, 442-497, 512-522, 538-554, 579-603, 629, 644, 651, 655-658, 704-705
+app\pages_modules\consultant_forms.py             204     61    70%   19, 41-43, 126-148, 151, 154-158, 253-372
+app\pages_modules\consultant_info.py              231    130    44%   17, 34-36, 89-146, 156-186, 192-256, 262-326, 415-458
+app\pages_modules\consultant_languages.py         299    119    60%   18, 36-38, 90-195, 330-402, 516-517, 526-599, 649-651, 695-697, 722-723, 807-808, 871-874
+app\pages_modules\consultant_list.py              193     99    49%   19, 43-45, 69-307, 342-351, 372-373, 409
+app\pages_modules\consultant_missions.py          441    224    49%   21, 35-39, 73-74, 89-131, 157-222, 303-433, 479, 482, 590-745, 769-804, 835-836, 884-892, 900-901, 910-914, 917, 947-948, 972-973, 1070-1071, 1135
+app\pages_modules\consultant_profile.py           247     80    68%   15, 33-35, 96, 98, 101-102, 127-218, 281-304, 387-403, 474, 487, 502, 507
+app\pages_modules\consultant_skills.py            294     74    75%   18, 34, 48-49, 114-133, 145-146, 153, 157, 164, 168, 255-312, 384-441
+app\pages_modules\consultants.py                 1462   1135    22%   17, 45-47, 66-72, 81-149, 176-288, 369, 475-478, 486, 488, 491-492, 502-548, 584-630, 657-670, 723-776, 803-831, 851, 858-887, 930, 953-1006, 1011-1027, 1046-1086, 1094-1095, 1107-1110, 1121-1166, 1174-1203, 1208-1224, 1246-1291, 1299-1336, 1349-1434, 1440-1469, 1497-1499, 1508, 1544-1546, 1551-1630, 1642-1779, 1885-1926, 1934-1957, 1962-1975, 1981-2006, 2012-2053, 2059-2097, 2103-2171, 2177-2257, 2270-2278, 2295-2323, 2342-2352, 2370-2432, 2438-2458, 2464-2483, 2489-2509, 2515-2542, 2548-2581, 2587-2618, 2624-2670, 2676-2866, 2881-2945, 2963-2974, 2988-3026, 3041-3109, 3115-3184, 3190-3215, 3223-3378, 3396-3422, 3436-3459, 3464, 3469, 3474, 3479, 3484, 3489, 3494
+app\pages_modules\consultants_clean.py            202    202     0%   6-427
+app\pages_modules\consultants_final.py            263    263     0%   6-554
+app\pages_modules\consultants_optimized.py        202    202     0%   6-425
+app\pages_modules\documents_functions.py          103      6    94%   44, 121, 186, 195, 199, 203
+app\pages_modules\documents_upload.py              54      3    94%   16, 27-28
+app\pages_modules\home.py                          81     45    44%   26, 85-153, 159-218
+app\pages_modules\missions.py                       0      0   100%
+app\pages_modules\practices.py                    269     42    84%   145, 179-180, 231-274, 346, 350-359, 393, 523, 567-573, 584, 586, 589-590, 627
+app\pages_modules\practices_optimized.py          237    237     0%   6-568
+app\pages_modules\skills.py                         0      0   100%
+app\pages_modules\technologies.py                   5      0   100%
+app\services\business_manager_service.py           62     26    58%   34-60, 69-113, 119-124
+app\services\cache_service.py                     150      6    96%   21, 127-128, 148-149, 260
+app\services\chatbot_service.py                   905    520    43%   44, 52-59, 84, 88, 92, 94, 96, 98, 100, 102, 104, 106, 110-119, 372, 379, 384, 392, 397, 401, 406, 410, 439, 442, 446, 466, 499, 529, 548-549, 571-581, 594-599, 620, 696, 708, 710, 715-720, 755, 773-803, 817-825, 847-953, 976-999, 1006-1073, 1088-1147, 1154-1161, 1186, 1197, 1205-1210, 1237-1277, 1323, 1332-1334, 1346, 1358-1394, 1412-1424, 1431-1462, 1470, 1483-1546, 1563-1587, 1603-1617, 1621-1636, 1640, 1666-1679, 1730-1733, 1738-1741, 1762-1769, 1783-1787, 1789-1795, 1797-1802, 1811, 1863-1900, 1910-1930, 1982-1998, 2024-2069, 2117-2144, 2176-2227, 2349, 2377-2388, 2407-2408, 2435-2436, 2473-2500, 2536, 2580-2639, 2722-2750, 2763, 2774-2783, 2811-2881, 2943-2993, 3009-3016, 3028-3106
+app\services\consultant_service.py                416    136    67%   64-66, 107-109, 201-205, 236-238, 246-248, 292, 295, 298, 336-340, 373-375, 398-400, 454-458, 481-483, 503, 551-555, 580-584, 677-679, 725, 734-736, 777-785, 814-816, 833-835, 865, 870-873, 897, 900-901, 920-922, 994-996, 1030, 1111-1185, 1190-1235, 1240-1285, 1300-1306
+app\services\document_analyzer.py                 572    208    64%   245-259, 264-328, 333-371, 376-424, 470-474, 647-649, 716-717, 722-723, 737-741, 748-767, 832, 861, 918, 938, 947-960, 1036-1038, 1055, 1087, 1226, 1234, 1242, 1317-1431, 1600-1615
+app\services\document_service.py                  201     45    78%   24-25, 119, 129-138, 143-150, 155-164, 179-184, 188-189, 210-211, 227-228, 386-388
+app\services\practice_service.py                  161     94    42%   34-36, 43-50, 55-62, 77-86, 103-104, 111-112, 125-202, 218-237, 244-312, 324-344
+app\services\practice_service_optimized.py        109     75    31%   34-58, 64-112, 118-179, 186-262, 268-308, 313-318
+app\services\simple_analyzer.py                    82      4    95%   190, 192, 208-209
+app\services\technology_service.py                 76      0   100%
+app\ui\enhanced_ui.py                             226    162    28%   43-170, 174-185, 189-199, 204, 210-211, 223, 230, 237, 244, 251, 259, 266, 274, 281, 303, 307-310, 321-395, 400-427, 441-443, 452-455, 460-463, 468-471, 476-479, 486-558
+app\utils\skill_categories.py                      25     17    32%   341, 349-354, 359, 367-395
+app\utils\technologies_referentiel.py              23     15    35%   412-415, 420, 425-427, 432-439
+-----------------------------------------------------------------------------
+TOTAL                                           10305   5733    44%
+
+
+--------------------------------------------------------------------------------------------------- benchmark: 5 tests ---------------------------------------------------------------------------------------------------
+Name (time in us)                         Min                    Max                  Mean                StdDev                Median                 IQR            Outliers           OPS            Rounds  Iterations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_data_processing_speed             4.1000 (1.0)      60,597.9000 (32.28)        7.4726 (1.0)        213.9278 (14.25)        4.5000 (1.0)        3.0000 (1.0)       37;2704  133,821.5338 (1.0)       87720           1
+test_ui_rendering_simulation           5.5000 (1.34)      1,877.3000 (1.0)          7.8386 (1.05)        15.0085 (1.0)          5.9000 (1.31)       4.1000 (1.37)      292;522  127,573.4436 (0.95)      54645           1
+test_memory_usage_simulation          29.8000 (7.27)     40,804.2000 (21.74)       61.0940 (8.18)       552.6998 (36.83)       48.9000 (10.87)      4.4000 (1.47)      19;2888   16,368.2147 (0.12)      15061           1
+test_database_connection_speed     1,023.5000 (249.64)    3,755.6000 (2.00)     1,506.3160 (201.58)     175.4426 (11.69)    1,533.2000 (340.71)    14.5000 (4.83)      126;263      663.8713 (0.00)        951           1
+test_api_response_simulation       5,028.5000 (>1000.0)  44,413.3000 (23.66)    7,930.1209 (>1000.0)  6,820.8107 (454.46)   5,356.3500 (>1000.0)  418.8000 (139.60)      23;37      126.1015 (0.00)        196           1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+=========================== short test summary info ===========================
+FAILED tests/unit/services/test_document_analyzer.py::TestDocumentAnalyzer::test_find_dates_in_text_ongoing
+FAILED tests/unit/services/test_document_analyzer.py::TestDocumentAnalyzer::test_find_client_in_block_improved_no_client
+2 failed, 641 passed, 9 warnings in 51.57s
