@@ -57,15 +57,15 @@ jobs:
     - name: Install SonarQube scanner
       run: |
         echo "🔧 Installing SonarQube scanner compatible with Java 11..."
-        wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
-        unzip -q sonar-scanner-cli-4.6.2.2472-linux.zip
-        export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin
-        echo "✅ SonarQube scanner 4.6.2 installed (compatible with Java 11)"
+        wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170-linux.zip
+        unzip -q sonar-scanner-cli-4.4.0.2170-linux.zip
+        export PATH=$PATH:$(pwd)/sonar-scanner-4.4.0.2170-linux/bin
+        echo "✅ SonarQube scanner 4.4.0 installed (compatible with Java 11)"
 
     - name: SonarCloud Scan
       run: |
         echo "=== STARTING SONARQUBE ANALYSIS ==="
-        export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin
+        export PATH=$PATH:$(pwd)/sonar-scanner-4.4.0.2170-linux/bin
 
         if [ -z "$SONAR_TOKEN" ]; then
           echo "❌ SONAR_TOKEN not found - skipping SonarQube analysis"
