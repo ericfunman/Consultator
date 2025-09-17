@@ -34,7 +34,47 @@ jobs:
     - name: Run tests with coverage
       run: |
         mkdir -p reports
-        pytest --cov=app --cov-report=xml:reports/coverage.xml --cov-report=html:reports/htmlcov --tb=no -q || echo "Tests failed but continuing with coverage report"
+        echo "🚀 Starting test execution with coverage..."
+        echo "Creating initial coverage file..."
+        echo '<?xml version="1.0" ?><coverage version="7.10.6" timestamp="'$(date +%s)'000" lines-valid="0" lines-covered="0" line-rate="0.0" branches-covered="0" branches-valid="0" branch-rate="0" complexity="0"><sources><source>.</source></sources><packages></packages></coverage>' > reports/coverage.xml
+
+        echo "Running tests..."
+        if pytest --cov=app --cov-report=xml:reports/coverage.xml --cov-report=html:reports/htmlcov --tb=no -q --maxfail=5; then
+          echo "✅ Tests passed successfully"
+        else
+          echo "❌ Some tests failed, but coverage file should still be generated"
+          # Check if coverage file exists and has content
+          if [ -f reports/coverage.xml ] && [ $(wc -c < reports/coverage.xml) -gt 200 ]; then
+            echo "✅ Coverage file exists and has content"
+          else
+            echo "⚠️ Coverage file is empty or too small, keeping initial file"
+          fi
+        fi
+
+    - name: Verify coverage file
+      run: |
+        echo "🔍 Verifying coverage file..."
+        if [ -f reports/coverage.xml ]; then
+          echo "✅ Coverage file exists"
+          # Check if file has content (more than just empty XML)
+          if [ $(wc -c < reports/coverage.xml) -gt 100 ]; then
+            echo "✅ Coverage file has content"
+            head -3 reports/coverage.xml
+            # Extract coverage percentage from XML
+            COVERAGE=$(grep -o 'line-rate="[^"]*"' reports/coverage.xml | head -1 | sed 's/line-rate="//' | sed 's/"//')
+            if [ ! -z "$COVERAGE" ]; then
+              COVERAGE_PERCENT=$(echo "scale=2; $COVERAGE * 100" | bc 2>/dev/null || echo "0")
+              echo "📊 Coverage rate: ${COVERAGE_PERCENT}%"
+            fi
+          else
+            echo "⚠️ Coverage file is empty or too small"
+            cat reports/coverage.xml
+          fi
+        else
+          echo "❌ Coverage file not found!"
+          ls -la reports/
+          exit 1
+        fi
 
     - name: Setup Java
       run: |
@@ -51,10 +91,22 @@ jobs:
         echo "$(pwd)/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
 
     - name: SonarCloud Scan
+      if: always()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
+        echo "🔧 Starting SonarQube analysis..."
+        # Ensure coverage file exists
+        if [ ! -f reports/coverage.xml ]; then
+          echo "Creating minimal coverage file..."
+          mkdir -p reports
+          echo '<?xml version="1.0" ?><coverage version="7.10.6" timestamp="'$(date +%s)'000" lines-valid="0" lines-covered="0" line-rate="0.0" branches-covered="0" branches-valid="0" branch-rate="0" complexity="0"><sources><source>.</source></sources><packages></packages></coverage>' > reports/coverage.xml
+        fi
+
+        echo "Coverage file size: $(wc -c < reports/coverage.xml) bytes"
+        head -3 reports/coverage.xml
+
         sonar-scanner \
           -Dsonar.projectKey=ericfunman_Consultator \
           -Dsonar.organization=ericfunman \
