@@ -108,7 +108,7 @@ class TestSimpleDocumentAnalyzer:
 
         assert "Erreur d'extraction: File error" in result
 
-    @patch('app.services.simple_analyzer.st')
+    @patch("app.services.simple_analyzer.st")
     def test_analyze_cv_content_basic(self, mock_st):
         """Test analyse basique du contenu CV"""
         text = """
@@ -133,7 +133,7 @@ class TestSimpleDocumentAnalyzer:
         assert "informations_generales" in result
         assert result["informations_generales"]["technologies_detectees"] > 0
 
-    @patch('app.services.simple_analyzer.st')
+    @patch("app.services.simple_analyzer.st")
     def test_analyze_cv_content_empty_text(self, mock_st):
         """Test analyse avec texte vide"""
         result = SimpleDocumentAnalyzer.analyze_cv_content("", "Test")
@@ -144,7 +144,7 @@ class TestSimpleDocumentAnalyzer:
         assert result["competences_fonctionnelles"] == []
         assert result["informations_generales"]["technologies_detectees"] == 0
 
-    @patch('app.services.simple_analyzer.st')
+    @patch("app.services.simple_analyzer.st")
     def test_analyze_cv_content_no_matches(self, mock_st):
         """Test analyse sans correspondances"""
         text = "Texte sans technologies ni clients connus"
@@ -156,7 +156,7 @@ class TestSimpleDocumentAnalyzer:
         assert result["informations_generales"]["technologies_detectees"] == 0
         assert result["informations_generales"]["clients_detectes"] == 0
 
-    @patch('app.services.simple_analyzer.st')
+    @patch("app.services.simple_analyzer.st")
     def test_analyze_cv_content_case_insensitive(self, mock_st):
         """Test recherche insensible à la casse"""
         text = "python, JAVASCRIPT, bnp paribas"
@@ -166,7 +166,7 @@ class TestSimpleDocumentAnalyzer:
         assert "JavaScript" in result["langages_techniques"]
         assert len(result["missions"]) > 0
 
-    @patch('app.services.simple_analyzer.st')
+    @patch("app.services.simple_analyzer.st")
     def test_analyze_cv_content_limit_results(self, mock_st):
         """Test limitation du nombre de résultats"""
         # Créer un texte avec beaucoup de technologies
@@ -178,11 +178,13 @@ class TestSimpleDocumentAnalyzer:
         # Vérifier que seules les 15 premières sont gardées
         assert len(result["langages_techniques"]) <= 15
 
-    @patch('app.services.simple_analyzer.st')
+    @patch("app.services.simple_analyzer.st")
     def test_analyze_cv_content_with_error(self, mock_st):
         """Test gestion d'erreur pendant l'analyse"""
         # Simuler une erreur en patchant une partie du code
-        with patch.object(SimpleDocumentAnalyzer, 'TECHNOLOGIES', side_effect=Exception("Test error")):
+        with patch.object(
+            SimpleDocumentAnalyzer, "TECHNOLOGIES", side_effect=Exception("Test error")
+        ):
             result = SimpleDocumentAnalyzer.analyze_cv_content("test", "Test")
 
         # Le résultat devrait quand même être retourné avec les valeurs par défaut

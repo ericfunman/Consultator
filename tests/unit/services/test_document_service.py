@@ -31,6 +31,7 @@ class TestDocumentService:
 
         # Supprimer le répertoire temporaire
         import shutil
+
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_init_upload_directory(self):
@@ -96,7 +97,7 @@ class TestDocumentService:
         pdf_path = Path(self.temp_dir) / "test.pdf"
         pdf_path.write_text("dummy pdf content")
 
-        with patch.object(DocumentService, '_extract_text_from_pdf') as mock_extract:
+        with patch.object(DocumentService, "_extract_text_from_pdf") as mock_extract:
             mock_extract.return_value = "Extracted PDF text"
 
             result = DocumentService.extract_text_from_file(str(pdf_path))
@@ -107,7 +108,7 @@ class TestDocumentService:
         """Test d'extraction de texte depuis un DOCX"""
         docx_path = Path(self.temp_dir) / "test.docx"
 
-        with patch.object(DocumentService, '_extract_text_from_docx') as mock_extract:
+        with patch.object(DocumentService, "_extract_text_from_docx") as mock_extract:
             mock_extract.return_value = "Extracted DOCX text"
 
             result = DocumentService.extract_text_from_file(str(docx_path))
@@ -125,13 +126,13 @@ class TestDocumentService:
         """Test d'extraction de texte avec erreur"""
         pdf_path = Path(self.temp_dir) / "test.pdf"
 
-        with patch.object(DocumentService, '_extract_text_from_pdf') as mock_extract:
+        with patch.object(DocumentService, "_extract_text_from_pdf") as mock_extract:
             mock_extract.side_effect = OSError("File corrupted")
 
             result = DocumentService.extract_text_from_file(str(pdf_path))
             assert result == "Erreur d'extraction: File corrupted"
 
-    @patch('app.services.document_service.pdfplumber')
+    @patch("app.services.document_service.pdfplumber")
     def test_extract_text_from_pdf_success(self, mock_pdfplumber):
         """Test d'extraction de texte PDF avec succès"""
         # Mock pdfplumber
@@ -147,7 +148,7 @@ class TestDocumentService:
         assert result == "Page content"
         mock_pdfplumber.open.assert_called_once_with(str(pdf_path))
 
-    @patch('app.services.document_service.DocxDocument')
+    @patch("app.services.document_service.DocxDocument")
     def test_extract_text_from_docx_success(self, mock_docx):
         """Test d'extraction de texte DOCX avec succès"""
         # Mock docx
@@ -166,7 +167,7 @@ class TestDocumentService:
         assert result == "Paragraph 1\nParagraph 2"
         mock_docx.assert_called_once_with(str(docx_path))
 
-    @patch('app.services.document_service.DocxDocument')
+    @patch("app.services.document_service.DocxDocument")
     def test_extract_text_from_docx_with_tables(self, mock_docx):
         """Test d'extraction de texte DOCX avec tableaux"""
         # Mock docx avec tableaux
@@ -191,7 +192,7 @@ class TestDocumentService:
         assert "Content" in result
         assert "Cell content" in result
 
-    @patch('app.services.document_service.Presentation')
+    @patch("app.services.document_service.Presentation")
     def test_extract_text_from_pptx_success(self, mock_pptx):
         """Test d'extraction de texte PPTX avec succès"""
         # Mock pptx
@@ -315,7 +316,7 @@ class TestDocumentService:
         result = DocumentService.delete_document(str(non_existent_file))
         assert result is False
 
-    @patch('app.services.document_service.get_database_session')
+    @patch("app.services.document_service.get_database_session")
     def test_get_all_consultants_for_selection(self, mock_get_session):
         """Test de récupération de tous les consultants pour sélection"""
         # Mock de la session et des consultants
@@ -332,7 +333,10 @@ class TestDocumentService:
         mock_consultant2.email = "jane.smith@example.com"
 
         mock_session = MagicMock()
-        mock_session.query.return_value.all.return_value = [mock_consultant1, mock_consultant2]
+        mock_session.query.return_value.all.return_value = [
+            mock_consultant1,
+            mock_consultant2,
+        ]
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         result = DocumentService.get_all_consultants_for_selection()
@@ -348,7 +352,7 @@ class TestDocumentService:
         assert result[1]["email"] == "jane.smith@example.com"
         assert result[1]["display"] == "Jane Smith (jane.smith@example.com)"
 
-    @patch('app.services.document_service.get_database_session')
+    @patch("app.services.document_service.get_database_session")
     def test_get_all_consultants_for_selection_error(self, mock_get_session):
         """Test de récupération de consultants avec erreur DB"""
         from sqlalchemy.exc import SQLAlchemyError

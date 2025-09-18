@@ -33,7 +33,7 @@ class TestCacheService:
 
     def test_init_without_redis(self):
         """Test d'initialisation sans Redis"""
-        with patch('app.services.cache_service.REDIS_AVAILABLE', False):
+        with patch("app.services.cache_service.REDIS_AVAILABLE", False):
             cache = CacheService()
             assert cache.redis_client is None
             assert cache.default_ttl == 300
@@ -42,8 +42,9 @@ class TestCacheService:
     def test_init_with_redis_success(self):
         """Test d'initialisation avec Redis disponible"""
         mock_redis = MagicMock()
-        with patch('app.services.cache_service.REDIS_AVAILABLE', True), \
-             patch('app.services.cache_service.redis') as mock_redis_module:
+        with patch("app.services.cache_service.REDIS_AVAILABLE", True), patch(
+            "app.services.cache_service.redis"
+        ) as mock_redis_module:
             mock_redis_module.from_url.return_value = mock_redis
             mock_redis.ping.return_value = True
 
@@ -56,8 +57,9 @@ class TestCacheService:
 
     def test_init_with_redis_connection_error(self):
         """Test d'initialisation avec erreur de connexion Redis"""
-        with patch('app.services.cache_service.REDIS_AVAILABLE', True), \
-             patch('app.services.cache_service.redis') as mock_redis_module:
+        with patch("app.services.cache_service.REDIS_AVAILABLE", True), patch(
+            "app.services.cache_service.redis"
+        ) as mock_redis_module:
             mock_redis_module.from_url.side_effect = Exception("Connection failed")
 
             cache = CacheService()
@@ -102,7 +104,7 @@ class TestCacheService:
         value = {"data": "test_value"}
         self.cache_service.memory_cache[key] = {
             "data": value,
-            "expires_at": time.time() + 100
+            "expires_at": time.time() + 100,
         }
 
         result = self.cache_service.get(key)
@@ -113,7 +115,7 @@ class TestCacheService:
         key = "test_key"
         self.cache_service.memory_cache[key] = {
             "data": "test_value",
-            "expires_at": time.time() - 100
+            "expires_at": time.time() - 100,
         }
 
         result = self.cache_service.get(key)
@@ -185,7 +187,10 @@ class TestCacheService:
     def test_delete_from_memory_cache(self):
         """Test de suppression du cache mémoire"""
         key = "test_key"
-        self.cache_service.memory_cache[key] = {"data": "value", "expires_at": time.time() + 100}
+        self.cache_service.memory_cache[key] = {
+            "data": "value",
+            "expires_at": time.time() + 100,
+        }
 
         result = self.cache_service.delete(key)
         assert result is True
@@ -208,7 +213,10 @@ class TestCacheService:
         mock_redis.delete.return_value = 1
 
         key = "test_key"
-        self.cache_service.memory_cache[key] = {"data": "value", "expires_at": time.time() + 100}
+        self.cache_service.memory_cache[key] = {
+            "data": "value",
+            "expires_at": time.time() + 100,
+        }
 
         result = self.cache_service.delete(key)
         assert result is True
@@ -292,6 +300,7 @@ class TestGlobalCacheFunctions:
         """Test du pattern singleton pour get_cache_service"""
         # Reset global state
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         service1 = get_cache_service()
@@ -304,6 +313,7 @@ class TestGlobalCacheFunctions:
         """Test du décorateur @cached"""
         # Reset global state
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         call_count = 0
@@ -332,6 +342,7 @@ class TestGlobalCacheFunctions:
     def test_cached_decorator_with_prefix(self):
         """Test du décorateur @cached avec préfixe"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         @cached(ttl=30, key_prefix="test")
@@ -351,6 +362,7 @@ class TestGlobalCacheFunctions:
     def test_invalidate_cache(self):
         """Test de la fonction invalidate_cache"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         cache_service = get_cache_service()
@@ -368,6 +380,7 @@ class TestGlobalCacheFunctions:
     def test_invalidate_consultant_cache_all(self):
         """Test d'invalidation du cache consultant (tous)"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         cache_service = get_cache_service()
@@ -385,6 +398,7 @@ class TestGlobalCacheFunctions:
     def test_invalidate_consultant_cache_specific(self):
         """Test d'invalidation du cache consultant (spécifique)"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         cache_service = get_cache_service()
@@ -403,6 +417,7 @@ class TestGlobalCacheFunctions:
     def test_invalidate_mission_cache(self):
         """Test d'invalidation du cache mission"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         cache_service = get_cache_service()
@@ -419,6 +434,7 @@ class TestGlobalCacheFunctions:
     def test_invalidate_practice_cache(self):
         """Test d'invalidation du cache practice"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         cache_service = get_cache_service()
@@ -435,6 +451,7 @@ class TestGlobalCacheFunctions:
     def test_invalidate_search_cache(self):
         """Test d'invalidation du cache recherche"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
         cache_service = get_cache_service()
@@ -455,9 +472,10 @@ class TestCachedFunctions:
     def test_get_cached_consultant_stats(self):
         """Test de la fonction get_cached_consultant_stats"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
-        with patch('app.services.consultant_service.ConsultantService') as mock_service:
+        with patch("app.services.consultant_service.ConsultantService") as mock_service:
             mock_service.get_consultant_summary_stats.return_value = {"total": 100}
 
             # Premier appel
@@ -474,10 +492,13 @@ class TestCachedFunctions:
     def test_get_cached_consultants_list(self):
         """Test de la fonction get_cached_consultants_list"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
-        with patch('app.services.consultant_service.ConsultantService') as mock_service:
-            mock_service.get_all_consultants_with_stats.return_value = [{"id": 1, "name": "Test"}]
+        with patch("app.services.consultant_service.ConsultantService") as mock_service:
+            mock_service.get_all_consultants_with_stats.return_value = [
+                {"id": 1, "name": "Test"}
+            ]
 
             # Test avec paramètres par défaut
             result = get_cached_consultants_list()
@@ -487,11 +508,16 @@ class TestCachedFunctions:
     def test_get_cached_search_results(self):
         """Test de la fonction get_cached_search_results"""
         import app.services.cache_service
+
         app.services.cache_service._cache_service = None
 
-        with patch('app.services.consultant_service.ConsultantService') as mock_service:
-            mock_service.search_consultants_optimized.return_value = [{"id": 1, "name": "John"}]
+        with patch("app.services.consultant_service.ConsultantService") as mock_service:
+            mock_service.search_consultants_optimized.return_value = [
+                {"id": 1, "name": "John"}
+            ]
 
             result = get_cached_search_results("John", page=2, per_page=10)
             assert result == [{"id": 1, "name": "John"}]
-            mock_service.search_consultants_optimized.assert_called_once_with("John", 2, 10)
+            mock_service.search_consultants_optimized.assert_called_once_with(
+                "John", 2, 10
+            )

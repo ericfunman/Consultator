@@ -22,12 +22,12 @@ class TestConsultantService(BaseServiceTest):
         data_invalid_email = {
             "prenom": "Jean",
             "nom": "Dupont",
-            "email": "invalid_email"
+            "email": "invalid_email",
         }
         result = ConsultantService.create_consultant(data_invalid_email)
         assert result is False
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultant_by_id_existing(self, mock_session):
         """Test de récupération d'un consultant existant par ID"""
         # Mock session
@@ -40,7 +40,9 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         # Test
         result = ConsultantService.get_consultant_by_id(1)
@@ -50,14 +52,16 @@ class TestConsultantService(BaseServiceTest):
         assert result.prenom == "Jean"
         assert result.nom == "Dupont"
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultant_by_id_not_found(self, mock_session):
         """Test de récupération d'un consultant inexistant"""
         # Mock session
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
 
-        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = None
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
+            None
+        )
 
         # Test
         result = ConsultantService.get_consultant_by_id(999)
@@ -65,7 +69,7 @@ class TestConsultantService(BaseServiceTest):
         # Vérifications
         assert result is None
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_create_consultant_valid_data(self, mock_session):
         """Test de création d'un consultant avec données valides"""
         # Mock session
@@ -83,7 +87,7 @@ class TestConsultantService(BaseServiceTest):
             "telephone": "0123456789",
             "salaire": 55000,
             "practice_id": 1,
-            "disponible": True
+            "disponible": True,
         }
 
         # Test
@@ -94,7 +98,7 @@ class TestConsultantService(BaseServiceTest):
         mock_db.add.assert_called_once()
         mock_db.commit.assert_called_once()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_update_consultant_valid_data(self, mock_session):
         """Test de mise à jour d'un consultant"""
         # Mock session
@@ -107,13 +111,12 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         # Données de mise à jour
-        data = {
-            "telephone": "0987654321",
-            "salaire": 60000
-        }
+        data = {"telephone": "0987654321", "salaire": 60000}
 
         # Test
         result = ConsultantService.update_consultant(1, data)
@@ -122,7 +125,7 @@ class TestConsultantService(BaseServiceTest):
         assert result is True
         mock_db.commit.assert_called_once()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_delete_consultant_existing(self, mock_session):
         """Test de suppression d'un consultant existant"""
         # Mock session
@@ -135,7 +138,9 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         # Test
         result = ConsultantService.delete_consultant(1)
@@ -145,7 +150,7 @@ class TestConsultantService(BaseServiceTest):
         mock_db.delete.assert_called_once_with(mock_consultant)
         mock_db.commit.assert_called_once()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_search_consultants(self, mock_session):
         """Test de recherche de consultants"""
         # Mock session
@@ -157,7 +162,9 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [mock_consultant]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            mock_consultant
+        ]
 
         # Test
         result = ConsultantService.search_consultants("Jean")
@@ -166,7 +173,7 @@ class TestConsultantService(BaseServiceTest):
         assert len(result) == 1
         assert result[0].prenom == "Jean"
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultants_count(self, mock_session):
         """Test de comptage des consultants"""
         # Mock session
@@ -181,7 +188,7 @@ class TestConsultantService(BaseServiceTest):
         # Vérifications
         assert result == 42
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_all_consultants_objects(self, mock_session):
         """Test de récupération de tous les consultants comme objets"""
         # Mock session
@@ -196,7 +203,10 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant2.id = 2
         mock_consultant2.prenom = "Marie"
 
-        mock_db.query.return_value.options.return_value.offset.return_value.limit.return_value.all.return_value = [mock_consultant1, mock_consultant2]
+        mock_db.query.return_value.options.return_value.offset.return_value.limit.return_value.all.return_value = [
+            mock_consultant1,
+            mock_consultant2,
+        ]
 
         # Test
         result = ConsultantService.get_all_consultants_objects(page=1, per_page=10)
@@ -206,31 +216,31 @@ class TestConsultantService(BaseServiceTest):
         assert result[0].id == 1
         assert result[1].id == 2
 
-    @patch('app.services.consultant_service.get_database_session')
-    @patch('app.services.consultant_service.ConsultantService.get_all_consultants')
+    @patch("app.services.consultant_service.get_database_session")
+    @patch("app.services.consultant_service.ConsultantService.get_all_consultants")
     def test_get_all_consultants(self, mock_get_all_consultants, mock_session):
         """Test de récupération de tous les consultants avec stats"""
         # Mock la fonction pour éviter le cache Streamlit
         mock_get_all_consultants.return_value = [
             {
-                'id': 1,
-                'prenom': 'Jean',
-                'nom': 'Dupont',
-                'email': 'jean@test.com',
-                'disponibilite': True,
-                'salaire_actuel': 50000,
-                'date_creation': datetime.now(),
-                'societe': 'Quanteam',
-                'grade': 'Senior',
-                'type_contrat': 'CDI',
-                'practice_name': 'Tech',
-                'nb_missions': 3,
-                'cjm': 1440.0,
-                'salaire_formatted': '50,000€',
-                'cjm_formatted': '1,440€',
-                'statut': '✅ Disponible',
-                'experience_annees': 0,
-                'experience_formatted': 'N/A'
+                "id": 1,
+                "prenom": "Jean",
+                "nom": "Dupont",
+                "email": "jean@test.com",
+                "disponibilite": True,
+                "salaire_actuel": 50000,
+                "date_creation": datetime.now(),
+                "societe": "Quanteam",
+                "grade": "Senior",
+                "type_contrat": "CDI",
+                "practice_name": "Tech",
+                "nb_missions": 3,
+                "cjm": 1440.0,
+                "salaire_formatted": "50,000€",
+                "cjm_formatted": "1,440€",
+                "statut": "✅ Disponible",
+                "experience_annees": 0,
+                "experience_formatted": "N/A",
             }
         ]
 
@@ -239,10 +249,10 @@ class TestConsultantService(BaseServiceTest):
 
         # Vérifications
         assert len(result) == 1
-        assert result[0]['id'] == 1
-        assert result[0]['prenom'] == "Jean"
+        assert result[0]["id"] == 1
+        assert result[0]["prenom"] == "Jean"
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultant_with_stats(self, mock_session):
         """Test de récupération d'un consultant avec statistiques détaillées"""
         # Mock session
@@ -295,14 +305,14 @@ class TestConsultantService(BaseServiceTest):
 
         # Vérifications
         assert result is not None
-        assert result['id'] == 1
-        assert result['prenom'] == "Jean"
-        assert result['competences_count'] == 1
-        assert result['missions_count'] == 1
-        assert len(result['competences']) == 1
-        assert len(result['missions']) == 1
+        assert result["id"] == 1
+        assert result["prenom"] == "Jean"
+        assert result["competences_count"] == 1
+        assert result["missions_count"] == 1
+        assert len(result["competences"]) == 1
+        assert len(result["missions"]) == 1
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultant_by_email(self, mock_session):
         """Test de récupération d'un consultant par email"""
         # Mock session
@@ -314,7 +324,9 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.id = 1
         mock_consultant.email = "jean@test.com"
 
-        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         # Test
         result = ConsultantService.get_consultant_by_email("jean@test.com")
@@ -323,7 +335,7 @@ class TestConsultantService(BaseServiceTest):
         assert result is not None
         assert result.email == "jean@test.com"
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultants_by_availability(self, mock_session):
         """Test de récupération des consultants par disponibilité"""
         # Mock session
@@ -336,17 +348,19 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.disponibilite = True
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [mock_consultant]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            mock_consultant
+        ]
 
         # Test
         result = ConsultantService.get_consultants_by_availability(available=True)
 
         # Vérifications
         assert len(result) == 1
-        assert result[0]['id'] == 1
-        assert result[0]['disponibilite'] is True
+        assert result[0]["id"] == 1
+        assert result[0]["disponibilite"] is True
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultant_summary_stats(self, mock_session):
         """Test de récupération des statistiques générales"""
         # Mock session
@@ -355,50 +369,59 @@ class TestConsultantService(BaseServiceTest):
 
         # Mock les compteurs avec side_effect pour retourner des valeurs différentes
         # Ordre: total_consultants, available_consultants, total_missions, active_missions
-        mock_db.query.return_value.count.side_effect = [150, 200, 50]  # total_consultants, total_missions, active_missions
-        mock_db.query.return_value.filter.return_value.count.side_effect = [120, 50]  # available_consultants, active_missions
+        mock_db.query.return_value.count.side_effect = [
+            150,
+            200,
+            50,
+        ]  # total_consultants, total_missions, active_missions
+        mock_db.query.return_value.filter.return_value.count.side_effect = [
+            120,
+            50,
+        ]  # available_consultants, active_missions
 
         # Test
         result = ConsultantService.get_consultant_summary_stats()
 
         # Vérifications
         assert isinstance(result, dict)
-        assert 'total_consultants' in result
-        assert result['total_consultants'] == 150
-        assert result['available_consultants'] == 120
-        assert result['total_missions'] == 200
-        assert result['active_missions'] == 50
-        assert result['busy_consultants'] == 30  # 150 - 120
+        assert "total_consultants" in result
+        assert result["total_consultants"] == 150
+        assert result["available_consultants"] == 120
+        assert result["total_missions"] == 200
+        assert result["active_missions"] == 50
+        assert result["busy_consultants"] == 30  # 150 - 120
 
-    @patch('app.services.consultant_service.ConsultantService.get_all_consultants_with_stats')
+    @patch(
+        "app.services.consultant_service.ConsultantService.get_all_consultants_with_stats"
+    )
     def test_get_all_consultants_with_stats(self, mock_get_all_consultants_with_stats):
         """Test de récupération de tous les consultants avec statistiques complètes"""
         # Mock la fonction pour éviter le cache Streamlit
         mock_get_all_consultants_with_stats.return_value = [
             {
-                'id': 1,
-                'prenom': 'Jean',
-                'nom': 'Dupont',
-                'disponibilite': True,
-                'salaire_actuel': 50000,
-                'date_creation': datetime.now(),
-                'derniere_maj': datetime.now(),
-                'societe': 'Quanteam',
-                'grade': 'Senior',
-                'type_contrat': 'CDI',
-                'practice_name': 'Tech',
-                'nb_missions': 3,
-                'cjm': 1440.0,
-                'salaire_formatted': '50,000€',
-                'cjm_formatted': '1,440€',
-                'statut': '✅ Disponible',
-                'experience_annees': 0,
-                'experience_formatted': 'N/A',
-                'stats': {
-                    'nb_missions': 3,
-                    'nb_competences': 5,
-                    'experience_moyenne': 2.5
-                }
+                "id": 1,
+                "prenom": "Jean",
+                "nom": "Dupont",
+                "disponibilite": True,
+                "salaire_actuel": 50000,
+                "date_creation": datetime.now(),
+                "derniere_maj": datetime.now(),
+                "societe": "Quanteam",
+                "grade": "Senior",
+                "type_contrat": "CDI",
+                "practice_name": "Tech",
+                "nb_missions": 3,
+                "cjm": 1440.0,
+                "salaire_formatted": "50,000€",
+                "cjm_formatted": "1,440€",
+                "statut": "✅ Disponible",
+                "experience_annees": 0,
+                "experience_formatted": "N/A",
+                "stats": {
+                    "nb_missions": 3,
+                    "nb_competences": 5,
+                    "experience_moyenne": 2.5,
+                },
             }
         ]
 
@@ -407,10 +430,10 @@ class TestConsultantService(BaseServiceTest):
 
         # Vérifications
         assert len(result) == 1
-        assert result[0]['id'] == 1
-        assert 'stats' in result[0]
+        assert result[0]["id"] == 1
+        assert "stats" in result[0]
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_search_consultants_optimized(self, mock_session):
         """Test de recherche optimisée de consultants"""
         # Mock session
@@ -447,15 +470,17 @@ class TestConsultantService(BaseServiceTest):
         mock_query.all.return_value = [mock_result]
 
         # Test
-        result = ConsultantService.search_consultants_optimized("Jean", page=1, per_page=10)
+        result = ConsultantService.search_consultants_optimized(
+            "Jean", page=1, per_page=10
+        )
 
         # Vérifications
         assert len(result) == 1
-        assert result[0]['id'] == 1
-        assert result[0]['prenom'] == "Jean"
-        assert result[0]['nb_missions'] == 3
+        assert result[0]["id"] == 1
+        assert result[0]["prenom"] == "Jean"
+        assert result[0]["nb_missions"] == 3
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_save_cv_analysis(self, mock_session):
         """Test de sauvegarde d'analyse CV"""
         # Mock session
@@ -465,13 +490,15 @@ class TestConsultantService(BaseServiceTest):
         # Mock consultant
         mock_consultant = Mock()
         mock_consultant.id = 1
-        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         # Données d'analyse
         analysis_data = {
             "competences": ["Python", "SQL"],
             "experience": "5 ans",
-            "missions": []
+            "missions": [],
         }
 
         # Test
@@ -492,14 +519,16 @@ class TestConsultantService(BaseServiceTest):
         assert result == "Frontend"
 
         # Test compétences fonctionnelles
-        result = ConsultantService._determine_skill_category("Management", "fonctionnelle")
+        result = ConsultantService._determine_skill_category(
+            "Management", "fonctionnelle"
+        )
         assert result == "Management"
 
         # Test compétence inconnue
         result = ConsultantService._determine_skill_category("Unknown", "technique")
         assert result == "Technique"
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_create_consultant_duplicate_email(self, mock_session):
         """Test de création avec email déjà existant"""
         # Mock session
@@ -508,14 +537,12 @@ class TestConsultantService(BaseServiceTest):
 
         # Mock consultant existant avec même email
         mock_existing = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = mock_existing
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            mock_existing
+        )
 
         # Données de test
-        data = {
-            "prenom": "Jean",
-            "nom": "Dupont",
-            "email": "existing@test.com"
-        }
+        data = {"prenom": "Jean", "nom": "Dupont", "email": "existing@test.com"}
 
         # Test
         result = ConsultantService.create_consultant(data)
@@ -523,7 +550,7 @@ class TestConsultantService(BaseServiceTest):
         # Vérifications
         assert result is False
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_update_consultant_not_found(self, mock_session):
         """Test de mise à jour d'un consultant inexistant"""
         # Mock session
@@ -538,7 +565,7 @@ class TestConsultantService(BaseServiceTest):
         # Vérifications
         assert result is False
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_delete_consultant_not_found(self, mock_session):
         """Test de suppression d'un consultant inexistant"""
         # Mock session
@@ -553,7 +580,7 @@ class TestConsultantService(BaseServiceTest):
         # Vérifications
         assert result is False
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_search_consultants_no_results(self, mock_session):
         """Test de recherche sans résultats"""
         # Mock session
@@ -568,7 +595,7 @@ class TestConsultantService(BaseServiceTest):
         # Vérifications
         assert len(result) == 0
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultant_by_email_not_found(self, mock_session):
         """Test de récupération par email inexistant"""
         # Mock session
@@ -583,7 +610,7 @@ class TestConsultantService(BaseServiceTest):
         # Vérifications
         assert result is None
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_available_consultants(self, mock_session):
         """Test de récupération des consultants disponibles"""
         # Mock session
@@ -601,7 +628,10 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant2.prenom = "Marie"
         mock_consultant2.disponibilite = True
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [mock_consultant1, mock_consultant2]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            mock_consultant1,
+            mock_consultant2,
+        ]
 
         # Test
         result = ConsultantService.get_available_consultants()
@@ -612,7 +642,7 @@ class TestConsultantService(BaseServiceTest):
         assert result[1].prenom == "Marie"
         assert all(c.disponibilite for c in result)
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_available_consultants_empty(self, mock_session):
         """Test de récupération des consultants disponibles quand aucun n'est disponible"""
         # Mock session
@@ -627,14 +657,14 @@ class TestConsultantService(BaseServiceTest):
         # Vérifications
         assert len(result) == 0
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_available_consultants_database_error(self, mock_session):
         """Test de récupération des consultants disponibles avec erreur de base de données"""
         # Note: Cette méthode ne capture pas les exceptions, donc on ne peut pas la tester facilement
         # La couverture est quand même améliorée avec les autres tests
         pass
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_save_mission_from_analysis_success(self, mock_session):
         """Test de sauvegarde réussie d'une mission depuis l'analyse CV"""
         # Mock session
@@ -650,7 +680,7 @@ class TestConsultantService(BaseServiceTest):
             "date_debut": "2023-01-01",
             "date_fin": "2023-12-31",
             "resume": "Test mission description",
-            "langages_techniques": ["Python", "SQL"]
+            "langages_techniques": ["Python", "SQL"],
         }
 
         # Test
@@ -660,7 +690,7 @@ class TestConsultantService(BaseServiceTest):
         assert result is True
         mock_db.add.assert_called_once()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_save_mission_from_analysis_duplicate(self, mock_session):
         """Test de sauvegarde d'une mission déjà existante (doublon)"""
         # Mock session
@@ -669,13 +699,15 @@ class TestConsultantService(BaseServiceTest):
 
         # Mock mission existante
         mock_existing_mission = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = mock_existing_mission
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            mock_existing_mission
+        )
 
         # Données de mission
         mission_data = {
             "client": "Test Client",
             "date_debut": "2023-01-01",
-            "date_fin": "2023-12-31"
+            "date_fin": "2023-12-31",
         }
 
         # Test
@@ -685,7 +717,7 @@ class TestConsultantService(BaseServiceTest):
         assert result is False
         mock_db.add.assert_not_called()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_save_mission_from_analysis_no_client(self, mock_session):
         """Test de sauvegarde d'une mission sans client"""
         # Mock session
@@ -693,10 +725,7 @@ class TestConsultantService(BaseServiceTest):
         mock_session.return_value.__enter__.return_value = mock_db
 
         # Données de mission sans client
-        mission_data = {
-            "date_debut": "2023-01-01",
-            "resume": "Test mission"
-        }
+        mission_data = {"date_debut": "2023-01-01", "resume": "Test mission"}
 
         # Test
         result = ConsultantService._save_mission_from_analysis(mock_db, 1, mission_data)
@@ -705,7 +734,7 @@ class TestConsultantService(BaseServiceTest):
         assert result is False
         mock_db.add.assert_not_called()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_save_competence_from_analysis_success(self, mock_session):
         """Test de sauvegarde réussie d'une compétence depuis l'analyse CV"""
         # Mock session
@@ -722,13 +751,15 @@ class TestConsultantService(BaseServiceTest):
         mock_db.flush.return_value = None
 
         # Test
-        result = ConsultantService._save_competence_from_analysis(mock_db, 1, "Python", "technique")
+        result = ConsultantService._save_competence_from_analysis(
+            mock_db, 1, "Python", "technique"
+        )
 
         # Vérifications
         assert result is True
         assert mock_db.add.call_count == 2  # Compétence + ConsultantCompetence
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_save_competence_from_analysis_existing_competence(self, mock_session):
         """Test de sauvegarde d'une compétence existante dans le référentiel"""
         # Mock session
@@ -738,16 +769,21 @@ class TestConsultantService(BaseServiceTest):
         # Mock compétence existante dans le référentiel
         mock_competence = Mock()
         mock_competence.id = 1
-        mock_db.query.return_value.filter.return_value.first.side_effect = [mock_competence, None]
+        mock_db.query.return_value.filter.return_value.first.side_effect = [
+            mock_competence,
+            None,
+        ]
 
         # Test
-        result = ConsultantService._save_competence_from_analysis(mock_db, 1, "Python", "technique")
+        result = ConsultantService._save_competence_from_analysis(
+            mock_db, 1, "Python", "technique"
+        )
 
         # Vérifications
         assert result is True
         mock_db.add.assert_called_once()  # Seulement ConsultantCompetence
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_save_competence_from_analysis_already_assigned(self, mock_session):
         """Test de sauvegarde d'une compétence déjà assignée au consultant"""
         # Mock session
@@ -759,16 +795,21 @@ class TestConsultantService(BaseServiceTest):
         mock_competence.id = 1
         mock_existing_relation = Mock()
 
-        mock_db.query.return_value.filter.return_value.first.side_effect = [mock_competence, mock_existing_relation]
+        mock_db.query.return_value.filter.return_value.first.side_effect = [
+            mock_competence,
+            mock_existing_relation,
+        ]
 
         # Test
-        result = ConsultantService._save_competence_from_analysis(mock_db, 1, "Python", "technique")
+        result = ConsultantService._save_competence_from_analysis(
+            mock_db, 1, "Python", "technique"
+        )
 
         # Vérifications
         assert result is False
         mock_db.add.assert_not_called()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_save_competence_from_analysis_empty_name(self, mock_session):
         """Test de sauvegarde d'une compétence avec nom vide"""
         # Mock session
@@ -776,23 +817,27 @@ class TestConsultantService(BaseServiceTest):
         mock_session.return_value.__enter__.return_value = mock_db
 
         # Test
-        result = ConsultantService._save_competence_from_analysis(mock_db, 1, "", "technique")
+        result = ConsultantService._save_competence_from_analysis(
+            mock_db, 1, "", "technique"
+        )
 
         # Vérifications
         assert result is False
         mock_db.add.assert_not_called()
 
-    @patch('app.services.consultant_service.get_database_session')
-    @patch('streamlit.error')
-    @patch('streamlit.success')
-    @patch('streamlit.info')
-    def test_save_cv_analysis_success(self, mock_info, mock_success, mock_error, mock_session):
+    @patch("app.services.consultant_service.get_database_session")
+    @patch("streamlit.error")
+    @patch("streamlit.success")
+    @patch("streamlit.info")
+    def test_save_cv_analysis_success(
+        self, mock_info, mock_success, mock_error, mock_session
+    ):
         """Test de sauvegarde complète d'analyse CV réussie"""
         # Note: Cette méthode complexe nécessite un mock très élaboré, testé partiellement par d'autres tests
         pass
 
-    @patch('app.services.consultant_service.get_database_session')
-    @patch('streamlit.error')
+    @patch("app.services.consultant_service.get_database_session")
+    @patch("streamlit.error")
     def test_save_cv_analysis_consultant_not_found(self, mock_error, mock_session):
         """Test de sauvegarde d'analyse CV pour consultant inexistant"""
         # Mock session
@@ -809,8 +854,8 @@ class TestConsultantService(BaseServiceTest):
         assert result is False
         mock_error.assert_called_with("❌ Consultant avec ID 999 introuvable")
 
-    @patch('app.services.consultant_service.get_database_session')
-    @patch('streamlit.error')
+    @patch("app.services.consultant_service.get_database_session")
+    @patch("streamlit.error")
     def test_save_cv_analysis_database_error(self, mock_error, mock_session):
         """Test de sauvegarde d'analyse CV avec erreur de base de données"""
         # Note: Cette méthode complexe nécessite un mock très élaboré, testé partiellement par d'autres tests
@@ -889,11 +934,15 @@ class TestConsultantService(BaseServiceTest):
     def test_determine_skill_category_functional_management(self):
         """Test de détermination de catégorie pour compétences fonctionnelles management"""
         # Test Management
-        result = ConsultantService._determine_skill_category("Management", "fonctionnelle")
+        result = ConsultantService._determine_skill_category(
+            "Management", "fonctionnelle"
+        )
         assert result == "Management"
 
         # Test Leadership
-        result = ConsultantService._determine_skill_category("Leadership", "fonctionnelle")
+        result = ConsultantService._determine_skill_category(
+            "Leadership", "fonctionnelle"
+        )
         assert result == "Management"
 
         # Test Gestion
@@ -917,11 +966,15 @@ class TestConsultantService(BaseServiceTest):
     def test_determine_skill_category_functional_unknown(self):
         """Test de détermination de catégorie pour compétences fonctionnelles inconnues"""
         # Test compétence inconnue
-        result = ConsultantService._determine_skill_category("Unknown Skill", "fonctionnelle")
+        result = ConsultantService._determine_skill_category(
+            "Unknown Skill", "fonctionnelle"
+        )
         assert result == "Fonctionnelle"
 
     def test_determine_skill_category_technical_unknown(self):
         """Test de détermination de catégorie pour compétences techniques inconnues"""
         # Test compétence inconnue
-        result = ConsultantService._determine_skill_category("Unknown Tech", "technique")
+        result = ConsultantService._determine_skill_category(
+            "Unknown Tech", "technique"
+        )
         assert result == "Technique"

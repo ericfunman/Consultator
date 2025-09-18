@@ -13,8 +13,8 @@ from app.database.models import Practice, Consultant
 class TestPracticeService:
     """Tests pour PracticeService"""
 
-    @patch('app.services.practice_service.st')
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.st")
+    @patch("app.services.practice_service.get_session")
     def test_get_all_practices_success(self, mock_session, mock_st):
         """Test récupération de toutes les practices actives - cas succès"""
         # Create fresh mock practices
@@ -49,10 +49,11 @@ class TestPracticeService:
         assert result[0].nom == "Data Science"
         assert result[1].nom == "Quant"
 
-    @patch('app.services.practice_service.st')
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.st")
+    @patch("app.services.practice_service.get_session")
     def test_get_practice_by_id_found(self, mock_session, mock_st):
         """Test récupération practice par ID - trouvée"""
+
         # Create simple practice object
         class SimplePractice:
             def __init__(self):
@@ -62,7 +63,9 @@ class TestPracticeService:
         mock_practice = SimplePractice()
 
         # Mock the entire method to return our practice directly
-        with patch.object(PracticeService, 'get_practice_by_id', return_value=mock_practice):
+        with patch.object(
+            PracticeService, "get_practice_by_id", return_value=mock_practice
+        ):
             # Test
             result = PracticeService.get_practice_by_id(1)
 
@@ -71,10 +74,11 @@ class TestPracticeService:
             assert result.id == 1
             assert result.nom == "Data Science"
 
-    @patch('app.services.practice_service.st')
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.st")
+    @patch("app.services.practice_service.get_session")
     def test_get_practice_by_name_found(self, mock_session, mock_st):
         """Test récupération practice par nom - trouvée"""
+
         # Create simple practice object
         class SimplePractice:
             def __init__(self):
@@ -84,7 +88,9 @@ class TestPracticeService:
         mock_practice = SimplePractice()
 
         # Mock the entire method to return our practice directly
-        with patch.object(PracticeService, 'get_practice_by_name', return_value=mock_practice):
+        with patch.object(
+            PracticeService, "get_practice_by_name", return_value=mock_practice
+        ):
             # Test
             result = PracticeService.get_practice_by_name("Data Science")
 
@@ -92,11 +98,12 @@ class TestPracticeService:
             assert result is not None
             assert result.nom == "Data Science"
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
-    @patch('app.services.practice_service.Practice')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
+    @patch("app.services.practice_service.Practice")
     def test_create_practice_success(self, mock_practice_class, mock_st, mock_session):
         """Test création practice - cas succès"""
+
         # Create simple practice object
         class SimplePractice:
             def __init__(self):
@@ -108,28 +115,38 @@ class TestPracticeService:
         mock_practice = SimplePractice()
 
         # Mock the method to return our practice directly
-        with patch.object(PracticeService, 'create_practice', return_value=mock_practice):
+        with patch.object(
+            PracticeService, "create_practice", return_value=mock_practice
+        ):
             # Test
-            result = PracticeService.create_practice("New Practice", "Description", "Responsable")
+            result = PracticeService.create_practice(
+                "New Practice", "Description", "Responsable"
+            )
 
             # Vérifications
             assert result is not None
             assert result.nom == "New Practice"
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
     def test_update_practice_success(self, mock_st, mock_session):
         """Test mise à jour practice - cas succès"""
         # Mock the method to return True directly
-        with patch.object(PracticeService, 'update_practice', return_value=True) as mock_update:
+        with patch.object(
+            PracticeService, "update_practice", return_value=True
+        ) as mock_update:
             # Test
-            result = PracticeService.update_practice(1, nom="New Name", description="New Description")
+            result = PracticeService.update_practice(
+                1, nom="New Name", description="New Description"
+            )
 
             # Vérifications
             assert result is True
-            mock_update.assert_called_once_with(1, nom="New Name", description="New Description")
+            mock_update.assert_called_once_with(
+                1, nom="New Name", description="New Description"
+            )
 
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.get_session")
     def test_get_practice_statistics(self, mock_session):
         """Test récupération statistiques practices"""
         # Mock statistics data
@@ -148,12 +165,14 @@ class TestPracticeService:
                     "total_consultants": 6,
                     "consultants_actifs": 2,
                     "responsable": "Jane Smith",
-                }
-            ]
+                },
+            ],
         }
 
         # Mock the method to return our statistics directly
-        with patch.object(PracticeService, 'get_practice_statistics', return_value=mock_stats):
+        with patch.object(
+            PracticeService, "get_practice_statistics", return_value=mock_stats
+        ):
             # Test
             result = PracticeService.get_practice_statistics()
 
@@ -161,43 +180,43 @@ class TestPracticeService:
             assert result["total_practices"] == 2
             assert result["total_consultants"] == 11
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
     def test_get_all_practices_database_error(self, mock_st, mock_session):
         """Test récupération practices - erreur base de données"""
         # Mock the method to return empty list directly (simulating error handling)
-        with patch.object(PracticeService, 'get_all_practices', return_value=[]):
+        with patch.object(PracticeService, "get_all_practices", return_value=[]):
             # Test
             result = PracticeService.get_all_practices()
 
             # Vérifications
             assert result == []
 
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.get_session")
     def test_get_practice_by_id_not_found(self, mock_session):
         """Test récupération practice par ID - non trouvée"""
         # Mock the method to return None directly
-        with patch.object(PracticeService, 'get_practice_by_id', return_value=None):
+        with patch.object(PracticeService, "get_practice_by_id", return_value=None):
             # Test
             result = PracticeService.get_practice_by_id(999)
 
             # Vérifications
             assert result is None
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
     def test_get_practice_by_id_error(self, mock_st, mock_session):
         """Test récupération practice par ID - erreur base de données"""
         # Mock the method to return None directly (simulating error handling)
-        with patch.object(PracticeService, 'get_practice_by_id', return_value=None):
+        with patch.object(PracticeService, "get_practice_by_id", return_value=None):
             # Test
             result = PracticeService.get_practice_by_id(1)
 
             # Vérifications
             assert result is None
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
     def test_create_practice_already_exists(self, mock_st, mock_session):
         """Test création practice - practice existe déjà"""
         # Setup mocks
@@ -222,24 +241,26 @@ class TestPracticeService:
         # Vérifications
         assert result is None
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
     def test_update_practice_not_found(self, mock_st, mock_session):
         """Test mise à jour practice - practice non trouvée"""
         # Mock the method to return False directly (practice not found)
-        with patch.object(PracticeService, 'update_practice', return_value=False):
+        with patch.object(PracticeService, "update_practice", return_value=False):
             # Test
             result = PracticeService.update_practice(999, nom="New Name")
 
             # Vérifications
             assert result is False
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
     def test_assign_consultant_to_practice_success(self, mock_st, mock_session):
         """Test assignation consultant à practice - cas succès"""
         # Mock the method to return True directly
-        with patch.object(PracticeService, 'assign_consultant_to_practice', return_value=True) as mock_assign:
+        with patch.object(
+            PracticeService, "assign_consultant_to_practice", return_value=True
+        ) as mock_assign:
             # Test
             result = PracticeService.assign_consultant_to_practice(1, 1)
 
@@ -247,12 +268,16 @@ class TestPracticeService:
             assert result is True
             mock_assign.assert_called_once_with(1, 1)
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
-    def test_assign_consultant_to_practice_remove_assignment(self, mock_st, mock_session):
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
+    def test_assign_consultant_to_practice_remove_assignment(
+        self, mock_st, mock_session
+    ):
         """Test retrait consultant de practice"""
         # Mock the method to return True directly
-        with patch.object(PracticeService, 'assign_consultant_to_practice', return_value=True) as mock_assign:
+        with patch.object(
+            PracticeService, "assign_consultant_to_practice", return_value=True
+        ) as mock_assign:
             # Test (practice_id = None pour retirer)
             result = PracticeService.assign_consultant_to_practice(1, None)
 
@@ -260,12 +285,12 @@ class TestPracticeService:
             assert result is True
             mock_assign.assert_called_once_with(1, None)
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
     def test_init_default_practices_success(self, mock_st, mock_session):
         """Test initialisation practices par défaut - cas succès"""
         # Mock the method - we can't easily test the internal calls, so we'll just ensure it doesn't raise
-        with patch.object(PracticeService, 'init_default_practices') as mock_init:
+        with patch.object(PracticeService, "init_default_practices") as mock_init:
             mock_init.return_value = None  # Method doesn't return anything
             # Test
             PracticeService.init_default_practices()
@@ -273,8 +298,8 @@ class TestPracticeService:
             # Vérifications - just ensure the method was called
             mock_init.assert_called_once()
 
-    @patch('app.services.practice_service.get_session')
-    @patch('app.services.practice_service.st')
+    @patch("app.services.practice_service.get_session")
+    @patch("app.services.practice_service.st")
     def test_init_default_practices_already_exist(self, mock_st, mock_session):
         """Test initialisation practices par défaut - practices existent déjà"""
         # Setup mocks

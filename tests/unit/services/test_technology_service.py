@@ -15,9 +15,11 @@ from app.services.technology_service import TechnologyService
 class TestTechnologyService:
     """Tests pour la classe TechnologyService"""
 
-    @patch('app.services.technology_service.get_database_session')
-    @patch('app.services.technology_service.get_all_technologies')
-    def test_get_all_available_technologies_success(self, mock_get_all, mock_get_session):
+    @patch("app.services.technology_service.get_database_session")
+    @patch("app.services.technology_service.get_all_technologies")
+    def test_get_all_available_technologies_success(
+        self, mock_get_all, mock_get_session
+    ):
         """Test récupération de toutes les technologies disponibles"""
         # Mock données
         mock_get_all.return_value = ["Python", "Java", "SQL"]
@@ -38,9 +40,11 @@ class TestTechnologyService:
         assert len(result) == 4  # Toutes les technos sans doublons
         assert result == sorted(result)  # Trié
 
-    @patch('app.services.technology_service.get_database_session')
-    @patch('app.services.technology_service.get_all_technologies')
-    def test_get_all_available_technologies_db_error(self, mock_get_all, mock_get_session):
+    @patch("app.services.technology_service.get_database_session")
+    @patch("app.services.technology_service.get_all_technologies")
+    def test_get_all_available_technologies_db_error(
+        self, mock_get_all, mock_get_session
+    ):
         """Test récupération avec erreur DB - retourne seulement référentiel"""
         mock_get_all.return_value = ["Python", "Java"]
 
@@ -53,11 +57,13 @@ class TestTechnologyService:
         # Retourne seulement les technos du référentiel
         assert result == ["Python", "Java"]
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_add_custom_technology_success(self, mock_get_session):
         """Test ajout d'une technologie personnalisée"""
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = None  # N'existe pas
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            None  # N'existe pas
+        )
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         result = TechnologyService.add_custom_technology("NewTech", "Frameworks")
@@ -66,12 +72,14 @@ class TestTechnologyService:
         mock_session.add.assert_called_once()
         mock_session.commit.assert_called_once()
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_add_custom_technology_already_exists(self, mock_get_session):
         """Test ajout d'une technologie qui existe déjà"""
         mock_existing = MagicMock()
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_existing
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_existing
+        )
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         result = TechnologyService.add_custom_technology("ExistingTech")
@@ -80,18 +88,20 @@ class TestTechnologyService:
         mock_session.add.assert_not_called()
         mock_session.commit.assert_not_called()
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_add_custom_technology_db_error(self, mock_get_session):
         """Test ajout avec erreur DB"""
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.side_effect = SQLAlchemyError("DB Error")
+        mock_session.query.return_value.filter.return_value.first.side_effect = (
+            SQLAlchemyError("DB Error")
+        )
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         result = TechnologyService.add_custom_technology("NewTech")
 
         assert result is False
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_get_custom_technologies_success(self, mock_get_session):
         """Test récupération des technologies personnalisées"""
         mock_tech = MagicMock()
@@ -111,7 +121,7 @@ class TestTechnologyService:
         assert result[0]["nom"] == "CustomTech"
         assert result[0]["categorie"] == "Personnalisées"
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_get_custom_technologies_db_error(self, mock_get_session):
         """Test récupération avec erreur DB"""
         mock_session = MagicMock()
@@ -122,12 +132,14 @@ class TestTechnologyService:
 
         assert result == []
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_delete_custom_technology_success(self, mock_get_session):
         """Test suppression d'une technologie personnalisée"""
         mock_tech = MagicMock()
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_tech
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_tech
+        )
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         result = TechnologyService.delete_custom_technology(1)
@@ -136,7 +148,7 @@ class TestTechnologyService:
         mock_session.delete.assert_called_once_with(mock_tech)
         mock_session.commit.assert_called_once()
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_delete_custom_technology_not_found(self, mock_get_session):
         """Test suppression d'une technologie inexistante"""
         mock_session = MagicMock()
@@ -149,7 +161,7 @@ class TestTechnologyService:
         mock_session.delete.assert_not_called()
         mock_session.commit.assert_not_called()
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_delete_custom_technology_db_error(self, mock_get_session):
         """Test suppression avec erreur DB"""
         mock_session = MagicMock()
@@ -160,7 +172,9 @@ class TestTechnologyService:
 
         assert result is False
 
-    @patch('app.services.technology_service.TechnologyService.get_all_available_technologies')
+    @patch(
+        "app.services.technology_service.TechnologyService.get_all_available_technologies"
+    )
     def test_search_technologies(self, mock_get_all):
         """Test recherche de technologies"""
         mock_get_all.return_value = ["Python", "Java", "JavaScript", "SQL", "React"]
@@ -179,21 +193,21 @@ class TestTechnologyService:
         result = TechnologyService.search_technologies("xyz")
         assert result == []
 
-    @patch('app.services.technology_service.TECHNOLOGIES_REFERENTIEL')
-    @patch('app.services.technology_service.TechnologyService.get_custom_technologies')
+    @patch("app.services.technology_service.TECHNOLOGIES_REFERENTIEL")
+    @patch("app.services.technology_service.TechnologyService.get_custom_technologies")
     def test_get_technologies_by_category(self, mock_get_custom, mock_referentiel):
         """Test organisation des technologies par catégorie"""
         # Mock référentiel
         mock_referentiel.copy.return_value = {
             "Langages": ["Python", "Java"],
-            "Frameworks": ["React", "Angular"]
+            "Frameworks": ["React", "Angular"],
         }
 
         # Mock technologies personnalisées
         mock_get_custom.return_value = [
             {"nom": "CustomLang", "categorie": "Langages"},
             {"nom": "CustomFramework", "categorie": "Frameworks"},
-            {"nom": "NewCategoryTech", "categorie": "Nouvelles"}
+            {"nom": "NewCategoryTech", "categorie": "Nouvelles"},
         ]
 
         result = TechnologyService.get_technologies_by_category()

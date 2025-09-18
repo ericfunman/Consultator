@@ -17,7 +17,7 @@ from app.services.technology_service import TechnologyService
 class TestConsultantService:
     """Tests pour ConsultantService"""
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_all_consultants(self, mock_get_session):
         """Test récupération de tous les consultants"""
         # Mock de la session
@@ -68,7 +68,7 @@ class TestConsultantService:
         # Vérifier que la session a été fermée
         mock_get_session.return_value.__exit__.assert_called_once()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_create_consultant(self, mock_get_session):
         """Test création d'un consultant"""
         # Mock de la session
@@ -86,10 +86,10 @@ class TestConsultantService:
 
         # Données de test
         consultant_data = {
-            'nom': 'Dupont',
-            'prenom': 'Jean',
-            'email': 'jean.dupont@test.com',
-            'salaire_actuel': 50000
+            "nom": "Dupont",
+            "prenom": "Jean",
+            "email": "jean.dupont@test.com",
+            "salaire_actuel": 50000,
         }
 
         # Appel de la méthode
@@ -102,7 +102,7 @@ class TestConsultantService:
         # __exit__ est appelé 2 fois : une fois pour vérifier l'email, une fois pour créer
         assert mock_context.__exit__.call_count == 2
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_get_consultant_by_id(self, mock_get_session):
         """Test récupération d'un consultant par ID"""
         # Mock de la session
@@ -132,7 +132,7 @@ class TestConsultantService:
         # Vérifier que la session a été fermée
         mock_get_session.return_value.__exit__.assert_called_once()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_update_consultant(self, mock_get_session):
         """Test mise à jour d'un consultant"""
         # Mock de la session
@@ -152,7 +152,7 @@ class TestConsultantService:
         mock_query.first.return_value = mock_consultant
 
         # Données de mise à jour
-        update_data = {'salaire_actuel': 60000}
+        update_data = {"salaire_actuel": 60000}
 
         # Appel de la méthode
         result = ConsultantService.update_consultant(1, update_data)
@@ -163,7 +163,7 @@ class TestConsultantService:
         mock_session.commit.assert_called_once()
         mock_get_session.return_value.__exit__.assert_called_once()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_delete_consultant(self, mock_get_session):
         """Test suppression d'un consultant"""
         # Mock de la session
@@ -190,7 +190,7 @@ class TestConsultantService:
         mock_session.commit.assert_called_once()
         mock_get_session.return_value.__exit__.assert_called_once()
 
-    @patch('app.services.consultant_service.get_database_session')
+    @patch("app.services.consultant_service.get_database_session")
     def test_search_consultants(self, mock_get_session):
         """Test recherche de consultants"""
         # Mock de la session
@@ -221,7 +221,7 @@ class TestConsultantService:
 class TestPracticeService:
     """Tests pour PracticeService"""
 
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.get_session")
     def test_get_all_practices(self, mock_get_session):
         """Test récupération de toutes les practices"""
         # Mock de la session
@@ -256,7 +256,7 @@ class TestPracticeService:
         # Vérifier que la session a été fermée
         mock_session.close.assert_called_once()
 
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.get_session")
     def test_create_practice(self, mock_get_session):
         """Test création d'une practice"""
         # Mock de la session
@@ -271,9 +271,9 @@ class TestPracticeService:
 
         # Données de test
         practice_data = {
-            'nom': 'Technology',
-            'description': 'Practice technologique',
-            'responsable': 'Jean Dupont'
+            "nom": "Technology",
+            "description": "Practice technologique",
+            "responsable": "Jean Dupont",
         }
 
         # Appel de la méthode
@@ -285,7 +285,7 @@ class TestPracticeService:
         mock_session.commit.assert_called_once()
         mock_session.close.assert_called_once()
 
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.get_session")
     def test_get_practice_by_id(self, mock_get_session):
         """Test récupération d'une practice par ID"""
         # Mock de la session
@@ -314,7 +314,7 @@ class TestPracticeService:
         # Vérifier que la session a été fermée
         mock_session.close.assert_called_once()
 
-    @patch('app.services.practice_service.get_session')
+    @patch("app.services.practice_service.get_session")
     def test_get_consultants_by_practice(self, mock_get_session):
         """Test récupération des consultants d'une practice"""
         # Mock de la session
@@ -364,7 +364,7 @@ class TestPracticeService:
 class TestTechnologyService:
     """Tests pour TechnologyService"""
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_get_all_available_technologies(self, mock_get_session):
         """Test récupération de toutes les technologies disponibles"""
         # Mock de la session
@@ -387,14 +387,16 @@ class TestTechnologyService:
         result = TechnologyService.get_all_available_technologies()
 
         # Vérifications
-        assert len(result) >= 2  # Au moins les technologies du référentiel + personnalisées
+        assert (
+            len(result) >= 2
+        )  # Au moins les technologies du référentiel + personnalisées
         assert "CustomTech1" in result
         assert "CustomTech2" in result
 
         # Vérifier que la session a été fermée
         mock_get_session.return_value.__exit__.assert_called_once()
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_create_technology(self, mock_get_session):
         """Test création d'une technologie"""
         # Mock de la session
@@ -408,10 +410,7 @@ class TestTechnologyService:
         mock_query.first.return_value = None  # Technologie n'existe pas encore
 
         # Données de test
-        technology_data = {
-            'name': 'Python',
-            'category': 'Language'
-        }
+        technology_data = {"name": "Python", "category": "Language"}
 
         # Appel de la méthode
         result = TechnologyService.add_custom_technology(**technology_data)
@@ -424,7 +423,7 @@ class TestTechnologyService:
         # Vérifier que la session a été fermée
         mock_get_session.return_value.__exit__.assert_called_once()
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_get_custom_technologies(self, mock_get_session):
         """Test récupération des technologies personnalisées"""
         # Mock de la session
@@ -460,7 +459,7 @@ class TestTechnologyService:
         # Vérifier que la session a été fermée
         mock_get_session.return_value.__exit__.assert_called_once()
 
-    @patch('app.services.technology_service.get_database_session')
+    @patch("app.services.technology_service.get_database_session")
     def test_search_technologies(self, mock_get_session):
         """Test recherche de technologies"""
         # Mock de la session
@@ -490,7 +489,7 @@ class TestTechnologyService:
 class TestBusinessManagerService:
     """Tests pour BusinessManagerService"""
 
-    @patch('app.services.business_manager_service.get_database_session')
+    @patch("app.services.business_manager_service.get_database_session")
     def test_get_all_business_managers(self, mock_get_session):
         """Test récupération de tous les business managers"""
         # Mock de la session
@@ -525,12 +524,22 @@ class TestBusinessManagerService:
 
         # Mock de la query pour compter les consultants - retourner des données sérialisables
         mock_count_query = Mock()
-        mock_session.query.side_effect = lambda *args, **kwargs: mock_bm_query if args and hasattr(args[0], '__name__') and 'BusinessManager' in str(args[0]) else mock_count_query
+        mock_session.query.side_effect = lambda *args, **kwargs: (
+            mock_bm_query
+            if args
+            and hasattr(args[0], "__name__")
+            and "BusinessManager" in str(args[0])
+            else mock_count_query
+        )
         mock_count_query.filter.return_value = mock_count_query
         mock_count_query.count.return_value = 5
 
         # Patch de la fonction pour éviter le cache Streamlit
-        with patch.object(BusinessManagerService, 'get_all_business_managers', wraps=BusinessManagerService.get_all_business_managers) as mock_method:
+        with patch.object(
+            BusinessManagerService,
+            "get_all_business_managers",
+            wraps=BusinessManagerService.get_all_business_managers,
+        ) as mock_method:
             # Mock de la vraie fonction pour retourner des données sérialisables
             mock_method.return_value = [
                 {
@@ -542,7 +551,7 @@ class TestBusinessManagerService:
                     "actif": True,
                     "consultants_count": 5,
                     "date_creation": "2023-01-01",
-                    "notes": "Test manager"
+                    "notes": "Test manager",
                 },
                 {
                     "id": 2,
@@ -553,8 +562,8 @@ class TestBusinessManagerService:
                     "actif": True,
                     "consultants_count": 5,
                     "date_creation": "2023-01-02",
-                    "notes": "Test manager 2"
-                }
+                    "notes": "Test manager 2",
+                },
             ]
 
             # Appel de la méthode
@@ -565,7 +574,7 @@ class TestBusinessManagerService:
             assert result[0]["nom"] == "Durand"
             assert result[1]["nom"] == "Moreau"
 
-    @patch('app.services.business_manager_service.get_database_session')
+    @patch("app.services.business_manager_service.get_database_session")
     def test_get_business_manager_by_id(self, mock_get_session):
         """Test récupération d'un business manager par ID"""
         # Mock de la session
@@ -594,7 +603,7 @@ class TestBusinessManagerService:
         # Vérifier que la session a été fermée
         mock_get_session.return_value.__exit__.assert_called_once()
 
-    @patch('app.services.business_manager_service.get_database_session')
+    @patch("app.services.business_manager_service.get_database_session")
     def test_search_business_managers(self, mock_get_session):
         """Test recherche de business managers"""
         # Mock de la session
@@ -638,9 +647,11 @@ class TestBusinessManagerService:
 class TestServiceIntegration:
     """Tests d'intégration entre services"""
 
-    @patch('app.services.consultant_service.get_database_session')
-    @patch('app.services.technology_service.get_database_session')
-    def test_consultant_technologies_integration(self, mock_technology_get_session, mock_consultant_get_session):
+    @patch("app.services.consultant_service.get_database_session")
+    @patch("app.services.technology_service.get_database_session")
+    def test_consultant_technologies_integration(
+        self, mock_technology_get_session, mock_consultant_get_session
+    ):
         """Test intégration consultant-technologies"""
         # Mock pour ConsultantService
         mock_consultant_session = Mock()
@@ -683,9 +694,11 @@ class TestServiceIntegration:
 
         # Note: Les context managers gèrent automatiquement la fermeture des sessions
 
-    @patch('app.services.practice_service.get_database_session')
-    @patch('app.services.consultant_service.get_database_session')
-    def test_practice_consultants_integration(self, mock_consultant_get_session, mock_practice_get_session):
+    @patch("app.services.practice_service.get_database_session")
+    @patch("app.services.consultant_service.get_database_session")
+    def test_practice_consultants_integration(
+        self, mock_consultant_get_session, mock_practice_get_session
+    ):
         """Test intégration practice-consultants"""
         # Mock pour PracticeService
         mock_practice_session = Mock()
@@ -732,47 +745,49 @@ class TestServiceIntegration:
         """Test transformation des données entre services"""
         # Simuler des données brutes
         raw_consultant_data = {
-            'nom': 'Dupont',
-            'prenom': 'Jean',
-            'email': 'jean.dupont@test.com',
-            'salaire_actuel': 50000,
-            'practice_id': 1,
-            'business_manager_id': 1
+            "nom": "Dupont",
+            "prenom": "Jean",
+            "email": "jean.dupont@test.com",
+            "salaire_actuel": 50000,
+            "practice_id": 1,
+            "business_manager_id": 1,
         }
 
         # Transformation pour l'affichage
         display_data = {
-            'nom_complet': f"{raw_consultant_data['prenom']} {raw_consultant_data['nom']}",
-            'email': raw_consultant_data['email'],
-            'salaire_formate': f"{raw_consultant_data['salaire_actuel']:,} €".replace(",", " "),
-            'practice_id': raw_consultant_data['practice_id'],
-            'manager_id': raw_consultant_data['business_manager_id']
+            "nom_complet": f"{raw_consultant_data['prenom']} {raw_consultant_data['nom']}",
+            "email": raw_consultant_data["email"],
+            "salaire_formate": f"{raw_consultant_data['salaire_actuel']:,} €".replace(
+                ",", " "
+            ),
+            "practice_id": raw_consultant_data["practice_id"],
+            "manager_id": raw_consultant_data["business_manager_id"],
         }
 
         # Vérifications
-        assert display_data['nom_complet'] == 'Jean Dupont'
-        assert display_data['salaire_formate'] == '50 000 €'
-        assert display_data['email'] == 'jean.dupont@test.com'
+        assert display_data["nom_complet"] == "Jean Dupont"
+        assert display_data["salaire_formate"] == "50 000 €"
+        assert display_data["email"] == "jean.dupont@test.com"
 
     def test_service_error_handling(self):
         """Test gestion d'erreurs dans les services"""
         # Test avec des données invalides
         invalid_data = {
-            'nom': '',  # Nom vide
-            'email': 'invalid-email',  # Email invalide
-            'salaire_actuel': -1000  # Salaire négatif
+            "nom": "",  # Nom vide
+            "email": "invalid-email",  # Email invalide
+            "salaire_actuel": -1000,  # Salaire négatif
         }
 
         # Simuler la validation
         errors = []
 
-        if not invalid_data.get('nom'):
+        if not invalid_data.get("nom"):
             errors.append("Le nom est requis")
 
-        if invalid_data.get('email') and '@' not in invalid_data['email']:
+        if invalid_data.get("email") and "@" not in invalid_data["email"]:
             errors.append("L'email n'est pas valide")
 
-        if invalid_data.get('salaire_actuel', 0) < 0:
+        if invalid_data.get("salaire_actuel", 0) < 0:
             errors.append("Le salaire ne peut pas être négatif")
 
         # Vérifications
@@ -802,21 +817,45 @@ class TestServiceIntegration:
         """Test recherche et filtrage dans les services"""
         # Simuler des données de consultants
         consultants_data = [
-            {'id': 1, 'nom': 'Dupont', 'prenom': 'Jean', 'practice': 'Tech', 'ville': 'Paris'},
-            {'id': 2, 'nom': 'Martin', 'prenom': 'Marie', 'practice': 'Finance', 'ville': 'Lyon'},
-            {'id': 3, 'nom': 'Bernard', 'prenom': 'Pierre', 'practice': 'Tech', 'ville': 'Paris'},
-            {'id': 4, 'nom': 'Durand', 'prenom': 'Sophie', 'practice': 'Marketing', 'ville': 'Marseille'}
+            {
+                "id": 1,
+                "nom": "Dupont",
+                "prenom": "Jean",
+                "practice": "Tech",
+                "ville": "Paris",
+            },
+            {
+                "id": 2,
+                "nom": "Martin",
+                "prenom": "Marie",
+                "practice": "Finance",
+                "ville": "Lyon",
+            },
+            {
+                "id": 3,
+                "nom": "Bernard",
+                "prenom": "Pierre",
+                "practice": "Tech",
+                "ville": "Paris",
+            },
+            {
+                "id": 4,
+                "nom": "Durand",
+                "prenom": "Sophie",
+                "practice": "Marketing",
+                "ville": "Marseille",
+            },
         ]
 
         # Test de filtrage par practice
-        tech_consultants = [c for c in consultants_data if c['practice'] == 'Tech']
+        tech_consultants = [c for c in consultants_data if c["practice"] == "Tech"]
         assert len(tech_consultants) == 2
 
         # Test de recherche par nom
-        search_results = [c for c in consultants_data if 'Martin' in c['nom']]
+        search_results = [c for c in consultants_data if "Martin" in c["nom"]]
         assert len(search_results) == 1
-        assert search_results[0]['prenom'] == 'Marie'
+        assert search_results[0]["prenom"] == "Marie"
 
         # Test de filtrage par ville
-        paris_consultants = [c for c in consultants_data if c['ville'] == 'Paris']
+        paris_consultants = [c for c in consultants_data if c["ville"] == "Paris"]
         assert len(paris_consultants) == 2

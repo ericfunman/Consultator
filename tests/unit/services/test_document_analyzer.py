@@ -140,7 +140,10 @@ class TestDocumentAnalyzer:
     def test_clean_client_name(self):
         """Test nettoyage du nom de client"""
         assert DocumentAnalyzer._clean_client_name("BNP PARIBAS") == "Bnp Paribas"
-        assert DocumentAnalyzer._clean_client_name("société générale!") == "Société Générale"
+        assert (
+            DocumentAnalyzer._clean_client_name("société générale!")
+            == "Société Générale"
+        )
         assert DocumentAnalyzer._clean_client_name("ABC") == "Abc"
 
     def test_date_sort_key(self):
@@ -150,11 +153,13 @@ class TestDocumentAnalyzer:
         assert DocumentAnalyzer._date_sort_key("En cours") == "9999-12-31"
         assert DocumentAnalyzer._date_sort_key("") == "9999-12-31"
 
-    @patch('app.services.document_analyzer.DocumentAnalyzer._extract_missions')
-    @patch('app.services.document_analyzer.DocumentAnalyzer._extract_technical_skills')
-    @patch('app.services.document_analyzer.DocumentAnalyzer._extract_functional_skills')
-    @patch('app.services.document_analyzer.DocumentAnalyzer._extract_general_info')
-    def test_analyze_cv_content(self, mock_general_info, mock_functional, mock_technical, mock_missions):
+    @patch("app.services.document_analyzer.DocumentAnalyzer._extract_missions")
+    @patch("app.services.document_analyzer.DocumentAnalyzer._extract_technical_skills")
+    @patch("app.services.document_analyzer.DocumentAnalyzer._extract_functional_skills")
+    @patch("app.services.document_analyzer.DocumentAnalyzer._extract_general_info")
+    def test_analyze_cv_content(
+        self, mock_general_info, mock_functional, mock_technical, mock_missions
+    ):
         """Test analyse complète du contenu CV"""
         # Mocks
         mock_missions.return_value = [
@@ -162,7 +167,7 @@ class TestDocumentAnalyzer:
                 "client": "BNP Paribas",
                 "date_debut": "2023-01-01",
                 "date_fin": "En cours",
-                "langages_techniques": ["Python", "SQL"]
+                "langages_techniques": ["Python", "SQL"],
             }
         ]
         mock_technical.return_value = ["Python", "SQL", "Docker"]
@@ -185,20 +190,20 @@ class TestDocumentAnalyzer:
                 "client": "BNP Paribas",
                 "date_debut": "2023-01-01",
                 "date_fin": "En cours",
-                "resume": "Développement application"
+                "resume": "Développement application",
             },
             {
                 "client": "BNP Paribas",
                 "date_debut": "2023-01-01",
                 "date_fin": "En cours",
-                "resume": "Développement application"  # Doublon
+                "resume": "Développement application",  # Doublon
             },
             {
                 "client": "Société Générale",
                 "date_debut": "2022-01-01",
                 "date_fin": "2022-12-31",
-                "resume": "Analyse fonctionnelle"
-            }
+                "resume": "Analyse fonctionnelle",
+            },
         ]
 
         cleaned = DocumentAnalyzer._clean_and_deduplicate_missions(missions)
@@ -251,13 +256,13 @@ class TestDocumentAnalyzer:
                     "date_debut": "2023-01-01",
                     "date_fin": "En cours",
                     "resume": "Développement d'application de trading",
-                    "langages_techniques": ["Python", "SQL"]
+                    "langages_techniques": ["Python", "SQL"],
                 }
             ],
             "langages_techniques": ["Python", "SQL", "Docker"],
             "competences_fonctionnelles": ["Management", "Agile"],
             "informations_generales": {"email": "jean@email.com"},
-            "texte_brut": "Aperçu du texte extrait..."
+            "texte_brut": "Aperçu du texte extrait...",
         }
 
         preview = DocumentAnalyzer.get_analysis_preview(analysis_data)
