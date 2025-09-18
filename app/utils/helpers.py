@@ -192,8 +192,9 @@ def round_to_nearest(value: float, nearest: float) -> float:
     try:
         # Utiliser decimal pour éviter les problèmes de précision flottante
         from decimal import Decimal, ROUND_HALF_UP
+
         result = Decimal(str(value)) / Decimal(str(nearest))
-        result = result.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+        result = result.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
         result = result * Decimal(str(nearest))
         return float(result)
     except (ZeroDivisionError, TypeError, ValueError):
@@ -232,7 +233,7 @@ def validate_email(email: str) -> bool:
     if not email or not isinstance(email, str):
         return False
 
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return re.match(pattern, email.strip()) is not None
 
 
@@ -250,10 +251,10 @@ def validate_phone(phone: str) -> bool:
         return False
 
     # Nettoyer les espaces et caractères spéciaux
-    cleaned = re.sub(r'[\s\-\(\)\.]', '', phone.strip())
+    cleaned = re.sub(r"[\s\-\(\)\.]", "", phone.strip())
 
     # Formats acceptés : 10 chiffres, ou +33 suivi de 9 chiffres
-    if cleaned.startswith('+33'):
+    if cleaned.startswith("+33"):
         return len(cleaned) == 12 and cleaned[3:].isdigit()
     else:
         return len(cleaned) == 10 and cleaned.isdigit()
@@ -274,7 +275,7 @@ def validate_date(date_str: str) -> bool:
 
     try:
         # Essayer différents formats
-        for fmt in ['%Y-%m-%d', '%d/%m/%Y', '%d-%m-%Y']:
+        for fmt in ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"]:
             try:
                 datetime.strptime(date_str, fmt)
                 return True
@@ -323,10 +324,10 @@ def clean_string(text: str) -> str:
     cleaned = text.strip()
 
     # Remplacer les espaces multiples par un seul
-    cleaned = re.sub(r'\s+', ' ', cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned)
 
     # Supprimer les caractères de contrôle
-    cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', cleaned)
+    cleaned = re.sub(r"[\x00-\x1f\x7f-\x9f]", "", cleaned)
 
     return cleaned
 
@@ -348,8 +349,10 @@ def normalize_text(text: str) -> str:
     normalized = text.lower()
 
     # Supprimer les accents
-    normalized = unicodedata.normalize('NFD', normalized)
-    normalized = ''.join(char for char in normalized if unicodedata.category(char) != 'Mn')
+    normalized = unicodedata.normalize("NFD", normalized)
+    normalized = "".join(
+        char for char in normalized if unicodedata.category(char) != "Mn"
+    )
 
     return normalized
 
@@ -371,10 +374,10 @@ def slugify(text: str) -> str:
     normalized = normalize_text(text)
 
     # Remplacer les espaces et caractères spéciaux par des tirets
-    slug = re.sub(r'[^a-z0-9]+', '-', normalized)
+    slug = re.sub(r"[^a-z0-9]+", "-", normalized)
 
     # Supprimer les tirets en début et fin
-    slug = slug.strip('-')
+    slug = slug.strip("-")
 
     return slug
 
@@ -401,11 +404,11 @@ def truncate_text(text: str, max_length: int) -> str:
     if max_length <= 3:
         return text[:max_length]
 
-    truncated = text[:max_length - 3].rstrip()
+    truncated = text[: max_length - 3].rstrip()
     # Si après rstrip on a perdu des caractères, essayer de récupérer
     if len(truncated) < max_length - 3 and len(text) > len(truncated):
         additional_chars = (max_length - 3) - len(truncated)
-        truncated = text[:len(truncated) + additional_chars].rstrip()
+        truncated = text[: len(truncated) + additional_chars].rstrip()
 
     return truncated + "..."
 
@@ -425,7 +428,7 @@ def split_list_into_chunks(data: list, chunk_size: int) -> list:
         return []
 
     try:
-        return [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
+        return [data[i : i + chunk_size] for i in range(0, len(data), chunk_size)]
     except (TypeError, ValueError):
         return []
 

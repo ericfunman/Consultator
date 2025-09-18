@@ -863,11 +863,25 @@ class DocumentAnalyzer:
 
                 # Filtre pour éviter les faux positifs
                 client_lower = client.lower()
-                if any(word in client_lower for word in [
-                    "particulier", "spécifique", "général", "simple", "basique",
-                    "standard", "classique", "ordinaire", "commun", "habituel",
-                    "typique", "normal", "ordinaire", "banal"
-                ]):
+                if any(
+                    word in client_lower
+                    for word in [
+                        "particulier",
+                        "spécifique",
+                        "général",
+                        "simple",
+                        "basique",
+                        "standard",
+                        "classique",
+                        "ordinaire",
+                        "commun",
+                        "habituel",
+                        "typique",
+                        "normal",
+                        "ordinaire",
+                        "banal",
+                    ]
+                ):
                     continue
 
                 if 3 < len(client) < 60:
