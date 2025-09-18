@@ -29,7 +29,24 @@ jobs:
 
     - name: Initialize database
       run: |
-        python -c "from app.database.database import init_database; init_database()"
+        python -c "
+        from app.database.database import init_database, reset_database
+        from app.database.models import Base
+        from sqlalchemy import create_engine
+        print('🔧 Initialisation complète de la base de données...')
+        
+        # Force la création de toutes les tables
+        engine = create_engine('sqlite:///test_consultator.db')
+        Base.metadata.create_all(engine)
+        
+        # Initialisation standard
+        init_database()
+        print('✅ Base de données initialisée avec toutes les tables')
+        "
+
+    - name: Verify database setup
+      run: |
+        python verify_db_setup.py
 
     - name: Clean pytest cache
       run: |
