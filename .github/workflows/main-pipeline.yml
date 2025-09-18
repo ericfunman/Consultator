@@ -124,6 +124,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-test.txt
+        # Installer explicitement les outils de qualité
+        pip install black isort flake8 pylint bandit
 
     - name: Run Black (code formatting)
       run: |

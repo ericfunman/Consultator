@@ -15,7 +15,7 @@ from app.database.models import Practice, Consultant, Mission
 
 # Fixtures pour les tests de statistiques
 @pytest.fixture
-def statistics_test_data():
+def statistics_test_data(test_db):
     """Créer un jeu de données complet pour les tests de statistiques"""
 
     # Créer des practices
@@ -40,7 +40,7 @@ def statistics_test_data():
     practice_ids = []
 
     for practice_data in practices_data:
-        with get_database_session() as session:
+        with test_db() as session:
             practice = Practice(**practice_data)
             session.add(practice)
             session.commit()
@@ -197,7 +197,7 @@ def statistics_test_data():
 
     for practice_id in practice_ids:
         try:
-            with get_database_session() as session:
+            with test_db() as session:
                 practice = (
                     session.query(Practice).filter(Practice.id == practice_id).first()
                 )
