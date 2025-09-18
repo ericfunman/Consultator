@@ -49,9 +49,9 @@ st_mock.cache_data = Mock()
 class TestPageStructure:
     """Tests pour la structure générale des pages"""
 
-    @patch('streamlit.title')
-    @patch('streamlit.header')
-    @patch('streamlit.subheader')
+    @patch("streamlit.title")
+    @patch("streamlit.header")
+    @patch("streamlit.subheader")
     def test_page_title_structure(self, mock_subheader, mock_header, mock_title):
         """Test structure des titres de page"""
         # Simuler l'appel à st.title
@@ -61,7 +61,7 @@ class TestPageStructure:
         mock_title("Test Page")
         mock_title.assert_called_once_with("Test Page")
 
-    @patch('streamlit.columns')
+    @patch("streamlit.columns")
     def test_page_layout_columns(self, mock_columns):
         """Test mise en page avec colonnes"""
         mock_col1 = MagicMock()
@@ -75,7 +75,7 @@ class TestPageStructure:
         assert col1 is not None
         assert col2 is not None
 
-    @patch('streamlit.tabs')
+    @patch("streamlit.tabs")
     def test_page_tabs_structure(self, mock_tabs):
         """Test structure avec onglets"""
         mock_tab1 = MagicMock()
@@ -93,8 +93,8 @@ class TestPageStructure:
 class TestFormHandling:
     """Tests pour la gestion des formulaires"""
 
-    @patch('streamlit.form')
-    @patch('streamlit.form_submit_button')
+    @patch("streamlit.form")
+    @patch("streamlit.form_submit_button")
     def test_form_creation_and_submission(self, mock_submit, mock_form):
         """Test création et soumission de formulaire"""
         mock_form_instance = MagicMock()
@@ -108,11 +108,13 @@ class TestFormHandling:
         assert submitted is False
         mock_form.assert_called_once_with("test_form")
 
-    @patch('streamlit.form')
-    @patch('streamlit.form_submit_button')
-    @patch('streamlit.text_input')
-    @patch('streamlit.selectbox')
-    def test_form_data_collection(self, mock_selectbox, mock_text_input, mock_submit, mock_form):
+    @patch("streamlit.form")
+    @patch("streamlit.form_submit_button")
+    @patch("streamlit.text_input")
+    @patch("streamlit.selectbox")
+    def test_form_data_collection(
+        self, mock_selectbox, mock_text_input, mock_submit, mock_form
+    ):
         """Test collecte des données de formulaire"""
         mock_form_instance = MagicMock()
         mock_form.return_value = mock_form_instance
@@ -134,13 +136,13 @@ class TestFormHandling:
 class TestDataDisplay:
     """Tests pour l'affichage des données"""
 
-    @patch('streamlit.dataframe')
+    @patch("streamlit.dataframe")
     def test_dataframe_display(self, mock_dataframe):
         """Test affichage de DataFrame"""
         test_data = {
-            'Nom': ['Dupont', 'Martin', 'Bernard'],
-            'Prénom': ['Jean', 'Marie', 'Pierre'],
-            'Salaire': [50000, 55000, 60000]
+            "Nom": ["Dupont", "Martin", "Bernard"],
+            "Prénom": ["Jean", "Marie", "Pierre"],
+            "Salaire": [50000, 55000, 60000],
         }
         df = pd.DataFrame(test_data)
 
@@ -149,20 +151,17 @@ class TestDataDisplay:
 
         mock_dataframe.assert_called_once()
 
-    @patch('streamlit.table')
+    @patch("streamlit.table")
     def test_table_display(self, mock_table):
         """Test affichage de table"""
-        test_data = [
-            ['Dupont', 'Jean', 50000],
-            ['Martin', 'Marie', 55000]
-        ]
+        test_data = [["Dupont", "Jean", 50000], ["Martin", "Marie", 55000]]
 
         # Simuler l'affichage de la table
         mock_table(test_data)
 
         mock_table.assert_called_once_with(test_data)
 
-    @patch('streamlit.metric')
+    @patch("streamlit.metric")
     def test_metrics_display(self, mock_metric):
         """Test affichage de métriques"""
         # Simuler l'affichage de métriques
@@ -171,14 +170,13 @@ class TestDataDisplay:
 
         assert mock_metric.call_count == 2
 
-    @patch('streamlit.bar_chart')
-    @patch('streamlit.line_chart')
+    @patch("streamlit.bar_chart")
+    @patch("streamlit.line_chart")
     def test_charts_display(self, mock_line_chart, mock_bar_chart):
         """Test affichage de graphiques"""
-        chart_data = pd.DataFrame({
-            'Mois': ['Jan', 'Fev', 'Mar'],
-            'Valeur': [100, 150, 200]
-        })
+        chart_data = pd.DataFrame(
+            {"Mois": ["Jan", "Fev", "Mar"], "Valeur": [100, 150, 200]}
+        )
 
         # Simuler l'affichage de graphiques
         mock_bar_chart(chart_data)
@@ -191,7 +189,7 @@ class TestDataDisplay:
 class TestUserInteraction:
     """Tests pour les interactions utilisateur"""
 
-    @patch('streamlit.button')
+    @patch("streamlit.button")
     def test_button_interaction(self, mock_button):
         """Test interaction avec boutons"""
         mock_button.return_value = True
@@ -202,7 +200,7 @@ class TestUserInteraction:
         assert clicked is True
         mock_button.assert_called_once_with("Cliquez-moi")
 
-    @patch('streamlit.checkbox')
+    @patch("streamlit.checkbox")
     def test_checkbox_interaction(self, mock_checkbox):
         """Test interaction avec cases à cocher"""
         mock_checkbox.return_value = True
@@ -213,7 +211,7 @@ class TestUserInteraction:
         assert checked is True
         mock_checkbox.assert_called_once_with("Activer l'option")
 
-    @patch('streamlit.selectbox')
+    @patch("streamlit.selectbox")
     def test_selectbox_interaction(self, mock_selectbox):
         """Test interaction avec liste déroulante"""
         options = ["Option 1", "Option 2", "Option 3"]
@@ -225,7 +223,7 @@ class TestUserInteraction:
         assert selected == "Option 2"
         mock_selectbox.assert_called_once_with("Choisir une option", options)
 
-    @patch('streamlit.multiselect')
+    @patch("streamlit.multiselect")
     def test_multiselect_interaction(self, mock_multiselect):
         """Test interaction avec sélection multiple"""
         options = ["Tech", "Finance", "Marketing"]
@@ -241,8 +239,8 @@ class TestUserInteraction:
 class TestInputValidation:
     """Tests pour la validation des entrées"""
 
-    @patch('streamlit.text_input')
-    @patch('streamlit.error')
+    @patch("streamlit.text_input")
+    @patch("streamlit.error")
     def test_text_input_validation(self, mock_error, mock_text_input):
         """Test validation des entrées texte"""
         mock_text_input.return_value = ""
@@ -255,8 +253,8 @@ class TestInputValidation:
 
         mock_error.assert_called_once_with("Le nom est requis")
 
-    @patch('streamlit.number_input')
-    @patch('streamlit.warning')
+    @patch("streamlit.number_input")
+    @patch("streamlit.warning")
     def test_number_input_validation(self, mock_warning, mock_number_input):
         """Test validation des entrées numériques"""
         mock_number_input.return_value = -100
@@ -269,8 +267,8 @@ class TestInputValidation:
 
         mock_warning.assert_called_once_with("Le salaire doit être positif")
 
-    @patch('streamlit.date_input')
-    @patch('streamlit.info')
+    @patch("streamlit.date_input")
+    @patch("streamlit.info")
     def test_date_input_validation(self, mock_info, mock_date_input):
         """Test validation des entrées de date"""
         future_date = date.today().replace(year=date.today().year + 1)
@@ -288,9 +286,9 @@ class TestInputValidation:
 class TestPageIntegration:
     """Tests d'intégration pour les pages"""
 
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
+    @patch("streamlit.title")
+    @patch("streamlit.columns")
+    @patch("streamlit.metric")
     def test_dashboard_page_structure(self, mock_metric, mock_columns, mock_title):
         """Test structure d'une page dashboard"""
         mock_col1 = MagicMock()
@@ -312,13 +310,14 @@ class TestPageIntegration:
         mock_columns.assert_called_once_with(2)
         assert mock_metric.call_count == 2
 
-    @patch('streamlit.form')
-    @patch('streamlit.text_input')
-    @patch('streamlit.selectbox')
-    @patch('streamlit.form_submit_button')
-    @patch('streamlit.success')
-    def test_form_page_workflow(self, mock_success, mock_submit, mock_selectbox,
-                               mock_text_input, mock_form):
+    @patch("streamlit.form")
+    @patch("streamlit.text_input")
+    @patch("streamlit.selectbox")
+    @patch("streamlit.form_submit_button")
+    @patch("streamlit.success")
+    def test_form_page_workflow(
+        self, mock_success, mock_submit, mock_selectbox, mock_text_input, mock_form
+    ):
         """Test workflow complet d'une page avec formulaire"""
         mock_form_instance = MagicMock()
         mock_form.return_value = mock_form_instance
@@ -337,9 +336,9 @@ class TestPageIntegration:
 
         mock_success.assert_called_once_with("Consultant Dupont créé avec succès !")
 
-    @patch('streamlit.tabs')
-    @patch('streamlit.dataframe')
-    @patch('streamlit.button')
+    @patch("streamlit.tabs")
+    @patch("streamlit.dataframe")
+    @patch("streamlit.button")
     def test_tabs_page_structure(self, mock_button, mock_dataframe, mock_tabs):
         """Test structure d'une page avec onglets"""
         mock_tab1 = MagicMock()
@@ -352,7 +351,7 @@ class TestPageIntegration:
 
         with mock_tab1:
             # Simuler l'affichage de la liste
-            test_df = pd.DataFrame({'Nom': ['Dupont', 'Martin']})
+            test_df = pd.DataFrame({"Nom": ["Dupont", "Martin"]})
             mock_dataframe(test_df)
 
         with mock_tab2:
@@ -367,7 +366,7 @@ class TestPageIntegration:
 class TestErrorHandling:
     """Tests pour la gestion d'erreurs"""
 
-    @patch('streamlit.error')
+    @patch("streamlit.error")
     def test_error_display(self, mock_error):
         """Test affichage des erreurs"""
         error_message = "Une erreur s'est produite"
@@ -377,7 +376,7 @@ class TestErrorHandling:
 
         mock_error.assert_called_once_with(error_message)
 
-    @patch('streamlit.warning')
+    @patch("streamlit.warning")
     def test_warning_display(self, mock_warning):
         """Test affichage des avertissements"""
         warning_message = "Attention : données manquantes"
@@ -387,7 +386,7 @@ class TestErrorHandling:
 
         mock_warning.assert_called_once_with(warning_message)
 
-    @patch('streamlit.success')
+    @patch("streamlit.success")
     def test_success_display(self, mock_success):
         """Test affichage des messages de succès"""
         success_message = "Opération réussie"
@@ -397,7 +396,7 @@ class TestErrorHandling:
 
         mock_success.assert_called_once_with(success_message)
 
-    @patch('streamlit.info')
+    @patch("streamlit.info")
     def test_info_display(self, mock_info):
         """Test affichage des informations"""
         info_message = "Traitement en cours..."
@@ -416,23 +415,23 @@ class TestDataProcessing:
         # Simuler des données de consultants
         consultants_data = [
             {
-                'id': 1,
-                'nom': 'Dupont',
-                'prenom': 'Jean',
-                'email': 'jean.dupont@test.com',
-                'salaire_actuel': 50000,
-                'disponibilite': True,
-                'grade': 'Senior'
+                "id": 1,
+                "nom": "Dupont",
+                "prenom": "Jean",
+                "email": "jean.dupont@test.com",
+                "salaire_actuel": 50000,
+                "disponibilite": True,
+                "grade": "Senior",
             },
             {
-                'id': 2,
-                'nom': 'Martin',
-                'prenom': 'Marie',
-                'email': 'marie.martin@test.com',
-                'salaire_actuel': 55000,
-                'disponibilite': False,
-                'grade': 'Lead'
-            }
+                "id": 2,
+                "nom": "Martin",
+                "prenom": "Marie",
+                "email": "marie.martin@test.com",
+                "salaire_actuel": 55000,
+                "disponibilite": False,
+                "grade": "Lead",
+            },
         ]
 
         # Créer le DataFrame
@@ -440,63 +439,63 @@ class TestDataProcessing:
 
         # Vérifications
         assert len(df) == 2
-        assert df.iloc[0]['nom'] == 'Dupont'
-        assert df.iloc[1]['salaire_actuel'] == 55000
-        assert df['disponibilite'].iloc[0] == True
+        assert df.iloc[0]["nom"] == "Dupont"
+        assert df.iloc[1]["salaire_actuel"] == 55000
+        assert df["disponibilite"].iloc[0] == True
 
     def test_chart_data_preparation(self):
         """Test préparation des données pour les graphiques"""
         # Simuler des données de missions
         missions_data = [
-            {'mois': 'Jan', 'revenus': 100000, 'consultants': 10},
-            {'mois': 'Fev', 'revenus': 120000, 'consultants': 12},
-            {'mois': 'Mar', 'revenus': 150000, 'consultants': 15}
+            {"mois": "Jan", "revenus": 100000, "consultants": 10},
+            {"mois": "Fev", "revenus": 120000, "consultants": 12},
+            {"mois": "Mar", "revenus": 150000, "consultants": 15},
         ]
 
         df = pd.DataFrame(missions_data)
 
         # Vérifications pour graphiques
         assert len(df) == 3
-        assert 'revenus' in df.columns
-        assert 'consultants' in df.columns
-        assert df['revenus'].sum() == 370000
+        assert "revenus" in df.columns
+        assert "consultants" in df.columns
+        assert df["revenus"].sum() == 370000
 
     def test_filtering_and_search(self):
         """Test filtrage et recherche de données"""
         # Simuler des données de compétences
         competences_data = [
-            {'nom': 'Python', 'categorie': 'Technique', 'niveau': 'Expert'},
-            {'nom': 'Java', 'categorie': 'Technique', 'niveau': 'Avancé'},
-            {'nom': 'SQL', 'categorie': 'Technique', 'niveau': 'Intermédiaire'},
-            {'nom': 'Management', 'categorie': 'Fonctionnel', 'niveau': 'Senior'}
+            {"nom": "Python", "categorie": "Technique", "niveau": "Expert"},
+            {"nom": "Java", "categorie": "Technique", "niveau": "Avancé"},
+            {"nom": "SQL", "categorie": "Technique", "niveau": "Intermédiaire"},
+            {"nom": "Management", "categorie": "Fonctionnel", "niveau": "Senior"},
         ]
 
         df = pd.DataFrame(competences_data)
 
         # Test de filtrage par catégorie
-        technique_df = df[df['categorie'] == 'Technique']
+        technique_df = df[df["categorie"] == "Technique"]
         assert len(technique_df) == 3
 
         # Test de recherche par nom
-        python_df = df[df['nom'].str.contains('Python', case=False)]
+        python_df = df[df["nom"].str.contains("Python", case=False)]
         assert len(python_df) == 1
-        assert python_df.iloc[0]['nom'] == 'Python'
+        assert python_df.iloc[0]["nom"] == "Python"
 
     def test_aggregation_calculations(self):
         """Test calculs d'agrégation"""
         # Simuler des données financières
         financial_data = [
-            {'consultant': 'Dupont', 'revenus': 50000, 'missions': 2},
-            {'consultant': 'Martin', 'revenus': 75000, 'missions': 3},
-            {'consultant': 'Bernard', 'revenus': 60000, 'missions': 2}
+            {"consultant": "Dupont", "revenus": 50000, "missions": 2},
+            {"consultant": "Martin", "revenus": 75000, "missions": 3},
+            {"consultant": "Bernard", "revenus": 60000, "missions": 2},
         ]
 
         df = pd.DataFrame(financial_data)
 
         # Calculs d'agrégation
-        total_revenus = df['revenus'].sum()
-        moyenne_revenus = df['revenus'].mean()
-        total_missions = df['missions'].sum()
+        total_revenus = df["revenus"].sum()
+        moyenne_revenus = df["revenus"].mean()
+        total_missions = df["missions"].sum()
 
         assert total_revenus == 185000
         assert moyenne_revenus == 61666.666666666664
@@ -506,16 +505,18 @@ class TestDataProcessing:
         """Test formatage des dates pour l'affichage"""
         # Simuler des données avec dates
         date_data = [
-            {'nom': 'Dupont', 'date_entree': date(2020, 1, 15)},
-            {'nom': 'Martin', 'date_entree': date(2019, 6, 1)},
-            {'nom': 'Bernard', 'date_entree': date(2021, 3, 20)}
+            {"nom": "Dupont", "date_entree": date(2020, 1, 15)},
+            {"nom": "Martin", "date_entree": date(2019, 6, 1)},
+            {"nom": "Bernard", "date_entree": date(2021, 3, 20)},
         ]
 
         df = pd.DataFrame(date_data)
 
         # Formatage des dates pour l'affichage (conversion explicite en datetime)
-        df['date_entree_formatted'] = pd.to_datetime(df['date_entree']).dt.strftime('%d/%m/%Y')
+        df["date_entree_formatted"] = pd.to_datetime(df["date_entree"]).dt.strftime(
+            "%d/%m/%Y"
+        )
 
-        assert df.iloc[0]['date_entree_formatted'] == '15/01/2020'
-        assert df.iloc[1]['date_entree_formatted'] == '01/06/2019'
-        assert df.iloc[2]['date_entree_formatted'] == '20/03/2021'
+        assert df.iloc[0]["date_entree_formatted"] == "15/01/2020"
+        assert df.iloc[1]["date_entree_formatted"] == "01/06/2019"
+        assert df.iloc[2]["date_entree_formatted"] == "20/03/2021"

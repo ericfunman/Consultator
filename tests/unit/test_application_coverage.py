@@ -27,7 +27,7 @@ class TestRealCodeExecution:
         from app.utils.skill_categories import (
             get_all_competences,
             get_competences_by_category,
-            get_all_categories
+            get_all_categories,
         )
 
         # Exécuter les vraies fonctions
@@ -46,14 +46,16 @@ class TestRealCodeExecution:
         assert isinstance(categories, dict)
         assert len(categories) > 0
 
-        print(f"✅ Module skill_categories exécuté: {len(all_competences)} catégories, {len(categories)} types")
+        print(
+            f"✅ Module skill_categories exécuté: {len(all_competences)} catégories, {len(categories)} types"
+        )
 
     def test_technologies_referentiel_real_execution(self):
         """Test exécution réelle du module technologies_referentiel"""
         from app.utils.technologies_referentiel import (
             get_all_technologies,
             get_technologies_by_category,
-            search_technologies
+            search_technologies,
         )
 
         # Exécuter les vraies fonctions
@@ -71,14 +73,23 @@ class TestRealCodeExecution:
         search_results = search_technologies("Python")
         assert search_results is not None
 
-        print(f"✅ Module technologies_referentiel exécuté: {len(all_technologies)} catégories")
+        print(
+            f"✅ Module technologies_referentiel exécuté: {len(all_technologies)} catégories"
+        )
 
     def test_database_models_real_import(self):
         """Test import réel des modèles de base de données"""
         from app.database.models import (
-            Base, Consultant, Practice, BusinessManager,
-            Mission, Competence, ConsultantCompetence,
-            Langue, ConsultantLangue, CV
+            Base,
+            Consultant,
+            Practice,
+            BusinessManager,
+            Mission,
+            Competence,
+            ConsultantCompetence,
+            Langue,
+            ConsultantLangue,
+            CV,
         )
 
         # Vérifier que les classes existent
@@ -100,7 +111,7 @@ class TestRealCodeExecution:
         from app.database.database import (
             get_database_session,
             init_database,
-            get_database_info
+            get_database_info,
         )
 
         # Vérifier que les fonctions existent
@@ -114,6 +125,7 @@ class TestRealCodeExecution:
         """Test import réel des services"""
         try:
             from app.services.consultant_service import ConsultantService
+
             assert ConsultantService is not None
             print("✅ ConsultantService importé avec succès")
         except ImportError:
@@ -121,6 +133,7 @@ class TestRealCodeExecution:
 
         try:
             from app.services.business_manager_service import BusinessManagerService
+
             assert BusinessManagerService is not None
             print("✅ BusinessManagerService importé avec succès")
         except ImportError:
@@ -128,6 +141,7 @@ class TestRealCodeExecution:
 
         try:
             from app.services.practice_service import PracticeService
+
             assert PracticeService is not None
             print("✅ PracticeService importé avec succès")
         except ImportError:
@@ -137,6 +151,7 @@ class TestRealCodeExecution:
         """Test import réel des modules de pages"""
         try:
             import app.pages_modules.consultants_page
+
             assert app.pages_modules.consultants_page is not None
             print("✅ Module consultants_page importé avec succès")
         except ImportError as e:
@@ -144,6 +159,7 @@ class TestRealCodeExecution:
 
         try:
             import app.pages_modules.business_managers_page
+
             assert app.pages_modules.business_managers_page is not None
             print("✅ Module business_managers_page importé avec succès")
         except ImportError as e:
@@ -151,6 +167,7 @@ class TestRealCodeExecution:
 
         try:
             import app.pages_modules.practices_page
+
             assert app.pages_modules.practices_page is not None
             print("✅ Module practices_page importé avec succès")
         except ImportError as e:

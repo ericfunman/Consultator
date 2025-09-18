@@ -1,6 +1,7 @@
 """
 Tests pour le module technologies_referentiel.py
 """
+
 import pytest
 from app.utils.technologies_referentiel import (
     TECHNOLOGIES_REFERENTIEL,
@@ -21,7 +22,11 @@ class TestTechnologiesReferentiel:
         assert len(TECHNOLOGIES_REFERENTIEL) > 0
 
         # Vérifier qu'il y a au moins quelques catégories attendues
-        expected_categories = ["Langages de programmation", "Frameworks Web", "Bases de données"]
+        expected_categories = [
+            "Langages de programmation",
+            "Frameworks Web",
+            "Bases de données",
+        ]
         for category in expected_categories:
             assert category in TECHNOLOGIES_REFERENTIEL
             assert isinstance(TECHNOLOGIES_REFERENTIEL[category], list)
@@ -187,7 +192,9 @@ class TestTechnologiesReferentiel:
         all_techs = get_all_technologies()
 
         for popular_tech in TECHNOLOGIES_POPULAIRES:
-            assert popular_tech in all_techs, f"Technologie populaire '{popular_tech}' manquante du référentiel"
+            assert (
+                popular_tech in all_techs
+            ), f"Technologie populaire '{popular_tech}' manquante du référentiel"
 
     def test_search_technologies_special_characters(self):
         """Test de recherche avec caractères spéciaux"""

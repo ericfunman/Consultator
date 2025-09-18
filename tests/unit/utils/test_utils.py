@@ -11,14 +11,26 @@ import tempfile
 import json
 
 from app.utils.helpers import (
-    format_currency, format_date, format_percentage,
-    calculate_age, calculate_experience_years,
-    validate_email, validate_phone, validate_date,
-    safe_divide, round_to_nearest, generate_id,
-    clean_string, normalize_text, slugify,
-    get_file_extension, is_valid_file_type,
-    calculate_percentage_change, format_number,
-    truncate_text, split_list_into_chunks
+    format_currency,
+    format_date,
+    format_percentage,
+    calculate_age,
+    calculate_experience_years,
+    validate_email,
+    validate_phone,
+    validate_date,
+    safe_divide,
+    round_to_nearest,
+    generate_id,
+    clean_string,
+    normalize_text,
+    slugify,
+    get_file_extension,
+    is_valid_file_type,
+    calculate_percentage_change,
+    format_number,
+    truncate_text,
+    split_list_into_chunks,
 )
 
 
@@ -133,7 +145,9 @@ class TestValidationUtils:
         """Test validation des types de fichiers"""
         assert is_valid_file_type("document.pdf", [".pdf", ".docx"]) is True
         assert is_valid_file_type("image.jpg", [".pdf", ".docx"]) is False
-        assert is_valid_file_type("document.PDF", [".pdf", ".docx"]) is True  # Case insensitive
+        assert (
+            is_valid_file_type("document.PDF", [".pdf", ".docx"]) is True
+        )  # Case insensitive
         assert is_valid_file_type("file", [".pdf"]) is False  # Pas d'extension
 
 
@@ -307,7 +321,9 @@ class TestIntegrationUtils:
         truncated = truncate_text(normalized, 20)
         slug = slugify(truncated)
 
-        assert len(truncated) <= 23  # 20 + "..." mais peut être moins si rstrip supprime des caractères
+        assert (
+            len(truncated) <= 23
+        )  # 20 + "..." mais peut être moins si rstrip supprime des caractères
         assert "..." in truncated or len(normalized) <= 20
         assert isinstance(slug, str)
         assert " " not in slug
@@ -322,18 +338,18 @@ class TestIntegrationUtils:
             "telephone": "01 23 45 67 89",
             "salaire": 50000.50,
             "date_naissance": date(1990, 1, 1),
-            "description": "Consultant expérimenté en Python"
+            "description": "Consultant expérimenté en Python",
         }
 
         # Traiter chaque champ
         processed_data = {
             "nom_complet": f"{consultant_data['prenom']} {consultant_data['nom']}",
-            "email_valide": validate_email(consultant_data['email']),
-            "telephone_valide": validate_phone(consultant_data['telephone']),
-            "salaire_formatte": format_currency(consultant_data['salaire']),
-            "age": calculate_age(consultant_data['date_naissance']),
-            "date_naissance_formatee": format_date(consultant_data['date_naissance']),
-            "description_normalisee": normalize_text(consultant_data['description'])
+            "email_valide": validate_email(consultant_data["email"]),
+            "telephone_valide": validate_phone(consultant_data["telephone"]),
+            "salaire_formatte": format_currency(consultant_data["salaire"]),
+            "age": calculate_age(consultant_data["date_naissance"]),
+            "date_naissance_formatee": format_date(consultant_data["date_naissance"]),
+            "description_normalisee": normalize_text(consultant_data["description"]),
         }
 
         # Vérifications
@@ -343,4 +359,7 @@ class TestIntegrationUtils:
         assert processed_data["salaire_formatte"] == "50 000,50 €"
         assert isinstance(processed_data["age"], int)
         assert processed_data["date_naissance_formatee"] == "01/01/1990"
-        assert processed_data["description_normalisee"] == "consultant experimente en python"
+        assert (
+            processed_data["description_normalisee"]
+            == "consultant experimente en python"
+        )

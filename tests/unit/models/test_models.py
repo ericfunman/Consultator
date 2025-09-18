@@ -1,6 +1,7 @@
 """
 Tests pour les modèles de base de données
 """
+
 import pytest
 from datetime import date, datetime, timedelta
 from unittest.mock import Mock, patch
@@ -30,7 +31,7 @@ class TestPracticeModel:
             nom="Data Science",
             description="Practice spécialisée en data science",
             responsable="Jean Dupont",
-            actif=True
+            actif=True,
         )
 
         assert practice.nom == "Data Science"
@@ -48,9 +49,15 @@ class TestPracticeModel:
         practice = Practice()
 
         # Créer des objets Consultant réels pour le test
-        consultant1 = Consultant(nom="Dupont", prenom="Jean", email="jean@test.com", disponibilite=True)
-        consultant2 = Consultant(nom="Martin", prenom="Marie", email="marie@test.com", disponibilite=False)
-        consultant3 = Consultant(nom="Bernard", prenom="Pierre", email="pierre@test.com", disponibilite=True)
+        consultant1 = Consultant(
+            nom="Dupont", prenom="Jean", email="jean@test.com", disponibilite=True
+        )
+        consultant2 = Consultant(
+            nom="Martin", prenom="Marie", email="marie@test.com", disponibilite=False
+        )
+        consultant3 = Consultant(
+            nom="Bernard", prenom="Pierre", email="pierre@test.com", disponibilite=True
+        )
 
         # Simuler la relation
         practice.consultants = [consultant1, consultant2, consultant3]
@@ -72,7 +79,7 @@ class TestConsultantModel:
             disponibilite=True,
             societe="Quanteam",
             grade="Senior",
-            type_contrat="CDI"
+            type_contrat="CDI",
         )
 
         assert consultant.nom == "Dupont"
@@ -139,17 +146,17 @@ class TestConsultantModel:
         mission1 = Mock()
         mission1.date_fin = date.today() + timedelta(days=30)
         mission1._sa_instance_state = Mock()
-        mission1._sa_instance_state.manager = {'consultant': Mock(impl=Mock())}
+        mission1._sa_instance_state.manager = {"consultant": Mock(impl=Mock())}
         mission1._sa_instance_state.parents = {}
 
         mission2 = Mock()
         mission2.date_fin = date.today() + timedelta(days=60)
         mission2._sa_instance_state = Mock()
-        mission2._sa_instance_state.manager = {'consultant': Mock(impl=Mock())}
+        mission2._sa_instance_state.manager = {"consultant": Mock(impl=Mock())}
         mission2._sa_instance_state.parents = {}
 
         # Patcher directement la propriété missions
-        with patch.object(consultant, 'missions', [mission1, mission2]):
+        with patch.object(consultant, "missions", [mission1, mission2]):
             # Devrait retourner la date la plus tardive
             expected_date = mission2.date_fin.strftime("%d/%m/%Y")
             assert consultant.date_disponibilite == expected_date
@@ -163,18 +170,20 @@ class TestConsultantModel:
         gestion1.date_fin = None
         gestion1.business_manager = "BM Actuel"
         gestion1._sa_instance_state = Mock()
-        gestion1._sa_instance_state.manager = {'consultant': Mock(impl=Mock())}
+        gestion1._sa_instance_state.manager = {"consultant": Mock(impl=Mock())}
         gestion1._sa_instance_state.parents = {}
 
         gestion2 = Mock()
         gestion2.date_fin = date.today()
         gestion2.business_manager = "Ancien BM"
         gestion2._sa_instance_state = Mock()
-        gestion2._sa_instance_state.manager = {'consultant': Mock(impl=Mock())}
+        gestion2._sa_instance_state.manager = {"consultant": Mock(impl=Mock())}
         gestion2._sa_instance_state.parents = {}
 
         # Patcher directement la propriété business_manager_gestions
-        with patch.object(consultant, 'business_manager_gestions', [gestion1, gestion2]):
+        with patch.object(
+            consultant, "business_manager_gestions", [gestion1, gestion2]
+        ):
             assert consultant.business_manager_actuel == "BM Actuel"
 
 
@@ -188,7 +197,7 @@ class TestCompetenceModel:
             categorie="Langages de programmation",
             type_competence="technique",
             description="Langage de programmation Python",
-            niveau_requis="senior"
+            niveau_requis="senior",
         )
 
         assert competence.nom == "Python"
@@ -199,7 +208,9 @@ class TestCompetenceModel:
     def test_competence_repr(self):
         """Test de la représentation string"""
         competence = Competence(id=1, nom="Python", categorie="Backend")
-        assert repr(competence) == "<Competence(id=1, nom='Python', categorie='Backend')>"
+        assert (
+            repr(competence) == "<Competence(id=1, nom='Python', categorie='Backend')>"
+        )
 
 
 class TestMissionModel:
@@ -216,7 +227,7 @@ class TestMissionModel:
             date_fin=date(2024, 6, 30),
             statut="terminee",
             tjm=650.0,
-            technologies_utilisees="Python, TensorFlow, AWS"
+            technologies_utilisees="Python, TensorFlow, AWS",
         )
 
         assert mission.nom_mission == "Projet Data Science"
@@ -254,7 +265,7 @@ class TestCVModel:
             fichier_nom="cv_jean_dupont.pdf",
             fichier_path="/uploads/cv_jean_dupont.pdf",
             contenu_extrait="Contenu du CV...",
-            taille_fichier=1024000
+            taille_fichier=1024000,
         )
 
         assert cv.fichier_nom == "cv_jean_dupont.pdf"
@@ -274,7 +285,7 @@ class TestCustomTechnologyModel:
         tech = CustomTechnology(
             nom="FrameworkXYZ",
             categorie="Frameworks Web",
-            description="Framework personnalisé"
+            description="Framework personnalisé",
         )
 
         assert tech.nom == "FrameworkXYZ"
@@ -295,7 +306,7 @@ class TestConsultantSalaireModel:
             consultant_id=1,
             salaire=50000.0,
             date_debut=date(2024, 1, 1),
-            commentaire="Augmentation annuelle"
+            commentaire="Augmentation annuelle",
         )
 
         assert salaire.salaire == 50000.0
@@ -303,7 +314,9 @@ class TestConsultantSalaireModel:
 
     def test_consultant_salaire_repr(self):
         """Test de la représentation string"""
-        salaire = ConsultantSalaire(id=1, consultant_id=1, salaire=45000.0, date_debut=date(2024, 1, 1))
+        salaire = ConsultantSalaire(
+            id=1, consultant_id=1, salaire=45000.0, date_debut=date(2024, 1, 1)
+        )
         expected = "<ConsultantSalaire(id=1, consultant_id=1, salaire=45000.0, date_debut=2024-01-01)>"
         assert repr(salaire) == expected
 
@@ -313,11 +326,7 @@ class TestLangueModel:
 
     def test_langue_creation(self):
         """Test de création d'une langue"""
-        langue = Langue(
-            nom="Français",
-            code_iso="FR",
-            description="Langue française"
-        )
+        langue = Langue(nom="Français", code_iso="FR", description="Langue française")
 
         assert langue.nom == "Français"
         assert langue.code_iso == "FR"
@@ -334,10 +343,7 @@ class TestConsultantLangueModel:
     def test_consultant_langue_creation(self):
         """Test de création d'une langue consultant"""
         consultant_langue = ConsultantLangue(
-            consultant_id=1,
-            langue_id=1,
-            niveau=4,
-            commentaire="Certification TOEIC"
+            consultant_id=1, langue_id=1, niveau=4, commentaire="Certification TOEIC"
         )
 
         assert consultant_langue.niveau == 4
@@ -346,7 +352,10 @@ class TestConsultantLangueModel:
     def test_consultant_langue_repr(self):
         """Test de la représentation string"""
         consultant_langue = ConsultantLangue(consultant_id=1, langue_id=1, niveau=3)
-        assert repr(consultant_langue) == "<ConsultantLangue(consultant_id=1, langue_id=1, niveau=3)>"
+        assert (
+            repr(consultant_langue)
+            == "<ConsultantLangue(consultant_id=1, langue_id=1, niveau=3)>"
+        )
 
     def test_consultant_langue_niveau_label(self):
         """Test de la propriété niveau_label"""
@@ -370,7 +379,7 @@ class TestBusinessManagerModel:
             prenom="Marie",
             email="marie.dubois@email.com",
             telephone="0123456789",
-            actif=True
+            actif=True,
         )
 
         assert bm.nom == "Dubois"
@@ -397,18 +406,18 @@ class TestBusinessManagerModel:
         gestion1.date_fin = None
         gestion1.consultant = "Consultant Actif"
         gestion1._sa_instance_state = Mock()
-        gestion1._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion1._sa_instance_state.manager = {"business_manager": Mock(impl=Mock())}
         gestion1._sa_instance_state.parents = {}
 
         gestion2 = Mock()
         gestion2.date_fin = date.today()
         gestion2.consultant = "Consultant Inactif"
         gestion2._sa_instance_state = Mock()
-        gestion2._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion2._sa_instance_state.manager = {"business_manager": Mock(impl=Mock())}
         gestion2._sa_instance_state.parents = {}
 
         # Patcher directement la propriété consultant_gestions
-        with patch.object(bm, 'consultant_gestions', [gestion1, gestion2]):
+        with patch.object(bm, "consultant_gestions", [gestion1, gestion2]):
             consultants = bm.consultants_actuels
             assert len(consultants) == 1
             assert consultants[0] == "Consultant Actif"
@@ -421,23 +430,23 @@ class TestBusinessManagerModel:
         gestion1 = Mock()
         gestion1.date_fin = None
         gestion1._sa_instance_state = Mock()
-        gestion1._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion1._sa_instance_state.manager = {"business_manager": Mock(impl=Mock())}
         gestion1._sa_instance_state.parents = {}
 
         gestion2 = Mock()
         gestion2.date_fin = None
         gestion2._sa_instance_state = Mock()
-        gestion2._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion2._sa_instance_state.manager = {"business_manager": Mock(impl=Mock())}
         gestion2._sa_instance_state.parents = {}
 
         gestion3 = Mock()
         gestion3.date_fin = date.today()
         gestion3._sa_instance_state = Mock()
-        gestion3._sa_instance_state.manager = {'business_manager': Mock(impl=Mock())}
+        gestion3._sa_instance_state.manager = {"business_manager": Mock(impl=Mock())}
         gestion3._sa_instance_state.parents = {}
 
         # Patcher directement la propriété consultant_gestions
-        with patch.object(bm, 'consultant_gestions', [gestion1, gestion2, gestion3]):
+        with patch.object(bm, "consultant_gestions", [gestion1, gestion2, gestion3]):
             assert bm.nombre_consultants_actuels == 2
 
 
@@ -450,7 +459,7 @@ class TestConsultantBusinessManagerModel:
             consultant_id=1,
             business_manager_id=1,
             date_debut=date(2024, 1, 1),
-            commentaire="Nouvelle affectation"
+            commentaire="Nouvelle affectation",
         )
 
         assert gestion.consultant_id == 1
@@ -460,11 +469,11 @@ class TestConsultantBusinessManagerModel:
     def test_consultant_business_manager_repr(self):
         """Test de la représentation string"""
         gestion = ConsultantBusinessManager(
-            consultant_id=1,
-            business_manager_id=1,
-            date_debut=date(2024, 1, 1)
+            consultant_id=1, business_manager_id=1, date_debut=date(2024, 1, 1)
         )
-        expected = "<ConsultantBusinessManager(consultant_id=1, bm_id=1, debut=2024-01-01)>"
+        expected = (
+            "<ConsultantBusinessManager(consultant_id=1, bm_id=1, debut=2024-01-01)>"
+        )
         assert repr(gestion) == expected
 
     def test_consultant_business_manager_est_actuel(self):
@@ -486,7 +495,9 @@ class TestConsultantBusinessManagerModel:
     def test_consultant_business_manager_duree_jours_active(self):
         """Test de duree_jours pour une gestion active"""
         gestion = ConsultantBusinessManager()
-        gestion.date_debut = date.today() - timedelta(days=10)  # Utiliser timedelta pour éviter les erreurs de date
+        gestion.date_debut = date.today() - timedelta(
+            days=10
+        )  # Utiliser timedelta pour éviter les erreurs de date
         gestion.date_fin = None  # Gestion active
 
         # Devrait utiliser la date actuelle

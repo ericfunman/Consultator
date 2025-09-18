@@ -2,6 +2,7 @@
 Tests complets pour maximiser la couverture du module helpers.py
 Objectif: Atteindre 95%+ de couverture avec des tests robustes
 """
+
 import pytest
 from datetime import datetime, date
 import os
@@ -29,7 +30,7 @@ from app.utils.helpers import (
     truncate_text,
     split_list_into_chunks,
     generate_id,
-    get_file_extension
+    get_file_extension,
 )
 
 
@@ -204,7 +205,7 @@ class TestHelpersMaxCoverage:
     def test_round_to_nearest_decimal_exception(self):
         """Test arrondi exception décimale"""
         # Tester le cas où Decimal pourrait lever une exception
-        with patch('decimal.Decimal') as mock_decimal:
+        with patch("decimal.Decimal") as mock_decimal:
             mock_decimal.side_effect = Exception("Decimal error")
             result = round_to_nearest(123.45, 10)
             assert result == 123.45
@@ -291,18 +292,18 @@ class TestHelpersMaxCoverage:
     # Tests is_valid_file_type
     def test_is_valid_file_type_valid(self):
         """Test validation type fichier valide"""
-        valid_types = ['.pdf', '.docx', '.jpg']
+        valid_types = [".pdf", ".docx", ".jpg"]
         assert is_valid_file_type("document.pdf", valid_types) == True
         assert is_valid_file_type("image.JPG", valid_types) == True
 
     def test_is_valid_file_type_invalid(self):
         """Test validation type fichier invalide"""
-        valid_types = ['.pdf', '.docx']
+        valid_types = [".pdf", ".docx"]
         assert is_valid_file_type("document.txt", valid_types) == False
 
     def test_is_valid_file_type_none(self):
         """Test validation type fichier None"""
-        assert is_valid_file_type(None, ['.pdf']) == False
+        assert is_valid_file_type(None, [".pdf"]) == False
 
     def test_is_valid_file_type_empty_extensions(self):
         """Test validation type fichier extensions vides"""

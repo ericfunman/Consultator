@@ -2,6 +2,7 @@
 Test de couverture forcée pour SonarQube - Force l'exécution de code réel
 """
 
+
 def test_force_code_execution():
     """Test qui force l'exécution de code pour augmenter la couverture"""
 
@@ -46,25 +47,25 @@ def test_import_all_modules():
     """Test qui importe tous les modules pour maximiser la couverture"""
 
     modules_to_import = [
-        'app.main',
-        'app.database.database',
-        'app.database.models',
-        'app.services.consultant_service',
-        'app.services.business_manager_service',
-        'app.services.practice_service',
-        'app.utils.skill_categories',
-        'app.utils.technologies_referentiel',
-        'app.pages_modules.consultants',
-        'app.pages_modules.practices',
-        'app.pages_modules.business_managers',
-        'app.pages_modules.home'
+        "app.main",
+        "app.database.database",
+        "app.database.models",
+        "app.services.consultant_service",
+        "app.services.business_manager_service",
+        "app.services.practice_service",
+        "app.utils.skill_categories",
+        "app.utils.technologies_referentiel",
+        "app.pages_modules.consultants",
+        "app.pages_modules.practices",
+        "app.pages_modules.business_managers",
+        "app.pages_modules.home",
     ]
 
     imported_count = 0
 
     for module_name in modules_to_import:
         try:
-            module = __import__(module_name, fromlist=[''])
+            module = __import__(module_name, fromlist=[""])
             assert module is not None
             imported_count += 1
             print(f"✅ {module_name} importé avec succès")
@@ -86,7 +87,7 @@ def test_execute_main_functions():
             get_all_competences,
             get_competences_by_category,
             get_all_categories,
-            search_competences
+            search_competences,
         )
 
         # Exécuter toutes les fonctions
@@ -111,7 +112,7 @@ def test_execute_main_functions():
         from app.utils.technologies_referentiel import (
             get_all_technologies,
             get_technologies_by_category,
-            search_technologies
+            search_technologies,
         )
 
         # Exécuter toutes les fonctions

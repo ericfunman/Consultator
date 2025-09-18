@@ -1,6 +1,7 @@
 """
 Tests pour le module skill_categories.py
 """
+
 import pytest
 from app.utils.skill_categories import (
     COMPETENCES_TECHNIQUES,

@@ -1,6 +1,7 @@
 """
 Tests pour le module database
 """
+
 import pytest
 import os
 import sys
@@ -16,8 +17,8 @@ if parent_dir not in sys.path:
 class TestDatabaseModule:
     """Tests pour les fonctions de base de données"""
 
-    @patch('app.database.database.st')
-    @patch('app.database.database.create_engine')
+    @patch("app.database.database.st")
+    @patch("app.database.database.create_engine")
     def test_get_database_engine(self, mock_create_engine, mock_st):
         """Test de la création de l'engine de base de données"""
         from app.database.database import get_database_engine
@@ -27,7 +28,7 @@ class TestDatabaseModule:
         mock_create_engine.return_value = mock_engine
 
         # Clear le cache Streamlit pour ce test
-        if hasattr(get_database_engine, 'clear'):
+        if hasattr(get_database_engine, "clear"):
             get_database_engine.clear()
 
         result = get_database_engine()
@@ -46,9 +47,9 @@ class TestDatabaseModule:
 
         assert result == mock_engine
 
-    @patch('app.database.database.st')
-    @patch('app.database.database.get_database_engine')
-    @patch('app.database.database.sessionmaker')
+    @patch("app.database.database.st")
+    @patch("app.database.database.get_database_engine")
+    @patch("app.database.database.sessionmaker")
     def test_get_session_factory(self, mock_sessionmaker, mock_get_engine, mock_st):
         """Test de la création de la factory de sessions"""
         from app.database.database import get_session_factory
@@ -60,16 +61,14 @@ class TestDatabaseModule:
         mock_sessionmaker.return_value = mock_factory
 
         # Clear le cache Streamlit pour ce test
-        if hasattr(get_session_factory, 'clear'):
+        if hasattr(get_session_factory, "clear"):
             get_session_factory.clear()
 
         result = get_session_factory()
 
         # Vérifier que sessionmaker a été appelé avec les bons paramètres
         mock_sessionmaker.assert_called_once_with(
-            autocommit=False,
-            autoflush=False,
-            bind=mock_engine
+            autocommit=False, autoflush=False, bind=mock_engine
         )
 
         assert result == mock_factory
@@ -84,8 +83,8 @@ class TestDatabaseModule:
         # Vérifier que la fonction retourne quelque chose
         assert result is not None
 
-    @patch('app.database.database.os.path.exists')
-    @patch('app.database.database.get_database_engine')
+    @patch("app.database.database.os.path.exists")
+    @patch("app.database.database.get_database_engine")
     def test_get_database_info_exists(self, mock_get_engine, mock_exists):
         """Test de get_database_info quand la DB existe"""
         from app.database.database import get_database_info
@@ -97,7 +96,7 @@ class TestDatabaseModule:
         mock_engine = Mock()
         mock_get_engine.return_value = mock_engine
 
-        with patch('app.database.database.get_database_session') as mock_get_session:
+        with patch("app.database.database.get_database_session") as mock_get_session:
             mock_session = Mock()
             mock_get_session.return_value = mock_session
             # Configurer le mock session pour supporter le context manager
@@ -108,7 +107,7 @@ class TestDatabaseModule:
             mock_session.query.return_value.count.side_effect = [150, 8, 75, 10]
 
             # Clear le cache pour ce test
-            if hasattr(get_database_info, 'clear'):
+            if hasattr(get_database_info, "clear"):
                 get_database_info.clear()
 
             result = get_database_info()
@@ -119,7 +118,7 @@ class TestDatabaseModule:
             assert result["competences"] == 8
             assert result["practices"] == 10
 
-    @patch('app.database.database.os.path.exists')
+    @patch("app.database.database.os.path.exists")
     def test_get_database_info_not_exists(self, mock_exists):
         """Test de get_database_info quand la DB n'existe pas"""
         from app.database.database import get_database_info
@@ -128,7 +127,7 @@ class TestDatabaseModule:
         mock_exists.return_value = False
 
         # Clear le cache pour ce test
-        if hasattr(get_database_info, 'clear'):
+        if hasattr(get_database_info, "clear"):
             get_database_info.clear()
 
         result = get_database_info()
@@ -139,11 +138,13 @@ class TestDatabaseModule:
         assert "missions" not in result
         assert "practices" not in result
 
-    @patch('app.database.database.st')
-    @patch('app.database.database.get_database_engine')
-    @patch('app.database.database.Base')
-    @patch('app.database.database.is_database_initialized')
-    def test_init_database_success(self, mock_is_initialized, mock_base, mock_get_engine, mock_st):
+    @patch("app.database.database.st")
+    @patch("app.database.database.get_database_engine")
+    @patch("app.database.database.Base")
+    @patch("app.database.database.is_database_initialized")
+    def test_init_database_success(
+        self, mock_is_initialized, mock_base, mock_get_engine, mock_st
+    ):
         """Test de l'initialisation réussie de la base de données"""
         from app.database.database import init_database
 
@@ -159,6 +160,7 @@ class TestDatabaseModule:
 
         # Reset le flag global pour ce test
         import app.database.database as db_module
+
         db_module._database_initialized = False
 
         result = init_database()
@@ -166,11 +168,13 @@ class TestDatabaseModule:
         assert result is True
         mock_base.metadata.create_all.assert_called_once_with(bind=mock_engine)
 
-    @patch('app.database.database.st')
-    @patch('app.database.database.get_database_engine')
-    @patch('app.database.database.Base')
-    @patch('app.database.database.is_database_initialized')
-    def test_init_database_error(self, mock_is_initialized, mock_base, mock_get_engine, mock_st):
+    @patch("app.database.database.st")
+    @patch("app.database.database.get_database_engine")
+    @patch("app.database.database.Base")
+    @patch("app.database.database.is_database_initialized")
+    def test_init_database_error(
+        self, mock_is_initialized, mock_base, mock_get_engine, mock_st
+    ):
         """Test de l'initialisation avec erreur"""
         from app.database.database import init_database
 
@@ -186,15 +190,16 @@ class TestDatabaseModule:
 
         # Reset le flag global pour ce test
         import app.database.database as db_module
+
         db_module._database_initialized = False
 
         result = init_database()
 
         assert result is False
 
-    @patch('app.database.database.st')
-    @patch('app.database.database.get_database_engine')
-    @patch('app.database.database.Base')
+    @patch("app.database.database.st")
+    @patch("app.database.database.get_database_engine")
+    @patch("app.database.database.Base")
     def test_reset_database(self, mock_base, mock_get_engine, mock_st):
         """Test de la remise à zéro de la base de données"""
         from app.database.database import reset_database
@@ -210,9 +215,9 @@ class TestDatabaseModule:
         mock_base.metadata.drop_all.assert_called_once_with(bind=mock_engine)
         mock_base.metadata.create_all.assert_called_once_with(bind=mock_engine)
 
-    @patch('app.database.database.st')
-    @patch('app.database.database.get_database_engine')
-    @patch('app.database.database.Base')
+    @patch("app.database.database.st")
+    @patch("app.database.database.get_database_engine")
+    @patch("app.database.database.Base")
     def test_reset_database_not_exists(self, mock_base, mock_get_engine, mock_st):
         """Test de reset quand la DB n'existe pas"""
         from app.database.database import reset_database
