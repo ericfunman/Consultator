@@ -7,7 +7,7 @@ import streamlit as st
 from app.pages_modules.consultants import (
     show_consultants_list,
     show_add_consultant_form,
-    show_consultant_profile
+    show_consultant_profile,
 )
 from app.database.models import Consultant, Practice
 from tests.fixtures.base_test import BaseUITest
@@ -23,7 +23,7 @@ class TestConsultantForms(BaseUITest):
         assert callable(show_add_consultant_form)
         assert callable(show_consultant_profile)
 
-    @patch('app.pages_modules.consultants.ConsultantService')
+    @patch("app.pages_modules.consultants.ConsultantService")
     def test_show_consultants_list_can_be_called(self, mock_service):
         """Test que show_consultants_list peut être appelée sans erreur"""
         # Mock service pour éviter les appels réels
@@ -42,7 +42,7 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultants.ConsultantService')
+    @patch("app.pages_modules.consultants.ConsultantService")
     def test_show_add_consultant_form_can_be_called(self, mock_service):
         """Test que show_add_consultant_form peut être appelée sans erreur"""
         # Mock service
@@ -59,16 +59,16 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultants.ConsultantService')
+    @patch("app.pages_modules.consultants.ConsultantService")
     def test_show_consultant_profile_can_be_called(self, mock_service):
         """Test que show_consultant_profile peut être appelée sans erreur"""
         # Mock service
         mock_service.get_consultant_with_stats.return_value = {
-            'id': 1,
-            'prenom': 'Test',
-            'nom': 'User',
-            'email': 'test@example.com',
-            'disponibilite': True
+            "id": 1,
+            "prenom": "Test",
+            "nom": "User",
+            "email": "test@example.com",
+            "disponibilite": True,
         }
 
         # Test que la fonction peut être appelée
@@ -81,7 +81,7 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultants.ConsultantService')
+    @patch("app.pages_modules.consultants.ConsultantService")
     def test_show_consultants_list_with_empty_data(self, mock_service):
         """Test avec données vides"""
         mock_service.get_all_consultants_with_stats.return_value = []
@@ -96,11 +96,13 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultants.ConsultantService')
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.pd')
-    @patch('app.pages_modules.consultants.show_consultants_list_enhanced')
-    def test_show_consultants_list_with_data(self, mock_enhanced_func, mock_pd, mock_st, mock_service):
+    @patch("app.pages_modules.consultants.ConsultantService")
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.pd")
+    @patch("app.pages_modules.consultants.show_consultants_list_enhanced")
+    def test_show_consultants_list_with_data(
+        self, mock_enhanced_func, mock_pd, mock_st, mock_service
+    ):
         """Test avec données présentes"""
         # Forcer l'utilisation de la version classique en faisant échouer l'import des composants UI
         mock_enhanced_func.side_effect = ImportError("UI components not available")
@@ -136,25 +138,27 @@ class TestConsultantForms(BaseUITest):
         mock_st.spinner.return_value.__exit__ = MagicMock()
         mock_st.empty.return_value = None
 
-        mock_data = [{
-            'id': 1,
-            'prenom': 'Jean',
-            'nom': 'Dupont',
-            'email': 'jean@test.com',
-            'disponibilite': True,
-            'salaire_actuel': 50000,
-            'societe': 'Quanteam',
-            'grade': 'Senior',
-            'type_contrat': 'CDI',
-            'practice_name': 'Tech',
-            'nb_missions': 3,
-            'cjm': 1440.0,
-            'salaire_formatted': '50,000€',
-            'cjm_formatted': '1,440€',
-            'statut': '✅ Disponible',
-            'experience_annees': 5,
-            'experience_formatted': '5 ans'
-        }]
+        mock_data = [
+            {
+                "id": 1,
+                "prenom": "Jean",
+                "nom": "Dupont",
+                "email": "jean@test.com",
+                "disponibilite": True,
+                "salaire_actuel": 50000,
+                "societe": "Quanteam",
+                "grade": "Senior",
+                "type_contrat": "CDI",
+                "practice_name": "Tech",
+                "nb_missions": 3,
+                "cjm": 1440.0,
+                "salaire_formatted": "50,000€",
+                "cjm_formatted": "1,440€",
+                "statut": "✅ Disponible",
+                "experience_annees": 5,
+                "experience_formatted": "5 ans",
+            }
+        ]
         mock_service.get_all_consultants_with_stats.return_value = mock_data
         mock_service.search_consultants_optimized.return_value = mock_data
 
@@ -162,12 +166,16 @@ class TestConsultantForms(BaseUITest):
             show_consultants_list()
             assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e) or "UI components not available" in str(e):
+            if (
+                "ScriptRunContext" in str(e)
+                or "Session state" in str(e)
+                or "UI components not available" in str(e)
+            ):
                 assert True  # Erreur attendue en mode test
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultants.ConsultantService')
+    @patch("app.pages_modules.consultants.ConsultantService")
     def test_show_add_consultant_form_with_service_error(self, mock_service):
         """Test avec erreur du service"""
         mock_service.create_consultant.return_value = False
@@ -181,7 +189,7 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultants.ConsultantService')
+    @patch("app.pages_modules.consultants.ConsultantService")
     def test_show_consultant_profile_with_no_data(self, mock_service):
         """Test du profil avec données manquantes"""
         mock_service.get_consultant_with_stats.return_value = None
@@ -200,12 +208,12 @@ class TestConsultantForms(BaseUITest):
         import app.pages_modules.consultants as consultants_module
 
         # Vérifier que les fonctions principales existent
-        assert hasattr(consultants_module, 'show_consultants_list')
-        assert hasattr(consultants_module, 'show_add_consultant_form')
-        assert hasattr(consultants_module, 'show_consultant_profile')
+        assert hasattr(consultants_module, "show_consultants_list")
+        assert hasattr(consultants_module, "show_add_consultant_form")
+        assert hasattr(consultants_module, "show_consultant_profile")
 
         # Vérifier que les services sont importés
-        assert hasattr(consultants_module, 'ConsultantService')
+        assert hasattr(consultants_module, "ConsultantService")
 
     def test_function_signatures(self):
         """Test que les fonctions ont les signatures attendues"""

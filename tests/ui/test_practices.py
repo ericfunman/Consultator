@@ -20,7 +20,7 @@ SAMPLE_PRACTICES = [
         "description": "Practice spécialisée en ingénierie de données",
         "responsable": "Jean Dupont",
         "actif": True,
-        "date_creation": "2023-01-15"
+        "date_creation": "2023-01-15",
     },
     {
         "id": 2,
@@ -28,7 +28,7 @@ SAMPLE_PRACTICES = [
         "description": "Practice d'analyse et science des données",
         "responsable": "Marie Martin",
         "actif": True,
-        "date_creation": "2023-02-01"
+        "date_creation": "2023-02-01",
     },
     {
         "id": 3,
@@ -36,8 +36,8 @@ SAMPLE_PRACTICES = [
         "description": "Practice cloud et automatisation",
         "responsable": "Pierre Bernard",
         "actif": True,
-        "date_creation": "2023-03-10"
-    }
+        "date_creation": "2023-03-10",
+    },
 ]
 
 # Données de test pour les consultants
@@ -53,7 +53,7 @@ SAMPLE_CONSULTANTS = [
         "disponibilite": True,
         "nb_missions": 5,
         "nb_competences": 8,
-        "experience_annees": 5
+        "experience_annees": 5,
     },
     {
         "id": 2,
@@ -66,8 +66,8 @@ SAMPLE_CONSULTANTS = [
         "disponibilite": True,
         "nb_missions": 4,
         "nb_competences": 6,
-        "experience_annees": 4
-    }
+        "experience_annees": 4,
+    },
 ]
 
 # Données de test pour les statistiques
@@ -80,39 +80,39 @@ SAMPLE_PRACTICE_STATS = {
             "nom": "Data Engineering",
             "total_consultants": 3,
             "consultants_actifs": 2,
-            "responsable": "Jean Dupont"
+            "responsable": "Jean Dupont",
         },
         {
             "nom": "Data Science",
             "total_consultants": 4,
             "consultants_actifs": 3,
-            "responsable": "Marie Martin"
+            "responsable": "Marie Martin",
         },
         {
             "nom": "Cloud & DevOps",
             "total_consultants": 3,
             "consultants_actifs": 2,
-            "responsable": "Pierre Bernard"
-        }
-    ]
+            "responsable": "Pierre Bernard",
+        },
+    ],
 }
 
 
 class TestShowFunction(BaseUITest):
-    @patch('app.pages_modules.practices.st')
+    @patch("app.pages_modules.practices.st")
     def test_show_basic_display(self, mock_st):
         """Test affichage de base de la fonction show"""
-        
+
         # Mock UI components
         mock_st.title = MagicMock()
         mock_st.tabs = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
 
         # Mock PracticeService to return serializable data
-        with patch('app.pages_modules.practices.PracticeService') as mock_service:
+        with patch("app.pages_modules.practices.PracticeService") as mock_service:
             mock_service.get_practice_statistics.return_value = {
                 "total_practices": 2,
                 "total_consultants": 10,
-                "active_practices": 2
+                "active_practices": 2,
             }
             mock_service.get_all_practices.return_value = []
 
@@ -125,8 +125,8 @@ class TestShowFunction(BaseUITest):
 
 
 class TestShowPracticeOverview(BaseUITest):
-    @patch('app.pages_modules.practices.st')
-    @patch('app.pages_modules.practices.PracticeService')
+    @patch("app.pages_modules.practices.st")
+    @patch("app.pages_modules.practices.PracticeService")
     def test_show_practice_overview_with_data(self, mock_service, mock_st):
         """Test vue d'ensemble avec données"""
         # Setup mock data
@@ -144,7 +144,9 @@ class TestShowPracticeOverview(BaseUITest):
 
         # Mock UI components
         mock_st.subheader = MagicMock()
-        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
+        mock_st.columns = MagicMock(
+            return_value=[MagicMock(), MagicMock(), MagicMock()]
+        )
         mock_st.metric = MagicMock()
         mock_st.expander = MagicMock()
         mock_st.write = MagicMock()
@@ -159,8 +161,8 @@ class TestShowPracticeOverview(BaseUITest):
         assert mock_st.metric.call_count == 3  # 3 metrics in overview
         mock_st.subheader.assert_called()
 
-    @patch('app.pages_modules.practices.st')
-    @patch('app.pages_modules.practices.PracticeService')
+    @patch("app.pages_modules.practices.st")
+    @patch("app.pages_modules.practices.PracticeService")
     def test_show_practice_overview_error(self, mock_service, mock_st):
         """Test vue d'ensemble avec erreur"""
         # Setup error
@@ -177,11 +179,11 @@ class TestShowPracticeOverview(BaseUITest):
 
 
 class TestShowConsultantsByPractice(BaseUITest):
-    @patch('app.pages_modules.practices.st')
-    @patch('app.pages_modules.practices.PracticeService')
+    @patch("app.pages_modules.practices.st")
+    @patch("app.pages_modules.practices.PracticeService")
     def test_show_consultants_with_data(self, mock_service, mock_st):
         """Test affichage consultants avec données"""
-        
+
         # Create mock practice and consultant objects
         class MockPractice:
             def __init__(self, data):
@@ -215,8 +217,8 @@ class TestShowConsultantsByPractice(BaseUITest):
         mock_service.get_consultants_by_practice.assert_called_once()
         mock_st.selectbox.assert_called_once()
 
-    @patch('app.pages_modules.practices.st')
-    @patch('app.pages_modules.practices.PracticeService')
+    @patch("app.pages_modules.practices.st")
+    @patch("app.pages_modules.practices.PracticeService")
     def test_show_consultants_no_practices(self, mock_service, mock_st):
         """Test affichage consultants sans practices"""
         mock_service.get_all_practices.return_value = []
@@ -231,8 +233,8 @@ class TestShowConsultantsByPractice(BaseUITest):
         # Verify
         mock_st.warning.assert_called_once_with("Aucune practice trouvée.")
 
-    @patch('app.pages_modules.practices.st')
-    @patch('app.pages_modules.practices.PracticeService')
+    @patch("app.pages_modules.practices.st")
+    @patch("app.pages_modules.practices.PracticeService")
     def test_show_consultants_error(self, mock_service, mock_st):
         """Test affichage consultants avec erreur"""
         mock_service.get_all_practices.side_effect = Exception("Test error")
@@ -248,11 +250,11 @@ class TestShowConsultantsByPractice(BaseUITest):
 
 
 class TestShowPracticeManagement(BaseUITest):
-    @patch('app.pages_modules.practices.st')
-    @patch('app.pages_modules.practices.PracticeService')
+    @patch("app.pages_modules.practices.st")
+    @patch("app.pages_modules.practices.PracticeService")
     def test_show_practice_management(self, mock_service, mock_st):
         """Test interface de gestion des practices"""
-        
+
         # Create mock practice objects
         class MockPractice:
             def __init__(self, data):
@@ -270,7 +272,9 @@ class TestShowPracticeManagement(BaseUITest):
         mock_st.text_area = MagicMock(return_value="")
         mock_st.form_submit_button = MagicMock(return_value=False)
         mock_st.write = MagicMock()
-        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
+        mock_st.columns = MagicMock(
+            return_value=[MagicMock(), MagicMock(), MagicMock()]
+        )
         mock_st.button = MagicMock(return_value=False)
 
         # Execute
@@ -281,8 +285,8 @@ class TestShowPracticeManagement(BaseUITest):
         mock_st.expander.assert_called_once()
         mock_service.get_all_practices.assert_called_once()
 
-    @patch('app.pages_modules.practices.st')
-    @patch('app.pages_modules.practices.PracticeService')
+    @patch("app.pages_modules.practices.st")
+    @patch("app.pages_modules.practices.PracticeService")
     def test_show_practice_management_create_success(self, mock_service, mock_st):
         """Test création practice réussie"""
         mock_service.create_practice.return_value = True
@@ -308,9 +312,11 @@ class TestShowPracticeManagement(BaseUITest):
         mock_st.success.assert_called_once()
         mock_st.rerun.assert_called_once()
 
-    @patch('app.pages_modules.practices.st')
-    @patch('app.pages_modules.practices.PracticeService')
-    def test_show_practice_management_create_validation_error(self, mock_service, mock_st):
+    @patch("app.pages_modules.practices.st")
+    @patch("app.pages_modules.practices.PracticeService")
+    def test_show_practice_management_create_validation_error(
+        self, mock_service, mock_st
+    ):
         """Test validation formulaire de création"""
         mock_service.get_all_practices.return_value = []
 

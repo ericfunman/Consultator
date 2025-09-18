@@ -16,7 +16,7 @@ from app.pages_modules.consultant_missions import (
     delete_mission,
     show_mission_full_details,
     show_missions_analysis,
-    show_missions_revenues
+    show_missions_revenues,
 )
 from tests.fixtures.base_test import BaseUITest
 
@@ -29,8 +29,8 @@ class TestConsultantMissions(BaseUITest):
         # Vérifier que les fonctions sont importables
         assert callable(show_consultant_missions)
 
-    @patch('app.pages_modules.consultant_missions.imports_ok', True)
-    @patch('app.pages_modules.consultant_missions.ConsultantService')
+    @patch("app.pages_modules.consultant_missions.imports_ok", True)
+    @patch("app.pages_modules.consultant_missions.ConsultantService")
     def test_show_consultant_missions_basic(self, mock_service):
         """Test d'affichage basique des missions"""
         # Mock consultant
@@ -52,7 +52,7 @@ class TestConsultantMissions(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_missions.imports_ok', False)
+    @patch("app.pages_modules.consultant_missions.imports_ok", False)
     def test_show_consultant_missions_imports_error(self):
         """Test d'affichage avec erreur d'imports"""
         mock_consultant = Mock()
@@ -78,8 +78,8 @@ class TestConsultantMissions(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_missions.imports_ok', True)
-    @patch('app.pages_modules.consultant_missions.ConsultantService')
+    @patch("app.pages_modules.consultant_missions.imports_ok", True)
+    @patch("app.pages_modules.consultant_missions.ConsultantService")
     def test_show_consultant_missions_with_data(self, mock_service):
         """Test d'affichage avec données de missions"""
         # Mock consultant
@@ -91,40 +91,40 @@ class TestConsultantMissions(BaseUITest):
         # Mock missions
         mock_missions = [
             {
-                'id': 1,
-                'nom': 'Projet Web E-commerce',
-                'client_nom': 'Client A',
-                'date_debut': '2023-01-01',
-                'date_fin': '2023-06-30',
-                'statut': 'Terminée',
-                'description': 'Développement d\'une plateforme e-commerce',
-                'technologies': ['Python', 'Django', 'React'],
-                'tarif_journalier': 550.0,
-                'duree_jours': 120
+                "id": 1,
+                "nom": "Projet Web E-commerce",
+                "client_nom": "Client A",
+                "date_debut": "2023-01-01",
+                "date_fin": "2023-06-30",
+                "statut": "Terminée",
+                "description": "Développement d'une plateforme e-commerce",
+                "technologies": ["Python", "Django", "React"],
+                "tarif_journalier": 550.0,
+                "duree_jours": 120,
             },
             {
-                'id': 2,
-                'nom': 'API REST Microservices',
-                'client_nom': 'Client B',
-                'date_debut': '2023-07-01',
-                'date_fin': None,
-                'statut': 'En cours',
-                'description': 'Développement d\'API REST',
-                'technologies': ['Python', 'FastAPI', 'Docker'],
-                'tarif_journalier': 600.0,
-                'duree_jours': None
-            }
+                "id": 2,
+                "nom": "API REST Microservices",
+                "client_nom": "Client B",
+                "date_debut": "2023-07-01",
+                "date_fin": None,
+                "statut": "En cours",
+                "description": "Développement d'API REST",
+                "technologies": ["Python", "FastAPI", "Docker"],
+                "tarif_journalier": 600.0,
+                "duree_jours": None,
+            },
         ]
 
         # Mock service
         mock_service_instance = Mock()
         mock_service_instance.get_consultant_missions.return_value = mock_missions
         mock_service_instance.get_consultant_missions_stats.return_value = {
-            'total_missions': 2,
-            'missions_actives': 1,
-            'missions_terminees': 1,
-            'total_jours': 120,
-            'ca_total': 66000.0
+            "total_missions": 2,
+            "missions_actives": 1,
+            "missions_terminees": 1,
+            "total_jours": 120,
+            "ca_total": 66000.0,
         }
         mock_service.return_value = mock_service_instance
 
@@ -137,8 +137,8 @@ class TestConsultantMissions(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_missions.imports_ok', True)
-    @patch('app.pages_modules.consultant_missions.ConsultantService')
+    @patch("app.pages_modules.consultant_missions.imports_ok", True)
+    @patch("app.pages_modules.consultant_missions.ConsultantService")
     def test_show_consultant_missions_empty(self, mock_service):
         """Test d'affichage avec missions vides"""
         # Mock consultant
@@ -151,11 +151,11 @@ class TestConsultantMissions(BaseUITest):
         mock_service_instance = Mock()
         mock_service_instance.get_consultant_missions.return_value = []
         mock_service_instance.get_consultant_missions_stats.return_value = {
-            'total_missions': 0,
-            'missions_actives': 0,
-            'missions_terminees': 0,
-            'total_jours': 0,
-            'ca_total': 0.0
+            "total_missions": 0,
+            "missions_actives": 0,
+            "missions_terminees": 0,
+            "total_jours": 0,
+            "ca_total": 0.0,
         }
         mock_service.return_value = mock_service_instance
 
@@ -168,8 +168,8 @@ class TestConsultantMissions(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_missions.imports_ok', True)
-    @patch('app.pages_modules.consultant_missions.ConsultantService')
+    @patch("app.pages_modules.consultant_missions.imports_ok", True)
+    @patch("app.pages_modules.consultant_missions.ConsultantService")
     def test_show_consultant_missions_service_error(self, mock_service):
         """Test d'affichage avec erreur de service"""
         # Mock consultant
@@ -180,7 +180,9 @@ class TestConsultantMissions(BaseUITest):
 
         # Mock service qui lève une exception
         mock_service_instance = Mock()
-        mock_service_instance.get_consultant_missions.side_effect = Exception("Service error")
+        mock_service_instance.get_consultant_missions.side_effect = Exception(
+            "Service error"
+        )
         mock_service.return_value = mock_service_instance
 
         try:
@@ -197,11 +199,11 @@ class TestConsultantMissions(BaseUITest):
         import app.pages_modules.consultant_missions as missions_module
 
         # Vérifier que les fonctions principales existent
-        assert hasattr(missions_module, 'show_consultant_missions')
+        assert hasattr(missions_module, "show_consultant_missions")
 
         # Vérifier que les variables d'import existent
-        assert hasattr(missions_module, 'imports_ok')
-        assert hasattr(missions_module, 'ConsultantService')
+        assert hasattr(missions_module, "imports_ok")
+        assert hasattr(missions_module, "ConsultantService")
 
     def test_function_signatures(self):
         """Test que les fonctions ont les signatures attendues"""
@@ -225,7 +227,7 @@ class TestConsultantMissions(BaseUITest):
             client_id=1,
             date_debut=date(2024, 1, 1),
             en_cours=False,
-            date_fin=date(2024, 6, 30)
+            date_fin=date(2024, 6, 30),
         )
 
         assert result is True
@@ -239,7 +241,7 @@ class TestConsultantMissions(BaseUITest):
             client_id=1,
             date_debut=date(2024, 1, 1),
             en_cours=True,
-            date_fin=None
+            date_fin=None,
         )
 
         assert result is False
@@ -253,14 +255,14 @@ class TestConsultantMissions(BaseUITest):
             client_id=1,
             date_debut=date(2024, 6, 30),
             en_cours=False,
-            date_fin=date(2024, 1, 1)  # Date fin avant date début
+            date_fin=date(2024, 1, 1),  # Date fin avant date début
         )
 
         assert result is False
 
-    @patch('app.pages_modules.consultant_missions.st')
-    @patch('app.pages_modules.consultant_missions.get_database_session')
-    @patch('app.pages_modules.consultant_missions.Mission')
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    @patch("app.pages_modules.consultant_missions.Mission")
     def test_create_mission_success(self, mock_mission_class, mock_session, mock_st):
         """Test création de mission réussie"""
         from app.pages_modules.consultant_missions import create_mission
@@ -284,7 +286,7 @@ class TestConsultantMissions(BaseUITest):
             "tjm": 550,
             "salaire_mensuel": 0,
             "description": "Test description",
-            "competences_requises": "Python, SQL"
+            "competences_requises": "Python, SQL",
         }
 
         result = create_mission(1, data)
@@ -293,7 +295,7 @@ class TestConsultantMissions(BaseUITest):
         mock_session_instance.add.assert_called_once_with(mock_mission)
         mock_session_instance.commit.assert_called_once()
 
-    @patch('app.pages_modules.consultant_missions.get_database_session')
+    @patch("app.pages_modules.consultant_missions.get_database_session")
     def test_create_mission_database_error(self, mock_session):
         """Test création de mission avec erreur DB"""
         from app.pages_modules.consultant_missions import create_mission
@@ -313,16 +315,16 @@ class TestConsultantMissions(BaseUITest):
             "tjm": 0,
             "salaire_mensuel": 0,
             "description": "",
-            "competences_requises": ""
+            "competences_requises": "",
         }
 
         result = create_mission(1, data)
 
         assert result is False
 
-    @patch('app.pages_modules.consultant_missions.st')
-    @patch('app.pages_modules.consultant_missions.get_database_session')
-    @patch('app.pages_modules.consultant_missions.Mission')
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    @patch("app.pages_modules.consultant_missions.Mission")
     def test_delete_mission_success(self, mock_mission_class, mock_session, mock_st):
         """Test suppression de mission réussie"""
         from app.pages_modules.consultant_missions import delete_mission
@@ -330,7 +332,9 @@ class TestConsultantMissions(BaseUITest):
         # Mock session et mission
         mock_session_instance = MagicMock()
         mock_mission = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_mission
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            mock_mission
+        )
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         result = delete_mission(1)
@@ -339,21 +343,23 @@ class TestConsultantMissions(BaseUITest):
         mock_session_instance.delete.assert_called_once_with(mock_mission)
         mock_session_instance.commit.assert_called_once()
 
-    @patch('app.pages_modules.consultant_missions.get_database_session')
+    @patch("app.pages_modules.consultant_missions.get_database_session")
     def test_delete_mission_not_found(self, mock_session):
         """Test suppression de mission inexistante"""
         from app.pages_modules.consultant_missions import delete_mission
 
         # Mock session qui ne trouve pas la mission
         mock_session_instance = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            None
+        )
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         result = delete_mission(999)
 
         assert result is False
 
-    @patch('app.pages_modules.consultant_missions.st')
+    @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_statistics_with_data(self, mock_st):
         """Test affichage des statistiques avec données"""
         from app.pages_modules.consultant_missions import show_missions_statistics
@@ -381,7 +387,7 @@ class TestConsultantMissions(BaseUITest):
         # Vérifier que metric a été appelé
         assert mock_st.metric.call_count >= 4  # Au moins 4 métriques
 
-    @patch('app.pages_modules.consultant_missions.st')
+    @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_statistics_empty(self, mock_st):
         """Test affichage des statistiques sans données"""
         from app.pages_modules.consultant_missions import show_missions_statistics
@@ -391,8 +397,8 @@ class TestConsultantMissions(BaseUITest):
         # Vérifier qu'aucune métrique n'est affichée
         mock_st.metric.assert_not_called()
 
-    @patch('app.pages_modules.consultant_missions.st')
-    @patch('app.pages_modules.consultant_missions.get_database_session')
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
     def test_show_add_mission_form_success(self, mock_session, mock_st):
         """Test formulaire d'ajout avec succès"""
         from app.pages_modules.consultant_missions import show_add_mission_form
@@ -418,10 +424,12 @@ class TestConsultantMissions(BaseUITest):
         mock_st.form_submit_button.return_value = True
 
         # Mock create_mission
-        with patch('app.pages_modules.consultant_missions.create_mission', return_value=True):
+        with patch(
+            "app.pages_modules.consultant_missions.create_mission", return_value=True
+        ):
             show_add_mission_form(1)
 
-    @patch('app.pages_modules.consultant_missions.st')
+    @patch("app.pages_modules.consultant_missions.st")
     def test_show_mission_details_with_client(self, mock_st):
         """Test affichage des détails de mission avec client"""
         from app.pages_modules.consultant_missions import show_mission_full_details
@@ -453,8 +461,8 @@ class TestConsultantMissions(BaseUITest):
         # Vérifier que les informations sont affichées
         mock_st.write.assert_called()
 
-    @patch('app.pages_modules.consultant_missions.st')
-    @patch('app.pages_modules.consultant_missions.date')
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.date")
     def test_show_missions_analysis_with_data(self, mock_date_class, mock_st):
         """Test analyse des missions avec données"""
         from app.pages_modules.consultant_missions import show_missions_analysis
@@ -463,7 +471,9 @@ class TestConsultantMissions(BaseUITest):
         mock_today = MagicMock()
         mock_today.today.return_value = date(2024, 12, 31)
         mock_date_class.today = mock_today.today
-        mock_date_class.side_effect = lambda *args, **kwargs: date(*args, **kwargs) if args else mock_today
+        mock_date_class.side_effect = lambda *args, **kwargs: (
+            date(*args, **kwargs) if args else mock_today
+        )
 
         # Mock missions
         mock_missions = []
@@ -483,8 +493,8 @@ class TestConsultantMissions(BaseUITest):
         # Vérifier que l'analyse est affichée
         mock_st.write.assert_called()
 
-    @patch('app.pages_modules.consultant_missions.st')
-    @patch('pandas.DataFrame')
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("pandas.DataFrame")
     def test_show_missions_revenues_with_data(self, mock_dataframe, mock_st):
         """Test analyse des revenus avec données"""
         from app.pages_modules.consultant_missions import show_missions_revenues

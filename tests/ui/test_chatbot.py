@@ -5,7 +5,7 @@ from tests.fixtures.base_test import BaseUITest
 
 
 class TestShowDataInsights(BaseUITest):
-    @patch('app.pages_modules.chatbot.st')
+    @patch("app.pages_modules.chatbot.st")
     def test_show_data_insights_salaire(self, mock_st):
         """Test affichage insights pour données salaire"""
         # Setup
@@ -15,12 +15,14 @@ class TestShowDataInsights(BaseUITest):
                 "moyenne": 65000,
                 "mediane": 62000,
                 "maximum": 85000,
-                "total": 25
+                "total": 25,
             }
         }
 
         mock_st.markdown = MagicMock()
-        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
+        mock_st.columns = MagicMock(
+            return_value=[MagicMock(), MagicMock(), MagicMock()]
+        )
         mock_st.metric = MagicMock()
 
         # Execute
@@ -31,7 +33,7 @@ class TestShowDataInsights(BaseUITest):
         assert mock_st.columns.call_count == 1
         assert mock_st.metric.call_count == 5  # 5 metrics for salary stats
 
-    @patch('app.pages_modules.chatbot.st')
+    @patch("app.pages_modules.chatbot.st")
     def test_show_data_insights_statistiques(self, mock_st):
         """Test affichage insights pour données statistiques"""
         # Setup
@@ -41,7 +43,7 @@ class TestShowDataInsights(BaseUITest):
                 "consultants_actifs": 35,
                 "consultants_inactifs": 7,
                 "missions_total": 28,
-                "missions_en_cours": 15
+                "missions_en_cours": 15,
             }
         }
 
@@ -59,7 +61,7 @@ class TestShowDataInsights(BaseUITest):
         assert mock_st.metric.call_count == 4  # 4 metrics for general stats
         mock_st.progress.assert_called_once()
 
-    @patch('app.pages_modules.chatbot.st')
+    @patch("app.pages_modules.chatbot.st")
     def test_show_data_insights_unknown_intent(self, mock_st):
         """Test affichage insights pour intention inconnue"""
         # Setup
@@ -76,7 +78,7 @@ class TestShowDataInsights(BaseUITest):
 
 
 class TestShowSidebar(BaseUITest):
-    @patch('app.pages_modules.chatbot.st')
+    @patch("app.pages_modules.chatbot.st")
     def test_show_sidebar_basic_display(self, mock_st):
         """Test affichage de base de la sidebar"""
         # Setup
@@ -98,7 +100,7 @@ class TestShowSidebar(BaseUITest):
         assert mock_st.markdown.call_count >= 5  # Multiple markdown calls
         mock_st.button.assert_called_once()
 
-    @patch('app.pages_modules.chatbot.st')
+    @patch("app.pages_modules.chatbot.st")
     def test_show_sidebar_clear_history(self, mock_st):
         """Test effacement de l'historique"""
         # Setup
@@ -117,7 +119,7 @@ class TestShowSidebar(BaseUITest):
         # Verify
         mock_st.rerun.assert_called_once()
 
-    @patch('app.pages_modules.chatbot.st')
+    @patch("app.pages_modules.chatbot.st")
     def test_show_sidebar_with_stats(self, mock_st):
         """Test affichage des statistiques dans la sidebar"""
         # Setup
@@ -125,7 +127,7 @@ class TestShowSidebar(BaseUITest):
         mock_service._get_general_stats.return_value = {
             "consultants_total": 42,
             "missions_total": 15,
-            "tjm_moyen": 650
+            "tjm_moyen": 650,
         }
 
         # Create a mock session state that supports attribute assignment
@@ -141,7 +143,9 @@ class TestShowSidebar(BaseUITest):
                 try:
                     return self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
         mock_session_state = MockSessionState()
         mock_st.session_state = mock_session_state
@@ -159,7 +163,7 @@ class TestShowSidebar(BaseUITest):
         mock_service._get_general_stats.assert_called_once()
         assert mock_st.metric.call_count == 3  # 3 metrics: consultants, missions, TJM
 
-    @patch('app.pages_modules.chatbot.st')
+    @patch("app.pages_modules.chatbot.st")
     def test_show_sidebar_stats_error(self, mock_st):
         """Test gestion d'erreur lors de l'affichage des stats"""
         # Setup
@@ -179,7 +183,9 @@ class TestShowSidebar(BaseUITest):
                 try:
                     return self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
         mock_session_state = MockSessionState()
         mock_st.session_state = mock_session_state
@@ -198,11 +204,13 @@ class TestShowSidebar(BaseUITest):
 
 
 class TestIntegrationScenarios(BaseUITest):
-    @patch('app.pages_modules.chatbot.st')
+    @patch("app.pages_modules.chatbot.st")
     def test_show_data_insights_edge_cases(self, mock_st):
         """Test cas limites pour show_data_insights"""
         # Setup proper column mocks
-        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
+        mock_st.columns = MagicMock(
+            return_value=[MagicMock(), MagicMock(), MagicMock()]
+        )
         mock_st.metric = MagicMock()
 
         # Test with empty data
@@ -215,7 +223,7 @@ class TestIntegrationScenarios(BaseUITest):
                 "moyenne": 65000,
                 "mediane": 62000,
                 "maximum": 85000,
-                "total": 25
+                "total": 25,
             }
         }
         show_data_insights(complete_stats, "salaire")
@@ -228,8 +236,8 @@ class TestIntegrationScenarios(BaseUITest):
 
 
 class TestShowFunction(BaseUITest):
-    @patch('app.pages_modules.chatbot.st')
-    @patch('app.pages_modules.chatbot.ChatbotService')
+    @patch("app.pages_modules.chatbot.st")
+    @patch("app.pages_modules.chatbot.ChatbotService")
     def test_show_initialization(self, mock_chatbot_service, mock_st):
         """Test initialisation de la fonction show"""
         # Setup
@@ -248,13 +256,17 @@ class TestShowFunction(BaseUITest):
                 try:
                     return self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
             def __delattr__(self, name):
                 try:
                     del self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
             def __contains__(self, key):
                 return key in dict.keys(self)
@@ -279,8 +291,8 @@ class TestShowFunction(BaseUITest):
         assert "messages" in mock_session_state
         assert len(mock_session_state.messages) == 1  # Welcome message
 
-    @patch('app.pages_modules.chatbot.st')
-    @patch('app.pages_modules.chatbot.ChatbotService')
+    @patch("app.pages_modules.chatbot.st")
+    @patch("app.pages_modules.chatbot.ChatbotService")
     def test_show_with_user_input(self, mock_chatbot_service, mock_st):
         """Test traitement d'une question utilisateur"""
         # Setup
@@ -289,7 +301,7 @@ class TestShowFunction(BaseUITest):
             "response": "Voici la réponse à votre question",
             "confidence": 0.85,
             "intent": "salaire",
-            "data": {"stats": {"moyenne": 65000}}
+            "data": {"stats": {"moyenne": 65000}},
         }
         mock_chatbot_service.return_value = mock_service_instance
 
@@ -305,13 +317,17 @@ class TestShowFunction(BaseUITest):
                 try:
                     return self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
             def __delattr__(self, name):
                 try:
                     del self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
             def __contains__(self, key):
                 return key in dict.keys(self)
@@ -334,12 +350,16 @@ class TestShowFunction(BaseUITest):
         show()
 
         # Verify user input processing
-        mock_service_instance.process_question.assert_called_once_with("Quel est le salaire moyen ?")
+        mock_service_instance.process_question.assert_called_once_with(
+            "Quel est le salaire moyen ?"
+        )
         mock_st.rerun.assert_called_once()  # Called once in main logic (no clear history button click)
-        assert len(mock_session_state.messages) == 2  # User message + assistant response
+        assert (
+            len(mock_session_state.messages) == 2
+        )  # User message + assistant response
 
-    @patch('app.pages_modules.chatbot.st')
-    @patch('app.pages_modules.chatbot.ChatbotService')
+    @patch("app.pages_modules.chatbot.st")
+    @patch("app.pages_modules.chatbot.ChatbotService")
     def test_show_error_handling(self, mock_chatbot_service, mock_st):
         """Test gestion d'erreur lors du traitement"""
         # Setup
@@ -359,13 +379,17 @@ class TestShowFunction(BaseUITest):
                 try:
                     return self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
             def __delattr__(self, name):
                 try:
                     del self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
             def __contains__(self, key):
                 return key in dict.keys(self)
@@ -392,8 +416,8 @@ class TestShowFunction(BaseUITest):
         mock_st.error.assert_called_once()
         # Note: messages may not be added due to mocking complexity, focus on error display
 
-    @patch('app.pages_modules.chatbot.st')
-    @patch('app.pages_modules.chatbot.ChatbotService')
+    @patch("app.pages_modules.chatbot.st")
+    @patch("app.pages_modules.chatbot.ChatbotService")
     def test_show_debug_mode(self, mock_chatbot_service, mock_st):
         """Test mode debug activé"""
         # Setup
@@ -402,7 +426,7 @@ class TestShowFunction(BaseUITest):
             "response": "Debug response",
             "confidence": 0.9,
             "intent": "statistiques",
-            "data": {}
+            "data": {},
         }
         mock_chatbot_service.return_value = mock_service_instance
 
@@ -419,13 +443,17 @@ class TestShowFunction(BaseUITest):
                 try:
                     return self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
             def __delattr__(self, name):
                 try:
                     del self[name]
                 except KeyError:
-                    raise AttributeError(f"'MockSessionState' object has no attribute '{name}'")
+                    raise AttributeError(
+                        f"'MockSessionState' object has no attribute '{name}'"
+                    )
 
             def __contains__(self, key):
                 return key in dict.keys(self)
@@ -450,5 +478,9 @@ class TestShowFunction(BaseUITest):
         # Verify debug information is displayed
         assert mock_st.caption.call_count >= 1  # At least one caption call
         # Check that debug info was displayed (may be mixed with other captions)
-        debug_calls = [call for call in mock_st.caption.call_args_list if "🎯 Intention:" in str(call)]
+        debug_calls = [
+            call
+            for call in mock_st.caption.call_args_list
+            if "🎯 Intention:" in str(call)
+        ]
         assert len(debug_calls) == 1

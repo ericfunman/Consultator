@@ -15,8 +15,8 @@ class TestConsultantForms(BaseUITest):
         # Vérifier que les fonctions sont importables
         assert callable(show_add_consultant_form)
 
-    @patch('app.pages_modules.consultant_forms.imports_ok', True)
-    @patch('app.pages_modules.consultant_forms.ConsultantService')
+    @patch("app.pages_modules.consultant_forms.imports_ok", True)
+    @patch("app.pages_modules.consultant_forms.ConsultantService")
     def test_show_add_consultant_form_basic(self, mock_service):
         """Test d'affichage basique du formulaire d'ajout"""
         # Mock service
@@ -32,7 +32,7 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_forms.imports_ok', False)
+    @patch("app.pages_modules.consultant_forms.imports_ok", False)
     def test_show_add_consultant_form_imports_error(self):
         """Test d'affichage avec erreur d'imports"""
         try:
@@ -44,8 +44,8 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_forms.imports_ok', True)
-    @patch('app.pages_modules.consultant_forms.ConsultantService')
+    @patch("app.pages_modules.consultant_forms.imports_ok", True)
+    @patch("app.pages_modules.consultant_forms.ConsultantService")
     def test_show_add_consultant_form_with_service_methods(self, mock_service):
         """Test du formulaire avec méthodes de service disponibles"""
         # Mock service avec méthodes
@@ -64,8 +64,8 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_forms.imports_ok', True)
-    @patch('app.pages_modules.consultant_forms.ConsultantService')
+    @patch("app.pages_modules.consultant_forms.imports_ok", True)
+    @patch("app.pages_modules.consultant_forms.ConsultantService")
     def test_show_add_consultant_form_with_data(self, mock_service):
         """Test du formulaire avec données disponibles"""
         # Mock données
@@ -97,8 +97,8 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_forms.imports_ok', True)
-    @patch('app.pages_modules.consultant_forms.ConsultantService')
+    @patch("app.pages_modules.consultant_forms.imports_ok", True)
+    @patch("app.pages_modules.consultant_forms.ConsultantService")
     def test_show_add_consultant_form_service_error(self, mock_service):
         """Test du formulaire avec erreur de service"""
         # Mock service qui lève une exception
@@ -120,11 +120,11 @@ class TestConsultantForms(BaseUITest):
         import app.pages_modules.consultant_forms as forms_module
 
         # Vérifier que les fonctions principales existent
-        assert hasattr(forms_module, 'show_add_consultant_form')
+        assert hasattr(forms_module, "show_add_consultant_form")
 
         # Vérifier que les variables d'import existent
-        assert hasattr(forms_module, 'imports_ok')
-        assert hasattr(forms_module, 'ConsultantService')
+        assert hasattr(forms_module, "imports_ok")
+        assert hasattr(forms_module, "ConsultantService")
 
     def test_function_signatures(self):
         """Test que les fonctions ont les signatures attendues"""

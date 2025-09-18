@@ -15,8 +15,8 @@ class TestConsultantInfo(BaseUITest):
         # Vérifier que les fonctions sont importables
         assert callable(show_consultant_info)
 
-    @patch('app.pages_modules.consultant_info.imports_ok', True)
-    @patch('app.pages_modules.consultant_info.ConsultantService')
+    @patch("app.pages_modules.consultant_info.imports_ok", True)
+    @patch("app.pages_modules.consultant_info.ConsultantService")
     def test_show_consultant_info_basic(self, mock_service):
         """Test d'affichage basique des informations"""
         # Mock consultant
@@ -43,7 +43,7 @@ class TestConsultantInfo(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_info.imports_ok', False)
+    @patch("app.pages_modules.consultant_info.imports_ok", False)
     def test_show_consultant_info_imports_error(self):
         """Test d'affichage avec erreur d'imports"""
         mock_consultant = Mock()
@@ -69,8 +69,8 @@ class TestConsultantInfo(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_info.imports_ok', True)
-    @patch('app.pages_modules.consultant_info.ConsultantService')
+    @patch("app.pages_modules.consultant_info.imports_ok", True)
+    @patch("app.pages_modules.consultant_info.ConsultantService")
     def test_show_consultant_info_with_complete_data(self, mock_service):
         """Test d'affichage avec données complètes"""
         # Mock consultant avec toutes les informations
@@ -105,8 +105,8 @@ class TestConsultantInfo(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_info.imports_ok', True)
-    @patch('app.pages_modules.consultant_info.ConsultantService')
+    @patch("app.pages_modules.consultant_info.imports_ok", True)
+    @patch("app.pages_modules.consultant_info.ConsultantService")
     def test_show_consultant_info_with_missing_data(self, mock_service):
         """Test d'affichage avec données manquantes"""
         # Mock consultant avec données partielles
@@ -133,8 +133,8 @@ class TestConsultantInfo(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_info.imports_ok', True)
-    @patch('app.pages_modules.consultant_info.ConsultantService')
+    @patch("app.pages_modules.consultant_info.imports_ok", True)
+    @patch("app.pages_modules.consultant_info.ConsultantService")
     def test_show_consultant_info_service_error(self, mock_service):
         """Test d'affichage avec erreur de service"""
         # Mock consultant
@@ -145,7 +145,9 @@ class TestConsultantInfo(BaseUITest):
 
         # Mock service qui lève une exception
         mock_service_instance = Mock()
-        mock_service_instance.get_consultant_info.side_effect = Exception("Service error")
+        mock_service_instance.get_consultant_info.side_effect = Exception(
+            "Service error"
+        )
         mock_service.return_value = mock_service_instance
 
         try:
@@ -162,11 +164,11 @@ class TestConsultantInfo(BaseUITest):
         import app.pages_modules.consultant_info as info_module
 
         # Vérifier que les fonctions principales existent
-        assert hasattr(info_module, 'show_consultant_info')
+        assert hasattr(info_module, "show_consultant_info")
 
         # Vérifier que les variables d'import existent
-        assert hasattr(info_module, 'imports_ok')
-        assert hasattr(info_module, 'ConsultantService')
+        assert hasattr(info_module, "imports_ok")
+        assert hasattr(info_module, "ConsultantService")
 
     def test_function_signatures(self):
         """Test que les fonctions ont les signatures attendues"""

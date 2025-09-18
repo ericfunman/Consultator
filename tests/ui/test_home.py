@@ -11,11 +11,13 @@ from tests.fixtures.base_test import BaseUITest
 class TestHomeModule(BaseUITest):
     """Tests pour le module home"""
 
-    @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.error')
-    @patch('streamlit.button')
-    def test_show_database_not_initialized(self, mock_button, mock_error, mock_title, mock_get_db_info):
+    @patch("app.pages_modules.home.get_database_info")
+    @patch("streamlit.title")
+    @patch("streamlit.error")
+    @patch("streamlit.button")
+    def test_show_database_not_initialized(
+        self, mock_button, mock_error, mock_title, mock_get_db_info
+    ):
         """Test de show() quand la base de données n'est pas initialisée"""
         # Mock base de données non initialisée
         mock_get_db_info.return_value = {"exists": False}
@@ -30,15 +32,23 @@ class TestHomeModule(BaseUITest):
         mock_error.assert_called_once_with("❌ Base de données non initialisée")
         mock_button.assert_called_once_with("Initialiser la base de données")
 
-    @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.error')
-    @patch('streamlit.button')
-    @patch('streamlit.success')
-    @patch('streamlit.rerun')
-    @patch('database.database.init_database')
-    def test_show_database_initialization_success(self, mock_init_db, mock_rerun, mock_success,
-                                                 mock_button, mock_error, mock_title, mock_get_db_info):
+    @patch("app.pages_modules.home.get_database_info")
+    @patch("streamlit.title")
+    @patch("streamlit.error")
+    @patch("streamlit.button")
+    @patch("streamlit.success")
+    @patch("streamlit.rerun")
+    @patch("database.database.init_database")
+    def test_show_database_initialization_success(
+        self,
+        mock_init_db,
+        mock_rerun,
+        mock_success,
+        mock_button,
+        mock_error,
+        mock_title,
+        mock_get_db_info,
+    ):
         """Test de show() avec initialisation réussie de la base de données"""
         # Mock base de données non initialisée puis initialisée
         mock_get_db_info.return_value = {"exists": False}
@@ -51,21 +61,25 @@ class TestHomeModule(BaseUITest):
         # Vérifications
         mock_title.assert_called_once_with("🏠 Tableau de bord")
         mock_init_db.assert_called_once()
-        mock_success.assert_called_once_with("✅ Base de données initialisée avec succès !")
+        mock_success.assert_called_once_with(
+            "✅ Base de données initialisée avec succès !"
+        )
         mock_rerun.assert_called_once()
 
-    @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    @patch('app.pages_modules.home.show_dashboard_charts')
-    def test_show_with_data(self, mock_show_charts, mock_metric, mock_columns, mock_title, mock_get_db_info):
+    @patch("app.pages_modules.home.get_database_info")
+    @patch("streamlit.title")
+    @patch("streamlit.columns")
+    @patch("streamlit.metric")
+    @patch("app.pages_modules.home.show_dashboard_charts")
+    def test_show_with_data(
+        self, mock_show_charts, mock_metric, mock_columns, mock_title, mock_get_db_info
+    ):
         """Test de show() avec des données existantes"""
         # Mock base de données avec données
         mock_get_db_info.return_value = {
             "exists": True,
             "consultants": 45,
-            "missions": 23
+            "missions": 23,
         }
 
         # Mock colonnes
@@ -87,30 +101,32 @@ class TestHomeModule(BaseUITest):
         mock_title.assert_called_once_with("🏠 Tableau de bord")
         mock_columns.assert_called_once_with(3)
         mock_metric.assert_any_call(
-            label="👥 Consultants",
-            value=45,
-            delta="Actifs dans la practice"
+            label="👥 Consultants", value=45, delta="Actifs dans la practice"
         )
         mock_metric.assert_any_call(
-            label="💼 Missions",
-            value=23,
-            delta="En cours et terminées"
+            label="💼 Missions", value=23, delta="En cours et terminées"
         )
         mock_show_charts.assert_called_once()
 
-    @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    @patch('app.pages_modules.home.show_getting_started')
-    def test_show_without_data(self, mock_show_getting_started, mock_metric, mock_columns,
-                              mock_title, mock_get_db_info):
+    @patch("app.pages_modules.home.get_database_info")
+    @patch("streamlit.title")
+    @patch("streamlit.columns")
+    @patch("streamlit.metric")
+    @patch("app.pages_modules.home.show_getting_started")
+    def test_show_without_data(
+        self,
+        mock_show_getting_started,
+        mock_metric,
+        mock_columns,
+        mock_title,
+        mock_get_db_info,
+    ):
         """Test de show() sans données (consultants = 0)"""
         # Mock base de données sans données
         mock_get_db_info.return_value = {
             "exists": True,
             "consultants": 0,
-            "missions": 0
+            "missions": 0,
         }
 
         # Mock colonnes
@@ -131,4 +147,3 @@ class TestHomeModule(BaseUITest):
         # Vérifications
         mock_title.assert_called_once_with("🏠 Tableau de bord")
         mock_show_getting_started.assert_called_once()
-

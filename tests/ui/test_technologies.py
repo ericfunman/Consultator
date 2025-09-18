@@ -11,8 +11,8 @@ from tests.fixtures.base_test import BaseUITest
 class TestTechnologiesModule(BaseUITest):
     """Tests pour le module technologies"""
 
-    @patch('app.pages_modules.technologies.show_technologies_referentiel')
-    @patch('streamlit.title')
+    @patch("app.pages_modules.technologies.show_technologies_referentiel")
+    @patch("streamlit.title")
     def test_show_function(self, mock_title, mock_show_referentiel):
         """Test de la fonction show()"""
         # Test
@@ -22,8 +22,8 @@ class TestTechnologiesModule(BaseUITest):
         mock_title.assert_called_once_with("🛠️ Gestion des Technologies")
         mock_show_referentiel.assert_called_once()
 
-    @patch('app.pages_modules.technologies.show_technologies_referentiel')
-    @patch('streamlit.title')
+    @patch("app.pages_modules.technologies.show_technologies_referentiel")
+    @patch("streamlit.title")
     def test_show_function_error_handling(self, mock_title, mock_show_referentiel):
         """Test de la gestion d'erreur dans show()"""
         # Simuler une erreur dans le composant
@@ -42,12 +42,12 @@ class TestTechnologiesModule(BaseUITest):
         import app.pages_modules.technologies as tech_module
 
         # Vérifier que la fonction show existe
-        assert hasattr(tech_module, 'show')
+        assert hasattr(tech_module, "show")
         assert callable(tech_module.show)
 
         # Vérifier les imports
-        assert hasattr(tech_module, 'st')
-        assert hasattr(tech_module, 'show_technologies_referentiel')
+        assert hasattr(tech_module, "st")
+        assert hasattr(tech_module, "show_technologies_referentiel")
 
     def test_main_execution(self):
         """Test de l'exécution en tant que script principal"""
@@ -55,10 +55,10 @@ class TestTechnologiesModule(BaseUITest):
         import app.pages_modules.technologies as tech_module
 
         # Vérifier que __name__ est bien défini
-        assert hasattr(tech_module, '__name__')
+        assert hasattr(tech_module, "__name__")
 
         # Simuler l'exécution directe
-        with patch('app.pages_modules.technologies.show') as mock_show:
+        with patch("app.pages_modules.technologies.show") as mock_show:
             # Simuler __name__ == "__main__"
             tech_module.__name__ = "__main__"
 
@@ -67,8 +67,8 @@ class TestTechnologiesModule(BaseUITest):
             # nous vérifions simplement que la structure est correcte
             assert True
 
-    @patch('app.pages_modules.technologies.show_technologies_referentiel')
-    @patch('streamlit.title')
+    @patch("app.pages_modules.technologies.show_technologies_referentiel")
+    @patch("streamlit.title")
     def test_show_function_multiple_calls(self, mock_title, mock_show_referentiel):
         """Test de multiples appels à show()"""
         # Test multiple appels
