@@ -1,6 +1,7 @@
 """
 Tests pour les pages modules consultants
 """
+
 import pytest
 import sys
 import os
@@ -40,7 +41,9 @@ class TestConsultantsPage:
     @patch("app.pages_modules.consultants.st.error")
     @patch("app.pages_modules.consultants.st.success")
     @patch("app.pages_modules.consultants.get_database_session")
-    def test_delete_consultant_competence_success(self, mock_get_session, mock_success, mock_error, mock_rerun):
+    def test_delete_consultant_competence_success(
+        self, mock_get_session, mock_success, mock_error, mock_rerun
+    ):
         """Test de suppression réussie d'une compétence"""
         from app.pages_modules.consultants import _delete_consultant_competence
 
@@ -50,7 +53,9 @@ class TestConsultantsPage:
 
         # Mock de la compétence à supprimer
         mock_competence = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_competence
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_competence
+        )
 
         _delete_consultant_competence(1)
 
@@ -63,7 +68,9 @@ class TestConsultantsPage:
     @patch("app.pages_modules.consultants.st.error")
     @patch("app.pages_modules.consultants.st.success")
     @patch("app.pages_modules.consultants.get_database_session")
-    def test_delete_consultant_language_success(self, mock_get_session, mock_success, mock_error, mock_rerun):
+    def test_delete_consultant_language_success(
+        self, mock_get_session, mock_success, mock_error, mock_rerun
+    ):
         """Test de suppression réussie d'une langue"""
         from app.pages_modules.consultants import _delete_consultant_language
 
@@ -73,7 +80,9 @@ class TestConsultantsPage:
 
         # Mock de la langue à supprimer
         mock_langue = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_langue
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_langue
+        )
 
         _delete_consultant_language(1)
 

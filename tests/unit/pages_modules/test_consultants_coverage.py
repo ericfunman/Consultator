@@ -51,8 +51,8 @@ class TestConsultantsCoverage:
         mission.description = "Développement d'une API REST"
         return mission
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_show_function_with_imports_ok(self, mock_get_session, mock_st):
         """Test de la fonction show() avec imports réussis"""
         # Configuration des mocks
@@ -69,9 +69,13 @@ class TestConsultantsCoverage:
         mock_st.tabs.return_value = (mock_tab1, mock_tab2)
 
         # Mock des imports
-        with patch('app.pages_modules.consultants.imports_ok', True):
-            with patch('app.pages_modules.consultants.show_consultants_list') as mock_show_list:
-                with patch('app.pages_modules.consultants.show_add_consultant_form') as mock_show_form:
+        with patch("app.pages_modules.consultants.imports_ok", True):
+            with patch(
+                "app.pages_modules.consultants.show_consultants_list"
+            ) as mock_show_list:
+                with patch(
+                    "app.pages_modules.consultants.show_add_consultant_form"
+                ) as mock_show_form:
                     # Import et appel de la fonction
                     from app.pages_modules.consultants import show
 
@@ -83,19 +87,23 @@ class TestConsultantsCoverage:
                     mock_show_list.assert_called_once()
                     mock_show_form.assert_called_once()
 
-    @patch('app.pages_modules.consultants.st')
+    @patch("app.pages_modules.consultants.st")
     def test_show_function_with_imports_failed(self, mock_st):
         """Test de la fonction show() avec imports échoués"""
-        with patch('app.pages_modules.consultants.imports_ok', False):
+        with patch("app.pages_modules.consultants.imports_ok", False):
             from app.pages_modules.consultants import show
 
             show()
 
-            mock_st.error.assert_called_with("❌ Les services de base ne sont pas disponibles")
+            mock_st.error.assert_called_with(
+                "❌ Les services de base ne sont pas disponibles"
+            )
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    def test_show_consultant_profile_success(self, mock_get_session, mock_st, mock_consultant):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    def test_show_consultant_profile_success(
+        self, mock_get_session, mock_st, mock_consultant
+    ):
         """Test de l'affichage du profil consultant avec succès"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -132,23 +140,39 @@ class TestConsultantsCoverage:
         mock_tab5 = Mock()
         mock_tab5.__enter__ = Mock(return_value=mock_tab5)
         mock_tab5.__exit__ = Mock(return_value=None)
-        mock_st.tabs.return_value = (mock_tab1, mock_tab2, mock_tab3, mock_tab4, mock_tab5)
+        mock_st.tabs.return_value = (
+            mock_tab1,
+            mock_tab2,
+            mock_tab3,
+            mock_tab4,
+            mock_tab5,
+        )
 
         # Mock the functions to avoid actual execution
-        with patch('app.pages_modules.consultants.show_consultant_info') as mock_info:
-            with patch('app.pages_modules.consultants.show_consultant_skills') as mock_skills:
-                with patch('app.pages_modules.consultants.show_consultant_languages') as mock_lang:
-                    with patch('app.pages_modules.consultants.show_consultant_missions') as mock_miss:
-                        with patch('app.pages_modules.consultants.show_consultant_documents') as mock_docs:
-                            from app.pages_modules.consultants import show_consultant_profile
+        with patch("app.pages_modules.consultants.show_consultant_info") as mock_info:
+            with patch(
+                "app.pages_modules.consultants.show_consultant_skills"
+            ) as mock_skills:
+                with patch(
+                    "app.pages_modules.consultants.show_consultant_languages"
+                ) as mock_lang:
+                    with patch(
+                        "app.pages_modules.consultants.show_consultant_missions"
+                    ) as mock_miss:
+                        with patch(
+                            "app.pages_modules.consultants.show_consultant_documents"
+                        ) as mock_docs:
+                            from app.pages_modules.consultants import (
+                                show_consultant_profile,
+                            )
 
                             show_consultant_profile()
 
                             # Just check that title was called for now
                             mock_st.title.assert_called_with("👤 Profil de Jean Dupont")
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_show_consultant_profile_not_found(self, mock_get_session, mock_st):
         """Test de l'affichage du profil consultant introuvable"""
         mock_session = Mock()
@@ -165,13 +189,16 @@ class TestConsultantsCoverage:
 
         mock_st.error.assert_called_with("❌ Consultant introuvable")
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    @patch('app.pages_modules.consultants.ConsultantService')
-    def test_show_consultant_info_form_submission(self, mock_service, mock_get_session, mock_st, mock_consultant):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    @patch("app.pages_modules.consultants.ConsultantService")
+    def test_show_consultant_info_form_submission(
+        self, mock_service, mock_get_session, mock_st, mock_consultant
+    ):
         """Test de la soumission du formulaire d'informations consultant"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
+
         # Mock the consultant returned by the query with proper attributes
         class MockConsultant:
             def __init__(self):
@@ -192,13 +219,13 @@ class TestConsultantsCoverage:
                 self.type_contrat = "CDI"
 
         mock_consultant_db = MockConsultant()
-        
+
         # Configure the query chain properly to return our mock consultant
         mock_query_chain = Mock()
         mock_query_chain.options.return_value = mock_query_chain
         mock_query_chain.filter.return_value = mock_query_chain
         mock_query_chain.first.return_value = mock_consultant_db
-        
+
         # Mock practices query
         mock_practice = Mock()
         mock_practice.nom = "Data Science"
@@ -206,12 +233,12 @@ class TestConsultantsCoverage:
         mock_practice_query = Mock()
         mock_practice_query.filter.return_value = mock_practice_query
         mock_practice_query.all.return_value = [mock_practice]
-        
+
         # Set up session.query to return different things based on the model
         def query_side_effect(model):
-            if hasattr(model, '__name__') and model.__name__ == 'Consultant':
+            if hasattr(model, "__name__") and model.__name__ == "Consultant":
                 return mock_query_chain
-            elif hasattr(model, '__name__') and model.__name__ == 'ConsultantSalaire':
+            elif hasattr(model, "__name__") and model.__name__ == "ConsultantSalaire":
                 # Mock empty salary history
                 mock_salary_query = Mock()
                 mock_salary_query.filter.return_value = mock_salary_query
@@ -221,9 +248,11 @@ class TestConsultantsCoverage:
             else:  # Practice or other models
                 return mock_practice_query
 
-        mock_session.query.side_effect = query_side_effect        # Mock du service
+        mock_session.query.side_effect = query_side_effect  # Mock du service
         mock_service.update_consultant.return_value = True
-        mock_service.get_consultant_by_email.return_value = None  # No existing consultant with this email
+        mock_service.get_consultant_by_email.return_value = (
+            None  # No existing consultant with this email
+        )
 
         # Mock du formulaire avec context manager
         mock_form = Mock()
@@ -238,7 +267,7 @@ class TestConsultantsCoverage:
                 num_cols = len(num_cols_or_weights)
             else:
                 num_cols = num_cols_or_weights
-            
+
             columns = []
             for i in range(num_cols):
                 mock_col = Mock()
@@ -246,7 +275,7 @@ class TestConsultantsCoverage:
                 mock_col.__exit__ = Mock(return_value=None)
                 columns.append(mock_col)
             return tuple(columns)
-        
+
         mock_st.columns.side_effect = mock_columns_side_effect
 
         # Mock des inputs - use return_value instead of side_effect for simplicity
@@ -263,9 +292,11 @@ class TestConsultantsCoverage:
 
         mock_service.update_consultant.assert_called_once()
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    def test_show_consultant_skills_technical(self, mock_get_session, mock_st, mock_consultant):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    def test_show_consultant_skills_technical(
+        self, mock_get_session, mock_st, mock_consultant
+    ):
         """Test de l'affichage des compétences techniques"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -282,7 +313,9 @@ class TestConsultantsCoverage:
 
         # Set up the mock to return competencies when queried
         mock_query = Mock()
-        mock_query.join.return_value.filter.return_value.all.return_value = [(mock_consultant_comp, mock_competence)]
+        mock_query.join.return_value.filter.return_value.all.return_value = [
+            (mock_consultant_comp, mock_competence)
+        ]
         mock_session.query.return_value = mock_query
 
         # Mock missions for technologies
@@ -312,9 +345,11 @@ class TestConsultantsCoverage:
         # Vérifier qu'au moins une écriture a été faite
         assert mock_st.write.called or mock_st.subheader.called
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    def test_show_consultant_languages(self, mock_get_session, mock_st, mock_consultant):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    def test_show_consultant_languages(
+        self, mock_get_session, mock_st, mock_consultant
+    ):
         """Test de l'affichage des langues du consultant"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -337,9 +372,11 @@ class TestConsultantsCoverage:
 
         mock_st.subheader.assert_called_with("🌍 Langues parlées")
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    def test_show_consultant_missions_with_data(self, mock_get_session, mock_st, mock_consultant, mock_mission):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    def test_show_consultant_missions_with_data(
+        self, mock_get_session, mock_st, mock_consultant, mock_mission
+    ):
         """Test de l'affichage des missions avec données"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -351,10 +388,12 @@ class TestConsultantsCoverage:
 
         mock_st.subheader.assert_called_with("🚀 Historique des missions")
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    @patch('app.pages_modules.consultants.ConsultantService')
-    def test_show_consultants_list_classic(self, mock_service, mock_get_session, mock_st):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    @patch("app.pages_modules.consultants.ConsultantService")
+    def test_show_consultants_list_classic(
+        self, mock_service, mock_get_session, mock_st
+    ):
         """Test de la liste classique des consultants"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -377,7 +416,7 @@ class TestConsultantsCoverage:
                 "salaire_formatted": "50 000€",
                 "cjm_formatted": "2 083€",
                 "experience_formatted": "5 ans",
-                "statut": "Disponible"
+                "statut": "Disponible",
             }
         ]
 
@@ -394,10 +433,12 @@ class TestConsultantsCoverage:
 
         mock_st.text_input.assert_called()
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    @patch('app.pages_modules.consultants.ConsultantService')
-    def test_show_add_consultant_form_success(self, mock_service, mock_get_session, mock_st):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    @patch("app.pages_modules.consultants.ConsultantService")
+    def test_show_add_consultant_form_success(
+        self, mock_service, mock_get_session, mock_st
+    ):
         """Test de l'ajout réussi d'un consultant"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -429,7 +470,12 @@ class TestConsultantsCoverage:
         mock_st.columns.return_value = (mock_col1, mock_col2)
 
         # Mock des inputs
-        mock_st.text_input.side_effect = ["Jean", "jean@example.com", "01.23.45.67.89", "Dupont"]
+        mock_st.text_input.side_effect = [
+            "Jean",
+            "jean@example.com",
+            "01.23.45.67.89",
+            "Dupont",
+        ]
         mock_st.number_input.return_value = 50000
         mock_st.checkbox.return_value = True
         mock_st.selectbox.side_effect = ["Data Science", "Quanteam", "Confirmé", "CDI"]
@@ -442,9 +488,11 @@ class TestConsultantsCoverage:
 
         mock_service.create_consultant.assert_called_once()
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    def test_save_mission_changes_success(self, mock_get_session, mock_st, mock_mission):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    def test_save_mission_changes_success(
+        self, mock_get_session, mock_st, mock_mission
+    ):
         """Test de la sauvegarde des modifications de mission"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -459,7 +507,7 @@ class TestConsultantsCoverage:
             "statut": "en_cours",
             "revenus_generes": 80000,
             "technologies_utilisees": "Python, Django",
-            "description": "Nouvelle description"
+            "description": "Nouvelle description",
         }
 
         from app.pages_modules.consultants import save_mission_changes
@@ -469,8 +517,8 @@ class TestConsultantsCoverage:
         mock_session.commit.assert_called_once()
         mock_st.success.assert_called_with("✅ Mission mise à jour avec succès !")
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_delete_mission_success(self, mock_get_session, mock_st, mock_mission):
         """Test de la suppression d'une mission"""
         mock_session = Mock()
@@ -485,8 +533,8 @@ class TestConsultantsCoverage:
         mock_session.commit.assert_called_once()
         mock_st.success.assert_called_with("✅ Mission supprimée avec succès !")
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_add_new_mission_success(self, mock_get_session, mock_st):
         """Test de l'ajout d'une nouvelle mission"""
         mock_session = Mock()
@@ -501,7 +549,7 @@ class TestConsultantsCoverage:
             "statut": "en_cours",
             "revenus_generes": 60000,
             "technologies_utilisees": "Python, React",
-            "description": "Description de la mission"
+            "description": "Description de la mission",
         }
 
         from app.pages_modules.consultants import add_new_mission
@@ -512,21 +560,22 @@ class TestConsultantsCoverage:
         mock_session.commit.assert_called_once()
         mock_st.success.assert_called_with("✅ Nouvelle mission ajoutée avec succès !")
 
-    @patch('app.pages_modules.consultants.st')
+    @patch("app.pages_modules.consultants.st")
     def test_show_cv_analysis_fullwidth(self, mock_st):
         """Test de l'affichage de l'analyse CV en pleine largeur"""
+
         # Create a simple session state that works with 'in' operator
         class SimpleSessionState:
             def __init__(self):
                 self.cv_analysis = {
                     "analysis": {"missions": [], "competences": {}},
                     "consultant": Mock(prenom="Jean", nom="Dupont"),
-                    "file_name": "cv.pdf"
+                    "file_name": "cv.pdf",
                 }
-            
+
             def __contains__(self, key):
                 return key == "cv_analysis"
-            
+
             def __delattr__(self, name):
                 pass  # Allow deletion without error
 
@@ -553,7 +602,7 @@ class TestConsultantsCoverage:
                 num_cols = len(num_cols_or_weights)
             else:
                 num_cols = num_cols_or_weights
-            
+
             columns = []
             for i in range(num_cols):
                 mock_col = Mock()
@@ -561,7 +610,7 @@ class TestConsultantsCoverage:
                 mock_col.__exit__ = Mock(return_value=None)
                 columns.append(mock_col)
             return tuple(columns)
-        
+
         mock_st.columns.side_effect = mock_columns_side_effect
 
         from app.pages_modules.consultants import show_cv_analysis_fullwidth
@@ -569,10 +618,12 @@ class TestConsultantsCoverage:
         show_cv_analysis_fullwidth()
 
         # Verify that some UI components were called (relaxed assertion)
-        assert mock_st.tabs.called or mock_st.markdown.called or mock_st.container.called
+        assert (
+            mock_st.tabs.called or mock_st.markdown.called or mock_st.container.called
+        )
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_show_mission_readonly(self, mock_get_session, mock_st, mock_mission):
         """Test de l'affichage en lecture seule d'une mission"""
         # Set mission attributes to avoid formatting issues
@@ -601,8 +652,8 @@ class TestConsultantsCoverage:
 
         mock_st.write.assert_called()
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_show_mission_edit_form(self, mock_get_session, mock_st, mock_mission):
         """Test du formulaire d'édition de mission"""
         mock_session = Mock()
@@ -626,7 +677,10 @@ class TestConsultantsCoverage:
         mock_col3 = Mock()
         mock_col3.__enter__ = Mock(return_value=mock_col3)
         mock_col3.__exit__ = Mock(return_value=None)
-        mock_st.columns.side_effect = [(mock_col1, mock_col2), (mock_col1, mock_col2, mock_col3)]  # First call returns 2, second returns 3
+        mock_st.columns.side_effect = [
+            (mock_col1, mock_col2),
+            (mock_col1, mock_col2, mock_col3),
+        ]  # First call returns 2, second returns 3
 
         from app.pages_modules.consultants import show_mission_edit_form
 
@@ -634,8 +688,8 @@ class TestConsultantsCoverage:
 
         mock_st.form.assert_called_with(f"edit_mission_{mock_mission.id}")
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_show_add_mission_form(self, mock_get_session, mock_st, mock_consultant):
         """Test du formulaire d'ajout de mission"""
         mock_session = Mock()
@@ -665,8 +719,8 @@ class TestConsultantsCoverage:
 
     # Tests pour les formulaires de compétences
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_add_technical_skill_form(self, mock_get_session, mock_st, mock_consultant):
         """Test du formulaire d'ajout de compétence technique"""
         mock_session = Mock()
@@ -693,7 +747,7 @@ class TestConsultantsCoverage:
 
         # Mock COMPETENCES_TECHNIQUES to include "Langage"
         mock_competences = {"Langage": ["Python", "Java", "JavaScript"]}
-        with patch('utils.skill_categories.COMPETENCES_TECHNIQUES', mock_competences):
+        with patch("utils.skill_categories.COMPETENCES_TECHNIQUES", mock_competences):
             from app.pages_modules.consultants import _add_technical_skill_form
 
             _add_technical_skill_form(mock_consultant)
@@ -701,9 +755,11 @@ class TestConsultantsCoverage:
             # Check that selectbox was called at least 3 times
             assert mock_st.selectbox.call_count >= 3
 
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
-    def test_add_functional_skill_form(self, mock_get_session, mock_st, mock_consultant):
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
+    def test_add_functional_skill_form(
+        self, mock_get_session, mock_st, mock_consultant
+    ):
         """Test du formulaire d'ajout de compétence fonctionnelle"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -726,18 +782,21 @@ class TestConsultantsCoverage:
 
         # Mock selectbox pour retourner une valeur - need 3 values: category, competence, level
         mock_st.selectbox.side_effect = ["Gestion de projet", "Agile", "Avancé"]
-    
+
         # Mock COMPETENCES_FONCTIONNELLES to include "Gestion de projet"
         mock_competences = {"Gestion de projet": ["Agile", "Scrum", "Kanban"]}
-        with patch('utils.skill_categories.COMPETENCES_FONCTIONNELLES', mock_competences):
+        with patch(
+            "utils.skill_categories.COMPETENCES_FONCTIONNELLES", mock_competences
+        ):
             from app.pages_modules.consultants import _add_functional_skill_form
 
             _add_functional_skill_form(mock_consultant)
 
             # Check that selectbox was called at least 3 times
             assert mock_st.selectbox.call_count >= 3
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.get_database_session')
+
+    @patch("app.pages_modules.consultants.st")
+    @patch("app.pages_modules.consultants.get_database_session")
     def test_add_language_form(self, mock_get_session, mock_st, mock_consultant):
         """Test du formulaire d'ajout de langue"""
         mock_session = Mock()

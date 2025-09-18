@@ -15,7 +15,7 @@ from app.pages_modules.consultant_info import validate_info_form
 class TestConsultantInfoValidation:
     """Tests pour les fonctions de validation des informations consultant"""
 
-    @patch('app.pages_modules.consultant_info.st')
+    @patch("app.pages_modules.consultant_info.st")
     def test_validate_info_form_valid_data(self, mock_st):
         """Test de validation avec des données valides"""
         result = validate_info_form("John", "Doe", "john.doe@example.com")
@@ -24,7 +24,7 @@ class TestConsultantInfoValidation:
         # Vérifier qu'aucune erreur n'a été affichée
         mock_st.error.assert_not_called()
 
-    @patch('app.pages_modules.consultant_info.st')
+    @patch("app.pages_modules.consultant_info.st")
     def test_validate_info_form_missing_prenom(self, mock_st):
         """Test de validation avec prénom manquant"""
         result = validate_info_form("", "Doe", "john.doe@example.com")
@@ -32,7 +32,7 @@ class TestConsultantInfoValidation:
         assert result is False
         mock_st.error.assert_called_with("❌ Le prénom est obligatoire")
 
-    @patch('app.pages_modules.consultant_info.st')
+    @patch("app.pages_modules.consultant_info.st")
     def test_validate_info_form_missing_nom(self, mock_st):
         """Test de validation avec nom manquant"""
         result = validate_info_form("John", "", "john.doe@example.com")
@@ -40,7 +40,7 @@ class TestConsultantInfoValidation:
         assert result is False
         mock_st.error.assert_called_with("❌ Le nom est obligatoire")
 
-    @patch('app.pages_modules.consultant_info.st')
+    @patch("app.pages_modules.consultant_info.st")
     def test_validate_info_form_missing_email(self, mock_st):
         """Test de validation avec email manquant"""
         result = validate_info_form("John", "Doe", "")
@@ -48,7 +48,7 @@ class TestConsultantInfoValidation:
         assert result is False
         mock_st.error.assert_called_with("❌ L'email est obligatoire")
 
-    @patch('app.pages_modules.consultant_info.st')
+    @patch("app.pages_modules.consultant_info.st")
     def test_validate_info_form_invalid_email(self, mock_st):
         """Test de validation avec email invalide"""
         result = validate_info_form("John", "Doe", "invalid-email")
@@ -56,7 +56,7 @@ class TestConsultantInfoValidation:
         assert result is False
         mock_st.error.assert_called_with("❌ L'email doit être valide")
 
-    @patch('app.pages_modules.consultant_info.st')
+    @patch("app.pages_modules.consultant_info.st")
     def test_validate_info_form_multiple_errors(self, mock_st):
         """Test de validation avec plusieurs erreurs"""
         result = validate_info_form("", "", "invalid-email")
@@ -72,8 +72,8 @@ class TestConsultantInfoValidation:
 class TestConsultantInfoUpdate:
     """Tests pour la mise à jour des informations consultant"""
 
-    @patch('app.pages_modules.consultant_info.st')
-    @patch('app.pages_modules.consultant_info.get_database_session')
+    @patch("app.pages_modules.consultant_info.st")
+    @patch("app.pages_modules.consultant_info.get_database_session")
     def test_update_consultant_info_success(self, mock_get_session, mock_st):
         """Test de mise à jour réussie"""
         # Mock de la session et du consultant
@@ -85,9 +85,14 @@ class TestConsultantInfoUpdate:
         mock_consultant.salaire_actuel = 50000
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
         # Pas de conflit d'email
-        mock_session.query.return_value.filter.return_value.first.side_effect = [mock_consultant, None]
+        mock_session.query.return_value.filter.return_value.first.side_effect = [
+            mock_consultant,
+            None,
+        ]
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         data = {
@@ -98,7 +103,7 @@ class TestConsultantInfoUpdate:
             "salaire_actuel": 60000,
             "disponibilite": True,
             "notes": "Test notes",
-            "commentaire": "Augmentation"
+            "commentaire": "Augmentation",
         }
 
         result = update_consultant_info(1, data)
@@ -116,9 +121,11 @@ class TestConsultantInfoUpdate:
         mock_session.commit.assert_called_once()
         mock_st.info.assert_called_with("✅ Informations du consultant mises à jour")
 
-    @patch('app.pages_modules.consultant_info.st')
-    @patch('app.pages_modules.consultant_info.get_database_session')
-    def test_update_consultant_info_consultant_not_found(self, mock_get_session, mock_st):
+    @patch("app.pages_modules.consultant_info.st")
+    @patch("app.pages_modules.consultant_info.get_database_session")
+    def test_update_consultant_info_consultant_not_found(
+        self, mock_get_session, mock_st
+    ):
         """Test de mise à jour avec consultant introuvable"""
         mock_session = MagicMock()
         mock_session.query.return_value.filter.return_value.first.return_value = None
@@ -130,8 +137,8 @@ class TestConsultantInfoUpdate:
         assert result is False
         mock_st.error.assert_called_with("❌ Consultant introuvable")
 
-    @patch('app.pages_modules.consultant_info.st')
-    @patch('app.pages_modules.consultant_info.get_database_session')
+    @patch("app.pages_modules.consultant_info.st")
+    @patch("app.pages_modules.consultant_info.get_database_session")
     def test_update_consultant_info_email_conflict(self, mock_get_session, mock_st):
         """Test de mise à jour avec conflit d'email"""
         # Mock consultant existant
@@ -143,18 +150,25 @@ class TestConsultantInfoUpdate:
         mock_existing.id = 2
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.side_effect = [mock_consultant, mock_existing]
+        mock_session.query.return_value.filter.return_value.first.side_effect = [
+            mock_consultant,
+            mock_existing,
+        ]
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         data = {"prenom": "John", "nom": "Doe", "email": "existing@example.com"}
         result = update_consultant_info(1, data)
 
         assert result is False
-        mock_st.error.assert_called_with("❌ Cet email est déjà utilisé par un autre consultant")
+        mock_st.error.assert_called_with(
+            "❌ Cet email est déjà utilisé par un autre consultant"
+        )
 
-    @patch('app.pages_modules.consultant_info.st')
-    @patch('app.pages_modules.consultant_info.get_database_session')
-    def test_update_consultant_info_salary_change_with_history(self, mock_get_session, mock_st):
+    @patch("app.pages_modules.consultant_info.st")
+    @patch("app.pages_modules.consultant_info.get_database_session")
+    def test_update_consultant_info_salary_change_with_history(
+        self, mock_get_session, mock_st
+    ):
         """Test de mise à jour avec changement de salaire et historique"""
         mock_consultant = MagicMock()
         mock_consultant.id = 1
@@ -184,7 +198,7 @@ class TestConsultantInfoUpdate:
             "salaire_actuel": 60000,
             "disponibilite": True,
             "notes": "Test notes",
-            "commentaire": "Augmentation méritée"
+            "commentaire": "Augmentation méritée",
         }
 
         result = update_consultant_info(1, data)
@@ -193,8 +207,8 @@ class TestConsultantInfoUpdate:
         # Vérifier que session.add a été appelé pour l'historique de salaire
         mock_session.add.assert_called_once()
 
-    @patch('app.pages_modules.consultant_info.st')
-    @patch('app.pages_modules.consultant_info.get_database_session')
+    @patch("app.pages_modules.consultant_info.st")
+    @patch("app.pages_modules.consultant_info.get_database_session")
     def test_update_consultant_info_database_error(self, mock_get_session, mock_st):
         """Test de mise à jour avec erreur de base de données"""
         mock_session = MagicMock()
