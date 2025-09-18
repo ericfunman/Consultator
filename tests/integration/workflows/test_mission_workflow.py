@@ -10,6 +10,7 @@ from app.services.consultant_service import ConsultantService
 from app.database.database import get_database_session
 from app.database.models import Consultant, Practice, Mission
 
+
 # Fixtures pour les tests de mission
 @pytest.fixture
 def sample_mission_data():
@@ -23,8 +24,9 @@ def sample_mission_data():
         "statut": "en_cours",
         "technologies_utilisees": "React, Node.js, MongoDB",
         "revenus_generes": 0,
-        "role": "Développeur Full-Stack"
+        "role": "Développeur Full-Stack",
     }
+
 
 @pytest.fixture
 def sample_consultant_for_mission():
@@ -40,7 +42,7 @@ def sample_consultant_for_mission():
         "notes": "Consultant pour tests missions",
         "societe": "TestCorp",
         "grade": "Senior",
-        "type_contrat": "CDI"
+        "type_contrat": "CDI",
     }
 
     result = ConsultantService.create_consultant(data)
@@ -55,10 +57,13 @@ def sample_consultant_for_mission():
     except:
         pass
 
+
 class TestMissionWorkflowIntegration:
     """Tests d'intégration pour le workflow mission complet"""
 
-    def test_complete_mission_lifecycle(self, sample_consultant_for_mission, sample_mission_data):
+    def test_complete_mission_lifecycle(
+        self, sample_consultant_for_mission, sample_mission_data
+    ):
         """Test du cycle de vie complet d'une mission"""
 
         consultant_id = sample_consultant_for_mission
@@ -79,7 +84,9 @@ class TestMissionWorkflowIntegration:
 
             # Vérifier que la mission a été créée
             with get_database_session() as session:
-                created_mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                created_mission = (
+                    session.query(Mission).filter(Mission.id == mission_id).first()
+                )
                 assert created_mission is not None
                 assert created_mission.nom_mission == sample_mission_data["nom_mission"]
                 assert created_mission.client == sample_mission_data["client"]
@@ -91,7 +98,9 @@ class TestMissionWorkflowIntegration:
             print("=== PHASE 2: Modification de la mission ===")
 
             with get_database_session() as session:
-                mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                mission = (
+                    session.query(Mission).filter(Mission.id == mission_id).first()
+                )
                 mission.description = "Description mise à jour pour le test"
                 mission.technologies_utilisees = "React, Node.js, MongoDB, Docker"
                 mission.role = "Lead Développeur"
@@ -99,8 +108,13 @@ class TestMissionWorkflowIntegration:
 
             # Vérifier les modifications
             with get_database_session() as session:
-                updated_mission = session.query(Mission).filter(Mission.id == mission_id).first()
-                assert updated_mission.description == "Description mise à jour pour le test"
+                updated_mission = (
+                    session.query(Mission).filter(Mission.id == mission_id).first()
+                )
+                assert (
+                    updated_mission.description
+                    == "Description mise à jour pour le test"
+                )
                 assert updated_mission.role == "Lead Développeur"
 
             print("✅ Mission modifiée avec succès")
@@ -109,7 +123,9 @@ class TestMissionWorkflowIntegration:
             print("=== PHASE 3: Clôture de la mission ===")
 
             with get_database_session() as session:
-                mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                mission = (
+                    session.query(Mission).filter(Mission.id == mission_id).first()
+                )
                 mission.statut = "terminee"
                 mission.date_fin = date.today() + timedelta(days=85)  # Fin anticipée
                 mission.revenus_generes = 45000
@@ -117,7 +133,9 @@ class TestMissionWorkflowIntegration:
 
             # Vérifier la clôture
             with get_database_session() as session:
-                closed_mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                closed_mission = (
+                    session.query(Mission).filter(Mission.id == mission_id).first()
+                )
                 assert closed_mission.statut == "terminee"
                 assert closed_mission.revenus_generes == 45000
 
@@ -127,12 +145,14 @@ class TestMissionWorkflowIntegration:
             print("=== PHASE 4: Vérification des impacts ===")
 
             # Vérifier que le consultant a la mission dans son historique
-            consultant_with_stats = ConsultantService.get_consultant_with_stats(consultant_id)
+            consultant_with_stats = ConsultantService.get_consultant_with_stats(
+                consultant_id
+            )
             assert len(consultant_with_stats["missions"]) > 0
 
             mission_in_profile = next(
                 (m for m in consultant_with_stats["missions"] if m["id"] == mission_id),
-                None
+                None,
             )
             assert mission_in_profile is not None
             assert mission_in_profile["statut"] == "terminee"
@@ -148,7 +168,11 @@ class TestMissionWorkflowIntegration:
                 print("=== NETTOYAGE MISSION ===")
                 try:
                     with get_database_session() as session:
-                        mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                        mission = (
+                            session.query(Mission)
+                            .filter(Mission.id == mission_id)
+                            .first()
+                        )
                         if mission:
                             session.delete(mission)
                             session.commit()
@@ -174,7 +198,7 @@ class TestMissionWorkflowIntegration:
                     "statut": "en_cours",
                     "technologies_utilisees": "Python, FastAPI",
                     "revenus_generes": 0,
-                    "consultant_id": consultant_id
+                    "consultant_id": consultant_id,
                 },
                 {
                     "nom_mission": "Mission 2 - Frontend Development",
@@ -185,7 +209,7 @@ class TestMissionWorkflowIntegration:
                     "statut": "terminee",
                     "technologies_utilisees": "React, TypeScript",
                     "revenus_generes": 35000,
-                    "consultant_id": consultant_id
+                    "consultant_id": consultant_id,
                 },
                 {
                     "nom_mission": "Mission 3 - Database Design",
@@ -196,8 +220,8 @@ class TestMissionWorkflowIntegration:
                     "statut": "terminee",
                     "technologies_utilisees": "PostgreSQL, MongoDB",
                     "revenus_generes": 28000,
-                    "consultant_id": consultant_id
-                }
+                    "consultant_id": consultant_id,
+                },
             ]
 
             # Créer les missions
@@ -210,23 +234,39 @@ class TestMissionWorkflowIntegration:
 
             # Vérifier que toutes les missions sont créées
             with get_database_session() as session:
-                missions = session.query(Mission).filter(Mission.consultant_id == consultant_id).all()
+                missions = (
+                    session.query(Mission)
+                    .filter(Mission.consultant_id == consultant_id)
+                    .all()
+                )
                 assert len(missions) == 3
 
             # Vérifier les statistiques du consultant
-            consultant_with_stats = ConsultantService.get_consultant_with_stats(consultant_id)
+            consultant_with_stats = ConsultantService.get_consultant_with_stats(
+                consultant_id
+            )
             assert len(consultant_with_stats["missions"]) == 3
 
             # Calculer les revenus totaux
-            total_revenus = sum(m["revenus_generes"] for m in consultant_with_stats["missions"])
+            total_revenus = sum(
+                m["revenus_generes"] for m in consultant_with_stats["missions"]
+            )
             assert total_revenus == 63000  # 0 + 35000 + 28000
 
             # Vérifier le nombre de missions terminées
-            completed_missions = [m for m in consultant_with_stats["missions"] if m["statut"] == "terminee"]
+            completed_missions = [
+                m
+                for m in consultant_with_stats["missions"]
+                if m["statut"] == "terminee"
+            ]
             assert len(completed_missions) == 2
 
             # Vérifier qu'il y a une mission en cours
-            active_missions = [m for m in consultant_with_stats["missions"] if m["statut"] == "en_cours"]
+            active_missions = [
+                m
+                for m in consultant_with_stats["missions"]
+                if m["statut"] == "en_cours"
+            ]
             assert len(active_missions) == 1
 
             print("✅ Gestion de plusieurs missions réussie")
@@ -236,7 +276,11 @@ class TestMissionWorkflowIntegration:
             for mission_id in mission_ids:
                 try:
                     with get_database_session() as session:
-                        mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                        mission = (
+                            session.query(Mission)
+                            .filter(Mission.id == mission_id)
+                            .first()
+                        )
                         if mission:
                             session.delete(mission)
                             session.commit()
@@ -260,7 +304,7 @@ class TestMissionWorkflowIntegration:
                 "statut": "en_cours",
                 "technologies_utilisees": "Python",
                 "revenus_generes": 0,
-                "consultant_id": consultant_id
+                "consultant_id": consultant_id,
             }
 
             with get_database_session() as session:
@@ -274,12 +318,14 @@ class TestMissionWorkflowIntegration:
                 ("en_cours", "Mission en cours"),
                 ("suspendue", "Mission suspendue temporairement"),
                 ("terminee", "Mission terminée avec succès"),
-                ("annulee", "Mission annulée")
+                ("annulee", "Mission annulée"),
             ]
 
             for status, description in status_transitions:
                 with get_database_session() as session:
-                    mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                    mission = (
+                        session.query(Mission).filter(Mission.id == mission_id).first()
+                    )
                     mission.statut = status
                     if status == "terminee":
                         mission.revenus_generes = 30000
@@ -287,13 +333,17 @@ class TestMissionWorkflowIntegration:
 
                 # Vérifier le changement d'état
                 with get_database_session() as session:
-                    updated_mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                    updated_mission = (
+                        session.query(Mission).filter(Mission.id == mission_id).first()
+                    )
                     assert updated_mission.statut == status
 
                 print(f"✅ Transition vers '{status}' réussie")
 
             # Vérifier l'impact sur les statistiques du consultant
-            consultant_with_stats = ConsultantService.get_consultant_with_stats(consultant_id)
+            consultant_with_stats = ConsultantService.get_consultant_with_stats(
+                consultant_id
+            )
             missions = consultant_with_stats["missions"]
             assert len(missions) == 1
 
@@ -307,7 +357,11 @@ class TestMissionWorkflowIntegration:
             if mission_id:
                 try:
                     with get_database_session() as session:
-                        mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                        mission = (
+                            session.query(Mission)
+                            .filter(Mission.id == mission_id)
+                            .first()
+                        )
                         if mission:
                             session.delete(mission)
                             session.commit()
@@ -332,7 +386,7 @@ class TestMissionWorkflowIntegration:
                 "statut": "en_cours",
                 "technologies_utilisees": "Python",
                 "revenus_generes": 0,
-                "consultant_id": consultant_id
+                "consultant_id": consultant_id,
             }
 
             with get_database_session() as session:
@@ -346,14 +400,18 @@ class TestMissionWorkflowIntegration:
             new_end_date = base_date + timedelta(days=45)
 
             with get_database_session() as session:
-                mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                mission = (
+                    session.query(Mission).filter(Mission.id == mission_id).first()
+                )
                 mission.date_debut = new_start_date
                 mission.date_fin = new_end_date
                 session.commit()
 
             # Vérifier les nouvelles dates
             with get_database_session() as session:
-                updated_mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                updated_mission = (
+                    session.query(Mission).filter(Mission.id == mission_id).first()
+                )
                 assert updated_mission.date_debut == new_start_date
                 assert updated_mission.date_fin == new_end_date
 
@@ -368,7 +426,11 @@ class TestMissionWorkflowIntegration:
             if mission_id:
                 try:
                     with get_database_session() as session:
-                        mission = session.query(Mission).filter(Mission.id == mission_id).first()
+                        mission = (
+                            session.query(Mission)
+                            .filter(Mission.id == mission_id)
+                            .first()
+                        )
                         if mission:
                             session.delete(mission)
                             session.commit()

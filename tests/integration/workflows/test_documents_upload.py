@@ -8,7 +8,7 @@ from io import BytesIO
 from app.pages_modules.documents_upload import (
     show,
     show_document_upload_section,
-    save_uploaded_document
+    save_uploaded_document,
 )
 from tests.fixtures.base_test import BaseIntegrationTest
 
@@ -16,10 +16,10 @@ from tests.fixtures.base_test import BaseIntegrationTest
 class TestDocumentsUploadModule(BaseIntegrationTest):
     """Tests pour le module documents_upload"""
 
-    @patch('app.pages_modules.documents_upload.imports_ok', True)
-    @patch('streamlit.title')
-    @patch('streamlit.markdown')
-    @patch('app.pages_modules.documents_upload.show_document_upload_section')
+    @patch("app.pages_modules.documents_upload.imports_ok", True)
+    @patch("streamlit.title")
+    @patch("streamlit.markdown")
+    @patch("app.pages_modules.documents_upload.show_document_upload_section")
     def test_show_success(self, mock_show_section, mock_markdown, mock_title):
         """Test de show() avec imports réussis"""
         show()
@@ -28,21 +28,23 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_markdown.assert_called_once_with("### Uploadez et gérez les documents")
         mock_show_section.assert_called_once()
 
-    @patch('app.pages_modules.documents_upload.imports_ok', False)
-    @patch('streamlit.title')
-    @patch('streamlit.markdown')
-    @patch('streamlit.error')
+    @patch("app.pages_modules.documents_upload.imports_ok", False)
+    @patch("streamlit.title")
+    @patch("streamlit.markdown")
+    @patch("streamlit.error")
     def test_show_imports_failed(self, mock_error, mock_markdown, mock_title):
         """Test de show() avec imports échoués"""
         show()
 
         mock_title.assert_called_once_with(" Gestion des documents")
         mock_markdown.assert_called_once_with("### Uploadez et gérez les documents")
-        mock_error.assert_called_once_with(" Les services de documents ne sont pas disponibles")
+        mock_error.assert_called_once_with(
+            " Les services de documents ne sont pas disponibles"
+        )
 
-    @patch('app.pages_modules.documents_upload.imports_ok', True)
-    @patch('streamlit.subheader')
-    @patch('streamlit.file_uploader')
+    @patch("app.pages_modules.documents_upload.imports_ok", True)
+    @patch("streamlit.subheader")
+    @patch("streamlit.file_uploader")
     def test_show_document_upload_section_no_file(self, mock_uploader, mock_subheader):
         """Test de show_document_upload_section() sans fichier uploadé"""
         mock_uploader.return_value = None
@@ -52,14 +54,15 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_subheader.assert_called_once_with(" Upload de documents")
         mock_uploader.assert_called_once()
 
-    @patch('app.pages_modules.documents_upload.imports_ok', True)
-    @patch('streamlit.subheader')
-    @patch('streamlit.file_uploader')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    @patch('streamlit.button')
-    def test_show_document_upload_section_with_file(self, mock_button, mock_metric,
-                                                   mock_columns, mock_uploader, mock_subheader):
+    @patch("app.pages_modules.documents_upload.imports_ok", True)
+    @patch("streamlit.subheader")
+    @patch("streamlit.file_uploader")
+    @patch("streamlit.columns")
+    @patch("streamlit.metric")
+    @patch("streamlit.button")
+    def test_show_document_upload_section_with_file(
+        self, mock_button, mock_metric, mock_columns, mock_uploader, mock_subheader
+    ):
         """Test de show_document_upload_section() avec fichier uploadé"""
         # Mock fichier uploadé
         mock_file = Mock()
@@ -88,21 +91,27 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_columns.assert_called_once_with(3)
         mock_metric.assert_any_call(" Nom du fichier", "test_document.pdf")
         mock_metric.assert_any_call(" Taille", "500.0 KB")
-        mock_button.assert_called_once_with(" Sauvegarder document", type="primary", key="save_document")
+        mock_button.assert_called_once_with(
+            " Sauvegarder document", type="primary", key="save_document"
+        )
 
-    @patch('app.pages_modules.documents_upload.imports_ok', False)
-    @patch('streamlit.error')
+    @patch("app.pages_modules.documents_upload.imports_ok", False)
+    @patch("streamlit.error")
     def test_show_document_upload_section_imports_failed(self, mock_error):
         """Test de show_document_upload_section() avec imports échoués"""
         show_document_upload_section()
 
-        mock_error.assert_called_once_with(" Les services de documents ne sont pas disponibles")
+        mock_error.assert_called_once_with(
+            " Les services de documents ne sont pas disponibles"
+        )
 
-    @patch('app.pages_modules.documents_upload.DocumentService')
-    @patch('streamlit.success')
-    @patch('streamlit.info')
-    @patch('builtins.open', new_callable=MagicMock)
-    def test_save_uploaded_document_success(self, mock_open, mock_info, mock_success, mock_doc_service):
+    @patch("app.pages_modules.documents_upload.DocumentService")
+    @patch("streamlit.success")
+    @patch("streamlit.info")
+    @patch("builtins.open", new_callable=MagicMock)
+    def test_save_uploaded_document_success(
+        self, mock_open, mock_info, mock_success, mock_doc_service
+    ):
         """Test de save_uploaded_document() avec succès"""
         # Mock fichier
         mock_file = Mock()
@@ -129,8 +138,8 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_success.assert_called()
         mock_info.assert_called()
 
-    @patch('app.pages_modules.documents_upload.DocumentService')
-    @patch('streamlit.error')
+    @patch("app.pages_modules.documents_upload.DocumentService")
+    @patch("streamlit.error")
     def test_save_uploaded_document_error(self, mock_error, mock_doc_service):
         """Test de save_uploaded_document() avec erreur"""
         # Mock fichier
@@ -150,29 +159,35 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         import app.pages_modules.documents_upload as upload_module
 
         # Vérifier que les fonctions existent
-        assert hasattr(upload_module, 'show')
+        assert hasattr(upload_module, "show")
         assert callable(upload_module.show)
 
-        assert hasattr(upload_module, 'show_document_upload_section')
+        assert hasattr(upload_module, "show_document_upload_section")
         assert callable(upload_module.show_document_upload_section)
 
-        assert hasattr(upload_module, 'save_uploaded_document')
+        assert hasattr(upload_module, "save_uploaded_document")
         assert callable(upload_module.save_uploaded_document)
 
         # Vérifier les variables d'import
-        assert hasattr(upload_module, 'DocumentService')
-        assert hasattr(upload_module, 'imports_ok')
+        assert hasattr(upload_module, "DocumentService")
+        assert hasattr(upload_module, "imports_ok")
 
-    @patch('app.pages_modules.documents_upload.imports_ok', True)
-    @patch('streamlit.subheader')
-    @patch('streamlit.file_uploader')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    @patch('streamlit.button')
-    @patch('app.pages_modules.documents_upload.save_uploaded_document')
-    def test_show_document_upload_section_save_button_clicked(self, mock_save_func,
-                                                             mock_button, mock_metric,
-                                                             mock_columns, mock_uploader, mock_subheader):
+    @patch("app.pages_modules.documents_upload.imports_ok", True)
+    @patch("streamlit.subheader")
+    @patch("streamlit.file_uploader")
+    @patch("streamlit.columns")
+    @patch("streamlit.metric")
+    @patch("streamlit.button")
+    @patch("app.pages_modules.documents_upload.save_uploaded_document")
+    def test_show_document_upload_section_save_button_clicked(
+        self,
+        mock_save_func,
+        mock_button,
+        mock_metric,
+        mock_columns,
+        mock_uploader,
+        mock_subheader,
+    ):
         """Test de show_document_upload_section() avec clic sur sauvegarder"""
         # Mock fichier uploadé
         mock_file = Mock()
@@ -198,13 +213,14 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
 
         mock_save_func.assert_called_once_with(mock_file)
 
-    @patch('app.pages_modules.documents_upload.imports_ok', True)
-    @patch('streamlit.subheader')
-    @patch('streamlit.file_uploader')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    def test_show_document_upload_section_large_file(self, mock_metric, mock_columns,
-                                                    mock_uploader, mock_subheader):
+    @patch("app.pages_modules.documents_upload.imports_ok", True)
+    @patch("streamlit.subheader")
+    @patch("streamlit.file_uploader")
+    @patch("streamlit.columns")
+    @patch("streamlit.metric")
+    def test_show_document_upload_section_large_file(
+        self, mock_metric, mock_columns, mock_uploader, mock_subheader
+    ):
         """Test de show_document_upload_section() avec fichier volumineux"""
         # Mock fichier volumineux
         mock_file = Mock()

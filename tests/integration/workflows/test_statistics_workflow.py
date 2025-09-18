@@ -12,6 +12,7 @@ from app.services.practice_service import PracticeService
 from app.database.database import get_database_session
 from app.database.models import Practice, Consultant, Mission
 
+
 # Fixtures pour les tests de statistiques
 @pytest.fixture
 def statistics_test_data():
@@ -19,9 +20,21 @@ def statistics_test_data():
 
     # Créer des practices
     practices_data = [
-        {"nom": "Data Science", "description": "Data Science & AI", "responsable": "Dr. Marie Dubois"},
-        {"nom": "Frontend", "description": "Développement frontend", "responsable": "Alice Frontend"},
-        {"nom": "Backend", "description": "Développement backend", "responsable": "Bob Backend"}
+        {
+            "nom": "Data Science",
+            "description": "Data Science & AI",
+            "responsable": "Dr. Marie Dubois",
+        },
+        {
+            "nom": "Frontend",
+            "description": "Développement frontend",
+            "responsable": "Alice Frontend",
+        },
+        {
+            "nom": "Backend",
+            "description": "Développement backend",
+            "responsable": "Bob Backend",
+        },
     ]
 
     practice_ids = []
@@ -36,22 +49,128 @@ def statistics_test_data():
     # Créer des consultants avec diversité de salaires et grades
     consultants_data = [
         # Data Science - hauts salaires
-        {"prenom": "Alice", "nom": "Expert", "email": "alice.expert@test.com", "salaire_actuel": 75000, "practice_id": practice_ids[0], "disponibilite": True, "grade": "Expert", "societe": "DataCorp"},
-        {"prenom": "Bob", "nom": "Senior", "email": "bob.senior@test.com", "salaire_actuel": 65000, "practice_id": practice_ids[0], "disponibilite": True, "grade": "Senior", "societe": "DataCorp"},
-        {"prenom": "Claire", "nom": "Senior", "email": "claire.senior@test.com", "salaire_actuel": 62000, "practice_id": practice_ids[0], "disponibilite": False, "grade": "Senior", "societe": "DataCorp"},
-        {"prenom": "David", "nom": "Junior", "email": "david.junior@test.com", "salaire_actuel": 45000, "practice_id": practice_ids[0], "disponibilite": True, "grade": "Junior", "societe": "DataCorp"},
-
+        {
+            "prenom": "Alice",
+            "nom": "Expert",
+            "email": "alice.expert@test.com",
+            "salaire_actuel": 75000,
+            "practice_id": practice_ids[0],
+            "disponibilite": True,
+            "grade": "Expert",
+            "societe": "DataCorp",
+        },
+        {
+            "prenom": "Bob",
+            "nom": "Senior",
+            "email": "bob.senior@test.com",
+            "salaire_actuel": 65000,
+            "practice_id": practice_ids[0],
+            "disponibilite": True,
+            "grade": "Senior",
+            "societe": "DataCorp",
+        },
+        {
+            "prenom": "Claire",
+            "nom": "Senior",
+            "email": "claire.senior@test.com",
+            "salaire_actuel": 62000,
+            "practice_id": practice_ids[0],
+            "disponibilite": False,
+            "grade": "Senior",
+            "societe": "DataCorp",
+        },
+        {
+            "prenom": "David",
+            "nom": "Junior",
+            "email": "david.junior@test.com",
+            "salaire_actuel": 45000,
+            "practice_id": practice_ids[0],
+            "disponibilite": True,
+            "grade": "Junior",
+            "societe": "DataCorp",
+        },
         # Frontend - salaires moyens
-        {"prenom": "Emma", "nom": "Expert", "email": "emma.expert@test.com", "salaire_actuel": 68000, "practice_id": practice_ids[1], "disponibilite": True, "grade": "Expert", "societe": "WebCorp"},
-        {"prenom": "Felix", "nom": "Senior", "email": "felix.senior@test.com", "salaire_actuel": 58000, "practice_id": practice_ids[1], "disponibilite": True, "grade": "Senior", "societe": "WebCorp"},
-        {"prenom": "Grace", "nom": "Senior", "email": "grace.senior@test.com", "salaire_actuel": 55000, "practice_id": practice_ids[1], "disponibilite": False, "grade": "Senior", "societe": "WebCorp"},
-        {"prenom": "Henry", "nom": "Junior", "email": "henry.junior@test.com", "salaire_actuel": 42000, "practice_id": practice_ids[1], "disponibilite": True, "grade": "Junior", "societe": "WebCorp"},
-
+        {
+            "prenom": "Emma",
+            "nom": "Expert",
+            "email": "emma.expert@test.com",
+            "salaire_actuel": 68000,
+            "practice_id": practice_ids[1],
+            "disponibilite": True,
+            "grade": "Expert",
+            "societe": "WebCorp",
+        },
+        {
+            "prenom": "Felix",
+            "nom": "Senior",
+            "email": "felix.senior@test.com",
+            "salaire_actuel": 58000,
+            "practice_id": practice_ids[1],
+            "disponibilite": True,
+            "grade": "Senior",
+            "societe": "WebCorp",
+        },
+        {
+            "prenom": "Grace",
+            "nom": "Senior",
+            "email": "grace.senior@test.com",
+            "salaire_actuel": 55000,
+            "practice_id": practice_ids[1],
+            "disponibilite": False,
+            "grade": "Senior",
+            "societe": "WebCorp",
+        },
+        {
+            "prenom": "Henry",
+            "nom": "Junior",
+            "email": "henry.junior@test.com",
+            "salaire_actuel": 42000,
+            "practice_id": practice_ids[1],
+            "disponibilite": True,
+            "grade": "Junior",
+            "societe": "WebCorp",
+        },
         # Backend - salaires variés
-        {"prenom": "Iris", "nom": "Expert", "email": "iris.expert@test.com", "salaire_actuel": 72000, "practice_id": practice_ids[2], "disponibilite": False, "grade": "Expert", "societe": "BackendCorp"},
-        {"prenom": "Jack", "nom": "Senior", "email": "jack.senior@test.com", "salaire_actuel": 60000, "practice_id": practice_ids[2], "disponibilite": True, "grade": "Senior", "societe": "BackendCorp"},
-        {"prenom": "Kate", "nom": "Senior", "email": "kate.senior@test.com", "salaire_actuel": 57000, "practice_id": practice_ids[2], "disponibilite": True, "grade": "Senior", "societe": "BackendCorp"},
-        {"prenom": "Leo", "nom": "Junior", "email": "leo.junior@test.com", "salaire_actuel": 44000, "practice_id": practice_ids[2], "disponibilite": True, "grade": "Junior", "societe": "BackendCorp"}
+        {
+            "prenom": "Iris",
+            "nom": "Expert",
+            "email": "iris.expert@test.com",
+            "salaire_actuel": 72000,
+            "practice_id": practice_ids[2],
+            "disponibilite": False,
+            "grade": "Expert",
+            "societe": "BackendCorp",
+        },
+        {
+            "prenom": "Jack",
+            "nom": "Senior",
+            "email": "jack.senior@test.com",
+            "salaire_actuel": 60000,
+            "practice_id": practice_ids[2],
+            "disponibilite": True,
+            "grade": "Senior",
+            "societe": "BackendCorp",
+        },
+        {
+            "prenom": "Kate",
+            "nom": "Senior",
+            "email": "kate.senior@test.com",
+            "salaire_actuel": 57000,
+            "practice_id": practice_ids[2],
+            "disponibilite": True,
+            "grade": "Senior",
+            "societe": "BackendCorp",
+        },
+        {
+            "prenom": "Leo",
+            "nom": "Junior",
+            "email": "leo.junior@test.com",
+            "salaire_actuel": 44000,
+            "practice_id": practice_ids[2],
+            "disponibilite": True,
+            "grade": "Junior",
+            "societe": "BackendCorp",
+        },
     ]
 
     consultant_ids = []
@@ -66,7 +185,7 @@ def statistics_test_data():
         "practice_ids": practice_ids,
         "consultant_ids": consultant_ids,
         "practices_data": practices_data,
-        "consultants_data": consultants_data
+        "consultants_data": consultants_data,
     }
 
     # Nettoyage
@@ -79,12 +198,15 @@ def statistics_test_data():
     for practice_id in practice_ids:
         try:
             with get_database_session() as session:
-                practice = session.query(Practice).filter(Practice.id == practice_id).first()
+                practice = (
+                    session.query(Practice).filter(Practice.id == practice_id).first()
+                )
                 if practice:
                     session.delete(practice)
                     session.commit()
         except:
             pass
+
 
 class TestStatisticsWorkflowIntegration:
     """Tests d'intégration pour le workflow de statistiques et tableaux de bord"""
@@ -102,7 +224,11 @@ class TestStatisticsWorkflowIntegration:
         total_consultants = len(all_consultants)
         available_consultants = sum(1 for c in all_consultants if c["disponibilite"])
         unavailable_consultants = total_consultants - available_consultants
-        availability_rate = (available_consultants / total_consultants) * 100 if total_consultants > 0 else 0
+        availability_rate = (
+            (available_consultants / total_consultants) * 100
+            if total_consultants > 0
+            else 0
+        )
 
         total_salary = sum(c["salaire_actuel"] for c in all_consultants)
         avg_salary = total_salary / total_consultants if total_consultants > 0 else 0
@@ -133,7 +259,9 @@ class TestStatisticsWorkflowIntegration:
         # Statistiques par practice
         practice_stats = {}
         for practice_name in ["Data Science", "Frontend", "Backend"]:
-            practice_consultants = [c for c in all_consultants if c.get("practice_name") == practice_name]
+            practice_consultants = [
+                c for c in all_consultants if c.get("practice_name") == practice_name
+            ]
             if practice_consultants:
                 total = len(practice_consultants)
                 available = sum(1 for c in practice_consultants if c["disponibilite"])
@@ -148,7 +276,7 @@ class TestStatisticsWorkflowIntegration:
                     "unavailable": unavailable,
                     "availability_rate": availability_rate,
                     "total_salary": total_salary,
-                    "avg_salary": avg_salary
+                    "avg_salary": avg_salary,
                 }
 
                 print(f"📊 {practice_name}:")
@@ -197,7 +325,7 @@ class TestStatisticsWorkflowIntegration:
                     "available": available,
                     "availability_rate": availability_rate,
                     "total_salary": total_salary,
-                    "avg_salary": avg_salary
+                    "avg_salary": avg_salary,
                 }
 
                 print(f"📊 Grade {grade}:")
@@ -219,7 +347,11 @@ class TestStatisticsWorkflowIntegration:
         assert junior_stats["available"] == 3  # Tous disponibles
 
         # Vérifier la progression salariale
-        assert expert_stats["avg_salary"] > senior_stats["avg_salary"] > junior_stats["avg_salary"]
+        assert (
+            expert_stats["avg_salary"]
+            > senior_stats["avg_salary"]
+            > junior_stats["avg_salary"]
+        )
 
         print("✅ Statistiques par grade calculées correctement")
 
@@ -259,7 +391,7 @@ class TestStatisticsWorkflowIntegration:
             "40k-50k": sum(1 for s in salaries if 40000 <= s < 50000),
             "50k-60k": sum(1 for s in salaries if 50000 <= s < 60000),
             "60k-70k": sum(1 for s in salaries if 60000 <= s < 70000),
-            "70k-80k": sum(1 for s in salaries if 70000 <= s < 80000)
+            "70k-80k": sum(1 for s in salaries if 70000 <= s < 80000),
         }
 
         print(f"📊 Répartition par tranches:")
@@ -284,23 +416,45 @@ class TestStatisticsWorkflowIntegration:
         # Métriques clés pour le dashboard
         dashboard_metrics = {
             "total_consultants": len(all_consultants),
-            "available_consultants": sum(1 for c in all_consultants if c["disponibilite"]),
-            "total_practices": len(set(c.get("practice_name") for c in all_consultants if c.get("practice_name"))),
+            "available_consultants": sum(
+                1 for c in all_consultants if c["disponibilite"]
+            ),
+            "total_practices": len(
+                set(
+                    c.get("practice_name")
+                    for c in all_consultants
+                    if c.get("practice_name")
+                )
+            ),
             "total_salary_cost": sum(c["salaire_actuel"] for c in all_consultants),
-            "avg_salary": sum(c["salaire_actuel"] for c in all_consultants) / len(all_consultants),
-            "availability_rate": (sum(1 for c in all_consultants if c["disponibilite"]) / len(all_consultants)) * 100
+            "avg_salary": sum(c["salaire_actuel"] for c in all_consultants)
+            / len(all_consultants),
+            "availability_rate": (
+                sum(1 for c in all_consultants if c["disponibilite"])
+                / len(all_consultants)
+            )
+            * 100,
         }
 
         # Métriques par practice pour le dashboard
         practice_dashboard = {}
         for practice_name in ["Data Science", "Frontend", "Backend"]:
-            practice_consultants = [c for c in all_consultants if c.get("practice_name") == practice_name]
+            practice_consultants = [
+                c for c in all_consultants if c.get("practice_name") == practice_name
+            ]
             if practice_consultants:
                 practice_dashboard[practice_name] = {
                     "count": len(practice_consultants),
-                    "available": sum(1 for c in practice_consultants if c["disponibilite"]),
-                    "avg_salary": sum(c["salaire_actuel"] for c in practice_consultants) / len(practice_consultants),
-                    "availability_rate": (sum(1 for c in practice_consultants if c["disponibilite"]) / len(practice_consultants)) * 100
+                    "available": sum(
+                        1 for c in practice_consultants if c["disponibilite"]
+                    ),
+                    "avg_salary": sum(c["salaire_actuel"] for c in practice_consultants)
+                    / len(practice_consultants),
+                    "availability_rate": (
+                        sum(1 for c in practice_consultants if c["disponibilite"])
+                        / len(practice_consultants)
+                    )
+                    * 100,
                 }
 
         # Afficher les métriques du dashboard
@@ -310,13 +464,17 @@ class TestStatisticsWorkflowIntegration:
         print(f"   - 🏢 Practices: {dashboard_metrics['total_practices']}")
         print(f"   - 💰 Coût total: {dashboard_metrics['total_salary_cost']:,}€")
         print(f"   - 📈 Salaire moyen: {dashboard_metrics['avg_salary']:,.0f}€")
-        print(f"   - 📊 Taux disponibilité: {dashboard_metrics['availability_rate']:.1f}%")
+        print(
+            f"   - 📊 Taux disponibilité: {dashboard_metrics['availability_rate']:.1f}%"
+        )
 
         print("\n📊 MÉTRIQUES PAR PRACTICE:")
         for practice, metrics in practice_dashboard.items():
             print(f"   - {practice}:")
             print(f"     • Consultants: {metrics['count']}")
-            print(f"     • Disponibles: {metrics['available']} ({metrics['availability_rate']:.1f}%)")
+            print(
+                f"     • Disponibles: {metrics['available']} ({metrics['availability_rate']:.1f}%)"
+            )
             print(f"     • Salaire moyen: {metrics['avg_salary']:,.0f}€")
 
         # Vérifications des métriques
@@ -361,10 +519,12 @@ class TestStatisticsWorkflowIntegration:
         print(f"   - Max: {salary_stats['max']:,.0f}€")
 
         # Groupement par practice
-        practice_group = df.groupby("practice_name").agg({
-            "salaire_actuel": ["count", "mean", "min", "max"],
-            "disponibilite": "sum"  # Nombre de disponibles
-        })
+        practice_group = df.groupby("practice_name").agg(
+            {
+                "salaire_actuel": ["count", "mean", "min", "max"],
+                "disponibilite": "sum",  # Nombre de disponibles
+            }
+        )
 
         print(f"\n📊 Statistiques par practice (DataFrame):")
         for practice in practice_group.index:
@@ -372,13 +532,14 @@ class TestStatisticsWorkflowIntegration:
             count = stats["salaire_actuel"]["count"]
             mean_salary = stats["salaire_actuel"]["mean"]
             available = stats["disponibilite"]["sum"]
-            print(f"   - {practice}: {count} consultants, {available} disponibles, salaire moyen: {mean_salary:,.0f}€")
+            print(
+                f"   - {practice}: {count} consultants, {available} disponibles, salaire moyen: {mean_salary:,.0f}€"
+            )
 
         # Groupement par grade
-        grade_group = df.groupby("grade").agg({
-            "salaire_actuel": ["count", "mean"],
-            "disponibilite": "sum"
-        })
+        grade_group = df.groupby("grade").agg(
+            {"salaire_actuel": ["count", "mean"], "disponibilite": "sum"}
+        )
 
         print(f"\n📊 Statistiques par grade (DataFrame):")
         for grade in grade_group.index:
@@ -386,7 +547,9 @@ class TestStatisticsWorkflowIntegration:
             count = stats["salaire_actuel"]["count"]
             mean_salary = stats["salaire_actuel"]["mean"]
             available = stats["disponibilite"]["sum"]
-            print(f"   - {grade}: {count} consultants, {available} disponibles, salaire moyen: {mean_salary:,.0f}€")
+            print(
+                f"   - {grade}: {count} consultants, {available} disponibles, salaire moyen: {mean_salary:,.0f}€"
+            )
 
         # Simulation d'export CSV
         csv_content = df.to_csv(index=False)

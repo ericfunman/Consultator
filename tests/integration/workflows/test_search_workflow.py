@@ -11,6 +11,7 @@ from app.services.practice_service import PracticeService
 from app.database.database import get_database_session
 from app.database.models import Practice, Consultant
 
+
 # Fixtures pour les tests de recherche
 @pytest.fixture
 def search_test_data():
@@ -18,10 +19,26 @@ def search_test_data():
 
     # Créer des practices
     practices_data = [
-        {"nom": "Data Science", "description": "Data Science & AI", "responsable": "Dr. Marie Dubois"},
-        {"nom": "Frontend", "description": "Développement frontend", "responsable": "Alice Frontend"},
-        {"nom": "Backend", "description": "Développement backend", "responsable": "Bob Backend"},
-        {"nom": "DevOps", "description": "Infrastructure & DevOps", "responsable": "Charlie DevOps"}
+        {
+            "nom": "Data Science",
+            "description": "Data Science & AI",
+            "responsable": "Dr. Marie Dubois",
+        },
+        {
+            "nom": "Frontend",
+            "description": "Développement frontend",
+            "responsable": "Alice Frontend",
+        },
+        {
+            "nom": "Backend",
+            "description": "Développement backend",
+            "responsable": "Bob Backend",
+        },
+        {
+            "nom": "DevOps",
+            "description": "Infrastructure & DevOps",
+            "responsable": "Charlie DevOps",
+        },
     ]
 
     practice_ids = []
@@ -36,23 +53,119 @@ def search_test_data():
     # Créer des consultants avec diversité
     consultants_data = [
         # Data Science
-        {"prenom": "Alice", "nom": "Data", "email": "alice.data@test.com", "salaire_actuel": 65000, "practice_id": practice_ids[0], "disponibilite": True, "grade": "Expert", "societe": "DataCorp"},
-        {"prenom": "Bob", "nom": "AI", "email": "bob.ai@test.com", "salaire_actuel": 60000, "practice_id": practice_ids[0], "disponibilite": False, "grade": "Senior", "societe": "DataCorp"},
-        {"prenom": "Claire", "nom": "ML", "email": "claire.ml@test.com", "salaire_actuel": 55000, "practice_id": practice_ids[0], "disponibilite": True, "grade": "Senior", "societe": "DataCorp"},
-
+        {
+            "prenom": "Alice",
+            "nom": "Data",
+            "email": "alice.data@test.com",
+            "salaire_actuel": 65000,
+            "practice_id": practice_ids[0],
+            "disponibilite": True,
+            "grade": "Expert",
+            "societe": "DataCorp",
+        },
+        {
+            "prenom": "Bob",
+            "nom": "AI",
+            "email": "bob.ai@test.com",
+            "salaire_actuel": 60000,
+            "practice_id": practice_ids[0],
+            "disponibilite": False,
+            "grade": "Senior",
+            "societe": "DataCorp",
+        },
+        {
+            "prenom": "Claire",
+            "nom": "ML",
+            "email": "claire.ml@test.com",
+            "salaire_actuel": 55000,
+            "practice_id": practice_ids[0],
+            "disponibilite": True,
+            "grade": "Senior",
+            "societe": "DataCorp",
+        },
         # Frontend
-        {"prenom": "David", "nom": "React", "email": "david.react@test.com", "salaire_actuel": 55000, "practice_id": practice_ids[1], "disponibilite": True, "grade": "Senior", "societe": "WebCorp"},
-        {"prenom": "Emma", "nom": "Vue", "email": "emma.vue@test.com", "salaire_actuel": 50000, "practice_id": practice_ids[1], "disponibilite": True, "grade": "Junior", "societe": "WebCorp"},
-        {"prenom": "Felix", "nom": "Angular", "email": "felix.angular@test.com", "salaire_actuel": 52000, "practice_id": practice_ids[1], "disponibilite": False, "grade": "Senior", "societe": "WebCorp"},
-
+        {
+            "prenom": "David",
+            "nom": "React",
+            "email": "david.react@test.com",
+            "salaire_actuel": 55000,
+            "practice_id": practice_ids[1],
+            "disponibilite": True,
+            "grade": "Senior",
+            "societe": "WebCorp",
+        },
+        {
+            "prenom": "Emma",
+            "nom": "Vue",
+            "email": "emma.vue@test.com",
+            "salaire_actuel": 50000,
+            "practice_id": practice_ids[1],
+            "disponibilite": True,
+            "grade": "Junior",
+            "societe": "WebCorp",
+        },
+        {
+            "prenom": "Felix",
+            "nom": "Angular",
+            "email": "felix.angular@test.com",
+            "salaire_actuel": 52000,
+            "practice_id": practice_ids[1],
+            "disponibilite": False,
+            "grade": "Senior",
+            "societe": "WebCorp",
+        },
         # Backend
-        {"prenom": "Grace", "nom": "Python", "email": "grace.python@test.com", "salaire_actuel": 60000, "practice_id": practice_ids[2], "disponibilite": True, "grade": "Expert", "societe": "BackendCorp"},
-        {"prenom": "Henry", "nom": "Java", "email": "henry.java@test.com", "salaire_actuel": 58000, "practice_id": practice_ids[2], "disponibilite": True, "grade": "Senior", "societe": "BackendCorp"},
-        {"prenom": "Iris", "nom": "Node", "email": "iris.node@test.com", "salaire_actuel": 54000, "practice_id": practice_ids[2], "disponibilite": False, "grade": "Senior", "societe": "BackendCorp"},
-
+        {
+            "prenom": "Grace",
+            "nom": "Python",
+            "email": "grace.python@test.com",
+            "salaire_actuel": 60000,
+            "practice_id": practice_ids[2],
+            "disponibilite": True,
+            "grade": "Expert",
+            "societe": "BackendCorp",
+        },
+        {
+            "prenom": "Henry",
+            "nom": "Java",
+            "email": "henry.java@test.com",
+            "salaire_actuel": 58000,
+            "practice_id": practice_ids[2],
+            "disponibilite": True,
+            "grade": "Senior",
+            "societe": "BackendCorp",
+        },
+        {
+            "prenom": "Iris",
+            "nom": "Node",
+            "email": "iris.node@test.com",
+            "salaire_actuel": 54000,
+            "practice_id": practice_ids[2],
+            "disponibilite": False,
+            "grade": "Senior",
+            "societe": "BackendCorp",
+        },
         # DevOps
-        {"prenom": "Jack", "nom": "Docker", "email": "jack.docker@test.com", "salaire_actuel": 62000, "practice_id": practice_ids[3], "disponibilite": True, "grade": "Expert", "societe": "InfraCorp"},
-        {"prenom": "Kate", "nom": "Kubernetes", "email": "kate.kubernetes@test.com", "salaire_actuel": 59000, "practice_id": practice_ids[3], "disponibilite": True, "grade": "Senior", "societe": "InfraCorp"}
+        {
+            "prenom": "Jack",
+            "nom": "Docker",
+            "email": "jack.docker@test.com",
+            "salaire_actuel": 62000,
+            "practice_id": practice_ids[3],
+            "disponibilite": True,
+            "grade": "Expert",
+            "societe": "InfraCorp",
+        },
+        {
+            "prenom": "Kate",
+            "nom": "Kubernetes",
+            "email": "kate.kubernetes@test.com",
+            "salaire_actuel": 59000,
+            "practice_id": practice_ids[3],
+            "disponibilite": True,
+            "grade": "Senior",
+            "societe": "InfraCorp",
+        },
     ]
 
     consultant_ids = []
@@ -67,7 +180,7 @@ def search_test_data():
         "practice_ids": practice_ids,
         "consultant_ids": consultant_ids,
         "practices_data": practices_data,
-        "consultants_data": consultants_data
+        "consultants_data": consultants_data,
     }
 
     # Nettoyage
@@ -80,12 +193,15 @@ def search_test_data():
     for practice_id in practice_ids:
         try:
             with get_database_session() as session:
-                practice = session.query(Practice).filter(Practice.id == practice_id).first()
+                practice = (
+                    session.query(Practice).filter(Practice.id == practice_id).first()
+                )
                 if practice:
                     session.delete(practice)
                     session.commit()
         except:
             pass
+
 
 class TestSearchWorkflowIntegration:
     """Tests d'intégration pour le workflow de recherche et filtrage"""
@@ -96,23 +212,35 @@ class TestSearchWorkflowIntegration:
         print("=== TEST RECHERCHE BASIQUE ===")
 
         # Recherche sans filtre
-        all_results = ConsultantService.search_consultants_optimized("", page=1, per_page=50)
+        all_results = ConsultantService.search_consultants_optimized(
+            "", page=1, per_page=50
+        )
         assert len(all_results) == len(search_test_data["consultant_ids"])
 
         # Recherche par prénom
-        alice_results = ConsultantService.search_consultants_optimized("Alice", page=1, per_page=50)
+        alice_results = ConsultantService.search_consultants_optimized(
+            "Alice", page=1, per_page=50
+        )
         assert len(alice_results) == 1
         assert alice_results[0]["prenom"] == "Alice"
 
         # Recherche par nom
-        data_results = ConsultantService.search_consultants_optimized("Data", page=1, per_page=50)
-        assert len(data_results) == 3  # Alice Data (nom), Bob AI (societe=DataCorp), Claire ML (societe=DataCorp)
+        data_results = ConsultantService.search_consultants_optimized(
+            "Data", page=1, per_page=50
+        )
+        assert (
+            len(data_results) == 3
+        )  # Alice Data (nom), Bob AI (societe=DataCorp), Claire ML (societe=DataCorp)
         # Vérifier qu'Alice Data est dans les résultats
-        alice_in_results = any(r["nom"] == "Data" and r["prenom"] == "Alice" for r in data_results)
+        alice_in_results = any(
+            r["nom"] == "Data" and r["prenom"] == "Alice" for r in data_results
+        )
         assert alice_in_results
 
         # Recherche par société
-        webcorp_results = ConsultantService.search_consultants_optimized("WebCorp", page=1, per_page=50)
+        webcorp_results = ConsultantService.search_consultants_optimized(
+            "WebCorp", page=1, per_page=50
+        )
         assert len(webcorp_results) == 3  # David, Emma, Felix
 
         print("✅ Recherche basique fonctionnelle")
@@ -164,34 +292,38 @@ class TestSearchWorkflowIntegration:
 
         # Practice + Grade
         data_science_senior = ConsultantService.search_consultants_optimized(
-            "", page=1, per_page=50,
+            "",
+            page=1,
+            per_page=50,
             practice_filter="Data Science",
-            grade_filter="Senior"
+            grade_filter="Senior",
         )
         assert len(data_science_senior) == 2  # Bob, Claire
 
         # Practice + Disponibilité
         frontend_available = ConsultantService.search_consultants_optimized(
-            "", page=1, per_page=50,
+            "",
+            page=1,
+            per_page=50,
             practice_filter="Frontend",
-            availability_filter=True
+            availability_filter=True,
         )
         assert len(frontend_available) == 2  # David, Emma (Felix n'est pas disponible)
 
         # Grade + Disponibilité
         senior_available = ConsultantService.search_consultants_optimized(
-            "", page=1, per_page=50,
-            grade_filter="Senior",
-            availability_filter=True
+            "", page=1, per_page=50, grade_filter="Senior", availability_filter=True
         )
         assert len(senior_available) == 4  # Claire, David, Emma, Henry, Kate
 
         # Tous les filtres
         complex_filter = ConsultantService.search_consultants_optimized(
-            "", page=1, per_page=50,
+            "",
+            page=1,
+            per_page=50,
             practice_filter="Backend",
             grade_filter="Senior",
-            availability_filter=True
+            availability_filter=True,
         )
         assert len(complex_filter) == 1  # Henry
 
@@ -204,25 +336,25 @@ class TestSearchWorkflowIntegration:
 
         # Recherche "Python" dans Backend
         python_backend = ConsultantService.search_consultants_optimized(
-            "Python", page=1, per_page=50,
-            practice_filter="Backend"
+            "Python", page=1, per_page=50, practice_filter="Backend"
         )
         assert len(python_backend) == 1
         assert python_backend[0]["prenom"] == "Grace"
 
         # Recherche "React" dans Frontend disponibles
         react_frontend_available = ConsultantService.search_consultants_optimized(
-            "React", page=1, per_page=50,
+            "React",
+            page=1,
+            per_page=50,
             practice_filter="Frontend",
-            availability_filter=True
+            availability_filter=True,
         )
         assert len(react_frontend_available) == 1
         assert react_frontend_available[0]["prenom"] == "David"
 
         # Recherche "Corp" dans Experts
         corp_experts = ConsultantService.search_consultants_optimized(
-            "Corp", page=1, per_page=50,
-            grade_filter="Expert"
+            "Corp", page=1, per_page=50, grade_filter="Expert"
         )
         assert len(corp_experts) == 3  # Alice, Grace, Jack
 
@@ -260,7 +392,9 @@ class TestSearchWorkflowIntegration:
         )
 
         assert len(frontend_page1) == 2
-        assert len(frontend_page2) == 1  # 3 consultants frontend, donc page 2 a 1 résultat
+        assert (
+            len(frontend_page2) == 1
+        )  # 3 consultants frontend, donc page 2 a 1 résultat
 
         print("✅ Pagination fonctionnelle")
 
@@ -279,26 +413,42 @@ class TestSearchWorkflowIntegration:
         total_salary = sum(c["salaire_actuel"] for c in all_consultants)
         avg_salary = total_salary / total_consultants if total_consultants > 0 else 0
 
-        print(f"📊 Stats générales: {total_consultants} consultants, "
-              f"{available_count} disponibles, salaire moyen: {avg_salary:.0f}€")
+        print(
+            f"📊 Stats générales: {total_consultants} consultants, "
+            f"{available_count} disponibles, salaire moyen: {avg_salary:.0f}€"
+        )
 
         # Statistiques par practice
         for practice_name in ["Data Science", "Frontend", "Backend", "DevOps"]:
-            practice_consultants = [c for c in all_consultants if c.get("practice_name") == practice_name]
+            practice_consultants = [
+                c for c in all_consultants if c.get("practice_name") == practice_name
+            ]
             if practice_consultants:
-                practice_available = sum(1 for c in practice_consultants if c["disponibilite"])
-                practice_avg_salary = sum(c["salaire_actuel"] for c in practice_consultants) / len(practice_consultants)
-                print(f"📊 {practice_name}: {len(practice_consultants)} consultants, "
-                      f"{practice_available} disponibles, salaire moyen: {practice_avg_salary:.0f}€")
+                practice_available = sum(
+                    1 for c in practice_consultants if c["disponibilite"]
+                )
+                practice_avg_salary = sum(
+                    c["salaire_actuel"] for c in practice_consultants
+                ) / len(practice_consultants)
+                print(
+                    f"📊 {practice_name}: {len(practice_consultants)} consultants, "
+                    f"{practice_available} disponibles, salaire moyen: {practice_avg_salary:.0f}€"
+                )
 
         # Statistiques par grade
         for grade in ["Expert", "Senior", "Junior"]:
             grade_consultants = [c for c in all_consultants if c.get("grade") == grade]
             if grade_consultants:
-                grade_available = sum(1 for c in grade_consultants if c["disponibilite"])
-                grade_avg_salary = sum(c["salaire_actuel"] for c in grade_consultants) / len(grade_consultants)
-                print(f"📊 {grade}: {len(grade_consultants)} consultants, "
-                      f"{grade_available} disponibles, salaire moyen: {grade_avg_salary:.0f}€")
+                grade_available = sum(
+                    1 for c in grade_consultants if c["disponibilite"]
+                )
+                grade_avg_salary = sum(
+                    c["salaire_actuel"] for c in grade_consultants
+                ) / len(grade_consultants)
+                print(
+                    f"📊 {grade}: {len(grade_consultants)} consultants, "
+                    f"{grade_available} disponibles, salaire moyen: {grade_avg_salary:.0f}€"
+                )
 
         print("✅ Statistiques avec filtres fonctionnelles")
 
@@ -312,17 +462,21 @@ class TestSearchWorkflowIntegration:
         # Test performance recherche simple
         start_time = time.time()
         for _ in range(10):
-            results = ConsultantService.search_consultants_optimized("", page=1, per_page=50)
+            results = ConsultantService.search_consultants_optimized(
+                "", page=1, per_page=50
+            )
         simple_search_time = (time.time() - start_time) / 10
 
         # Test performance avec filtres
         start_time = time.time()
         for _ in range(10):
             results = ConsultantService.search_consultants_optimized(
-                "", page=1, per_page=50,
+                "",
+                page=1,
+                per_page=50,
                 practice_filter="Data Science",
                 grade_filter="Senior",
-                availability_filter=True
+                availability_filter=True,
             )
         filtered_search_time = (time.time() - start_time) / 10
 
@@ -331,6 +485,8 @@ class TestSearchWorkflowIntegration:
 
         # Les recherches filtrées peuvent être plus lentes mais pas excessivement
         assert simple_search_time < 1.0  # Moins d'1 seconde pour une recherche simple
-        assert filtered_search_time < 2.0  # Moins de 2 secondes pour une recherche filtrée
+        assert (
+            filtered_search_time < 2.0
+        )  # Moins de 2 secondes pour une recherche filtrée
 
         print("✅ Performances de recherche acceptables")

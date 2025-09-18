@@ -9,7 +9,14 @@ from datetime import datetime, date
 from app.services.consultant_service import ConsultantService
 from app.services.practice_service import PracticeService
 from app.database.database import get_database_session
-from app.database.models import Consultant, Practice, Competence, ConsultantCompetence, Mission
+from app.database.models import (
+    Consultant,
+    Practice,
+    Competence,
+    ConsultantCompetence,
+    Mission,
+)
+
 
 # Fixtures pour les tests d'intégration
 @pytest.fixture
@@ -26,8 +33,9 @@ def sample_consultant_data():
         "notes": "Consultant test d'intégration",
         "societe": "TestCorp",
         "grade": "Senior",
-        "type_contrat": "CDI"
+        "type_contrat": "CDI",
     }
+
 
 @pytest.fixture
 def sample_competence_data():
@@ -37,8 +45,9 @@ def sample_competence_data():
         "type_competence": "technique",
         "categorie": "Backend",
         "niveau_maitrise": "expert",
-        "annees_experience": 5.0
+        "annees_experience": 5.0,
     }
+
 
 @pytest.fixture
 def sample_mission_data():
@@ -51,8 +60,9 @@ def sample_mission_data():
         "date_fin": date(2024, 6, 30),
         "statut": "terminee",
         "technologies_utilisees": "Python, FastAPI, PostgreSQL",
-        "revenus_generes": 45000
+        "revenus_generes": 45000,
     }
+
 
 class TestConsultantWorkflowIntegration:
     """Tests d'intégration pour le workflow consultant complet"""
@@ -62,16 +72,20 @@ class TestConsultantWorkflowIntegration:
         # S'assurer que nous avons une practice de test
         with get_database_session() as session:
             # Créer une practice de test si elle n'existe pas
-            practice = session.query(Practice).filter(Practice.nom == "Test Practice").first()
+            practice = (
+                session.query(Practice).filter(Practice.nom == "Test Practice").first()
+            )
             if not practice:
                 practice = Practice(
                     nom="Test Practice",
-                    description="Practice pour les tests d'intégration"
+                    description="Practice pour les tests d'intégration",
                 )
                 session.add(practice)
                 session.commit()
 
-    def test_complete_consultant_workflow(self, sample_consultant_data, sample_competence_data, sample_mission_data):
+    def test_complete_consultant_workflow(
+        self, sample_consultant_data, sample_competence_data, sample_mission_data
+    ):
         """Test du workflow complet consultant : création → modification → compétences → missions → suppression"""
 
         consultant_id = None
@@ -85,8 +99,12 @@ class TestConsultantWorkflowIntegration:
             assert result is True, "La création du consultant devrait réussir"
 
             # Vérifier que le consultant a été créé
-            consultant = ConsultantService.get_consultant_by_email(sample_consultant_data["email"])
-            assert consultant is not None, "Le consultant devrait exister après création"
+            consultant = ConsultantService.get_consultant_by_email(
+                sample_consultant_data["email"]
+            )
+            assert (
+                consultant is not None
+            ), "Le consultant devrait exister après création"
             assert consultant.prenom == sample_consultant_data["prenom"]
             assert consultant.nom == sample_consultant_data["nom"]
             consultant_id = consultant.id
@@ -98,7 +116,7 @@ class TestConsultantWorkflowIntegration:
             update_data = {
                 "telephone": "0987654321",
                 "salaire_actuel": 60000,
-                "notes": "Consultant modifié lors du test d'intégration"
+                "notes": "Consultant modifié lors du test d'intégration",
             }
 
             result = ConsultantService.update_consultant(consultant_id, update_data)
@@ -115,15 +133,17 @@ class TestConsultantWorkflowIntegration:
 
             # Vérifier si la compétence existe déjà, sinon la créer
             with get_database_session() as session:
-                competence = session.query(Competence).filter(
-                    Competence.nom == sample_competence_data["nom"]
-                ).first()
+                competence = (
+                    session.query(Competence)
+                    .filter(Competence.nom == sample_competence_data["nom"])
+                    .first()
+                )
 
                 if not competence:
                     competence = Competence(
                         nom=sample_competence_data["nom"],
                         type_competence=sample_competence_data["type_competence"],
-                        categorie=sample_competence_data["categorie"]
+                        categorie=sample_competence_data["categorie"],
                     )
                     session.add(competence)
                     session.commit()
@@ -135,16 +155,20 @@ class TestConsultantWorkflowIntegration:
                 "consultant_id": consultant_id,
                 "competence_id": competence_id,
                 "niveau_maitrise": sample_competence_data["niveau_maitrise"],
-                "annees_experience": sample_competence_data["annees_experience"]
+                "annees_experience": sample_competence_data["annees_experience"],
             }
 
             with get_database_session() as session:
-                consultant_competence = ConsultantCompetence(**consultant_competence_data)
+                consultant_competence = ConsultantCompetence(
+                    **consultant_competence_data
+                )
                 session.add(consultant_competence)
                 session.commit()
 
             # Vérifier que la compétence a été ajoutée
-            consultant_with_stats = ConsultantService.get_consultant_with_stats(consultant_id)
+            consultant_with_stats = ConsultantService.get_consultant_with_stats(
+                consultant_id
+            )
             assert consultant_with_stats is not None
             assert len(consultant_with_stats["competences"]) > 0
             print("✅ Compétence ajoutée au consultant")
@@ -162,9 +186,14 @@ class TestConsultantWorkflowIntegration:
                 session.commit()
 
             # Vérifier que la mission a été ajoutée
-            consultant_with_stats = ConsultantService.get_consultant_with_stats(consultant_id)
+            consultant_with_stats = ConsultantService.get_consultant_with_stats(
+                consultant_id
+            )
             assert len(consultant_with_stats["missions"]) > 0
-            assert consultant_with_stats["missions"][0]["nom_mission"] == sample_mission_data["nom_mission"]
+            assert (
+                consultant_with_stats["missions"][0]["nom_mission"]
+                == sample_mission_data["nom_mission"]
+            )
             print("✅ Mission ajoutée au consultant")
 
             # === PHASE 5: Recherche et vérifications ===
@@ -173,7 +202,9 @@ class TestConsultantWorkflowIntegration:
             # Rechercher le consultant
             search_results = ConsultantService.search_consultants("Jean")
             assert len(search_results) > 0
-            found_consultant = next((c for c in search_results if c.id == consultant_id), None)
+            found_consultant = next(
+                (c for c in search_results if c.id == consultant_id), None
+            )
             assert found_consultant is not None
             print("✅ Consultant trouvé via recherche")
 
@@ -203,31 +234,44 @@ class TestConsultantWorkflowIntegration:
                 try:
                     # Supprimer les missions
                     with get_database_session() as session:
-                        missions = session.query(Mission).filter(Mission.consultant_id == consultant_id).all()
+                        missions = (
+                            session.query(Mission)
+                            .filter(Mission.consultant_id == consultant_id)
+                            .all()
+                        )
                         for mission in missions:
                             session.delete(mission)
                         session.commit()
 
                     # Supprimer les compétences du consultant
                     with get_database_session() as session:
-                        consultant_competences = session.query(ConsultantCompetence).filter(
-                            ConsultantCompetence.consultant_id == consultant_id
-                        ).all()
+                        consultant_competences = (
+                            session.query(ConsultantCompetence)
+                            .filter(ConsultantCompetence.consultant_id == consultant_id)
+                            .all()
+                        )
                         for cc in consultant_competences:
                             session.delete(cc)
                         session.commit()
 
                     # Supprimer la compétence de test si elle a été créée
                     with get_database_session() as session:
-                        test_competence = session.query(Competence).filter(
-                            Competence.nom == sample_competence_data["nom"]
-                        ).first()
+                        test_competence = (
+                            session.query(Competence)
+                            .filter(Competence.nom == sample_competence_data["nom"])
+                            .first()
+                        )
                         if test_competence:
                             # Vérifier qu'elle n'est pas utilisée par d'autres consultants
-                            other_usage = session.query(ConsultantCompetence).filter(
-                                ConsultantCompetence.competence_id == test_competence.id,
-                                ConsultantCompetence.consultant_id != consultant_id
-                            ).first()
+                            other_usage = (
+                                session.query(ConsultantCompetence)
+                                .filter(
+                                    ConsultantCompetence.competence_id
+                                    == test_competence.id,
+                                    ConsultantCompetence.consultant_id != consultant_id,
+                                )
+                                .first()
+                            )
                             if not other_usage:
                                 session.delete(test_competence)
                         session.commit()
@@ -246,20 +290,35 @@ class TestConsultantWorkflowIntegration:
         # Créer plusieurs consultants pour les tests
         consultants_data = [
             {
-                "prenom": "Alice", "nom": "Martin", "email": "alice.martin@test.com",
-                "salaire_actuel": 50000, "practice_id": 1, "disponibilite": True,
-                "grade": "Senior", "societe": "TechCorp"
+                "prenom": "Alice",
+                "nom": "Martin",
+                "email": "alice.martin@test.com",
+                "salaire_actuel": 50000,
+                "practice_id": 1,
+                "disponibilite": True,
+                "grade": "Senior",
+                "societe": "TechCorp",
             },
             {
-                "prenom": "Bob", "nom": "Dubois", "email": "bob.dubois@test.com",
-                "salaire_actuel": 45000, "practice_id": 1, "disponibilite": False,
-                "grade": "Junior", "societe": "TechCorp"
+                "prenom": "Bob",
+                "nom": "Dubois",
+                "email": "bob.dubois@test.com",
+                "salaire_actuel": 45000,
+                "practice_id": 1,
+                "disponibilite": False,
+                "grade": "Junior",
+                "societe": "TechCorp",
             },
             {
-                "prenom": "Claire", "nom": "Garcia", "email": "claire.garcia@test.com",
-                "salaire_actuel": 60000, "practice_id": 1, "disponibilite": True,
-                "grade": "Expert", "societe": "DataCorp"
-            }
+                "prenom": "Claire",
+                "nom": "Garcia",
+                "email": "claire.garcia@test.com",
+                "salaire_actuel": 60000,
+                "practice_id": 1,
+                "disponibilite": True,
+                "grade": "Expert",
+                "societe": "DataCorp",
+            },
         ]
 
         created_ids = []
@@ -311,16 +370,18 @@ class TestConsultantWorkflowIntegration:
         # Créer plusieurs consultants pour tester la pagination
         consultants_data = []
         for i in range(10):
-            consultants_data.append({
-                "prenom": f"Test{i}",
-                "nom": f"User{i}",
-                "email": f"test{i}.user@test.com",
-                "salaire_actuel": 50000 + i * 1000,
-                "practice_id": 1,
-                "disponibilite": True,
-                "grade": "Senior",
-                "societe": "TestCorp"
-            })
+            consultants_data.append(
+                {
+                    "prenom": f"Test{i}",
+                    "nom": f"User{i}",
+                    "email": f"test{i}.user@test.com",
+                    "salaire_actuel": 50000 + i * 1000,
+                    "practice_id": 1,
+                    "disponibilite": True,
+                    "grade": "Senior",
+                    "societe": "TestCorp",
+                }
+            )
 
         created_ids = []
 
@@ -346,7 +407,9 @@ class TestConsultantWorkflowIntegration:
             assert set(page1_ids).isdisjoint(set(page2_ids))
 
             # Test de recherche avec pagination
-            search_results = ConsultantService.search_consultants_optimized("Test", page=1, per_page=3)
+            search_results = ConsultantService.search_consultants_optimized(
+                "Test", page=1, per_page=3
+            )
             assert len(search_results) >= 3
 
             print("✅ Workflow de pagination réussi")

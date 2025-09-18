@@ -9,7 +9,7 @@ from app.pages_modules.documents_functions import (
     show_consultant_documents,
     save_consultant_document,
     show_existing_documents,
-    delete_consultant_document
+    delete_consultant_document,
 )
 
 
@@ -44,9 +44,11 @@ from tests.fixtures.base_test import BaseIntegrationTest
 
 
 class TestShowConsultantDocuments(BaseIntegrationTest):
-    @patch('app.pages_modules.documents_functions.st')
-    @patch('app.pages_modules.documents_functions.show_existing_documents')
-    def test_show_consultant_documents_basic_display(self, mock_show_existing, mock_st, mock_consultant):
+    @patch("app.pages_modules.documents_functions.st")
+    @patch("app.pages_modules.documents_functions.show_existing_documents")
+    def test_show_consultant_documents_basic_display(
+        self, mock_show_existing, mock_st, mock_consultant
+    ):
         """Test affichage de base de la section documents"""
         # Setup
         mock_file_uploader = MagicMock(return_value=None)
@@ -61,15 +63,24 @@ class TestShowConsultantDocuments(BaseIntegrationTest):
         show_consultant_documents(mock_consultant)
 
         # Verify
-        mock_st.subheader.assert_called_once_with(f" Documents de {mock_consultant.prenom} {mock_consultant.nom}")
+        mock_st.subheader.assert_called_once_with(
+            f" Documents de {mock_consultant.prenom} {mock_consultant.nom}"
+        )
         mock_st.expander.assert_called_once()
         mock_st.file_uploader.assert_called_once()
         mock_show_existing.assert_called_once_with(mock_consultant)
 
-    @patch('app.pages_modules.documents_functions.st')
-    @patch('app.pages_modules.documents_functions.show_existing_documents')
-    @patch('app.pages_modules.documents_functions.save_consultant_document')
-    def test_show_consultant_documents_with_file_upload(self, mock_save_doc, mock_show_existing, mock_st, mock_consultant, mock_uploaded_file):
+    @patch("app.pages_modules.documents_functions.st")
+    @patch("app.pages_modules.documents_functions.show_existing_documents")
+    @patch("app.pages_modules.documents_functions.save_consultant_document")
+    def test_show_consultant_documents_with_file_upload(
+        self,
+        mock_save_doc,
+        mock_show_existing,
+        mock_st,
+        mock_consultant,
+        mock_uploaded_file,
+    ):
         """Test upload de fichier avec sauvegarde"""
         # Setup
         mock_file_uploader = MagicMock(return_value=mock_uploaded_file)
@@ -102,11 +113,19 @@ class TestShowConsultantDocuments(BaseIntegrationTest):
 
 
 class TestSaveConsultantDocument(BaseIntegrationTest):
-    @patch('app.pages_modules.documents_functions.DocumentService')
-    @patch('app.pages_modules.documents_functions.datetime')
-    @patch('app.pages_modules.documents_functions.st')
-    @patch('builtins.open', new_callable=mock_open)
-    def test_save_consultant_document_success(self, mock_file_open, mock_st, mock_datetime, mock_doc_service, mock_consultant, mock_uploaded_file):
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    @patch("app.pages_modules.documents_functions.datetime")
+    @patch("app.pages_modules.documents_functions.st")
+    @patch("builtins.open", new_callable=mock_open)
+    def test_save_consultant_document_success(
+        self,
+        mock_file_open,
+        mock_st,
+        mock_datetime,
+        mock_doc_service,
+        mock_consultant,
+        mock_uploaded_file,
+    ):
         """Test sauvegarde réussie d'un document"""
         # Setup
         mock_upload_dir = MagicMock()
@@ -128,14 +147,18 @@ class TestSaveConsultantDocument(BaseIntegrationTest):
 
         # Verify
         mock_doc_service.init_upload_directory.assert_called_once()
-        mock_doc_service.is_allowed_file.assert_called_once_with(mock_uploaded_file.name)
+        mock_doc_service.is_allowed_file.assert_called_once_with(
+            mock_uploaded_file.name
+        )
         mock_file_open.assert_called_once()
         mock_st.success.assert_called_once()
         mock_st.rerun.assert_called_once()
 
-    @patch('app.pages_modules.documents_functions.DocumentService')
-    @patch('app.pages_modules.documents_functions.st')
-    def test_save_consultant_document_invalid_file_type(self, mock_st, mock_doc_service, mock_consultant, mock_uploaded_file):
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    @patch("app.pages_modules.documents_functions.st")
+    def test_save_consultant_document_invalid_file_type(
+        self, mock_st, mock_doc_service, mock_consultant, mock_uploaded_file
+    ):
         """Test sauvegarde avec type de fichier invalide"""
         # Setup
         mock_doc_service.is_allowed_file.return_value = False
@@ -147,10 +170,17 @@ class TestSaveConsultantDocument(BaseIntegrationTest):
         # Verify
         mock_st.error.assert_called_once_with(" Type de fichier non supporte")
 
-    @patch('app.pages_modules.documents_functions.DocumentService')
-    @patch('app.pages_modules.documents_functions.st')
-    @patch('builtins.open', new_callable=mock_open)
-    def test_save_consultant_document_with_exception(self, mock_file_open, mock_st, mock_doc_service, mock_consultant, mock_uploaded_file):
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    @patch("app.pages_modules.documents_functions.st")
+    @patch("builtins.open", new_callable=mock_open)
+    def test_save_consultant_document_with_exception(
+        self,
+        mock_file_open,
+        mock_st,
+        mock_doc_service,
+        mock_consultant,
+        mock_uploaded_file,
+    ):
         """Test gestion d'exception lors de la sauvegarde"""
         # Setup
         mock_doc_service.init_upload_directory.return_value = MagicMock()
@@ -167,9 +197,11 @@ class TestSaveConsultantDocument(BaseIntegrationTest):
 
 
 class TestShowExistingDocuments(BaseIntegrationTest):
-    @patch('app.pages_modules.documents_functions.DocumentService')
-    @patch('app.pages_modules.documents_functions.st')
-    def test_show_existing_documents_no_files(self, mock_st, mock_doc_service, mock_consultant):
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    @patch("app.pages_modules.documents_functions.st")
+    def test_show_existing_documents_no_files(
+        self, mock_st, mock_doc_service, mock_consultant
+    ):
         """Test affichage quand aucun document n'existe"""
         # Setup
         mock_upload_dir = MagicMock()
@@ -182,12 +214,16 @@ class TestShowExistingDocuments(BaseIntegrationTest):
         show_existing_documents(mock_consultant)
 
         # Verify
-        mock_st.info.assert_called_once_with(" Aucun document trouve pour ce consultant")
+        mock_st.info.assert_called_once_with(
+            " Aucun document trouve pour ce consultant"
+        )
 
-    @patch('app.pages_modules.documents_functions.DocumentService')
-    @patch('app.pages_modules.documents_functions.st')
-    @patch('app.pages_modules.documents_functions.delete_consultant_document')
-    def test_show_existing_documents_with_files(self, mock_delete_doc, mock_st, mock_doc_service, mock_consultant):
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    @patch("app.pages_modules.documents_functions.st")
+    @patch("app.pages_modules.documents_functions.delete_consultant_document")
+    def test_show_existing_documents_with_files(
+        self, mock_delete_doc, mock_st, mock_doc_service, mock_consultant
+    ):
         """Test affichage des documents existants"""
         # Setup
         mock_upload_dir = MagicMock()
@@ -196,13 +232,20 @@ class TestShowExistingDocuments(BaseIntegrationTest):
         # Mock file with stats
         mock_file = MagicMock(spec=Path)
         mock_file.name = "Jean_Dupont_CV_20231201_120000.pdf"
-        mock_file.stat.return_value = MagicMock(st_size=2048000, st_mtime=1701432000)  # 2MB, timestamp
+        mock_file.stat.return_value = MagicMock(
+            st_size=2048000, st_mtime=1701432000
+        )  # 2MB, timestamp
         mock_upload_dir.glob.return_value = [mock_file]
 
         # Mock Streamlit components - need to handle multiple calls
         mock_columns_calls = [
-            [MagicMock(), MagicMock(), MagicMock(), MagicMock()],  # 4 columns for metrics
-            [MagicMock(), MagicMock(), MagicMock()]  # 3 columns for buttons
+            [
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+            ],  # 4 columns for metrics
+            [MagicMock(), MagicMock(), MagicMock()],  # 3 columns for buttons
         ]
         mock_st.subheader = MagicMock()
         mock_st.expander = MagicMock()
@@ -217,14 +260,20 @@ class TestShowExistingDocuments(BaseIntegrationTest):
         mock_st.subheader.assert_called_once()
         mock_st.expander.assert_called_once()
         assert mock_st.columns.call_count == 2  # Should be called twice
-        assert mock_st.metric.call_count == 3  # 3 metrics are actually called (size, modified, type)
+        assert (
+            mock_st.metric.call_count == 3
+        )  # 3 metrics are actually called (size, modified, type)
 
-    @patch('app.pages_modules.documents_functions.DocumentService')
-    @patch('app.pages_modules.documents_functions.st')
-    def test_show_existing_documents_with_exception(self, mock_st, mock_doc_service, mock_consultant):
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    @patch("app.pages_modules.documents_functions.st")
+    def test_show_existing_documents_with_exception(
+        self, mock_st, mock_doc_service, mock_consultant
+    ):
         """Test gestion d'exception lors de l'affichage"""
         # Setup
-        mock_doc_service.init_upload_directory.side_effect = Exception("Directory error")
+        mock_doc_service.init_upload_directory.side_effect = Exception(
+            "Directory error"
+        )
         mock_st.error = MagicMock()
 
         # Execute
@@ -236,7 +285,7 @@ class TestShowExistingDocuments(BaseIntegrationTest):
 
 
 class TestDeleteConsultantDocument(BaseIntegrationTest):
-    @patch('app.pages_modules.documents_functions.st')
+    @patch("app.pages_modules.documents_functions.st")
     def test_delete_consultant_document_success(self, mock_st):
         """Test suppression réussie d'un document"""
         # Setup
@@ -255,7 +304,7 @@ class TestDeleteConsultantDocument(BaseIntegrationTest):
         mock_st.success.assert_called_once_with(" Document supprime avec succes")
         mock_st.rerun.assert_called_once()
 
-    @patch('app.pages_modules.documents_functions.st')
+    @patch("app.pages_modules.documents_functions.st")
     def test_delete_consultant_document_file_not_found(self, mock_st):
         """Test suppression d'un fichier introuvable"""
         # Setup
@@ -270,7 +319,7 @@ class TestDeleteConsultantDocument(BaseIntegrationTest):
         # Verify
         mock_st.error.assert_called_once_with(" Fichier introuvable")
 
-    @patch('app.pages_modules.documents_functions.st')
+    @patch("app.pages_modules.documents_functions.st")
     def test_delete_consultant_document_with_exception(self, mock_st):
         """Test gestion d'exception lors de la suppression"""
         # Setup
@@ -289,10 +338,12 @@ class TestDeleteConsultantDocument(BaseIntegrationTest):
 
 
 class TestIntegrationScenarios(BaseIntegrationTest):
-    @patch('app.pages_modules.documents_functions.DocumentService')
-    @patch('app.pages_modules.documents_functions.st')
-    @patch('builtins.open', new_callable=mock_open)
-    def test_complete_document_workflow(self, mock_file_open, mock_st, mock_doc_service, mock_consultant):
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    @patch("app.pages_modules.documents_functions.st")
+    @patch("builtins.open", new_callable=mock_open)
+    def test_complete_document_workflow(
+        self, mock_file_open, mock_st, mock_doc_service, mock_consultant
+    ):
         """Test workflow complet d'ajout et suppression de document"""
         # Setup
         mock_upload_dir = MagicMock()
@@ -303,7 +354,7 @@ class TestIntegrationScenarios(BaseIntegrationTest):
         mock_uploaded_file = MockUploadedFile("test_cv.pdf", 1024000)
 
         # Mock datetime
-        with patch('app.pages_modules.documents_functions.datetime') as mock_datetime:
+        with patch("app.pages_modules.documents_functions.datetime") as mock_datetime:
             mock_now = MagicMock()
             mock_now.strftime.return_value = "20231201_120000"
             mock_datetime.now.return_value = mock_now
@@ -315,14 +366,16 @@ class TestIntegrationScenarios(BaseIntegrationTest):
             mock_st.rerun = MagicMock()
 
             # Execute save
-            save_consultant_document(mock_uploaded_file, mock_consultant, "CV", "Test CV")
+            save_consultant_document(
+                mock_uploaded_file, mock_consultant, "CV", "Test CV"
+            )
 
             # Verify save worked
             mock_st.success.assert_called_once()
             mock_st.rerun.assert_called_once()
 
-    @patch('app.pages_modules.documents_functions.DocumentService')
-    @patch('app.pages_modules.documents_functions.st')
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    @patch("app.pages_modules.documents_functions.st")
     def test_file_size_display_logic(self, mock_st, mock_doc_service, mock_consultant):
         """Test logique d'affichage de la taille des fichiers"""
         # Setup
@@ -332,23 +385,45 @@ class TestIntegrationScenarios(BaseIntegrationTest):
         # Mock small file (< 1MB)
         mock_small_file = MagicMock(spec=Path)
         mock_small_file.name = "Jean_Dupont_CV_small.pdf"
-        mock_small_file.stat.return_value = MagicMock(st_size=512000, st_mtime=1701432000)  # 500KB
+        mock_small_file.stat.return_value = MagicMock(
+            st_size=512000, st_mtime=1701432000
+        )  # 500KB
         mock_small_file.exists.return_value = True
 
         # Mock large file (> 1MB)
         mock_large_file = MagicMock(spec=Path)
         mock_large_file.name = "Jean_Dupont_CV_large.pdf"
-        mock_large_file.stat.return_value = MagicMock(st_size=2097152, st_mtime=1701432000)  # 2MB
+        mock_large_file.stat.return_value = MagicMock(
+            st_size=2097152, st_mtime=1701432000
+        )  # 2MB
         mock_large_file.exists.return_value = True
 
         mock_upload_dir.glob.return_value = [mock_small_file, mock_large_file]
 
         # Mock Streamlit components with proper side effects
         mock_columns_calls = [
-            [MagicMock(), MagicMock(), MagicMock(), MagicMock()],  # 4 columns for metrics (first file)
-            [MagicMock(), MagicMock(), MagicMock()],  # 3 columns for buttons (first file)
-            [MagicMock(), MagicMock(), MagicMock(), MagicMock()],  # 4 columns for metrics (second file)
-            [MagicMock(), MagicMock(), MagicMock()]  # 3 columns for buttons (second file)
+            [
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+            ],  # 4 columns for metrics (first file)
+            [
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+            ],  # 3 columns for buttons (first file)
+            [
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+            ],  # 4 columns for metrics (second file)
+            [
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+            ],  # 3 columns for buttons (second file)
         ]
 
         mock_st.subheader = MagicMock()

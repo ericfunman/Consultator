@@ -17,7 +17,7 @@ from app.pages_modules.consultant_documents import (
     analyze_consultant_cv,
     show_full_cv_analysis,
     generate_cv_report,
-    show_documents_report
+    show_documents_report,
 )
 from tests.fixtures.base_test import BaseIntegrationTest
 
@@ -30,11 +30,11 @@ class TestConsultantDocuments(BaseIntegrationTest):
         import app.pages_modules.consultant_documents as docs_module
 
         # Vérifier que les fonctions principales existent
-        assert hasattr(docs_module, 'show_consultant_documents')
-        assert hasattr(docs_module, 'show_document_details')
-        assert hasattr(docs_module, 'upload_document')
+        assert hasattr(docs_module, "show_consultant_documents")
+        assert hasattr(docs_module, "show_document_details")
+        assert hasattr(docs_module, "upload_document")
 
-    @patch('app.pages_modules.consultant_documents.imports_ok', False)
+    @patch("app.pages_modules.consultant_documents.imports_ok", False)
     def test_show_consultant_documents_no_imports(self):
         """Test affichage documents sans imports"""
         mock_consultant = Mock()
@@ -49,8 +49,8 @@ class TestConsultantDocuments(BaseIntegrationTest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_documents.imports_ok', True)
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.imports_ok", True)
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_show_consultant_documents_with_data(self, mock_session):
         """Test affichage documents avec données"""
         # Mock consultant
@@ -90,8 +90,8 @@ class TestConsultantDocuments(BaseIntegrationTest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_documents.imports_ok', True)
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.imports_ok", True)
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_show_consultant_documents_empty(self, mock_session):
         """Test affichage documents vides"""
         # Mock consultant
@@ -155,7 +155,9 @@ class TestConsultantDocuments(BaseIntegrationTest):
         mock_document.date_upload.strftime.return_value = "01/01/2024"
         mock_document.mimetype = "application/pdf"
         mock_document.chemin_fichier = "/path/to/cv.pdf"
-        mock_document.analyse_cv = '{"missions": [{"titre": "Mission 1"}], "competences": ["Python", "Java"]}'
+        mock_document.analyse_cv = (
+            '{"missions": [{"titre": "Mission 1"}], "competences": ["Python", "Java"]}'
+        )
 
         mock_consultant = Mock()
         mock_consultant.id = 1
@@ -214,26 +216,20 @@ class TestConsultantDocuments(BaseIntegrationTest):
     def test_upload_document_success(self):
         """Test upload document réussi"""
         # Mock complet de la fonction pour contourner imports_ok
-        with patch('app.pages_modules.consultant_documents.upload_document') as mock_upload:
+        with patch(
+            "app.pages_modules.consultant_documents.upload_document"
+        ) as mock_upload:
             mock_upload.return_value = True
 
-            data = {
-                "file": Mock(),
-                "type_document": "CV",
-                "description": "Test CV"
-            }
+            data = {"file": Mock(), "type_document": "CV", "description": "Test CV"}
 
             result = mock_upload(1, data)
             assert result is True
 
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_upload_document_no_file(self, mock_session):
         """Test upload document sans fichier"""
-        data = {
-            "file": None,
-            "type_document": "CV",
-            "description": "Test"
-        }
+        data = {"file": None, "type_document": "CV", "description": "Test"}
 
         result = upload_document(1, data)
         assert result is False
@@ -259,7 +255,9 @@ class TestConsultantDocuments(BaseIntegrationTest):
     def test_reanalyze_document_success(self):
         """Test réanalyse document réussie"""
         # Mock complet de la fonction pour contourner imports_ok
-        with patch('app.pages_modules.consultant_documents.reanalyze_document') as mock_reanalyze:
+        with patch(
+            "app.pages_modules.consultant_documents.reanalyze_document"
+        ) as mock_reanalyze:
             mock_reanalyze.return_value = True
 
             mock_consultant = Mock()
@@ -269,7 +267,7 @@ class TestConsultantDocuments(BaseIntegrationTest):
             result = mock_reanalyze(1, mock_consultant)
             assert result is True
 
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_reanalyze_document_not_found(self, mock_session):
         """Test réanalyse document introuvable"""
         # Mock session
@@ -277,7 +275,9 @@ class TestConsultantDocuments(BaseIntegrationTest):
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock document non trouvé
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            None
+        )
 
         mock_consultant = Mock()
 
@@ -287,18 +287,20 @@ class TestConsultantDocuments(BaseIntegrationTest):
     def test_rename_document_success(self):
         """Test renommage document réussi"""
         # Mock complet de la fonction pour contourner imports_ok
-        with patch('app.pages_modules.consultant_documents.rename_document') as mock_rename:
+        with patch(
+            "app.pages_modules.consultant_documents.rename_document"
+        ) as mock_rename:
             mock_rename.return_value = True
 
             data = {
                 "new_name": "nouveau_nom.pdf",
-                "new_description": "Nouvelle description"
+                "new_description": "Nouvelle description",
             }
 
             result = mock_rename(1, data)
             assert result is True
 
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_rename_document_not_found(self, mock_session):
         """Test renommage document introuvable"""
         # Mock session
@@ -306,11 +308,13 @@ class TestConsultantDocuments(BaseIntegrationTest):
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock document non trouvé
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            None
+        )
 
         data = {
             "new_name": "nouveau_nom.pdf",
-            "new_description": "Nouvelle description"
+            "new_description": "Nouvelle description",
         }
 
         result = rename_document(1, data)
@@ -319,13 +323,15 @@ class TestConsultantDocuments(BaseIntegrationTest):
     def test_delete_document_success(self):
         """Test suppression document réussie"""
         # Mock complet de la fonction pour contourner imports_ok
-        with patch('app.pages_modules.consultant_documents.delete_document') as mock_delete:
+        with patch(
+            "app.pages_modules.consultant_documents.delete_document"
+        ) as mock_delete:
             mock_delete.return_value = True
 
             result = mock_delete(1)
             assert result is True
 
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_delete_document_not_found(self, mock_session):
         """Test suppression document introuvable"""
         # Mock session
@@ -333,12 +339,14 @@ class TestConsultantDocuments(BaseIntegrationTest):
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock document non trouvé
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            None
+        )
 
         result = delete_document(1)
         assert result is False
 
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_analyze_consultant_cv_with_cv(self, mock_session):
         """Test analyse CV consultant avec CV disponible"""
         # Mock session
@@ -373,7 +381,7 @@ class TestConsultantDocuments(BaseIntegrationTest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_analyze_consultant_cv_no_cv(self, mock_session):
         """Test analyse CV consultant sans CV"""
         # Mock session
@@ -406,7 +414,7 @@ class TestConsultantDocuments(BaseIntegrationTest):
             "resume": "Test resume",
             "missions": [{"titre": "Mission 1", "client": "Client A"}],
             "competences": ["Python", "Java"],
-            "contact": {"email": "test@example.com"}
+            "contact": {"email": "test@example.com"},
         }
 
         mock_consultant = Mock()
@@ -427,7 +435,7 @@ class TestConsultantDocuments(BaseIntegrationTest):
         analysis = {
             "resume": "Test resume",
             "missions": [{"titre": "Mission 1", "client": "Client A"}],
-            "competences": ["Python", "Java"]
+            "competences": ["Python", "Java"],
         }
 
         mock_consultant = Mock()
@@ -494,15 +502,18 @@ class TestConsultantDocuments(BaseIntegrationTest):
 
         # Vérifier que les fonctions principales existent
         required_functions = [
-            'show_consultant_documents', 'show_document_details',
-            'show_upload_document_form', 'upload_document',
-            'download_document', 'delete_document'
+            "show_consultant_documents",
+            "show_document_details",
+            "show_upload_document_form",
+            "upload_document",
+            "download_document",
+            "delete_document",
         ]
 
         for func_name in required_functions:
             assert hasattr(docs_module, func_name), f"Fonction {func_name} manquante"
 
         # Vérifier que les variables d'import existent
-        assert hasattr(docs_module, 'imports_ok')
-        assert hasattr(docs_module, 'ConsultantService')
-        assert hasattr(docs_module, 'get_database_session')
+        assert hasattr(docs_module, "imports_ok")
+        assert hasattr(docs_module, "ConsultantService")
+        assert hasattr(docs_module, "get_database_session")

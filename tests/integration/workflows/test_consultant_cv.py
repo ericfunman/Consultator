@@ -21,7 +21,7 @@ from app.pages_modules.consultant_cv import (
     save_cv_analysis_to_profile,
     generate_cv_analysis_report,
     compare_cv_with_profile,
-    show_career_suggestions
+    show_career_suggestions,
 )
 from tests.fixtures.base_test import BaseIntegrationTest
 
@@ -34,11 +34,11 @@ class TestConsultantCV(BaseIntegrationTest):
         import app.pages_modules.consultant_cv as cv_module
 
         # Vérifier que les fonctions principales existent
-        assert hasattr(cv_module, 'show_cv_missions')
-        assert hasattr(cv_module, 'show_cv_skills')
-        assert hasattr(cv_module, 'show_cv_summary')
-        assert hasattr(cv_module, 'show_cv_actions')
-        assert hasattr(cv_module, 'categorize_skill')
+        assert hasattr(cv_module, "show_cv_missions")
+        assert hasattr(cv_module, "show_cv_skills")
+        assert hasattr(cv_module, "show_cv_summary")
+        assert hasattr(cv_module, "show_cv_actions")
+        assert hasattr(cv_module, "categorize_skill")
 
     def test_categorize_skill_technologies(self):
         """Test de catégorisation des compétences techniques"""
@@ -72,7 +72,7 @@ class TestConsultantCV(BaseIntegrationTest):
             category = categorize_skill(skill)
             assert category == "📚 Autres"
 
-    @patch('app.pages_modules.consultant_cv.imports_ok', False)
+    @patch("app.pages_modules.consultant_cv.imports_ok", False)
     def test_check_existing_skill_no_imports(self):
         """Test vérification compétence sans imports"""
         result = check_existing_skill("Python", 1)
@@ -81,13 +81,15 @@ class TestConsultantCV(BaseIntegrationTest):
     def test_check_existing_skill_with_imports(self):
         """Test vérification compétence avec imports simulés"""
         # Mock complet de la fonction pour contourner imports_ok
-        with patch('app.pages_modules.consultant_cv.check_existing_skill') as mock_check:
+        with patch(
+            "app.pages_modules.consultant_cv.check_existing_skill"
+        ) as mock_check:
             mock_check.return_value = True
             result = mock_check("Python", 1)
             assert result is True
 
-    @patch('app.pages_modules.consultant_cv.imports_ok', True)
-    @patch('app.pages_modules.consultant_cv.get_database_session')
+    @patch("app.pages_modules.consultant_cv.imports_ok", True)
+    @patch("app.pages_modules.consultant_cv.get_database_session")
     def test_check_existing_skill_not_found(self, mock_session):
         """Test vérification compétence inexistante"""
         # Mock session
@@ -104,8 +106,8 @@ class TestConsultantCV(BaseIntegrationTest):
         result = check_existing_skill("Unknown Skill", 1)
         assert result is False
 
-    @patch('app.pages_modules.consultant_cv.imports_ok', True)
-    @patch('app.pages_modules.consultant_cv.get_database_session')
+    @patch("app.pages_modules.consultant_cv.imports_ok", True)
+    @patch("app.pages_modules.consultant_cv.get_database_session")
     def test_add_skill_from_cv_new_skill(self, mock_session):
         """Test ajout nouvelle compétence depuis CV"""
         # Mock session
@@ -133,7 +135,7 @@ class TestConsultantCV(BaseIntegrationTest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_cv.imports_ok', False)
+    @patch("app.pages_modules.consultant_cv.imports_ok", False)
     def test_add_skill_from_cv_no_imports(self):
         """Test ajout compétence sans imports"""
         try:
@@ -178,14 +180,39 @@ class TestConsultantCV(BaseIntegrationTest):
     def test_calculate_cv_quality_score_full(self):
         """Test calcul score qualité CV complet"""
         analysis = {
-            "missions": [{"titre": "Mission 1"}, {"titre": "Mission 2"}, {"titre": "Mission 3"}, {"titre": "Mission 4"}, {"titre": "Mission 5"}, {"titre": "Mission 6"}, {"titre": "Mission 7"}],
-            "competences": ["Python", "Java", "Agile", "Scrum", "Management", "Leadership", "Communication", "Anglais", "Français", "Docker", "AWS", "SQL", "Git", "React", "Node.js", "Django"],
+            "missions": [
+                {"titre": "Mission 1"},
+                {"titre": "Mission 2"},
+                {"titre": "Mission 3"},
+                {"titre": "Mission 4"},
+                {"titre": "Mission 5"},
+                {"titre": "Mission 6"},
+                {"titre": "Mission 7"},
+            ],
+            "competences": [
+                "Python",
+                "Java",
+                "Agile",
+                "Scrum",
+                "Management",
+                "Leadership",
+                "Communication",
+                "Anglais",
+                "Français",
+                "Docker",
+                "AWS",
+                "SQL",
+                "Git",
+                "React",
+                "Node.js",
+                "Django",
+            ],
             "contact": {
                 "email": "test@example.com",
                 "telephone": "0123456789",
-                "linkedin": "https://linkedin.com/in/test"
+                "linkedin": "https://linkedin.com/in/test",
             },
-            "resume": "Résumé détaillé du CV avec expérience significative"
+            "resume": "Résumé détaillé du CV avec expérience significative",
         }
         score = calculate_cv_quality_score(analysis)
         assert score == 100  # Score maximum avec données complètes
@@ -193,13 +220,20 @@ class TestConsultantCV(BaseIntegrationTest):
     def test_calculate_cv_quality_score_partial(self):
         """Test calcul score qualité CV partiel"""
         analysis = {
-            "missions": [{"titre": "Mission 1"}, {"titre": "Mission 2"}, {"titre": "Mission 3"}, {"titre": "Mission 4"}],
+            "missions": [
+                {"titre": "Mission 1"},
+                {"titre": "Mission 2"},
+                {"titre": "Mission 3"},
+                {"titre": "Mission 4"},
+            ],
             "competences": ["Python", "Java", "Agile", "Scrum", "Management"],
             "contact": {"email": "test@example.com"},
-            "resume": None
+            "resume": None,
         }
         score = calculate_cv_quality_score(analysis)
-        assert score == 40  # 20 (missions: 4*5) + 10 (compétences: 5*2) + 10 (email) = 40
+        assert (
+            score == 40
+        )  # 20 (missions: 4*5) + 10 (compétences: 5*2) + 10 (email) = 40
 
     def test_show_cv_recommendations_empty(self):
         """Test recommandations CV vide"""
@@ -217,12 +251,23 @@ class TestConsultantCV(BaseIntegrationTest):
     def test_show_cv_recommendations_complete(self):
         """Test recommandations CV complet"""
         analysis = {
-            "missions": [{"titre": "Mission 1"}, {"titre": "Mission 2"}, {"titre": "Mission 3"}],
-            "competences": ["Python", "Java", "Agile", "Scrum", "Management", "Leadership"],
+            "missions": [
+                {"titre": "Mission 1"},
+                {"titre": "Mission 2"},
+                {"titre": "Mission 3"},
+            ],
+            "competences": [
+                "Python",
+                "Java",
+                "Agile",
+                "Scrum",
+                "Management",
+                "Leadership",
+            ],
             "contact": {
                 "email": "test@example.com",
-                "linkedin": "https://linkedin.com/in/test"
-            }
+                "linkedin": "https://linkedin.com/in/test",
+            },
         }
 
         try:
@@ -237,7 +282,7 @@ class TestConsultantCV(BaseIntegrationTest):
     def test_save_mission_from_cv_success(self):
         """Test sauvegarde mission depuis CV réussie"""
         # Mock complet de la fonction pour contourner imports_ok
-        with patch('app.pages_modules.consultant_cv.save_mission_from_cv') as mock_save:
+        with patch("app.pages_modules.consultant_cv.save_mission_from_cv") as mock_save:
             mock_save.return_value = True
 
             data = {
@@ -248,7 +293,7 @@ class TestConsultantCV(BaseIntegrationTest):
                 "date_fin": "2023-12-31",
                 "taux_journalier": 500,
                 "description": "Test description",
-                "technologies": "Python, Java"
+                "technologies": "Python, Java",
             }
 
             result = mock_save(data, 1)
@@ -257,7 +302,7 @@ class TestConsultantCV(BaseIntegrationTest):
     def test_save_mission_from_cv_new_client(self):
         """Test sauvegarde mission avec nouveau client"""
         # Mock complet de la fonction pour contourner imports_ok
-        with patch('app.pages_modules.consultant_cv.save_mission_from_cv') as mock_save:
+        with patch("app.pages_modules.consultant_cv.save_mission_from_cv") as mock_save:
             mock_save.return_value = True
 
             data = {
@@ -268,7 +313,7 @@ class TestConsultantCV(BaseIntegrationTest):
                 "date_fin": "2023-12-31",
                 "taux_journalier": 500,
                 "description": "Test description",
-                "technologies": "Python, Java"
+                "technologies": "Python, Java",
             }
 
             result = mock_save(data, 1)
@@ -281,7 +326,7 @@ class TestConsultantCV(BaseIntegrationTest):
             "client": "Test Client",
             "periode": "2023-01-01 à 2023-12-31",
             "technologies": "Python, Java, SQL",
-            "description": "Développement d'une application web"
+            "description": "Développement d'une application web",
         }
 
         try:
@@ -313,7 +358,7 @@ class TestConsultantCV(BaseIntegrationTest):
             "client": "Test Client",
             "periode": "2023-01-01 à 2023-12-31",
             "technologies": "Python, Java",
-            "description": "Test description"
+            "description": "Test description",
         }
 
         try:
@@ -347,7 +392,7 @@ class TestConsultantCV(BaseIntegrationTest):
             "missions": [{"titre": "Mission 1"}],
             "competences": ["Python", "Java"],
             "contact": {"email": "test@example.com"},
-            "resume": "Test resume"
+            "resume": "Test resume",
         }
         mock_consultant = Mock()
         mock_consultant.prenom = "Jean"
@@ -362,8 +407,8 @@ class TestConsultantCV(BaseIntegrationTest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
-    @patch('app.pages_modules.consultant_cv.imports_ok', True)
-    @patch('app.pages_modules.consultant_cv.get_database_session')
+    @patch("app.pages_modules.consultant_cv.imports_ok", True)
+    @patch("app.pages_modules.consultant_cv.get_database_session")
     def test_compare_cv_with_profile(self, mock_session):
         """Test comparaison CV avec profil"""
         # Mock session
@@ -396,7 +441,7 @@ class TestConsultantCV(BaseIntegrationTest):
         """Test suggestions évolution carrière"""
         analysis = {
             "competences": ["Python", "Java", "Docker", "AWS"],
-            "missions": [{"titre": "Mission 1"}, {"titre": "Mission 2"}]
+            "missions": [{"titre": "Mission 1"}, {"titre": "Mission 2"}],
         }
         mock_consultant = Mock()
 
@@ -431,15 +476,15 @@ class TestConsultantCV(BaseIntegrationTest):
                 "client": "Client A",
                 "periode": "2023-01-01 à 2023-06-30",
                 "technologies": "Python, Django",
-                "description": "Développement web"
+                "description": "Développement web",
             },
             {
                 "titre": "Mission 2",
                 "client": "Client B",
                 "periode": "2023-07-01 à 2023-12-31",
                 "technologies": "Java, Spring",
-                "description": "Développement backend"
-            }
+                "description": "Développement backend",
+            },
         ]
         mock_consultant = Mock()
         mock_consultant.id = 1
@@ -466,9 +511,7 @@ class TestConsultantCV(BaseIntegrationTest):
 
     def test_show_cv_skills_with_data(self):
         """Test affichage compétences CV avec données"""
-        analysis = {
-            "competences": ["Python", "Java", "Agile", "Scrum", "Management"]
-        }
+        analysis = {"competences": ["Python", "Java", "Agile", "Scrum", "Management"]}
 
         try:
             show_cv_skills(analysis)
@@ -498,7 +541,7 @@ class TestConsultantCV(BaseIntegrationTest):
             "missions": [{"titre": "Mission 1"}, {"titre": "Mission 2"}],
             "competences": ["Python", "Java"],
             "contact": {"email": "test@example.com"},
-            "resume": "Test resume"
+            "resume": "Test resume",
         }
         mock_consultant = Mock()
 
@@ -533,7 +576,7 @@ class TestConsultantCV(BaseIntegrationTest):
             "client": "Test Client",
             "periode": "2023-01-01 à 2023-12-31",
             "technologies": "Python, Java",
-            "description": "Test description"
+            "description": "Test description",
         }
         mock_consultant = Mock()
         mock_consultant.id = 1
@@ -553,15 +596,20 @@ class TestConsultantCV(BaseIntegrationTest):
 
         # Vérifier que les fonctions principales existent
         required_functions = [
-            'show_cv_missions', 'show_cv_skills', 'show_cv_summary',
-            'show_cv_actions', 'categorize_skill', 'check_existing_skill',
-            'add_skill_from_cv', 'calculate_cv_quality_score'
+            "show_cv_missions",
+            "show_cv_skills",
+            "show_cv_summary",
+            "show_cv_actions",
+            "categorize_skill",
+            "check_existing_skill",
+            "add_skill_from_cv",
+            "calculate_cv_quality_score",
         ]
 
         for func_name in required_functions:
             assert hasattr(cv_module, func_name), f"Fonction {func_name} manquante"
 
         # Vérifier que les variables d'import existent
-        assert hasattr(cv_module, 'imports_ok')
-        assert hasattr(cv_module, 'ConsultantService')
-        assert hasattr(cv_module, 'get_database_session')
+        assert hasattr(cv_module, "imports_ok")
+        assert hasattr(cv_module, "ConsultantService")
+        assert hasattr(cv_module, "get_database_session")
