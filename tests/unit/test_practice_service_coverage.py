@@ -19,13 +19,14 @@ class TestPracticeServiceCoverage:
         self.mock_practice.responsable = "Jean Dupont"
         self.mock_practice.actif = True
 
-    @patch('app.services.practice_service.get_session')
+    @patch('app.services.practice_service.get_database_session')
     @patch('streamlit.error')
     def test_get_all_practices_success(self, mock_st_error, mock_session):
         """Test récupération de toutes les practices"""
-        # Mock session directe (pas de context manager)
+        # Mock session avec context manager
         mock_db = Mock()
-        mock_session.return_value = mock_db
+        mock_session.return_value.__enter__.return_value = mock_db
+        mock_session.return_value.__exit__.return_value = None
         mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = [self.mock_practice]
         
         # Execution
@@ -33,15 +34,15 @@ class TestPracticeServiceCoverage:
         
         # Vérifications
         assert result == [self.mock_practice]
-        mock_db.close.assert_called()
 
-    @patch('app.services.practice_service.get_session')
+    @patch('app.services.practice_service.get_database_session')
     @patch('streamlit.error')
     def test_get_all_practices_error(self, mock_st_error, mock_session):
         """Test récupération practices avec erreur"""
         # Mock session avec erreur
         mock_db = Mock()
-        mock_session.return_value = mock_db
+        mock_session.return_value.__enter__.return_value = mock_db
+        mock_session.return_value.__exit__.return_value = None
         mock_db.query.side_effect = Exception("DB Error")
         
         # Execution
