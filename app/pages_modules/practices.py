@@ -3,6 +3,7 @@ Page de gestion des practices - VERSION FONCTIONNELLE
 """
 
 import streamlit as st
+
 from services.practice_service import PracticeService
 
 

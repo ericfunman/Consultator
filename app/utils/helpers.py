@@ -3,12 +3,13 @@ Fonctions utilitaires générales pour Consultator
 Fonctions de formatage, validation, calcul et manipulation de données
 """
 
-from datetime import date, datetime
+import math
+import os
 import re
 import unicodedata
 import uuid
-import math
-import os
+from datetime import date
+from datetime import datetime
 
 
 def format_currency(amount: float) -> str:
@@ -191,7 +192,8 @@ def round_to_nearest(value: float, nearest: float) -> float:
 
     try:
         # Utiliser decimal pour éviter les problèmes de précision flottante
-        from decimal import Decimal, ROUND_HALF_UP
+        from decimal import ROUND_HALF_UP
+        from decimal import Decimal
 
         result = Decimal(str(value)) / Decimal(str(nearest))
         result = result.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
