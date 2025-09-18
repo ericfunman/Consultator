@@ -6,25 +6,24 @@ Tests minimaux pour éviter les échecs du workflow
 import sys
 import os
 
+
 def test_basic_import():
     """Test d'import basique"""
     try:
         import json
+
         print("[OK] Import JSON reussi")
         return True
     except ImportError as e:
         print(f"[ERROR] Erreur import JSON: {e}")
         return False
 
+
 def test_project_structure():
     """Test de la structure du projet"""
     try:
         # Vérifier que les fichiers principaux existent
-        files_to_check = [
-            "app/main.py",
-            "app/database/database.py",
-            "requirements.txt"
-        ]
+        files_to_check = ["app/main.py", "app/database/database.py", "requirements.txt"]
 
         for file_path in files_to_check:
             if os.path.exists(file_path):
@@ -38,6 +37,7 @@ def test_project_structure():
         print(f"[ERROR] Erreur verification structure: {e}")
         return False
 
+
 def test_python_version():
     """Test de la version Python"""
     try:
@@ -47,6 +47,7 @@ def test_python_version():
     except Exception as e:
         print(f"[ERROR] Erreur version Python: {e}")
         return False
+
 
 def main():
     """Fonction principale d'exécution des tests"""
@@ -66,7 +67,9 @@ def main():
             result = test_func()
             # S'assurer que result est un booléen
             if result is None:
-                result = True  # Si la fonction ne retourne rien, considérer comme succès
+                result = (
+                    True  # Si la fonction ne retourne rien, considérer comme succès
+                )
             results.append(bool(result))
             status = "REUSSI" if result else "ECHEC"
             print(f"   Resultat: {status}")
@@ -90,6 +93,7 @@ def main():
     else:
         print("   ECHEC DE CERTAINS TESTS !")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

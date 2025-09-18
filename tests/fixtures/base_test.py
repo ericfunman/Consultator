@@ -61,11 +61,32 @@ class BaseUITest(BaseTest):
         """Configuration automatique des mocks Streamlit"""
         # Liste des fonctions Streamlit communes à mocker
         streamlit_functions = [
-            'title', 'header', 'subheader', 'write', 'success', 'error',
-            'warning', 'info', 'columns', 'tabs', 'form', 'form_submit_button',
-            'text_input', 'text_area', 'selectbox', 'checkbox', 'button',
-            'table', 'dataframe', 'metric', 'expander', 'empty', 'radio',
-            'sidebar', 'spinner', 'container'
+            "title",
+            "header",
+            "subheader",
+            "write",
+            "success",
+            "error",
+            "warning",
+            "info",
+            "columns",
+            "tabs",
+            "form",
+            "form_submit_button",
+            "text_input",
+            "text_area",
+            "selectbox",
+            "checkbox",
+            "button",
+            "table",
+            "dataframe",
+            "metric",
+            "expander",
+            "empty",
+            "radio",
+            "sidebar",
+            "spinner",
+            "container",
         ]
 
         # Démarrer les patches
@@ -86,6 +107,7 @@ class BaseUITest(BaseTest):
 
     def _configure_common_mocks(self):
         """Configuration des mocks Streamlit courants"""
+
         # Mock columns pour retourner un nombre variable de colonnes
         def mock_columns(*args, **kwargs):
             if not args:
@@ -98,7 +120,7 @@ class BaseUITest(BaseTest):
             else:
                 return [MagicMock(), MagicMock()]
 
-        columns_patch = patch('streamlit.columns', side_effect=mock_columns)
+        columns_patch = patch("streamlit.columns", side_effect=mock_columns)
         columns_patch.start()
         self.streamlit_patches.append(columns_patch)
 
@@ -112,12 +134,12 @@ class BaseUITest(BaseTest):
             else:
                 return [MagicMock(), MagicMock(), MagicMock()]
 
-        tabs_patch = patch('streamlit.tabs', side_effect=mock_tabs)
+        tabs_patch = patch("streamlit.tabs", side_effect=mock_tabs)
         tabs_patch.start()
         self.streamlit_patches.append(tabs_patch)
 
         # Mock form_submit_button pour retourner False par défaut
-        submit_patch = patch('streamlit.form_submit_button', return_value=False)
+        submit_patch = patch("streamlit.form_submit_button", return_value=False)
         submit_patch.start()
         self.streamlit_patches.append(submit_patch)
 
@@ -127,7 +149,7 @@ class BaseUITest(BaseTest):
                 return args[1][0]  # Return first option
             return "default"
 
-        selectbox_patch = patch('streamlit.selectbox', side_effect=mock_selectbox)
+        selectbox_patch = patch("streamlit.selectbox", side_effect=mock_selectbox)
         selectbox_patch.start()
         self.streamlit_patches.append(selectbox_patch)
 
@@ -140,7 +162,7 @@ class BaseUITest(BaseTest):
     def get_displayed_elements(self) -> list:
         """Récupérer la liste des éléments affichés (mock)"""
         # Retourner une liste mockée des éléments affichés
-        return ['title', 'header', 'content']
+        return ["title", "header", "content"]
 
 
 class BaseDatabaseTest(BaseTest):
@@ -190,13 +212,13 @@ class TestDataFactory:
     def create_consultant_data(**overrides) -> Dict[str, Any]:
         """Créer des données de consultant de test"""
         base_data = {
-            'nom': 'Dupont',
-            'prenom': 'Jean',
-            'email': 'jean.dupont@test.com',
-            'telephone': '0123456789',
-            'disponibilite': True,
-            'salaire_souhaite': 45000,
-            'experience_annees': 5
+            "nom": "Dupont",
+            "prenom": "Jean",
+            "email": "jean.dupont@test.com",
+            "telephone": "0123456789",
+            "disponibilite": True,
+            "salaire_souhaite": 45000,
+            "experience_annees": 5,
         }
         base_data.update(overrides)
         return base_data
@@ -204,10 +226,7 @@ class TestDataFactory:
     @staticmethod
     def create_practice_data(**overrides) -> Dict[str, Any]:
         """Créer des données de practice de test"""
-        base_data = {
-            'nom': 'Data Science',
-            'actif': True
-        }
+        base_data = {"nom": "Data Science", "actif": True}
         base_data.update(overrides)
         return base_data
 
@@ -215,12 +234,12 @@ class TestDataFactory:
     def create_mission_data(**overrides) -> Dict[str, Any]:
         """Créer des données de mission de test"""
         base_data = {
-            'titre': 'Mission Test',
-            'client': 'Client Test',
-            'description': 'Description de test',
-            'duree_mois': 6,
-            'tarif_jour': 450,
-            'statut': 'En cours'
+            "titre": "Mission Test",
+            "client": "Client Test",
+            "description": "Description de test",
+            "duree_mois": 6,
+            "tarif_jour": 450,
+            "statut": "En cours",
         }
         base_data.update(overrides)
         return base_data
@@ -235,7 +254,8 @@ def assert_contains_text(text: str, container: str):
 def assert_valid_email(email: str):
     """Assertion utilitaire pour valider un email"""
     import re
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     assert re.match(pattern, email), f"Invalid email format: {email}"
 
 

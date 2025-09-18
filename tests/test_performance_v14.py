@@ -11,6 +11,7 @@ import time
 # Ajouter le chemin du projet
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 class TestPerformance:
     """Tests de performance pour les fonctionnalités critiques"""
 
@@ -25,6 +26,7 @@ class TestPerformance:
     @pytest.mark.benchmark
     def test_database_connection_speed(self, benchmark):
         """Test de la vitesse de connexion à la base de données"""
+
         def db_operation():
             try:
                 # Simuler une opération de base de données
@@ -39,6 +41,7 @@ class TestPerformance:
     @pytest.mark.benchmark
     def test_data_processing_speed(self, benchmark):
         """Test de la vitesse de traitement des données"""
+
         def process_data():
             # Simuler le traitement d'une liste de consultants
             data = list(range(100))
@@ -51,6 +54,7 @@ class TestPerformance:
     @pytest.mark.benchmark
     def test_ui_rendering_simulation(self, benchmark):
         """Test de simulation du rendu UI"""
+
         def render_ui():
             # Simuler le rendu d'une page avec plusieurs éléments
             elements = []
@@ -64,6 +68,7 @@ class TestPerformance:
     @pytest.mark.benchmark
     def test_memory_usage_simulation(self, benchmark):
         """Test de simulation de l'usage mémoire"""
+
         def memory_operation():
             # Simuler des opérations qui utilisent de la mémoire
             large_list = [i for i in range(1000)]
@@ -77,6 +82,7 @@ class TestPerformance:
     @pytest.mark.benchmark
     def test_api_response_simulation(self, benchmark):
         """Test de simulation des réponses API"""
+
         def api_call():
             # Simuler un appel API
             time.sleep(0.005)  # Simuler latence réseau

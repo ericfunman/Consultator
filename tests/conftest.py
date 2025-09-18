@@ -53,6 +53,7 @@ def test_db():
     except ImportError as e:
         # Si les modules de l'app ne sont pas disponibles, retourner un mock
         from unittest.mock import MagicMock
+
         pytest.skip(f"Modules de l'application non disponibles: {e}")
         yield MagicMock()
 
@@ -296,12 +297,16 @@ def mock_sqlalchemy_models():
     try:
         # Patch des modèles principaux - seulement si disponibles
         try:
-            patches.append(patch("app.database.models.Consultant", mock_consultant_class))
+            patches.append(
+                patch("app.database.models.Consultant", mock_consultant_class)
+            )
             patches.append(patch("app.database.models.Practice", mock_practice_class))
             patches.append(patch("app.database.models.BusinessManager", MagicMock()))
             patches.append(patch("app.database.models.Mission", MagicMock()))
             patches.append(patch("app.database.models.Competence", MagicMock()))
-            patches.append(patch("app.database.models.ConsultantCompetence", MagicMock()))
+            patches.append(
+                patch("app.database.models.ConsultantCompetence", MagicMock())
+            )
             patches.append(patch("app.database.models.Langue", MagicMock()))
             patches.append(patch("app.database.models.ConsultantLangue", MagicMock()))
             patches.append(patch("sqlalchemy.func", mock_func))
@@ -472,9 +477,9 @@ def mock_streamlit_complete():
     for patch_obj in patches:
         started_patches.append(patch_obj.start())
         if len(started_patches) <= len(streamlit_functions):
-            mock_patches[
-                streamlit_functions[len(started_patches) - 1]
-            ] = started_patches[-1]
+            mock_patches[streamlit_functions[len(started_patches) - 1]] = (
+                started_patches[-1]
+            )
 
     try:
         # Configuration des mocks
@@ -631,8 +636,15 @@ def mock_sqlalchemy_models_global():
     try:
         # Patch des sessions de base de données - seulement si les modules sont disponibles
         try:
-            patches.append(patch("app.database.database.get_database_session", return_value=mock_session))
-            patches.append(patch("app.database.database.session_local", return_value=mock_session))
+            patches.append(
+                patch(
+                    "app.database.database.get_database_session",
+                    return_value=mock_session,
+                )
+            )
+            patches.append(
+                patch("app.database.database.session_local", return_value=mock_session)
+            )
         except ImportError:
             # Si les modules de l'app ne sont pas disponibles, ne pas patcher
             pass
@@ -885,6 +897,7 @@ def disable_streamlit_cache():
             # Used as @st.cache_data(ttl=300)
             def decorator(func):
                 return func
+
             return decorator
 
     def mock_cache_resource(*args, **kwargs):
@@ -896,12 +909,13 @@ def disable_streamlit_cache():
             # Used as @st.cache_resource
             def decorator(func):
                 return func
+
             return decorator
 
     patches = []
     try:
-        patches.append(patch('streamlit.cache_data', mock_cache_data))
-        patches.append(patch('streamlit.cache_resource', mock_cache_resource))
+        patches.append(patch("streamlit.cache_data", mock_cache_data))
+        patches.append(patch("streamlit.cache_resource", mock_cache_resource))
 
         # Démarrer les patches
         for p in patches:

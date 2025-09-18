@@ -9,7 +9,16 @@ from unittest.mock import Mock, patch, MagicMock
 from typing import Dict, List, Any, Optional
 
 from app.services.chatbot_service import ChatbotService
-from app.database.models import Consultant, Competence, ConsultantCompetence, Langue, ConsultantLangue, Mission, Practice, CV
+from app.database.models import (
+    Consultant,
+    Competence,
+    ConsultantCompetence,
+    Langue,
+    ConsultantLangue,
+    Mission,
+    Practice,
+    CV,
+)
 
 
 class TestChatbotService:
@@ -50,13 +59,13 @@ class TestChatbotService:
         consultant.langues = []
         return consultant
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_init(self, mock_get_session, chatbot):
         """Test de l'initialisation du service"""
         assert chatbot.conversation_history == []
         assert chatbot.last_question == ""
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_get_session(self, mock_get_session, chatbot):
         """Test de la méthode _get_session"""
         mock_session = Mock()
@@ -66,7 +75,7 @@ class TestChatbotService:
         # Vérifier que la méthode retourne bien une session mockée
         assert result is not None
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_execute_with_fresh_session(self, mock_get_session, chatbot):
         """Test de la méthode _execute_with_fresh_session"""
         mock_session = Mock()
@@ -91,7 +100,7 @@ class TestChatbotService:
         # Test normal
         assert chatbot._clean_question("Bonjour le monde!") == "bonjour le monde!"
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_salaire(self, mock_get_session, chatbot, mock_consultant):
         """Test de l'analyse d'intention pour les questions de salaire"""
         # Mock de la base de données
@@ -111,8 +120,10 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("quelle est la rémunération de jean")
         assert intent == "salaire"
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_analyze_intent_experience(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_analyze_intent_experience(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de l'analyse d'intention pour les questions d'expérience"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -126,8 +137,10 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("quel âge professionnel a jean")
         assert intent == "experience"
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_analyze_intent_competences(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_analyze_intent_competences(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de l'analyse d'intention pour les questions de compétences"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -141,7 +154,7 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("quelles technologies maîtrise jean")
         assert intent == "competences"
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_langues(self, mock_get_session, chatbot, mock_consultant):
         """Test de l'analyse d'intention pour les questions de langues"""
         mock_session = Mock()
@@ -156,7 +169,7 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("jean est-il bilingue")
         assert intent == "langues"
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_missions(self, mock_get_session, chatbot, mock_consultant):
         """Test de l'analyse d'intention pour les questions de missions"""
         mock_session = Mock()
@@ -171,7 +184,7 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("sur quels projets travaille jean")
         assert intent == "missions"
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_contact(self, mock_get_session, chatbot, mock_consultant):
         """Test de l'analyse d'intention pour les questions de contact"""
         mock_session = Mock()
@@ -186,8 +199,10 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("quel est le téléphone de jean")
         assert intent == "contact"
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_analyze_intent_statistiques(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_analyze_intent_statistiques(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de l'analyse d'intention pour les questions statistiques"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -201,7 +216,7 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("quel est le salaire moyen")
         assert intent == "salaire"
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_practices(self, mock_get_session, chatbot, mock_consultant):
         """Test de l'analyse d'intention pour les questions de practices"""
         mock_session = Mock()
@@ -216,7 +231,7 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("jean est dans quelle équipe")
         assert intent == "practices"
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_cvs(self, mock_get_session, chatbot, mock_consultant):
         """Test de l'analyse d'intention pour les questions de CVs"""
         mock_session = Mock()
@@ -231,8 +246,10 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("quels documents a jean")
         assert intent == "cvs"
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_analyze_intent_disponibilite(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_analyze_intent_disponibilite(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de l'analyse d'intention pour les questions de disponibilité"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -246,8 +263,10 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("quand jean sera-t-il libre")
         assert intent == "disponibilite"
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_analyze_intent_tjm_mission(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_analyze_intent_tjm_mission(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de l'analyse d'intention pour les questions de TJM mission"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -261,8 +280,10 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("quel est le tarif de la mission de jean")
         assert intent == "tjm_mission"
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_analyze_intent_recherche_consultant(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_analyze_intent_recherche_consultant(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de l'analyse d'intention pour la recherche de consultant"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -282,18 +303,20 @@ class TestChatbotService:
         intent = chatbot._analyze_intent("blablabla")
         assert intent == "general"
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_extract_entities_noms(self, mock_get_session, chatbot, mock_consultant):
         """Test de l'extraction d'entités pour les noms"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
         mock_session.query.return_value.all.return_value = [mock_consultant]
-        
+
         # Mock Practice pour éviter l'erreur d'itération
         mock_practice = Mock()
         mock_practice.nom = "Test Practice"
         mock_practice.actif = True
-        mock_session.query.return_value.filter.return_value.all.return_value = [mock_practice]
+        mock_session.query.return_value.filter.return_value.all.return_value = [
+            mock_practice
+        ]
 
         entities = chatbot._extract_entities("parle avec jean dupont")
 
@@ -303,79 +326,89 @@ class TestChatbotService:
         assert "dupont" in noms_lowercase
         assert "jean dupont" in noms_lowercase
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_extract_entities_entreprises(self, mock_get_session, chatbot):
         """Test de l'extraction d'entités pour les entreprises"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
         mock_session.query.return_value.all.return_value = []
-        
+
         # Mock Practice pour éviter l'erreur d'itération
         mock_practice = Mock()
         mock_practice.nom = "Test Practice"
         mock_practice.actif = True
-        mock_session.query.return_value.filter.return_value.all.return_value = [mock_practice]
+        mock_session.query.return_value.filter.return_value.all.return_value = [
+            mock_practice
+        ]
 
         entities = chatbot._extract_entities("jean travaille chez bnp paribas")
 
         assert "bnp paribas" in entities["entreprises"]
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_extract_entities_competences(self, mock_get_session, chatbot):
         """Test de l'extraction d'entités pour les compétences"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
         mock_session.query.return_value.all.return_value = []
-        
+
         # Mock Practice pour éviter l'erreur d'itération
         mock_practice = Mock()
         mock_practice.nom = "Test Practice"
         mock_practice.actif = True
-        mock_session.query.return_value.filter.return_value.all.return_value = [mock_practice]
+        mock_session.query.return_value.filter.return_value.all.return_value = [
+            mock_practice
+        ]
 
         entities = chatbot._extract_entities("jean maîtrise python et sql")
 
         assert "python" in entities["competences"]
         assert "sql" in entities["competences"]
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_extract_entities_langues(self, mock_get_session, chatbot):
         """Test de l'extraction d'entités pour les langues"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
         mock_session.query.return_value.all.return_value = []
-        
+
         # Mock Practice pour éviter l'erreur d'itération
         mock_practice = Mock()
         mock_practice.nom = "Test Practice"
         mock_practice.actif = True
-        mock_session.query.return_value.filter.return_value.all.return_value = [mock_practice]
+        mock_session.query.return_value.filter.return_value.all.return_value = [
+            mock_practice
+        ]
 
         entities = chatbot._extract_entities("jean parle anglais et espagnol")
 
         assert "anglais" in entities["langues"]
         assert "espagnol" in entities["langues"]
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_extract_entities_montants(self, mock_get_session, chatbot):
         """Test de l'extraction d'entités pour les montants"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
         mock_session.query.return_value.all.return_value = []
-        
+
         # Mock Practice pour éviter l'erreur d'itération
         mock_practice = Mock()
         mock_practice.nom = "Test Practice"
         mock_practice.actif = True
-        mock_session.query.return_value.filter.return_value.all.return_value = [mock_practice]
+        mock_session.query.return_value.filter.return_value.all.return_value = [
+            mock_practice
+        ]
 
         entities = chatbot._extract_entities("jean gagne 45000 euros")
 
         assert "45000" in entities["montants"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_salary_question_with_name(self, mock_find_consultant, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_salary_question_with_name(
+        self, mock_find_consultant, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_salary_question avec un nom spécifique"""
         mock_find_consultant.return_value = mock_consultant
 
@@ -387,7 +420,7 @@ class TestChatbotService:
         assert "Dupont" in result["response"]
         assert "45,000" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_handle_salary_question_general(self, mock_get_session, chatbot):
         """Test de _handle_salary_question sans nom spécifique"""
         mock_session = Mock()
@@ -399,7 +432,10 @@ class TestChatbotService:
         mock_consultant2 = Mock()
         mock_consultant2.salaire_actuel = 50000
 
-        mock_session.query.return_value.filter.return_value.all.return_value = [mock_consultant1, mock_consultant2]
+        mock_session.query.return_value.filter.return_value.all.return_value = [
+            mock_consultant1,
+            mock_consultant2,
+        ]
 
         entities = {"noms": []}  # Ajouter les entités manquantes
         result = chatbot._handle_salary_question(entities)
@@ -407,15 +443,19 @@ class TestChatbotService:
         assert result["intent"] == "salaire"
         assert "Statistiques des salaires" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_experience_question(self, mock_find_consultant, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_experience_question(
+        self, mock_find_consultant, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_experience_question"""
         mock_find_consultant.return_value = mock_consultant
 
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         entities = {"noms": ["jean"]}
         result = chatbot._handle_experience_question(entities)
@@ -424,15 +464,19 @@ class TestChatbotService:
         assert "Jean" in result["response"]
         assert "Dupont" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_professional_profile_question(self, mock_find_consultant, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_professional_profile_question(
+        self, mock_find_consultant, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_professional_profile_question"""
         mock_find_consultant.return_value = mock_consultant
 
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         entities = {"noms": ["jean"]}
         result = chatbot._handle_professional_profile_question(entities)
@@ -441,9 +485,11 @@ class TestChatbotService:
         assert "Jean" in result["response"]
         assert "Dupont" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultants_by_skill')
-    def test_handle_skills_question(self, mock_find_consultants, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultants_by_skill")
+    def test_handle_skills_question(
+        self, mock_find_consultants, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_skills_question"""
         mock_find_consultants.return_value = [mock_consultant]
 
@@ -453,9 +499,11 @@ class TestChatbotService:
         assert result["intent"] == "competences"
         assert "Python" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultants_by_language')
-    def test_handle_languages_question(self, mock_find_consultants, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultants_by_language")
+    def test_handle_languages_question(
+        self, mock_find_consultants, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_languages_question"""
         mock_find_consultants.return_value = [mock_consultant]
 
@@ -463,24 +511,36 @@ class TestChatbotService:
         result = chatbot._handle_languages_question(entities)
 
         assert result["intent"] == "langues"
-        assert "anglais" in result["response"].lower()  # Conversion en minuscules pour comparaison
+        assert (
+            "anglais" in result["response"].lower()
+        )  # Conversion en minuscules pour comparaison
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_get_missions_by_consultant')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_missions_question(self, mock_find_consultant, mock_get_missions, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_get_missions_by_consultant")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_missions_question(
+        self,
+        mock_find_consultant,
+        mock_get_missions,
+        mock_get_session,
+        chatbot,
+        mock_consultant,
+    ):
         """Test de _handle_missions_question"""
         mock_find_consultant.return_value = mock_consultant
         mock_get_missions.return_value = []
 
-        entities = {"noms": ["jean"], "entreprises": []}  # Ajouter les entités manquantes
+        entities = {
+            "noms": ["jean"],
+            "entreprises": [],
+        }  # Ajouter les entités manquantes
         result = chatbot._handle_missions_question(entities)
 
         assert result["intent"] == "missions"
         assert "Jean" in result["response"]
         assert "Dupont" in result["response"]
 
-    @patch.object(ChatbotService, '_get_general_stats')
+    @patch.object(ChatbotService, "_get_general_stats")
     def test_handle_stats_question(self, mock_get_stats, chatbot):
         """Test de _handle_stats_question"""
         # Mock des statistiques générales avec toutes les clés nécessaires
@@ -496,7 +556,7 @@ class TestChatbotService:
             "consultants_avec_cv": 25,
             "tjm_moyen": 450.0,
             "cjm_moyen": 450.0,
-            "salaire_moyen": 45000.0
+            "salaire_moyen": 45000.0,
         }
 
         result = chatbot._handle_stats_question()
@@ -504,9 +564,11 @@ class TestChatbotService:
         assert result["intent"] == "statistiques"
         assert "Statistiques générales" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_contact_question(self, mock_find_consultant, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_contact_question(
+        self, mock_find_consultant, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_contact_question"""
         mock_find_consultant.return_value = mock_consultant
 
@@ -517,8 +579,10 @@ class TestChatbotService:
         assert "jean.dupont@email.com" in result["response"]
         assert "0123456789" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_handle_list_consultants_question(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_handle_list_consultants_question(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_list_consultants_question"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -529,9 +593,11 @@ class TestChatbotService:
         assert result["intent"] == "liste_consultants"
         assert "consultants" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_consultant_search(self, mock_find_consultant, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_consultant_search(
+        self, mock_find_consultant, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_consultant_search"""
         mock_find_consultant.return_value = mock_consultant
 
@@ -549,7 +615,7 @@ class TestChatbotService:
         assert result["intent"] == "general"
         assert "🤖 Je suis là pour vous aider" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_handle_practices_question(self, mock_get_session, chatbot):
         """Test de _handle_practices_question"""
         mock_session = Mock()
@@ -561,7 +627,9 @@ class TestChatbotService:
         mock_practice.responsable = "Marie Dupont"
         mock_practice.consultants = []
 
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_practice
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_practice
+        )
 
         entities = {"practices": ["data"]}
         result = chatbot._handle_practices_question(entities)
@@ -569,9 +637,11 @@ class TestChatbotService:
         assert result["intent"] == "practices"
         assert "Data" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_cvs_question(self, mock_find_consultant, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_cvs_question(
+        self, mock_find_consultant, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_cvs_question"""
         mock_find_consultant.return_value = mock_consultant
 
@@ -582,15 +652,19 @@ class TestChatbotService:
         assert "Jean" in result["response"]
         assert "Dupont" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_availability_question(self, mock_find_consultant, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_availability_question(
+        self, mock_find_consultant, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_availability_question"""
         mock_find_consultant.return_value = mock_consultant
 
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         entities = {"noms": ["jean"]}
         result = chatbot._handle_availability_question(entities)
@@ -599,15 +673,19 @@ class TestChatbotService:
         assert "Jean" in result["response"]
         assert "Dupont" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    @patch.object(ChatbotService, '_find_consultant_by_name')
-    def test_handle_mission_tjm_question(self, mock_find_consultant, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    @patch.object(ChatbotService, "_find_consultant_by_name")
+    def test_handle_mission_tjm_question(
+        self, mock_find_consultant, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _handle_mission_tjm_question"""
         mock_find_consultant.return_value = mock_consultant
 
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         entities = {"noms": ["jean"]}
         result = chatbot._handle_mission_tjm_question(entities)
@@ -616,77 +694,93 @@ class TestChatbotService:
         assert "Jean" in result["response"]
         assert "Dupont" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_find_consultant_by_name(self, mock_get_session, chatbot, mock_consultant):
         """Test de _find_consultant_by_name"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_session.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         result = chatbot._find_consultant_by_name("jean")
 
         assert result == mock_consultant
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_find_consultants_by_skill(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_find_consultants_by_skill(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _find_consultants_by_skill"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value.all.return_value = [mock_consultant]
+        mock_session.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value.all.return_value = [
+            mock_consultant
+        ]
 
         result = chatbot._find_consultants_by_skill("python")
 
         assert result == [mock_consultant]
 
-    @patch('app.services.chatbot_service.get_database_session')
-    def test_find_consultants_by_language(self, mock_get_session, chatbot, mock_consultant):
+    @patch("app.services.chatbot_service.get_database_session")
+    def test_find_consultants_by_language(
+        self, mock_get_session, chatbot, mock_consultant
+    ):
         """Test de _find_consultants_by_language"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value.all.return_value = [mock_consultant]
+        mock_session.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value.all.return_value = [
+            mock_consultant
+        ]
 
         result = chatbot._find_consultants_by_language("anglais")
 
         assert result == [mock_consultant]
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_get_missions_by_company(self, mock_get_session, chatbot):
         """Test de _get_missions_by_company"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        
+
         # Mock une mission avec le bon attribut 'client'
         mock_mission = Mock()
         mock_mission.client = "BNP Paribas"
-        mock_session.query.return_value.filter.return_value.all.return_value = [mock_mission]
+        mock_session.query.return_value.filter.return_value.all.return_value = [
+            mock_mission
+        ]
 
         result = chatbot._get_missions_by_company("bnp paribas")
 
         assert len(result) == 1
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_get_missions_by_consultant(self, mock_get_session, chatbot):
         """Test de _get_missions_by_consultant"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.filter.return_value.order_by.return_value.all.return_value = []
+        mock_session.query.return_value.filter.return_value.order_by.return_value.all.return_value = (
+            []
+        )
 
         result = chatbot._get_missions_by_consultant(1)
 
         assert result == []
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_get_consultant_skills(self, mock_get_session, chatbot):
         """Test de _get_consultant_skills"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
-        mock_session.query.return_value.join.return_value.filter.return_value.all.return_value = []
+        mock_session.query.return_value.join.return_value.filter.return_value.all.return_value = (
+            []
+        )
 
         result = chatbot._get_consultant_skills(1)
 
         assert result == []
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_get_salary_stats(self, mock_get_session, chatbot):
         """Test de _get_salary_stats"""
         mock_session = Mock()
@@ -698,7 +792,10 @@ class TestChatbotService:
         mock_consultant2 = Mock()
         mock_consultant2.salaire_actuel = 50000
 
-        mock_session.query.return_value.filter.return_value.all.return_value = [mock_consultant1, mock_consultant2]
+        mock_session.query.return_value.filter.return_value.all.return_value = [
+            mock_consultant1,
+            mock_consultant2,
+        ]
 
         result = chatbot._get_salary_stats()
 
@@ -707,7 +804,7 @@ class TestChatbotService:
         assert result["maximum"] == 50000
         assert result["total"] == 2
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_get_general_stats(self, mock_get_session, chatbot):
         """Test de _get_general_stats"""
         mock_session = Mock()
@@ -717,7 +814,10 @@ class TestChatbotService:
         mock_session.query.return_value.count.return_value = 100
         mock_session.query.return_value.filter.return_value.count.return_value = 80
         # Mock multiple scalar pour les moyennes TJM et salaire
-        mock_session.query.return_value.filter.return_value.scalar.side_effect = [450.0, 45000.0]
+        mock_session.query.return_value.filter.return_value.scalar.side_effect = [
+            450.0,
+            45000.0,
+        ]
 
         result = chatbot._get_general_stats()
 
@@ -727,7 +827,7 @@ class TestChatbotService:
         assert result["tjm_moyen"] == pytest.approx(450.0, rel=1e-2)
         assert result["salaire_moyen"] == pytest.approx(45000.0, rel=1e-2)
 
-    @patch.object(ChatbotService, 'process_question')
+    @patch.object(ChatbotService, "process_question")
     def test_get_response(self, mock_process_question, chatbot):
         """Test de get_response"""
         mock_process_question.return_value = {"response": "Test response"}
@@ -736,7 +836,7 @@ class TestChatbotService:
 
         assert result == "Test response"
 
-    @patch.object(ChatbotService, 'process_question')
+    @patch.object(ChatbotService, "process_question")
     def test_get_response_error(self, mock_process_question, chatbot):
         """Test de get_response avec erreur"""
         mock_process_question.side_effect = ValueError("Test error")
@@ -745,7 +845,7 @@ class TestChatbotService:
 
         assert "❌ Erreur:" in result
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_process_question_error_handling(self, mock_get_session, chatbot):
         """Test de la gestion d'erreurs dans process_question"""
         mock_session = Mock()
@@ -760,7 +860,7 @@ class TestChatbotService:
         assert result["intent"] == "error"
         assert "❌ Désolé, j'ai rencontré une erreur" in result["response"]
 
-    @patch('app.services.chatbot_service.get_database_session')
+    @patch("app.services.chatbot_service.get_database_session")
     def test_process_question_unknown_intent(self, mock_get_session, chatbot):
         """Test de process_question avec intention inconnue"""
         mock_session = Mock()

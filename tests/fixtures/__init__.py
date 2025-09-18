@@ -13,18 +13,18 @@ from .base_test import (
     TestDataFactory,
     assert_contains_text,
     assert_valid_email,
-    assert_positive_number
+    assert_positive_number,
 )
 
 __all__ = [
-    'BaseTest',
-    'BaseUnitTest',
-    'BaseIntegrationTest',
-    'BaseUITest',
-    'BaseDatabaseTest',
-    'BaseServiceTest',
-    'TestDataFactory',
-    'assert_contains_text',
-    'assert_valid_email',
-    'assert_positive_number'
+    "BaseTest",
+    "BaseUnitTest",
+    "BaseIntegrationTest",
+    "BaseUITest",
+    "BaseDatabaseTest",
+    "BaseServiceTest",
+    "TestDataFactory",
+    "assert_contains_text",
+    "assert_valid_email",
+    "assert_positive_number",
 ]
