@@ -677,10 +677,14 @@ class ChatbotService:
 
                                 # Ajouter des informations contextuelles
                                 if consultant_db.grade:
-                                    response += f"🎯 **Grade actuel :** {consultant_db.grade}\n"
+                                    response += (
+                                        f"🎯 **Grade actuel :** {consultant_db.grade}\n"
+                                    )
 
                                 if consultant_db.societe:
-                                    response += f"🏢 **Société :** {consultant_db.societe}\n"
+                                    response += (
+                                        f"🏢 **Société :** {consultant_db.societe}\n"
+                                    )
 
                                 if consultant_db.date_entree_societe:
                                     response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
@@ -1320,9 +1324,13 @@ class ChatbotService:
                                 and comp["annees_experience"] > 0
                             ):
                                 if comp["annees_experience"] == 1:
-                                    experience_text = f" ({comp['annees_experience']} an)"
+                                    experience_text = (
+                                        f" ({comp['annees_experience']} an)"
+                                    )
                                 else:
-                                    experience_text = f" ({comp['annees_experience']:.0f} ans)"
+                                    experience_text = (
+                                        f" ({comp['annees_experience']:.0f} ans)"
+                                    )
 
                             response += f"  {niveau_emoji} **{comp['nom']}** - {comp['niveau_maitrise'].title()}{experience_text}\n"
                         response += "\n"
@@ -1360,7 +1368,9 @@ class ChatbotService:
 
             if consultants:
                 noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-                response = f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
+                response = (
+                    f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
+                )
                 response += "\n".join([f"• {nom}" for nom in noms])
 
                 # Ajouter les détails des niveaux
@@ -1574,7 +1584,9 @@ class ChatbotService:
             elif missions:
                 response = f"🏢 **Missions chez {entreprise.title()} :**\n\n"
                 for mission in missions[:5]:  # Limiter à 5 résultats
-                    consultant_nom = f"{mission.consultant.prenom} {mission.consultant.nom}"
+                    consultant_nom = (
+                        f"{mission.consultant.prenom} {mission.consultant.nom}"
+                    )
                     response += f"• **{consultant_nom}** - {mission.nom_mission} ({mission.date_debut.strftime('%Y')})\n"
 
                 if len(missions) > 5:
@@ -1618,7 +1630,9 @@ class ChatbotService:
                                 " (dont " + str(len(missions_en_cours)) + " en cours)"
                             )
                 elif missions:
-                    response = f"💼 **Missions de {consultant.prenom} {consultant.nom} :**\n\n"
+                    response = (
+                        f"💼 **Missions de {consultant.prenom} {consultant.nom} :**\n\n"
+                    )
                     for mission in missions:
                         status_icon = "🟢" if mission.statut == "en_cours" else "✅"
                         response += f"{status_icon} **{mission.client}** - {mission.nom_mission}\n"
@@ -1742,11 +1756,15 @@ class ChatbotService:
 
                 else:
                     # Information de contact complète
-                    response = f"📞 **Contact de {consultant.prenom} {consultant.nom} :**\n\n"
+                    response = (
+                        f"📞 **Contact de {consultant.prenom} {consultant.nom} :**\n\n"
+                    )
                     response += (
                         f"📧 Email : **{consultant.email or 'Non renseigné'}**\n"
                     )
-                    response += f"📞 Téléphone : **{consultant.telephone or 'Non renseigné'}**"
+                    response += (
+                        f"📞 Téléphone : **{consultant.telephone or 'Non renseigné'}**"
+                    )
 
                 return {
                     "response": response,
@@ -1997,7 +2015,9 @@ class ChatbotService:
                     if practice.responsable:
                         response += f"\n👨‍💼 **Responsable** : {practice.responsable}"
                 else:
-                    response = f"📋 **Practice {practice.nom}** : Aucun consultant assigné"
+                    response = (
+                        f"📋 **Practice {practice.nom}** : Aucun consultant assigné"
+                    )
 
                 return {
                     "response": response,

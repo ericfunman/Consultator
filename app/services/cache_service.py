@@ -150,6 +150,7 @@ class CacheService:
 
         # Supprimer du cache mémoire
         import fnmatch
+
         keys_to_delete = [
             k for k in self.memory_cache.keys() if fnmatch.fnmatch(k, pattern)
         ]

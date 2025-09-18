@@ -479,7 +479,9 @@ class ConsultantService:
 
                 return consultant
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la rÃ©cupÃ©ration du consultant {consultant_id}: {e}")
+            print(
+                f"Erreur lors de la rÃ©cupÃ©ration du consultant {consultant_id}: {e}"
+            )
             return None
 
     @staticmethod
@@ -775,9 +777,7 @@ class ConsultantService:
                 return True
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(
-                f"â Erreur lors de la suppression du consultant {consultant_id}: {e}"
-            )
+            print(f"â Erreur lors de la suppression du consultant {consultant_id}: {e}")
             print(f"Type d'erreur: {type(e).__name__}")
             import traceback
 
