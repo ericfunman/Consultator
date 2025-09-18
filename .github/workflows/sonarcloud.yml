@@ -31,10 +31,16 @@ jobs:
       run: |
         python -c "from app.database.database import init_database; init_database()"
 
+    - name: Clean pytest cache
+      run: |
+        find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+        find . -name "*.pyc" -delete 2>/dev/null || true
+        echo "✅ Cache pytest nettoyé"
+
     - name: Run tests with coverage
       run: |
         mkdir -p reports
-        echo "🚀 Running ALL 1447+ tests with robust error handling..."
+        echo "🚀 Running ALL 1467+ tests with robust error handling..."
         
         # D'abord, exécuter les tests de couverture optimaux pour établir une baseline
         echo "📊 Phase 1: Tests de couverture optimisés (utils)..."
