@@ -1,4 +1,4 @@
-"""
+﻿"""
 Service de gestion des technologies personnalisées
 """
 
@@ -45,7 +45,7 @@ class TechnologyService:
         """Ajoute une technologie personnalisée en base de données"""
         try:
             with get_database_session() as session:
-                # Vérifier si elle existe déj�
+                # Vérifier si elle existe déj�
                 existing = (
                     session.query(CustomTechnology)
                     .filter(CustomTechnology.nom == name)
