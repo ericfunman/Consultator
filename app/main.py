@@ -69,8 +69,7 @@ def show_navigation():
                 "🔧 Technologies",
                 "🤖 Assistant IA",
             ],
-            icons=["house", "people", "briefcase", "building",
-                   "tools", "robot"],
+            icons=["house", "people", "briefcase", "building", "tools", "robot"],
             menu_icon="list",
             default_index=0,
             styles={

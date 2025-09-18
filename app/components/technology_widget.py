@@ -39,7 +39,7 @@ def technology_multiselect(
             tech.strip() for tech in current_technologies.split(",") if tech.strip()
         ]
 
-        # Matcher les technologies actuelles avec celles disponibles (insensible 
+        # Matcher les technologies actuelles avec celles disponibles (insensible
         # la casse)
         all_techs_lower = {tech.lower(): tech for tech in all_techs}
 
@@ -185,9 +185,7 @@ def show_technologies_referentiel():
                     if TechnologyService.add_custom_technology(
                         tech_name, tech_category
                     ):
-                        st.success(
-                            f" Technologie '{tech_name}' ajoute avec succs !"
-                        )
+                        st.success(f" Technologie '{tech_name}' ajoute avec succs !")
                         st.rerun()
                     else:
                         st.error(" Cette technologie existe dj")
