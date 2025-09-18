@@ -13,6 +13,7 @@ root_dir = Path(__file__).parent
 sys.path.insert(0, str(root_dir))
 sys.path.insert(0, str(root_dir / "app"))
 
+
 def test_imports():
     """Test des imports des nouveaux composants"""
     print("🔍 Test des imports...")
@@ -25,8 +26,9 @@ def test_imports():
             RealTimeSearch,
             DataTableEnhancer,
             LoadingSpinner,
-            NotificationManager
+            NotificationManager,
         )
+
         print("✅ Tous les imports réussis")
         return True
     except ImportError as exc:
@@ -34,12 +36,14 @@ def test_imports():
         print(f"   Python path: {sys.path[:3]}")
         return False
 
+
 def test_cache_service():
     """Test du service de cache"""
     print("\n🔍 Test du service de cache...")
 
     try:
         from services.cache_service import get_cached_consultants_list
+
         print("✅ Import cache service réussi")
 
         # Test récupération données (sans stats pour éviter les erreurs)
@@ -50,12 +54,14 @@ def test_cache_service():
         print(f"❌ Erreur cache: {exc}")
         return False
 
+
 def test_consultant_service():
     """Test du service consultant"""
     print("\n🔍 Test du service consultant...")
 
     try:
         from services.consultant_service import ConsultantService
+
         print("✅ Import consultant service réussi")
 
         # Test basique sans base de données
@@ -64,6 +70,7 @@ def test_consultant_service():
     except Exception as exc:
         print(f"❌ Erreur service consultant: {exc}")
         return False
+
 
 def test_ui_components():
     """Test des composants UI"""
@@ -83,17 +90,17 @@ def test_ui_components():
         # Test données fictives
         test_data = [
             {
-                'id': 1,
-                'prenom': 'Jean',
-                'nom': 'Dupont',
-                'email': 'jean@example.com',
-                'societe': 'Quanteam',
-                'grade': 'Senior',
-                'type_contrat': 'CDI',
-                'salaire_actuel': 50000,
-                'disponibilite': True,
-                'practice_name': 'Digital',
-                'experience_annees': 5.0
+                "id": 1,
+                "prenom": "Jean",
+                "nom": "Dupont",
+                "email": "jean@example.com",
+                "societe": "Quanteam",
+                "grade": "Senior",
+                "type_contrat": "CDI",
+                "salaire_actuel": 50000,
+                "disponibilite": True,
+                "practice_name": "Digital",
+                "experience_annees": 5.0,
             }
         ]
 
@@ -105,6 +112,7 @@ def test_ui_components():
     except Exception as exc:
         print(f"❌ Erreur composants UI: {exc}")
         return False
+
 
 def test_demo_script():
     """Test du script de démonstration"""
@@ -127,6 +135,7 @@ def test_demo_script():
         print("❌ Script de démonstration manquant")
         return False
 
+
 def test_file_structure():
     """Test de la structure des fichiers"""
     print("\n🔍 Test de la structure des fichiers...")
@@ -135,7 +144,7 @@ def test_file_structure():
         "app/ui/enhanced_ui.py",
         "app/services/cache_service.py",
         "app/services/consultant_service.py",
-        "app/pages_modules/consultants.py"
+        "app/pages_modules/consultants.py",
     ]
 
     missing_files = []
@@ -148,6 +157,7 @@ def test_file_structure():
             missing_files.append(file_path)
 
     return len(missing_files) == 0
+
 
 def main():
     """Fonction principale de test"""
@@ -164,7 +174,7 @@ def main():
         ("Cache Service", test_cache_service),
         ("Consultant Service", test_consultant_service),
         ("UI Components", test_ui_components),
-        ("Demo Script", test_demo_script)
+        ("Demo Script", test_demo_script),
     ]
 
     results = []
@@ -202,6 +212,8 @@ def main():
         print("   - Lancez 'python demo_enhanced_ui.py' pour tester manuellement")
         return 1
 
+
 if __name__ == "__main__":
     import importlib.util
+
     sys.exit(main())

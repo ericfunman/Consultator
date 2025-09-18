@@ -21,7 +21,7 @@ def run_command(command, description):
             check=True,
             capture_output=True,
             text=True,
-            cwd=Path(__file__).parent
+            cwd=Path(__file__).parent,
         )
         print(f"✅ {description} - Terminé")
         return True
@@ -46,7 +46,7 @@ def install_dev_dependencies():
         "isort",
         "bandit",
         "radon",
-        "mypy"
+        "mypy",
     ]
 
     for package in dev_packages:
@@ -65,7 +65,9 @@ def setup_pre_commit():
         return False
 
     # Installer les hooks dans le repo
-    if not run_command("pre-commit install --install-hooks", "Installation des hooks dans le repo"):
+    if not run_command(
+        "pre-commit install --install-hooks", "Installation des hooks dans le repo"
+    ):
         return False
 
     return True
@@ -116,7 +118,7 @@ def create_gitignore_entries():
     ]
 
     if gitignore_path.exists():
-        with open(gitignore_path, 'r', encoding='utf-8') as f:
+        with open(gitignore_path, "r", encoding="utf-8") as f:
             content = f.read()
     else:
         content = ""
@@ -125,7 +127,7 @@ def create_gitignore_entries():
         if entry and entry not in content:
             content += entry + "\n"
 
-    with open(gitignore_path, 'w', encoding='utf-8') as f:
+    with open(gitignore_path, "w", encoding="utf-8") as f:
         f.write(content)
 
     print("✅ .gitignore mis à jour")
@@ -164,7 +166,9 @@ def main():
     if success_count == len(steps):
         print("🎉 Configuration CI/CD terminée avec succès !")
         print("\n📝 Prochaines étapes :")
-        print("1. Commitez les changements : git add . && git commit -m 'feat: setup CI/CD pipeline'")
+        print(
+            "1. Commitez les changements : git add . && git commit -m 'feat: setup CI/CD pipeline'"
+        )
         print("2. Poussez vers GitHub : git push origin master")
         print("3. Vérifiez le statut du workflow dans l'onglet Actions de GitHub")
         print("\n🔧 Commandes utiles :")
@@ -172,7 +176,9 @@ def main():
         print("- pre-commit run black        # Exécuter seulement Black")
         print("- python -m pytest tests/      # Exécuter les tests")
     else:
-        print("⚠️  Certaines étapes ont échoué. Vérifiez les messages d'erreur ci-dessus.")
+        print(
+            "⚠️  Certaines étapes ont échoué. Vérifiez les messages d'erreur ci-dessus."
+        )
         sys.exit(1)
 
 

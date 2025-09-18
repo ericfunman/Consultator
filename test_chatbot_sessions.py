@@ -5,9 +5,11 @@ Test du chatbot après corrections des sessions
 
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), 'app'))
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "app"))
 
 from services.chatbot_service import ChatbotService
+
 
 def test_chatbot():
     """Test du service chatbot"""
@@ -32,7 +34,7 @@ def test_chatbot():
         test_queries = [
             "qui connait python",
             "consultants avec 5 ans d'expérience",
-            "missions en cours"
+            "missions en cours",
         ]
 
         for query in test_queries:
@@ -48,7 +50,9 @@ def test_chatbot():
     except Exception as exc:
         print(f"❌ Erreur lors des tests: {exc}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     test_chatbot()

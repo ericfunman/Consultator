@@ -15,6 +15,7 @@ from app.database.models import Practice, BusinessManager, Consultant, Competenc
 
 fake = Faker("fr_FR")
 
+
 def create_basic_data():
     """Crée des données de test de base"""
     print("🚀 Génération de données de test simples")
@@ -25,6 +26,7 @@ def create_basic_data():
 
     # Générer un suffixe unique pour éviter les conflits
     import time
+
     unique_suffix = str(int(time.time()))[-4:]  # 4 derniers chiffres du timestamp
 
     with get_database_session() as session:
@@ -36,7 +38,7 @@ def create_basic_data():
                 (f"Data Science {unique_suffix}", "Science des données"),
                 (f"Cloud & DevOps {unique_suffix}", "Cloud et automatisation"),
                 (f"Frontend Development {unique_suffix}", "Développement frontend"),
-                (f"Backend Development {unique_suffix}", "Développement backend")
+                (f"Backend Development {unique_suffix}", "Développement backend"),
             ]
 
             practices = []
@@ -46,7 +48,7 @@ def create_basic_data():
                     description=description,
                     responsable=fake.name(),
                     actif=True,
-                    date_creation=datetime.now()
+                    date_creation=datetime.now(),
                 )
                 session.add(practice)
                 practices.append(practice)
@@ -61,7 +63,7 @@ def create_basic_data():
                 ("Martin", "Marie", f"m.martin{unique_suffix}@consultator.fr"),
                 ("Bernard", "Pierre", f"p.bernard{unique_suffix}@consultator.fr"),
                 ("Durand", "Sophie", f"s.durand{unique_suffix}@consultator.fr"),
-                ("Moreau", "Marc", f"m.moreau{unique_suffix}@consultator.fr")
+                ("Moreau", "Marc", f"m.moreau{unique_suffix}@consultator.fr"),
             ]
 
             business_managers = []
@@ -72,7 +74,7 @@ def create_basic_data():
                     email=email,
                     telephone=fake.phone_number(),
                     actif=True,
-                    date_creation=datetime.now()
+                    date_creation=datetime.now(),
                 )
                 session.add(bm)
                 business_managers.append(bm)
@@ -85,14 +87,44 @@ def create_basic_data():
             consultants_data = [
                 ("Dupont", "Jean", f"jean.dupont{unique_suffix}@email.com", 65000),
                 ("Martin", "Marie", f"marie.martin{unique_suffix}@email.com", 58000),
-                ("Bernard", "Pierre", f"pierre.bernard{unique_suffix}@email.com", 72000),
+                (
+                    "Bernard",
+                    "Pierre",
+                    f"pierre.bernard{unique_suffix}@email.com",
+                    72000,
+                ),
                 ("Durand", "Sophie", f"sophie.durand{unique_suffix}@email.com", 55000),
                 ("Moreau", "Marc", f"marc.moreau{unique_suffix}@email.com", 68000),
-                ("Petit", "Isabelle", f"isabelle.petit{unique_suffix}@email.com", 61000),
-                ("Robert", "Laurent", f"laurent.robert{unique_suffix}@email.com", 69000),
-                ("Richard", "Nathalie", f"nathalie.richard{unique_suffix}@email.com", 56000),
-                ("Dubois", "Olivier", f"olivier.dubois{unique_suffix}@email.com", 73000),
-                ("Leroy", "Catherine", f"catherine.leroy{unique_suffix}@email.com", 59000)
+                (
+                    "Petit",
+                    "Isabelle",
+                    f"isabelle.petit{unique_suffix}@email.com",
+                    61000,
+                ),
+                (
+                    "Robert",
+                    "Laurent",
+                    f"laurent.robert{unique_suffix}@email.com",
+                    69000,
+                ),
+                (
+                    "Richard",
+                    "Nathalie",
+                    f"nathalie.richard{unique_suffix}@email.com",
+                    56000,
+                ),
+                (
+                    "Dubois",
+                    "Olivier",
+                    f"olivier.dubois{unique_suffix}@email.com",
+                    73000,
+                ),
+                (
+                    "Leroy",
+                    "Catherine",
+                    f"catherine.leroy{unique_suffix}@email.com",
+                    59000,
+                ),
             ]
 
             consultants = []
@@ -106,7 +138,7 @@ def create_basic_data():
                     practice_id=practices[len(consultants) % len(practices)].id,
                     disponibilite=fake.boolean(),
                     date_creation=datetime.now(),
-                    derniere_maj=datetime.now()
+                    derniere_maj=datetime.now(),
                 )
                 session.add(consultant)
                 consultants.append(consultant)
@@ -124,7 +156,7 @@ def create_basic_data():
                 ("SQL", "Database", "Langage de base de données"),
                 ("AWS", "Cloud", "Services cloud"),
                 ("Docker", "DevOps", "Conteneurisation"),
-                ("Git", "DevOps", "Contrôle de version")
+                ("Git", "DevOps", "Contrôle de version"),
             ]
 
             competences = []
@@ -133,7 +165,7 @@ def create_basic_data():
                     nom=nom,
                     categorie=categorie,
                     type_competence="technique",
-                    description=description
+                    description=description,
                 )
                 session.add(competence)
                 competences.append(competence)
@@ -153,6 +185,7 @@ def create_basic_data():
             print(f"❌ Erreur lors de la création des données: {e}")
             session.rollback()
             raise
+
 
 if __name__ == "__main__":
     create_basic_data()
