@@ -508,7 +508,7 @@ def _display_consultant_status(consultant_db):
         try:
             experience = consultant_db.experience_annees
             st.info("📊 **Expérience calculée :** " + str(experience) + " années")
-        except BaseException:
+        except (AttributeError, TypeError, ValueError):
             st.info("📊 **Expérience :** Calcul en cours...")
     else:
         st.info("📊 **Expérience :** Non calculée (date première mission manquante)")
@@ -522,7 +522,7 @@ def _display_consultant_status(consultant_db):
             st.warning("⚠️ **Statut :** " + str(statut))
         else:
             st.error("❌ **Statut :** " + str(statut))
-    except BaseException:
+    except (AttributeError, TypeError, ValueError):
         st.info("📊 **Statut :** En cours de calcul...")
 
 
@@ -1693,10 +1693,7 @@ def show_consultants_list_enhanced():
                     selected_consultant, ["view", "edit", "delete"]
                 )
 
-                if action == "view":
-                    st.session_state.view_consultant_profile = selected_consultant["id"]
-                    st.rerun()
-                elif action == "edit":
+                if action in ["view", "edit"]:
                     st.session_state.view_consultant_profile = selected_consultant["id"]
                     st.rerun()
                 elif action == "delete":
@@ -3337,7 +3334,7 @@ def show_cv_actions(analysis, consultant):
                         try:
                             # Simulation d'ajout (remplacer par la vraie logique)
                             added_count += 1
-                        except BaseException:
+                        except (SQLAlchemyError, ValueError, TypeError):
                             pass
 
                 if added_count > 0:
