@@ -47,6 +47,21 @@ except ImportError:
     pass
 
 
+# ===== CONSTANTES =====
+# Constantes pour les chaînes dupliquées (corrections SonarQube)
+STATUT_NON_AFFECTE = "Non affecté"
+STATUT_DISPONIBLE = "✅ Disponible"
+LABEL_STATUT = "📊 Statut"
+FORMAT_DATE = "%d/%m/%Y"
+LABEL_PRACTICE = "🏢 Practice"
+LABEL_COMPETENCES = "💼 Compétences"
+VALEUR_NON_SPECIFIE = "Non spécifié"
+LABEL_TECHNOLOGIES = "🛠️ Technologies"
+LABEL_TAILLE = "📊 Taille"
+MSG_FICHIER_INTROUVABLE = "❌ Fichier introuvable"
+MSG_CHAMP_OBLIGATOIRE = "Ce champ est obligatoire"
+
+
 def show():
     """Affiche la page de gestion des consultants"""
 
@@ -149,95 +164,109 @@ def show_cv_analysis_fullwidth():
         st.markdown("</div>", unsafe_allow_html=True)
 
 
+def _load_consultant_data(consultant_id):
+    """Charge les données d'un consultant avec ses relations."""
+    with get_database_session() as session:
+        consultant = (
+            session.query(Consultant)
+            .options(joinedload(Consultant.practice))
+            .filter(Consultant.id == consultant_id)
+            .first()
+        )
+
+        if not consultant:
+            return None, None
+
+        # Charger toutes les données nécessaires dans la session
+        practice_name = (
+            consultant.practice.nom if consultant.practice else STATUT_NON_AFFECTE
+        )
+
+        # Créer un dictionnaire avec toutes les données nécessaires
+        consultant_data = {
+            "id": consultant.id,
+            "prenom": consultant.prenom,
+            "nom": consultant.nom,
+            "email": consultant.email,
+            "telephone": consultant.telephone,
+            "salaire_actuel": consultant.salaire_actuel,
+            "disponibilite": consultant.disponibilite,
+            "notes": consultant.notes,
+            "date_creation": consultant.date_creation,
+            "practice_name": practice_name,
+        }
+        return consultant_data, consultant
+
+
+def _display_consultant_header(consultant_data):
+    """Affiche l'en-tête du profil consultant."""
+    col1, col2 = st.columns([6, 1])
+
+    with col1:
+        st.title(
+            "👤 Profil de " + consultant_data["prenom"] + " " + consultant_data["nom"]
+        )
+
+    with col2:
+        if st.button("← Retour", key="back_to_list"):
+            del st.session_state.view_consultant_profile
+            st.rerun()
+
+
+def _display_consultant_metrics(consultant_data):
+    """Affiche les métriques principales du consultant."""
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    with col1:
+        salaire = consultant_data["salaire_actuel"] or 0
+        st.metric("💰 Salaire annuel", f"{salaire:,}€")
+
+    with col2:
+        # Calcul du CJM (Coût Journalier Moyen)
+        cjm = (salaire * 1.8 / 216) if salaire else 0
+        st.metric("📈 CJM", f"{cjm:,.0f}€")
+
+    with col3:
+        status = (
+            STATUT_DISPONIBLE if consultant_data["disponibilite"] else "🔴 En mission"
+        )
+        st.metric(LABEL_STATUT, status)
+
+    with col4:
+        creation_date = (
+            consultant_data["date_creation"].strftime(FORMAT_DATE)
+            if consultant_data["date_creation"]
+            else "N/A"
+        )
+        st.metric("📅 Membre depuis", creation_date)
+
+    with col5:
+        st.metric(LABEL_PRACTICE, consultant_data["practice_name"])
+
+
+def _show_consultant_not_found(consultant_id):
+    """Affiche un message d'erreur pour un consultant introuvable."""
+    st.error("❌ Consultant introuvable")
+    if st.button("← Retour à la liste", key="back_to_list_error"):
+        del st.session_state.view_consultant_profile
+        st.rerun()
+
+
 def show_consultant_profile():
     """Affiche le profil détaillé d'un consultant avec gestion d'erreurs améliorée"""
 
     consultant_id = st.session_state.view_consultant_profile
 
     try:
-        # Charger le consultant avec toutes les relations nécessaires dans la même
-        # session
-        with get_database_session() as session:
-            consultant = (
-                session.query(Consultant)
-                .options(joinedload(Consultant.practice))
-                .filter(Consultant.id == consultant_id)
-                .first()
-            )
+        consultant_data, _ = _load_consultant_data(consultant_id)
 
-            if not consultant:
-                st.error("❌ Consultant introuvable")
-                if st.button("← Retour à la liste", key="back_to_list_error"):
-                    del st.session_state.view_consultant_profile
-                    st.rerun()
-                return
+        if not consultant_data:
+            _show_consultant_not_found(consultant_id)
+            return
 
-            # Charger toutes les données nécessaires dans la session
-            practice_name = (
-                consultant.practice.nom if consultant.practice else "Non affecté"
-            )
-
-            # Créer un dictionnaire avec toutes les données nécessaires
-            consultant_data = {
-                "id": consultant.id,
-                "prenom": consultant.prenom,
-                "nom": consultant.nom,
-                "email": consultant.email,
-                "telephone": consultant.telephone,
-                "salaire_actuel": consultant.salaire_actuel,
-                "disponibilite": consultant.disponibilite,
-                "notes": consultant.notes,
-                "date_creation": consultant.date_creation,
-                "practice_name": practice_name,
-            }
-
-        # En-tête avec bouton retour
-        col1, col2 = st.columns([6, 1])
-
-        with col1:
-            st.title(
-                "👤 Profil de "
-                + consultant_data["prenom"]
-                + " "
-                + consultant_data["nom"]
-            )
-
-        with col2:
-            if st.button("← Retour", key="back_to_list"):
-                del st.session_state.view_consultant_profile
-                st.rerun()
-
+        _display_consultant_header(consultant_data)
         st.markdown("---")
-
-        # Métriques principales
-        col1, col2, col3, col4, col5 = st.columns(5)
-
-        with col1:
-            salaire = consultant_data["salaire_actuel"] or 0
-            st.metric("💰 Salaire annuel", f"{salaire:,}€")
-
-        with col2:
-            # Calcul du CJM (Coût Journalier Moyen)
-            cjm = (salaire * 1.8 / 216) if salaire else 0
-            st.metric("📈 CJM", f"{cjm:,.0f}€")
-
-        with col3:
-            status = (
-                "✅ Disponible" if consultant_data["disponibilite"] else "🔴 En mission"
-            )
-            st.metric("📊 Statut", status)
-
-        with col4:
-            creation_date = (
-                consultant_data["date_creation"].strftime("%d/%m/%Y")
-                if consultant_data["date_creation"]
-                else "N/A"
-            )
-            st.metric("📅 Membre depuis", creation_date)
-
-        with col5:
-            st.metric("🏢 Practice", consultant_data["practice_name"])
-
+        _display_consultant_metrics(consultant_data)
         st.markdown("---")
 
         # Affichage de l'analyse CV en PLEINE LARGEUR (si disponible)
@@ -255,7 +284,7 @@ def show_consultant_profile():
             tab1, tab2, tab3, tab4, tab5 = st.tabs(
                 [
                     "📋 Informations",
-                    "💼 Compétences",
+                    LABEL_COMPETENCES,
                     "🌍 Langues",
                     "🚀 Missions",
                     "📁 Documents",
@@ -277,7 +306,7 @@ def show_consultant_profile():
             with tab5:
                 show_consultant_documents(consultant_obj)
 
-    except (AttributeError, TypeError, ValueError, SQLAlchemyError, Exception) as exc:
+    except (AttributeError, TypeError, ValueError, SQLAlchemyError) as exc:
         st.error("❌ Erreur lors du chargement du profil consultant: " + str(exc))
         st.code(str(exc))
 
@@ -288,24 +317,16 @@ def show_consultant_profile():
             st.rerun()
 
 
-def show_consultant_info(consultant):
-    """Affiche et permet la modification des informations du consultant"""
-
-    st.subheader("📋 Informations personnelles")
-
-    from sqlalchemy.orm import joinedload
-
-    from database.models import Consultant
+def _load_consultant_for_edit(consultant_id):
+    """Charge le consultant avec toutes ses relations pour l'édition."""
     from database.models import Practice
 
-    # Recharger le consultant avec la relation practice pour éviter
-    # DetachedInstanceError
     with get_database_session() as session:
         consultant_db = (
             session.query(Consultant)
             .options(joinedload(Consultant.practice))
             .options(joinedload(Consultant.business_manager_gestions))
-            .filter(Consultant.id == consultant.id)
+            .filter(Consultant.id == consultant_id)
             .first()
         )
         practices = session.query(Practice).filter(Practice.actif).all()
@@ -314,77 +335,219 @@ def show_consultant_info(consultant):
         bm_actuel = consultant_db.business_manager_actuel
         bm_nom_complet = bm_actuel.nom_complet if bm_actuel else None
         bm_email = bm_actuel.email if bm_actuel else None
-    practice_options = {p.nom: p.id for p in practices}
-    current_practice_id = (
-        consultant_db.practice_id if hasattr(consultant_db, "practice_id") else None
+
+        practice_options = {p.nom: p.id for p in practices}
+        current_practice_id = (
+            consultant_db.practice_id if hasattr(consultant_db, "practice_id") else None
+        )
+
+        return (
+            consultant_db,
+            practice_options,
+            current_practice_id,
+            bm_nom_complet,
+            bm_email,
+        )
+
+
+def _render_basic_consultant_fields(
+    consultant_db, practice_options, current_practice_id, bm_nom_complet, bm_email
+):
+    """Affiche les champs de base du consultant."""
+    col1, col2 = st.columns(2)
+
+    with col1:
+        prenom = st.text_input(
+            "👤 Prénom *", value=consultant_db.prenom, placeholder="Ex: Jean"
+        )
+        email = st.text_input(
+            "📧 Email *",
+            value=consultant_db.email,
+            placeholder="jean.dupont@example.com",
+        )
+        salaire = st.number_input(
+            "💰 Salaire annuel (€)",
+            min_value=0,
+            value=int(consultant_db.salaire_actuel or 0),
+            step=1000,
+        )
+
+        # Affichage du CJM calculé en temps réel
+        cjm_calcule = (salaire * 1.8 / 216) if salaire > 0 else 0
+        st.info(
+            "📈 CJM calculé : **" + f"{cjm_calcule:,.0f}" + " €** (salaire×1.8÷216)"
+        )
+
+        # Sélection de la practice
+        practice_label = st.selectbox(
+            LABEL_PRACTICE,
+            options=[STATUT_NON_AFFECTE] + list(practice_options.keys()),
+            index=(
+                (list(practice_options.values()).index(current_practice_id) + 1)
+                if current_practice_id in practice_options.values()
+                else 0
+            ),
+        )
+        selected_practice_id = practice_options.get(practice_label)
+
+        # Affichage du Business Manager (lecture seule)
+        if bm_nom_complet and bm_email:
+            st.text_input(
+                "👨‍💼 Business Manager",
+                value=bm_nom_complet + " (" + bm_email + ")",
+                disabled=True,
+                help="Le Business Manager ne peut être modifié que depuis la page BM",
+            )
+        else:
+            st.text_input(
+                "👨‍💼 Business Manager",
+                value="Non assigné",
+                disabled=True,
+                help="Aucun Business Manager assigné",
+            )
+
+    with col2:
+        nom = st.text_input(
+            "👤 Nom *", value=consultant_db.nom, placeholder="Ex: Dupont"
+        )
+        telephone = st.text_input(
+            "📞 Téléphone",
+            value=consultant_db.telephone or "",
+            placeholder="01.23.45.67.89",
+        )
+        disponibilite = st.checkbox(
+            STATUT_DISPONIBLE, value=consultant_db.disponibilite
+        )
+
+    return prenom, nom, email, telephone, salaire, disponibilite, selected_practice_id
+
+
+def _render_company_history_fields(consultant_db):
+    """Affiche les champs d'historique société."""
+    st.markdown("---")
+    st.markdown("### 🏢 Historique Société")
+
+    col3, col4 = st.columns(2)
+
+    with col3:
+        societe = st.selectbox(
+            "🏢 Société",
+            options=["Quanteam", "Asigma"],
+            index=0 if (consultant_db.societe or "Quanteam") == "Quanteam" else 1,
+        )
+        date_entree = st.date_input(
+            "📅 Date d'entrée société",
+            value=consultant_db.date_entree_societe,
+            help="Date d'entrée dans la société",
+        )
+
+    with col4:
+        date_sortie = st.date_input(
+            "📅 Date de sortie société (optionnel)",
+            value=consultant_db.date_sortie_societe,
+            help="Laissez vide si encore en poste",
+        )
+        date_premiere_mission = st.date_input(
+            "🚀 Date première mission (optionnel)",
+            value=consultant_db.date_premiere_mission,
+            help="Date de début de la première mission",
+        )
+
+    return societe, date_entree, date_sortie, date_premiere_mission
+
+
+def _render_professional_profile_fields(consultant_db):
+    """Affiche les champs de profil professionnel."""
+    st.markdown("---")
+    st.markdown("### 👔 Profil Professionnel")
+
+    col5, col6 = st.columns(2)
+
+    with col5:
+        grade_options = [
+            "Junior",
+            "Confirmé",
+            "Consultant Manager",
+            "Directeur de Practice",
+        ]
+        current_grade = consultant_db.grade or "Junior"
+        grade_index = (
+            grade_options.index(current_grade) if current_grade in grade_options else 0
+        )
+        grade = st.selectbox(
+            "🎯 Grade",
+            options=grade_options,
+            index=grade_index,
+            help="Niveau d'expérience du consultant",
+        )
+
+    with col6:
+        contrat_options = ["CDI", "CDD", "Stagiaire", "Alternant", "Indépendant"]
+        current_contrat = consultant_db.type_contrat or "CDI"
+        contrat_index = (
+            contrat_options.index(current_contrat)
+            if current_contrat in contrat_options
+            else 0
+        )
+        type_contrat = st.selectbox(
+            "📋 Type de contrat",
+            options=contrat_options,
+            index=contrat_index,
+            help="Type de contrat de travail",
+        )
+
+    return grade, type_contrat
+
+
+def _display_consultant_status(consultant_db):
+    """Affiche le statut et l'expérience du consultant."""
+    st.markdown("---")
+
+    # Affichage de l'expérience calculée
+    if consultant_db.date_premiere_mission:
+        try:
+            experience = consultant_db.experience_annees
+            st.info("📊 **Expérience calculée :** " + str(experience) + " années")
+        except BaseException:
+            st.info("📊 **Expérience :** Calcul en cours...")
+    else:
+        st.info("📊 **Expérience :** Non calculée (date première mission manquante)")
+
+    # Statut société
+    try:
+        statut = consultant_db.statut_societe
+        if statut == "En poste":
+            st.success("✅ **Statut :** " + str(statut))
+        elif statut == "Départ prévu":
+            st.warning("⚠️ **Statut :** " + str(statut))
+        else:
+            st.error("❌ **Statut :** " + str(statut))
+    except BaseException:
+        st.info("📊 **Statut :** En cours de calcul...")
+
+
+def show_consultant_info(consultant):
+    """Affiche et permet la modification des informations du consultant"""
+
+    st.subheader("📋 Informations personnelles")
+
+    # Charger les données nécessaires
+    consultant_db, practice_options, current_practice_id, bm_nom_complet, bm_email = (
+        _load_consultant_for_edit(consultant.id)
     )
 
     # Formulaire principal infos consultant
     with st.form(f"edit_consultant_{consultant.id}"):
-        col1, col2 = st.columns(2)
-
-        with col1:
-            prenom = st.text_input(
-                "👤 Prénom *", value=consultant_db.prenom, placeholder="Ex: Jean"
+        # Champs de base
+        prenom, nom, email, telephone, salaire, disponibilite, selected_practice_id = (
+            _render_basic_consultant_fields(
+                consultant_db,
+                practice_options,
+                current_practice_id,
+                bm_nom_complet,
+                bm_email,
             )
-            email = st.text_input(
-                "📧 Email *",
-                value=consultant_db.email,
-                placeholder="jean.dupont@example.com",
-            )
-            salaire = st.number_input(
-                "💰 Salaire annuel (€)",
-                min_value=0,
-                value=int(consultant_db.salaire_actuel or 0),
-                step=1000,
-            )
-
-            # Affichage du CJM calculé en temps réel
-            cjm_calcule = (salaire * 1.8 / 216) if salaire > 0 else 0
-            st.info(
-                "📈 CJM calculé : **" + f"{cjm_calcule:,.0f}" + " €** (salaire×1.8÷216)"
-            )
-
-            # Sélection de la practice
-            practice_label = st.selectbox(
-                "🏢 Practice",
-                options=["Non affecté"] + list(practice_options.keys()),
-                index=(
-                    (list(practice_options.values()).index(current_practice_id) + 1)
-                    if current_practice_id in practice_options.values()
-                    else 0
-                ),
-            )
-            selected_practice_id = practice_options.get(practice_label)
-
-            # Affichage du Business Manager (lecture seule)
-            if bm_nom_complet and bm_email:
-                st.text_input(
-                    "👨‍💼 Business Manager",
-                    value=bm_nom_complet + " (" + bm_email + ")",
-                    disabled=True,
-                    help="Le Business Manager ne peut être modifié que depuis la page BM",
-                )
-            else:
-                st.text_input(
-                    "👨‍💼 Business Manager",
-                    value="Non assigné",
-                    disabled=True,
-                    help="Aucun Business Manager assigné",
-                )
-
-        with col2:
-            nom = st.text_input(
-                "👤 Nom *", value=consultant_db.nom, placeholder="Ex: Dupont"
-            )
-            telephone = st.text_input(
-                "📞 Téléphone",
-                value=consultant_db.telephone or "",
-                placeholder="01.23.45.67.89",
-            )
-            disponibilite = st.checkbox(
-                "✅ Disponible", value=consultant_db.disponibilite
-            )
+        )
 
         # Notes
         notes = st.text_area(
@@ -394,102 +557,16 @@ def show_consultant_info(consultant):
             placeholder="Notes sur le consultant...",
         )
 
-        # Section historique société (nouveaux champs V1.2)
-        st.markdown("---")
-        st.markdown("### 🏢 Historique Société")
+        # Champs historique société
+        societe, date_entree, date_sortie, date_premiere_mission = (
+            _render_company_history_fields(consultant_db)
+        )
 
-        col3, col4 = st.columns(2)
+        # Champs profil professionnel
+        grade, type_contrat = _render_professional_profile_fields(consultant_db)
 
-        with col3:
-            societe = st.selectbox(
-                "🏢 Société",
-                options=["Quanteam", "Asigma"],
-                index=0 if (consultant_db.societe or "Quanteam") == "Quanteam" else 1,
-            )
-            date_entree = st.date_input(
-                "📅 Date d'entrée société",
-                value=consultant_db.date_entree_societe,
-                help="Date d'entrée dans la société",
-            )
-
-        with col4:
-            date_sortie = st.date_input(
-                "📅 Date de sortie société (optionnel)",
-                value=consultant_db.date_sortie_societe,
-                help="Laissez vide si encore en poste",
-            )
-            date_premiere_mission = st.date_input(
-                "🚀 Date première mission (optionnel)",
-                value=consultant_db.date_premiere_mission,
-                help="Date de début de la première mission",
-            )
-
-        # Section profil professionnel (nouveaux champs V1.2.1)
-        st.markdown("---")
-        st.markdown("### 👔 Profil Professionnel")
-
-        col5, col6 = st.columns(2)
-
-        with col5:
-            grade_options = [
-                "Junior",
-                "Confirmé",
-                "Consultant Manager",
-                "Directeur de Practice",
-            ]
-            current_grade = consultant_db.grade or "Junior"
-            grade_index = (
-                grade_options.index(current_grade)
-                if current_grade in grade_options
-                else 0
-            )
-            grade = st.selectbox(
-                "🎯 Grade",
-                options=grade_options,
-                index=grade_index,
-                help="Niveau d'expérience du consultant",
-            )
-
-        with col6:
-            contrat_options = ["CDI", "CDD", "Stagiaire", "Alternant", "Indépendant"]
-            current_contrat = consultant_db.type_contrat or "CDI"
-            contrat_index = (
-                contrat_options.index(current_contrat)
-                if current_contrat in contrat_options
-                else 0
-            )
-            type_contrat = st.selectbox(
-                "📋 Type de contrat",
-                options=contrat_options,
-                index=contrat_index,
-                help="Type de contrat de travail",
-            )
-
-        st.markdown("---")
-
-        # Affichage de l'expérience calculée
-        if consultant_db.date_premiere_mission:
-            try:
-                experience = consultant_db.experience_annees
-                st.info("📊 **Expérience calculée :** " + str(experience) + " années")
-            except BaseException:
-                st.info("📊 **Expérience :** Calcul en cours...")
-        else:
-            st.info(
-                "📊 **Expérience :** Non calculée (date première mission manquante)"
-            )
-
-        # Statut société
-        try:
-            statut = consultant_db.statut_societe
-            if statut == "En poste":
-                st.success("✅ **Statut :** " + str(statut))
-            elif statut == "Départ prévu":
-                st.warning("⚠️ **Statut :** " + str(statut))
-            else:
-                st.error("❌ **Statut :** " + str(statut))
-        except BaseException:
-            st.info("📊 **Statut :** En cours de calcul...")
+        # Affichage du statut
+        _display_consultant_status(consultant_db)
 
         # Bouton de sauvegarde
         col1, col2, col3 = st.columns([2, 1, 2])
@@ -1543,7 +1620,7 @@ def show_consultants_list_enhanced():
                 )
             else:
                 consultants = ConsultantService.get_all_consultants_with_stats()
-        except Exception as exc:
+        except (SQLAlchemyError, AttributeError) as exc:
             st.error(f"Erreur lors du chargement des données: {str(exc)}")
             return
 
@@ -1803,8 +1880,8 @@ def show_add_consultant_form():
             )
             # Sélection de la practice
             practice_label = st.selectbox(
-                "🏢 Practice",
-                options=["Non affecté"] + list(practice_options.keys()),
+                LABEL_PRACTICE,
+                options=[STATUT_NON_AFFECTE] + list(practice_options.keys()),
                 index=0,
             )
             selected_practice_id = practice_options.get(practice_label)
@@ -1812,7 +1889,7 @@ def show_add_consultant_form():
         with col2:
             nom = st.text_input("👤 Nom *", placeholder="Ex: Dupont")
             telephone = st.text_input("📞 Téléphone", placeholder="01.23.45.67.89")
-            disponibilite = st.checkbox("✅ Disponible", value=True)
+            disponibilite = st.checkbox(STATUT_DISPONIBLE, value=True)
 
         # Section historique société (nouveaux champs V1.2)
         st.markdown("---")
@@ -2055,7 +2132,7 @@ def show_consultant_documents(consultant):
     show_existing_documents(consultant)
 
 
-def save_consultant_document(uploaded_file, consultant, document_type, description):
+def save_consultant_document(uploaded_file, consultant, document_type):
     """Sauvegarde un document pour le consultant"""
 
     try:
@@ -2373,9 +2450,7 @@ def extract_original_filename(full_filename):
 
     if len(parts) >= 4:
         # Identifier les parties : ID, Prénom, Nom, puis le reste
-        id_part = parts[0]  # noqa: F841
-        prenom_part = parts[1]  # noqa: F841
-        nom_part = parts[2]  # noqa: F841
+        # Les 3 premières parties (ID, Prénom, Nom) ne sont pas utilisées dans le traitement
 
         # Le reste après Nom
         remaining_parts = parts[3:]
@@ -3166,7 +3241,7 @@ def show_cv_skills(analysis):
                 st.info(
                     "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement"
                 )
-                # TODO: Implémenter l'ajout automatique des compétences
+                # Fonctionnalité à implémenter : ajout automatique des compétences techniques détectées
             else:
                 st.warning("⚠️ Aucune technologie à ajouter")
 
@@ -3181,7 +3256,7 @@ def show_cv_skills(analysis):
                 st.info(
                     "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement"
                 )
-                # TODO: Implémenter l'ajout automatique des compétences
+                # Fonctionnalité à implémenter : ajout automatique des compétences fonctionnelles détectées
             else:
                 st.warning("⚠️ Aucune compétence fonctionnelle à ajouter")
 
@@ -3203,7 +3278,7 @@ def show_cv_summary(analysis, consultant):
 
     with col3:
         comp_count = len(analysis.get("competences_fonctionnelles", []))
-        st.metric("💼 Compétences", comp_count)
+        st.metric(LABEL_COMPETENCES, comp_count)
 
     with col4:
         info_general = analysis.get("informations_generales", {})
@@ -3237,7 +3312,7 @@ def show_cv_actions(analysis, consultant):
     with col_stat2:
         st.metric("🛠️ Technologies", len(technologies))
     with col_stat3:
-        st.metric("💼 Compétences", len(competences))
+        st.metric(LABEL_COMPETENCES, len(competences))
 
     st.markdown("---")
 
