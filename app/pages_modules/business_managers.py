@@ -491,7 +491,7 @@ def _get_mission_data(consultant, session):
     role_mission = (
         mission_en_cours.role if mission_en_cours and mission_en_cours.role else "N/A"
     )
-    
+
     # Extraire la logique de récupération du TJM
     tjm_mission = "N/A"
     if mission_en_cours:
@@ -499,7 +499,7 @@ def _get_mission_data(consultant, session):
             tjm_mission = mission_en_cours.tjm
         elif mission_en_cours.taux_journalier:
             tjm_mission = mission_en_cours.taux_journalier
-    
+
     date_debut_mission = (
         mission_en_cours.date_debut.strftime(DATE_FORMAT) if mission_en_cours else "N/A"
     )

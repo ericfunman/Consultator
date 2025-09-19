@@ -46,7 +46,9 @@ MSG_COMPETENCE_DEJA_ASSOCIEE = "❌ Cette compétence est déjà associée au co
 MSG_COMPETENCE_INTROUVABLE = "❌ Compétence introuvable"
 MSG_COMPETENCE_MISE_A_JOUR = "✅ Compétence mise à jour avec succès !"
 MSG_ERREUR_MISE_A_JOUR = "❌ Erreur lors de la mise à jour"
-MSG_ERREUR_CHARGEMENT_MODIFICATION = "❌ Erreur lors du chargement du formulaire de modification:"
+MSG_ERREUR_CHARGEMENT_MODIFICATION = (
+    "❌ Erreur lors du chargement du formulaire de modification:"
+)
 
 # Emojis pour la certification
 EMOJI_CERTIFIE = "✅"
@@ -96,9 +98,7 @@ def _create_skill_data_row(skill):
             else "N/A"
         ),
         "Certification": (
-            EMOJI_CERTIFIE
-            if skill["certification"]
-            else EMOJI_NON_CERTIFIE
+            EMOJI_CERTIFIE if skill["certification"] else EMOJI_NON_CERTIFIE
         ),
         "Actions": f"edit_{skill['id']}",
     }
@@ -172,10 +172,7 @@ def _display_action_buttons(consultant_id, consultant_competences):
 def _handle_skill_forms(consultant_id):
     """Gère l'affichage des formulaires d'ajout et de modification."""
     # Formulaire d'ajout (si activé)
-    if (
-        "add_skill" in st.session_state
-        and st.session_state.add_skill == consultant_id
-    ):
+    if "add_skill" in st.session_state and st.session_state.add_skill == consultant_id:
         show_add_skill_form(consultant_id)
 
     # Formulaire de modification (si activé)

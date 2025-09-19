@@ -663,7 +663,7 @@ def _load_mission_for_edit(mission_id: int):
         )
         if not mission:
             return None, {}
-        
+
         clients = session.query(Client).all()
         client_options = {c.id: c.nom for c in clients}
         return mission, client_options
@@ -768,7 +768,9 @@ def _handle_mission_update(mission_id, form_data):
     """Gère la mise à jour d'une mission."""
     titre, client_id, date_debut, en_cours, date_fin = form_data[:5]
     if validate_mission_form(titre, client_id, date_debut, en_cours, date_fin):
-        taux_journalier, salaire_mensuel, description, competences_requises = form_data[5:]
+        taux_journalier, salaire_mensuel, description, competences_requises = form_data[
+            5:
+        ]
         success = update_mission(
             mission_id,
             {
@@ -866,13 +868,28 @@ def show_edit_mission_form(mission_id: int):
 
         with st.form(f"edit_mission_form_{mission_id}", clear_on_submit=False):
             # Récupération des données du formulaire
-            titre, client_id, date_debut, en_cours, date_fin = _render_edit_mission_general_info(mission, client_options)
-            taux_journalier, salaire_mensuel = _render_edit_mission_remuneration(mission)
-            description, competences_requises = _render_edit_mission_description(mission)
+            titre, client_id, date_debut, en_cours, date_fin = (
+                _render_edit_mission_general_info(mission, client_options)
+            )
+            taux_journalier, salaire_mensuel = _render_edit_mission_remuneration(
+                mission
+            )
+            description, competences_requises = _render_edit_mission_description(
+                mission
+            )
 
             # Gestion des boutons
-            form_data = (titre, client_id, date_debut, en_cours, date_fin, 
-                        taux_journalier, salaire_mensuel, description, competences_requises)
+            form_data = (
+                titre,
+                client_id,
+                date_debut,
+                en_cours,
+                date_fin,
+                taux_journalier,
+                salaire_mensuel,
+                description,
+                competences_requises,
+            )
             _handle_edit_mission_buttons(mission_id, form_data)
 
     except Exception as e:
@@ -997,9 +1014,7 @@ def _display_mission_chronology(mission):
         today = date.today()
         duration_days = (today - mission.date_debut).days
         duration_months = duration_days // 30
-        st.write(
-            f"**Durée actuelle :** {duration_months} mois ({duration_days} jours)"
-        )
+        st.write(f"**Durée actuelle :** {duration_months} mois ({duration_days} jours)")
         st.write("**Statut :** 🔄 En cours")
 
 
@@ -1234,7 +1249,7 @@ def _calculate_mission_revenue(mission):
             duration_days = (today - mission.date_debut).days
             working_days = duration_days // 7 * 5
             revenue = mission.taux_journalier * working_days
-    
+
     return revenue
 
 
@@ -1245,7 +1260,7 @@ def _build_revenue_data(missions):
 
     for mission in missions:
         revenue = _calculate_mission_revenue(mission)
-        
+
         if revenue > 0:
             revenue_data.append(
                 {

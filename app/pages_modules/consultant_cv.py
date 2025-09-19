@@ -403,7 +403,7 @@ def calculate_cv_quality_score(analysis: Dict) -> int:
     return min(score, 100)
 
 
-def show_cv_recommendations(analysis: Dict):
+def show_cv_recommendations(analysis: Dict, consultant):
     """Affiche les recommandations basées sur l'analyse CV"""
 
     st.markdown("**💡 Recommandations :**")
@@ -671,13 +671,17 @@ def save_cv_analysis_to_profile(analysis: Dict, consultant):
         # Extraction des compétences pour mise à jour du profil
         competences_detectees = analysis.get("competences", [])
         missions_detectees = analysis.get("missions", [])
-        
+
         if competences_detectees:
-            st.info(f"💡 {len(competences_detectees)} compétences détectées pour ajout potentiel")
-        
+            st.info(
+                f"💡 {len(competences_detectees)} compétences détectées pour ajout potentiel"
+            )
+
         if missions_detectees:
-            st.info(f"💼 {len(missions_detectees)} missions détectées pour ajout potentiel")
-        
+            st.info(
+                f"💼 {len(missions_detectees)} missions détectées pour ajout potentiel"
+            )
+
         st.success(
             "✅ Analyse sauvegardée dans le profil (fonctionnalité à implémenter)"
         )
@@ -815,7 +819,7 @@ def compare_cv_with_profile(analysis: Dict, consultant):
         st.error(f"❌ Erreur lors de la comparaison: {e}")
 
 
-def show_career_suggestions(analysis: Dict):
+def show_career_suggestions(analysis: Dict, consultant):
     """Affiche des suggestions d'évolution de carrière"""
 
     st.markdown("### 📈 Suggestions d'évolution")

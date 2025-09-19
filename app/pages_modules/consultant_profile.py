@@ -129,10 +129,7 @@ def _display_consultant_header(consultant_data):
 
     with col1:
         st.title(
-            "👤 Profil de "
-            + consultant_data["prenom"]
-            + " "
-            + consultant_data["nom"]
+            "👤 Profil de " + consultant_data["prenom"] + " " + consultant_data["nom"]
         )
 
     with col2:
@@ -196,22 +193,27 @@ def _display_consultant_tabs(consultant_id):
 
         with tab1:
             from .consultants import show_consultant_info_tab
+
             show_consultant_info_tab(consultant_obj)
 
         with tab2:
             from .consultants import show_consultant_skills_tab
+
             show_consultant_skills_tab(consultant_obj)
 
         with tab3:
             from .consultants import show_consultant_languages_tab
+
             show_consultant_languages_tab(consultant_obj)
 
         with tab4:
             from .consultants import show_consultant_missions_tab
+
             show_consultant_missions_tab(consultant_obj)
 
         with tab5:
             from .consultants import show_consultant_documents_tab
+
             show_consultant_documents_tab(consultant_obj)
 
 
@@ -222,7 +224,7 @@ def show_consultant_profile():
 
     try:
         consultant_data, _ = _load_consultant_data(consultant_id)
-        
+
         if not consultant_data:
             _show_consultant_not_found(consultant_id)
             return
