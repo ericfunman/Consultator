@@ -10,6 +10,9 @@ import traceback
 import streamlit as st
 from streamlit_option_menu import option_menu
 
+# Constantes pour éviter la duplication
+CONSULTANTS_MENU_LABEL = "👥 Consultants"
+
 # Configuration de la page
 st.set_page_config(
     page_title="Consultator",
@@ -63,7 +66,7 @@ def show_navigation():
             menu_title=None,
             options=[
                 "🏠 Accueil",
-                "👥 Consultants",
+                CONSULTANTS_MENU_LABEL,
                 "🤵‍♂ Business Managers",
                 "🏢 Practices",
                 "🔧 Technologies",
@@ -91,7 +94,7 @@ def show_navigation():
     # Mapping vers les noms de modules
     page_mapping = {
         "🏠 Accueil": "home",
-        "👥 Consultants": "consultants",
+        CONSULTANTS_MENU_LABEL: "consultants",
         "🤵‍♂ Business Managers": "business_managers",
         "🏢 Practices": "practices",
         "🔧 Technologies": "technologies",
@@ -149,7 +152,7 @@ def show_fallback_home():
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric("👥 Consultants", "1000+", "Actifs dans la practice")
+        st.metric(CONSULTANTS_MENU_LABEL, "1000+", "Actifs dans la practice")
 
     with col2:
         st.metric("💼 Missions", "500+", "En cours et terminées")

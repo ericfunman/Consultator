@@ -12,6 +12,11 @@ from app.database.models import ConsultantBusinessManager
 from app.database.models import Mission
 from app.services.business_manager_service import BusinessManagerService
 
+# Constantes pour éviter la duplication
+TELEPHONE_LABEL = "Téléphone"
+DATE_FORMAT = "%d/%m/%Y"
+DUREE_LABEL = "Durée"
+
 
 def show():
     """
@@ -127,9 +132,9 @@ def show_bm_profile():
                 st.subheader("📋 Informations générales")
                 st.write(f"**Nom complet :** {bm.prenom} {bm.nom}")
                 st.write(f"**Email :** {bm.email}")
-                st.write(f"**Téléphone :** {bm.telephone or 'Non renseigné'}")
+                st.write(f"**{TELEPHONE_LABEL} :** {bm.telephone or 'Non renseigné'}")
                 st.write(
-                    f"**Date de création :** {bm.date_creation.strftime('%d/%m/%Y') if bm.date_creation else 'N/A'}"
+                    f"**Date de création :** {bm.date_creation.strftime(DATE_FORMAT) if bm.date_creation else 'N/A'}"
                 )
                 st.write(f"**Statut :** {'🟢 Actif' if bm.actif else '🔴 Inactif'}")
 
@@ -214,7 +219,7 @@ def show_edit_bm_form(bm):
 
         with col2:
             new_prenom = st.text_input("Prénom", value=bm.prenom)
-            new_telephone = st.text_input("Téléphone", value=bm.telephone or "")
+            new_telephone = st.text_input(TELEPHONE_LABEL, value=bm.telephone or "")
 
         new_notes = st.text_area("Notes", value=bm.notes or "", height=100)
 
@@ -335,7 +340,7 @@ def show_delete_bm_confirmation(bm):
                         for assignment in active_assignments:
                             assignment.date_fin = datetime.now().date()
                             assignment.commentaire = (
-                                f"BM supprimé le {datetime.now().strftime('%d/%m/%Y')}"
+                                f"BM supprimé le {datetime.now().strftime(DATE_FORMAT)}"
                             )
 
                         # Supprimer le BM - utiliser une nouvelle session pour éviter
@@ -486,7 +491,7 @@ def show_current_bm_consultants(bm, session):
                 )
             )
             date_debut_mission = (
-                mission_en_cours.date_debut.strftime("%d/%m/%Y")
+                mission_en_cours.date_debut.strftime(DATE_FORMAT)
                 if mission_en_cours
                 else "N/A"
             )
@@ -544,7 +549,7 @@ def show_current_bm_consultants(bm, session):
                 if st.button("🔚 Terminer l'assignation", type="primary"):
                     try:
                         assignment_to_end.date_fin = datetime.now().date()
-                        assignment_to_end.commentaire = f"Assignation terminée le {datetime.now().strftime('%d/%m/%Y')}"
+                        assignment_to_end.commentaire = f"Assignation terminée le {datetime.now().strftime(DATE_FORMAT)}"
                         session.commit()
                         st.success("✅ Assignation terminée avec succès !")
                         st.rerun()
@@ -572,7 +577,7 @@ def show_current_bm_consultants(bm, session):
                             )
                             if assignment:
                                 existing_comment = assignment.commentaire or ""
-                                date_str = datetime.now().strftime("%d/%m/%Y")
+                                date_str = datetime.now().strftime(DATE_FORMAT)
                                 new_comment = (
                                     f"{existing_comment}\n{date_str}: {comment}"
                                     if existing_comment
@@ -695,7 +700,7 @@ def show_add_bm_assignment(bm, session):
                     "**🔄 Consultants assignés à d'autres BMs (nécessite transfert) :**"
                 )
                 for consultant, current_bm, existing_assignment in assigned_to_other_bm:
-                    since_date = existing_assignment.date_debut.strftime("%d/%m/%Y")
+                    since_date = existing_assignment.date_debut.strftime(DATE_FORMAT)
                     key = f"🔄 {consultant.prenom} {consultant.nom} ({consultant.email}) - Actuellement avec {current_bm.prenom} {current_bm.nom} depuis le {since_date}"
                     consultant_options[key] = {
                         "consultant": consultant,
@@ -762,7 +767,7 @@ def show_add_bm_assignment(bm, session):
 
                         # Ajouter le commentaire de clôture
                         existing_comment = existing_assignment.commentaire or ""
-                        new_comment = f"Transfert vers {bm.prenom} {bm.nom} le {date_debut.strftime('%d/%m/%Y')}"
+                        new_comment = f"Transfert vers {bm.prenom} {bm.nom} le {date_debut.strftime(DATE_FORMAT)}"
                         if cloture_comment:
                             new_comment += f" - Raison: {cloture_comment}"
 
@@ -867,13 +872,13 @@ def show_bm_assignments_history(bm, session):
             data.append(
                 {
                     "Consultant": f"{consultant.prenom} {consultant.nom}",
-                    "Début": assignment.date_debut.strftime("%d/%m/%Y"),
+                    "Début": assignment.date_debut.strftime(DATE_FORMAT),
                     "Fin": (
-                        assignment.date_fin.strftime("%d/%m/%Y")
+                        assignment.date_fin.strftime(DATE_FORMAT)
                         if assignment.date_fin
                         else "-"
                     ),
-                    "Durée": duree,
+                    DUREE_LABEL: duree,
                     "Statut": statut,
                     "Commentaire": assignment.commentaire or "-",
                 }
@@ -889,7 +894,7 @@ def show_bm_assignments_history(bm, session):
                 "Consultant": st.column_config.TextColumn("Consultant", width="large"),
                 "Début": st.column_config.TextColumn("Date début", width="medium"),
                 "Fin": st.column_config.TextColumn("Date fin", width="medium"),
-                "Durée": st.column_config.TextColumn("Durée", width="medium"),
+                DUREE_LABEL: st.column_config.TextColumn(DUREE_LABEL, width="medium"),
                 "Statut": st.column_config.TextColumn("Statut", width="small"),
                 "Commentaire": st.column_config.TextColumn(
                     "Commentaire", width="large"
@@ -990,12 +995,12 @@ def show_business_managers_list():
                     "Prénom": bm_dict["prenom"],
                     "Nom": bm_dict["nom"],
                     "Email": bm_dict["email"],
-                    "Téléphone": bm_dict["telephone"] or "N/A",
+                    TELEPHONE_LABEL: bm_dict["telephone"] or "N/A",
                     "Consultants actuels": bm_dict["consultants_count"],
                     "Total assignations": total_assignments,
                     "Statut": "🟢 Actif" if bm_dict["actif"] else "🔴 Inactif",
                     "Créé le": (
-                        bm_dict["date_creation"].strftime("%d/%m/%Y")
+                        bm_dict["date_creation"].strftime(DATE_FORMAT)
                         if bm_dict["date_creation"]
                         else "N/A"
                     ),
@@ -1100,7 +1105,7 @@ def show_business_managers_list():
         with header_cols[2]:
             st.markdown("**Email**")
         with header_cols[3]:
-            st.markdown("**📱 Téléphone**")
+            st.markdown(f"**📱 {TELEPHONE_LABEL}**")
         with header_cols[4]:
             st.markdown("**👥 Consultants**")
         with header_cols[5]:
@@ -1157,7 +1162,7 @@ def show_business_managers_list():
                 )
 
             with cols[3]:
-                st.write(row["Téléphone"])
+                st.write(row[TELEPHONE_LABEL])
 
             with cols[4]:
                 st.write(f"**{row['Consultants actuels']}**")
@@ -1244,7 +1249,7 @@ def show_add_business_manager():
 
         with col2:
             prenom = st.text_input("Prénom *", placeholder="Jean")
-            telephone = st.text_input("Téléphone", placeholder="01 23 45 67 89")
+            telephone = st.text_input(TELEPHONE_LABEL, placeholder="01 23 45 67 89")
 
         notes = st.text_area(
             "Notes (optionnel)",

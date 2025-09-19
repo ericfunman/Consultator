@@ -27,6 +27,10 @@ from sqlalchemy.orm import relationship
 if TYPE_CHECKING:
     from typing import Any
 
+# Constantes pour éviter la duplication des chaînes littérales
+CASCADE_ALL_DELETE_ORPHAN = "all, delete-orphan"
+CONSULTANTS_ID_FK = "consultants.id"
+
 Base = declarative_base()
 
 
@@ -100,24 +104,28 @@ class Consultant(Base):
     competences: Mapped[List["ConsultantCompetence"]] = relationship(
         "ConsultantCompetence",
         back_populates="consultant",
-        cascade="all, delete-orphan",
+        cascade=CASCADE_ALL_DELETE_ORPHAN,
     )
     missions: Mapped[List["Mission"]] = relationship(
-        "Mission", back_populates="consultant", cascade="all, delete-orphan"
+        "Mission", back_populates="consultant", cascade=CASCADE_ALL_DELETE_ORPHAN
     )
     cvs: Mapped[List["CV"]] = relationship(
-        "CV", back_populates="consultant", cascade="all, delete-orphan"
+        "CV", back_populates="consultant", cascade=CASCADE_ALL_DELETE_ORPHAN
     )
     salaires: Mapped[List["ConsultantSalaire"]] = relationship(
-        "ConsultantSalaire", back_populates="consultant", cascade="all, delete-orphan"
+        "ConsultantSalaire",
+        back_populates="consultant",
+        cascade=CASCADE_ALL_DELETE_ORPHAN,
     )
     langues: Mapped[List["ConsultantLangue"]] = relationship(
-        "ConsultantLangue", back_populates="consultant", cascade="all, delete-orphan"
+        "ConsultantLangue",
+        back_populates="consultant",
+        cascade=CASCADE_ALL_DELETE_ORPHAN,
     )
     business_manager_gestions: Mapped[List["ConsultantBusinessManager"]] = relationship(
         "ConsultantBusinessManager",
         back_populates="consultant",
-        cascade="all, delete-orphan",
+        cascade=CASCADE_ALL_DELETE_ORPHAN,
     )
 
     # Index de performance pour recherches rapides
@@ -265,7 +273,7 @@ class ConsultantCompetence(Base):
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
     consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey("consultants.id"), nullable=False
+        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
     )
     competence_id: Mapped[int] = Column(
         Integer, ForeignKey("competences.id"), nullable=False
@@ -296,7 +304,7 @@ class Mission(Base):
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
     consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey("consultants.id"), nullable=False
+        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
     )
     nom_mission: Mapped[str] = Column(String(200), nullable=False)
     client: Mapped[str] = Column(String(200), nullable=False)
@@ -366,7 +374,7 @@ class CV(Base):
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
     consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey("consultants.id"), nullable=False
+        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
     )
     fichier_nom: Mapped[str] = Column(String(255), nullable=False)
     fichier_path: Mapped[str] = Column(String(500), nullable=False)
@@ -404,7 +412,7 @@ class ConsultantSalaire(Base):
     __tablename__ = "consultant_salaires"
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
     consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey("consultants.id"), nullable=False
+        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
     )
     salaire: Mapped[float] = Column(Float, nullable=False)
     date_debut: Mapped[datetime.date] = Column(
@@ -446,7 +454,7 @@ class ConsultantLangue(Base):
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
     consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey("consultants.id"), nullable=False
+        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
     )
     langue_id: Mapped[int] = Column(Integer, ForeignKey("langues.id"), nullable=False)
     # 1=Débutant, 2=Élémentaire, 3=Intermédiaire, 4=Avancé, 5=Natif
@@ -517,7 +525,7 @@ class BusinessManager(Base):
     consultant_gestions: Mapped[List["ConsultantBusinessManager"]] = relationship(
         "ConsultantBusinessManager",
         back_populates="business_manager",
-        cascade="all, delete-orphan",
+        cascade=CASCADE_ALL_DELETE_ORPHAN,
     )
 
     def __repr__(self) -> str:
@@ -583,7 +591,7 @@ class ConsultantBusinessManager(Base):
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
     consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey("consultants.id"), nullable=False
+        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
     )
     business_manager_id: Mapped[int] = Column(
         Integer, ForeignKey("business_managers.id"), nullable=False

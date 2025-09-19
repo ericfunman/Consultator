@@ -91,13 +91,13 @@ class ChatbotService:
             elif intent == "contact":
                 return self._handle_contact_question(entities)
             elif intent == "liste_consultants":
-                return self._handle_list_consultants_question(entities)
+                return self._handle_list_consultants_question()
             elif intent == "practices":
                 return self._handle_practices_question(entities)
             elif intent == "cvs":
                 return self._handle_cvs_question(entities)
             elif intent == "statistiques":
-                return self._handle_stats_question(entities)
+                return self._handle_stats_question()
             elif intent == "disponibilite":  # Nouveau handler V1.2.2
                 return self._handle_availability_question(entities)
             elif intent == "tjm_mission":  # Nouveau handler V1.2.2
@@ -105,7 +105,7 @@ class ChatbotService:
             elif intent == "recherche_consultant":
                 return self._handle_consultant_search(entities)
             else:
-                return self._handle_general_question(clean_question)
+                return self._handle_general_question()
 
         except (
             SQLAlchemyError,
