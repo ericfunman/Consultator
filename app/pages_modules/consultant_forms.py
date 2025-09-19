@@ -12,6 +12,9 @@ from typing import Optional
 
 import streamlit as st
 
+# Constantes pour éviter la duplication
+ERROR_CONSULTANT_NOT_FOUND = "❌ Consultant introuvable"
+
 # Ajouter les chemins nécessaires
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.dirname(current_dir)
@@ -246,7 +249,7 @@ def show_edit_consultant_form(consultant_id: int):
             )
 
             if not consultant:
-                st.error("❌ Consultant introuvable")
+                st.error(ERROR_CONSULTANT_NOT_FOUND)
                 return
 
             # Récupérer les practices
@@ -258,114 +261,36 @@ def show_edit_consultant_form(consultant_id: int):
         with st.form(f"edit_consultant_form_{consultant_id}", clear_on_submit=False):
             st.markdown("#### 📋 Informations personnelles")
 
-            col1, col2 = st.columns(2)
-
-            with col1:
-                prenom = st.text_input(
-                    "Prénom *", value=consultant.prenom, help="Prénom du consultant"
-                )
-
-                email = st.text_input(
-                    "Email *",
-                    value=consultant.email,
-                    help="Adresse email professionnelle",
-                )
-
-                salaire_actuel = st.number_input(
-                    "Salaire annuel (€)",
-                    value=consultant.salaire_actuel or 0,
-                    min_value=0,
-                    step=1000,
-                    help="Salaire annuel brut en euros",
-                )
-
-            with col2:
-                nom = st.text_input(
-                    "Nom *", value=consultant.nom, help="Nom de famille du consultant"
-                )
-
-                telephone = st.text_input(
-                    "Téléphone",
-                    value=consultant.telephone or "",
-                    help="Numéro de téléphone professionnel",
-                )
-
-                practice_id = st.selectbox(
-                    "Practice *",
-                    options=list(practice_options.keys()),
-                    format_func=lambda x: practice_options[x],
-                    index=(
-                        list(practice_options.keys()).index(consultant.practice_id)
-                        if consultant.practice_id in practice_options
-                        else 0
-                    ),
-                    help="Practice d'affectation",
-                )
-
-            st.markdown("#### 📝 Informations complémentaires")
-
-            disponibilite = st.checkbox(
-                "Disponible pour de nouvelles missions",
-                value=consultant.disponibilite,
-                help="Cochez si le consultant est disponible",
+            # Champs d'informations personnelles
+            prenom, nom, email, telephone, salaire_actuel = (
+                _display_personal_info_fields(consultant)
             )
 
-            notes = st.text_area(
-                "Notes",
-                value=consultant.notes or "",
-                height=100,
-                help="Informations complémentaires sur le consultant",
+            # Practice et informations complémentaires
+            practice_id, disponibilite, notes = _display_practice_and_additional_fields(
+                consultant, practice_options
             )
 
             # Boutons du formulaire
-            col1, col2, col3 = st.columns([1, 1, 2])
-
-            with col1:
-                submitted = st.form_submit_button("💾 Enregistrer", type="primary")
-
-            with col2:
-                delete = st.form_submit_button("🗑️ Supprimer", type="secondary")
-
-            with col3:
-                cancel = st.form_submit_button("❌ Annuler")
+            submitted, delete, cancel = _display_form_buttons()
 
             # Traitement du formulaire
             if submitted:
-                if validate_consultant_form(prenom, nom, email, practice_id):
-                    success = update_consultant(
-                        consultant_id,
-                        {
-                            "prenom": prenom,
-                            "nom": nom,
-                            "email": email,
-                            "telephone": telephone,
-                            "salaire_actuel": salaire_actuel,
-                            "practice_id": practice_id,
-                            "disponibilite": disponibilite,
-                            "notes": notes,
-                        },
-                    )
+                _handle_form_submission(
+                    submitted,
+                    consultant_id,
+                    prenom,
+                    nom,
+                    email,
+                    telephone,
+                    salaire_actuel,
+                    practice_id,
+                    disponibilite,
+                    notes,
+                )
 
-                    if success:
-                        st.success("✅ Consultant modifié avec succès !")
-                        st.rerun()
-                    else:
-                        st.error("❌ Erreur lors de la modification du consultant")
-                else:
-                    st.error("❌ Veuillez corriger les erreurs ci-dessus")
-
-            if delete:
-                st.warning("⚠️ Cette action est irréversible !")
-                if st.checkbox("Je confirme vouloir supprimer ce consultant"):
-                    if delete_consultant(consultant_id):
-                        st.success("✅ Consultant supprimé avec succès !")
-                        # Retourner à la liste
-                        if "view_consultant_profile" in st.session_state:
-                            del st.session_state.view_consultant_profile
-                        st.rerun()
-
-            if cancel:
-                st.info("ℹ️ Modification annulée")
+            _handle_delete_action(delete, consultant_id)
+            _handle_cancel_action(cancel)
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du formulaire de modification: {e}")
@@ -443,3 +368,147 @@ def delete_consultant(consultant_id: int) -> bool:
     except Exception as e:
         st.error(f"❌ Erreur lors de la suppression du consultant: {e}")
         return False
+
+
+# Helper methods pour show_edit_consultant_form()
+
+
+def _display_personal_info_fields(consultant):
+    """Affiche les champs d'informations personnelles du consultant."""
+    col1, col2 = st.columns(2)
+
+    with col1:
+        prenom = st.text_input(
+            "Prénom *", value=consultant.prenom, help="Prénom du consultant"
+        )
+
+        email = st.text_input(
+            "Email *",
+            value=consultant.email,
+            help="Adresse email professionnelle",
+        )
+
+        salaire_actuel = st.number_input(
+            "Salaire annuel (€)",
+            value=consultant.salaire_actuel or 0,
+            min_value=0,
+            step=1000,
+            help="Salaire annuel brut en euros",
+        )
+
+    with col2:
+        nom = st.text_input(
+            "Nom *", value=consultant.nom, help="Nom de famille du consultant"
+        )
+
+        telephone = st.text_input(
+            "Téléphone",
+            value=consultant.telephone or "",
+            help="Numéro de téléphone professionnel",
+        )
+
+    return prenom, nom, email, telephone, salaire_actuel
+
+
+def _display_practice_and_additional_fields(consultant, practice_options):
+    """Affiche les champs de practice et informations complémentaires."""
+    practice_id = st.selectbox(
+        "Practice *",
+        options=list(practice_options.keys()),
+        format_func=lambda x: practice_options[x],
+        index=(
+            list(practice_options.keys()).index(consultant.practice_id)
+            if consultant.practice_id in practice_options
+            else 0
+        ),
+        help="Practice d'affectation",
+    )
+
+    st.markdown("#### 📝 Informations complémentaires")
+
+    disponibilite = st.checkbox(
+        "Disponible pour de nouvelles missions",
+        value=consultant.disponibilite,
+        help="Cochez si le consultant est disponible",
+    )
+
+    notes = st.text_area(
+        "Notes",
+        value=consultant.notes or "",
+        height=100,
+        help="Informations complémentaires sur le consultant",
+    )
+
+    return practice_id, disponibilite, notes
+
+
+def _display_form_buttons():
+    """Affiche les boutons du formulaire de modification."""
+    col1, col2, col3 = st.columns([1, 1, 2])
+
+    with col1:
+        submitted = st.form_submit_button("💾 Enregistrer", type="primary")
+
+    with col2:
+        delete = st.form_submit_button("🗑️ Supprimer", type="secondary")
+
+    with col3:
+        cancel = st.form_submit_button("❌ Annuler")
+
+    return submitted, delete, cancel
+
+
+def _handle_form_submission(
+    submitted,
+    consultant_id,
+    prenom,
+    nom,
+    email,
+    telephone,
+    salaire_actuel,
+    practice_id,
+    disponibilite,
+    notes,
+):
+    """Gère la soumission du formulaire de modification."""
+    if validate_consultant_form(prenom, nom, email, practice_id):
+        success = update_consultant(
+            consultant_id,
+            {
+                "prenom": prenom,
+                "nom": nom,
+                "email": email,
+                "telephone": telephone,
+                "salaire_actuel": salaire_actuel,
+                "practice_id": practice_id,
+                "disponibilite": disponibilite,
+                "notes": notes,
+            },
+        )
+
+        if success:
+            st.success("✅ Consultant modifié avec succès !")
+            st.rerun()
+        else:
+            st.error("❌ Erreur lors de la modification du consultant")
+    else:
+        st.error("❌ Veuillez corriger les erreurs ci-dessus")
+
+
+def _handle_delete_action(delete, consultant_id):
+    """Gère l'action de suppression du consultant."""
+    if delete:
+        st.warning("⚠️ Cette action est irréversible !")
+        if st.checkbox("Je confirme vouloir supprimer ce consultant"):
+            if delete_consultant(consultant_id):
+                st.success("✅ Consultant supprimé avec succès !")
+                # Retourner à la liste
+                if "view_consultant_profile" in st.session_state:
+                    del st.session_state.view_consultant_profile
+                st.rerun()
+
+
+def _handle_cancel_action(cancel):
+    """Gère l'action d'annulation."""
+    if cancel:
+        st.info("ℹ️ Modification annulée")

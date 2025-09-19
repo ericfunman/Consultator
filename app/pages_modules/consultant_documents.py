@@ -13,6 +13,9 @@ from typing import Optional
 
 import streamlit as st
 
+# Constantes pour éviter la duplication
+ERROR_DOCUMENT_NOT_FOUND = "❌ Document introuvable"
+
 # Ajouter les chemins nécessaires
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.dirname(current_dir)
@@ -111,80 +114,19 @@ def show_document_details(document, consultant):
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("**📄 Informations**")
-        st.write(f"**Nom :** {document.nom_fichier}")
-        st.write(f"**Type :** {document.type_document}")
-        st.write(f"**Taille :** {document.taille_fichier or 'N/A'} octets")
-
-        if document.date_upload:
-            st.write(f"**Upload :** {document.date_upload.strftime('%d/%m/%Y %H:%M')}")
+        _display_document_basic_info(document)
 
     with col2:
-        st.markdown("**📊 Métadonnées**")
-        if document.mimetype:
-            st.write(f"**Type MIME :** {document.mimetype}")
-
-        if document.chemin_fichier:
-            st.write(f"**Chemin :** {document.chemin_fichier}")
-
-        if document.analyse_cv:
-            st.write("**Analyse CV :** ✅ Disponible")
-        else:
-            st.write("**Analyse CV :** ❌ Non disponible")
+        _display_document_metadata(document)
 
     # Contenu de l'analyse CV si disponible
-    if document.analyse_cv:
-        st.markdown("**🔍 Analyse CV**")
-        try:
-            import json
-
-            analysis = json.loads(document.analyse_cv)
-
-            # Afficher un résumé de l'analyse
-            if "missions" in analysis and analysis["missions"]:
-                st.write(f"**Missions détectées :** {len(analysis['missions'])}")
-
-            if "competences" in analysis and analysis["competences"]:
-                st.write(f"**Compétences détectées :** {len(analysis['competences'])}")
-
-            # Bouton pour voir l'analyse complète
-            if st.button(
-                "👁️ Voir analyse complète",
-                key=f"view_analysis_{document.id}",
-            ):
-                show_full_cv_analysis(analysis, document.nom_fichier, consultant)
-
-        except Exception as e:
-            st.error(f"❌ Erreur lors de l'affichage de l'analyse: {e}")
+    _display_cv_analysis_summary(document, consultant)
 
     # Actions sur le document
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        if st.button("📥 Télécharger", key=f"download_doc_{document.id}"):
-            download_document(document)
-
-    with col2:
-        if st.button("🔄 Réanalyser", key=f"reanalyze_doc_{document.id}"):
-            if reanalyze_document(document.id, consultant):
-                st.rerun()
-
-    with col3:
-        if st.button("✏️ Renommer", key=f"rename_doc_{document.id}"):
-            st.session_state.rename_document = document.id
-            st.rerun()
-
-    with col4:
-        if st.button("🗑️ Supprimer", key=f"delete_doc_{document.id}"):
-            if delete_document(document.id):
-                st.rerun()
+    _display_document_actions(document, consultant)
 
     # Formulaire de renommage (si activé)
-    if (
-        "rename_document" in st.session_state
-        and st.session_state.rename_document == document.id
-    ):
-        show_rename_document_form(document.id)
+    _handle_rename_form(document)
 
 
 def show_documents_statistics(documents):
@@ -772,3 +714,94 @@ def show_documents_report(documents):
 
     df = pd.DataFrame(doc_data)
     st.dataframe(df, use_container_width=True, hide_index=True)
+
+
+# Helper methods pour show_document_details()
+
+
+def _display_document_basic_info(document):
+    """Affiche les informations de base du document."""
+    st.markdown("**📄 Informations**")
+    st.write(f"**Nom :** {document.nom_fichier}")
+    st.write(f"**Type :** {document.type_document}")
+    st.write(f"**Taille :** {document.taille_fichier or 'N/A'} octets")
+
+    if document.date_upload:
+        st.write(f"**Upload :** {document.date_upload.strftime('%d/%m/%Y %H:%M')}")
+
+
+def _display_document_metadata(document):
+    """Affiche les métadonnées du document."""
+    st.markdown("**📊 Métadonnées**")
+    if document.mimetype:
+        st.write(f"**Type MIME :** {document.mimetype}")
+
+    if document.chemin_fichier:
+        st.write(f"**Chemin :** {document.chemin_fichier}")
+
+    if document.analyse_cv:
+        st.write("**Analyse CV :** ✅ Disponible")
+    else:
+        st.write("**Analyse CV :** ❌ Non disponible")
+
+
+def _display_cv_analysis_summary(document, consultant):
+    """Affiche le résumé de l'analyse CV si disponible."""
+    if not document.analyse_cv:
+        return
+
+    st.markdown("**🔍 Analyse CV**")
+    try:
+        import json
+
+        analysis = json.loads(document.analyse_cv)
+
+        # Afficher un résumé de l'analyse
+        if "missions" in analysis and analysis["missions"]:
+            st.write(f"**Missions détectées :** {len(analysis['missions'])}")
+
+        if "competences" in analysis and analysis["competences"]:
+            st.write(f"**Compétences détectées :** {len(analysis['competences'])}")
+
+        # Bouton pour voir l'analyse complète
+        if st.button(
+            "👁️ Voir analyse complète",
+            key=f"view_analysis_{document.id}",
+        ):
+            show_full_cv_analysis(analysis, document.nom_fichier, consultant)
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'affichage de l'analyse: {e}")
+
+
+def _display_document_actions(document, consultant):
+    """Affiche les actions disponibles pour le document."""
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        if st.button("📥 Télécharger", key=f"download_doc_{document.id}"):
+            download_document(document)
+
+    with col2:
+        if st.button("🔄 Réanalyser", key=f"reanalyze_doc_{document.id}"):
+            if reanalyze_document(document.id, consultant):
+                st.rerun()
+
+    with col3:
+        if st.button("✏️ Renommer", key=f"rename_doc_{document.id}"):
+            st.session_state.rename_document = document.id
+            st.rerun()
+
+    with col4:
+        if st.button("🗑️ Supprimer", key=f"delete_doc_{document.id}"):
+            if delete_document(document.id):
+                st.rerun()
+
+
+def _handle_rename_form(document):
+    """Gère l'affichage du formulaire de renommage si activé."""
+    if (
+        "rename_document" in st.session_state
+        and st.session_state.rename_document == document.id
+    ):
+        show_rename_document_form(document.id)

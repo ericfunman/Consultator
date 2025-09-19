@@ -96,36 +96,12 @@ def show_cv_skills(analysis: Dict):
     st.markdown("#### 🛠️ Compétences extraites du CV")
 
     # Organiser par catégorie
-    skills_by_category = {}
-    for skill in competences:
-        # Essayer de déterminer la catégorie
-        category = categorize_skill(skill)
-        if category not in skills_by_category:
-            skills_by_category[category] = []
-        skills_by_category[category].append(skill)
+    skills_by_category = _organize_skills_by_category(competences)
 
+    # Afficher les compétences par catégorie
+    consultant_id = st.session_state.get("view_consultant_profile")
     for category, skills in skills_by_category.items():
-        st.markdown(f"**{category}**")
-        cols = st.columns(min(len(skills), 4))
-
-        for i, skill in enumerate(skills):
-            with cols[i % len(cols)]:
-                # Vérifier si la compétence existe déjà pour le consultant
-                existing = check_existing_skill(
-                    skill, st.session_state.get("view_consultant_profile")
-                )
-                status = "✅ Existe" if existing else "➕ Nouveau"
-
-                if st.button(
-                    f"{skill} ({status})",
-                    key=f"skill_{category}_{i}_{st.session_state.get('view_consultant_profile', 0)}",
-                ):
-                    if not existing:
-                        add_skill_from_cv(
-                            skill, st.session_state.get("view_consultant_profile")
-                        )
-                    else:
-                        st.info(f"📋 La compétence '{skill}' existe déjà")
+        _display_skills_in_category(category, skills, consultant_id)
 
     # Statistiques des compétences
     show_cv_skills_statistics(competences)
@@ -906,3 +882,44 @@ def show_career_suggestions(analysis: Dict, consultant):
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'analyse des suggestions: {e}")
+
+
+# Helper methods pour show_cv_skills()
+
+
+def _organize_skills_by_category(competences):
+    """Organise les compétences par catégorie."""
+    skills_by_category = {}
+    for skill in competences:
+        # Essayer de déterminer la catégorie
+        category = categorize_skill(skill)
+        if category not in skills_by_category:
+            skills_by_category[category] = []
+        skills_by_category[category].append(skill)
+    return skills_by_category
+
+
+def _display_skill_button(skill, category, index, consultant_id):
+    """Affiche un bouton pour une compétence avec son statut."""
+    # Vérifier si la compétence existe déjà pour le consultant
+    existing = check_existing_skill(skill, consultant_id)
+    status = "✅ Existe" if existing else "➕ Nouveau"
+
+    if st.button(
+        f"{skill} ({status})",
+        key=f"skill_{category}_{index}_{consultant_id}",
+    ):
+        if not existing:
+            add_skill_from_cv(skill, consultant_id)
+        else:
+            st.info(f"📋 La compétence '{skill}' existe déjà")
+
+
+def _display_skills_in_category(category, skills, consultant_id):
+    """Affiche les compétences d'une catégorie donnée."""
+    st.markdown(f"**{category}**")
+    cols = st.columns(min(len(skills), 4))
+
+    for i, skill in enumerate(skills):
+        with cols[i % len(cols)]:
+            _display_skill_button(skill, category, i, consultant_id)
