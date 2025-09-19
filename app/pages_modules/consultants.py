@@ -156,7 +156,7 @@ def show_cv_analysis_fullwidth():
             show_cv_skills(analysis)
 
         with tab3:
-            show_cv_summary(analysis, consultant)
+            show_cv_summary(analysis)
 
         with tab4:
             show_cv_actions(analysis, consultant)

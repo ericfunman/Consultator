@@ -104,7 +104,7 @@ def _create_skill_data_row(skill):
     }
 
 
-def _display_skill_row(row, index):
+def _display_skill_row(row):
     """Affiche une ligne de compétence avec les boutons d'action."""
     col1, col2, col3, col4, col5 = st.columns([3, 2, 2, 2, 2])
 
@@ -146,7 +146,7 @@ def _display_skills_by_category(skills_by_category):
 
         # Afficher le tableau avec actions
         for index, row in df.iterrows():
-            _display_skill_row(row, index)
+            _display_skill_row(row)
 
 
 def _display_action_buttons(consultant_id, consultant_competences):
@@ -411,7 +411,7 @@ def show_edit_skill_form(consultant_competence_id: int):
             )
 
             if not cc:
-                st.error("❌ Compétence introuvable")
+                st.error(MSG_COMPETENCE_INTROUVABLE)
                 return
 
         with st.form(
@@ -495,7 +495,7 @@ def update_consultant_skill(
             )
 
             if not cc:
-                st.error("❌ Compétence introuvable")
+                st.error(MSG_COMPETENCE_INTROUVABLE)
                 return False
 
             # Mettre à jour les données
@@ -524,7 +524,7 @@ def delete_skill(consultant_competence_id: int) -> bool:
             )
 
             if not cc:
-                st.error("❌ Compétence introuvable")
+                st.error(MSG_COMPETENCE_INTROUVABLE)
                 return False
 
             session.delete(cc)

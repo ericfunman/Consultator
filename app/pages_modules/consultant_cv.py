@@ -107,7 +107,7 @@ def show_cv_skills(analysis: Dict):
     show_cv_skills_statistics(competences)
 
 
-def show_cv_summary(analysis: Dict, consultant):
+def show_cv_summary(analysis: Dict):
     """Affiche le résumé de l'analyse CV"""
 
     if not analysis:
@@ -148,7 +148,7 @@ def show_cv_summary(analysis: Dict, consultant):
             st.write(f"💼 LinkedIn : {contact['linkedin']}")
 
     # Recommandations
-    show_cv_recommendations(analysis, consultant)
+    show_cv_recommendations(analysis)
 
 
 def show_cv_actions(analysis: Dict, consultant):
@@ -182,7 +182,7 @@ def show_cv_actions(analysis: Dict, consultant):
 
     with col2:
         if st.button("📈 Suggestions d'évolution", key=f"suggestions_{consultant.id}"):
-            show_career_suggestions(analysis, consultant)
+            show_career_suggestions(analysis)
 
 
 def categorize_skill(skill: str) -> str:
@@ -403,7 +403,7 @@ def calculate_cv_quality_score(analysis: Dict) -> int:
     return min(score, 100)
 
 
-def show_cv_recommendations(analysis: Dict, consultant):
+def show_cv_recommendations(analysis: Dict):
     """Affiche les recommandations basées sur l'analyse CV"""
 
     st.markdown("**💡 Recommandations :**")
@@ -686,10 +686,12 @@ def save_cv_analysis_to_profile(analysis: Dict, consultant):
             "✅ Analyse sauvegardée dans le profil (fonctionnalité à implémenter)"
         )
 
-        # TODO: Implémenter la sauvegarde effective des données extraites
-        # - Ajouter les compétences manquantes au profil consultant
-        # - Créer les missions détectées si elles n'existent pas
-        # - Mettre à jour les informations de contact si nécessaire
+        # NOTE: Fonctionnalité de sauvegarde effective des données extraites non implémentée
+        # Cette fonctionnalité nécessiterait :
+        # - Une interface pour sélectionner les compétences à ajouter au profil
+        # - Une fonction pour créer les missions détectées avec validation utilisateur
+        # - Une synchronisation des informations de contact avec le profil consultant
+        # - Un historique des analyses CV pour suivi des évolutions
 
     except Exception as e:
         st.error(f"❌ Erreur lors de la sauvegarde: {e}")
@@ -819,7 +821,7 @@ def compare_cv_with_profile(analysis: Dict, consultant):
         st.error(f"❌ Erreur lors de la comparaison: {e}")
 
 
-def show_career_suggestions(analysis: Dict, consultant):
+def show_career_suggestions(analysis: Dict):
     """Affiche des suggestions d'évolution de carrière"""
 
     st.markdown("### 📈 Suggestions d'évolution")

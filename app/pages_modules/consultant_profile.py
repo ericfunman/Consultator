@@ -321,7 +321,7 @@ def show_cv_analysis_fullwidth():
             show_cv_summary_tab(analysis)
 
         with tab4:
-            show_cv_actions_tab(analysis)
+            show_cv_actions_tab()
 
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -404,7 +404,7 @@ def show_cv_summary_tab(analysis):
         st.write(resume)
 
 
-def show_cv_actions_tab(analysis):
+def show_cv_actions_tab():
     """Affiche l'onglet des actions du CV"""
     st.markdown("### 💾 Actions disponibles")
 
