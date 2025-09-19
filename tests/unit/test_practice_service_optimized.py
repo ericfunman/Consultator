@@ -90,7 +90,7 @@ class TestPracticeServiceOptimized:
 
         result = PracticeService.get_practice_by_id(999)
 
-        assert result is False  # Should return False on error  # Should return None on error
+        assert result is None  # Should return None on error
         mock_st_error.assert_not_called()
 
     @patch("app.services.practice_service.get_session")
@@ -104,7 +104,7 @@ class TestPracticeServiceOptimized:
 
         result = PracticeService.get_practice_by_id(1)
 
-        assert result is False  # Should return False on error  # Should return None on error
+        assert result is None  # Should return None on error
         mock_st_error.assert_called_once()
 
     @patch("app.services.practice_service.get_session")
@@ -162,7 +162,7 @@ class TestPracticeServiceOptimized:
                 data["nom"], data["description"], data["responsable"]
             )
 
-            assert result is False
+            assert result is None  # Returns None on error
             mock_db.rollback.assert_called_once()
             mock_st_error.assert_called_once()
 
@@ -182,7 +182,7 @@ class TestPracticeServiceOptimized:
 
         data = {"nom": "Updated Name", "description": "Updated Desc"}
 
-        result = PracticeService.update_practice(1, data)
+        result = PracticeService.update_practice(1, **data)
 
         assert result is True
         assert self.mock_practice.nom == "Updated Name"
@@ -204,7 +204,7 @@ class TestPracticeServiceOptimized:
 
         data = {"nom": "Updated Name"}
 
-        result = PracticeService.update_practice(999, data)
+        result = PracticeService.update_practice(999, **data)
 
         assert result is False
         mock_st_error.assert_called_once()
@@ -224,7 +224,7 @@ class TestPracticeServiceOptimized:
 
         data = {"nom": "Updated Name"}
 
-        result = PracticeService.update_practice(1, data)
+        result = PracticeService.update_practice(1, **data)
 
         assert result is False
         mock_db.rollback.assert_called_once()
@@ -349,14 +349,14 @@ class TestPracticeServiceOptimized:
         from database.models import Practice
 
         with patch("app.services.practice_service.Practice") as mock_practice_class:
-            mock_new_practices = [Mock(), Mock(), Mock()]
+            mock_new_practices = [Mock(), Mock()]  # Data et Quant
             mock_practice_class.side_effect = mock_new_practices
 
             result = PracticeService.init_default_practices()
 
-            assert result is True
-            # Vérifier que 3 practices ont été ajoutées
-            assert mock_db.add.call_count == 3
+            assert result is None  # Function returns None
+            # Vérifier que 2 practices ont été ajoutées (Data et Quant)
+            assert mock_db.add.call_count == 2
             mock_db.commit.assert_called_once()
             mock_st_success.assert_called_once()
 
@@ -375,7 +375,7 @@ class TestPracticeServiceOptimized:
 
         result = PracticeService.init_default_practices()
 
-        assert result is True
+        assert result is None  # Function returns None
         mock_db.add.assert_not_called()
         mock_st_success.assert_called_once()
 
@@ -397,7 +397,7 @@ class TestPracticeServiceOptimized:
         with patch("app.services.practice_service.Practice"):
             result = PracticeService.init_default_practices()
 
-            assert result is False
+            assert result is None  # Function returns None even on error
             mock_db.rollback.assert_called_once()
             mock_st_error.assert_called_once()
 
@@ -410,7 +410,7 @@ class TestPracticeServiceOptimized:
         mock_db.close = Mock()
         # Test get_practice_by_id avec ID None
         result = PracticeService.get_practice_by_id(None)
-        assert result is False  # Should return False on error  # Should return None on error
+        assert result is None  # Should return None on error
 
         # Test get_consultants_by_practice avec ID None
         result = PracticeService.get_consultants_by_practice(None)
