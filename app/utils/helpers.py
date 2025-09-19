@@ -193,7 +193,8 @@ def round_to_nearest(value: float, nearest: float) -> float:
     try:
         # Utiliser decimal pour éviter les problèmes de précision flottante
         from decimal import ROUND_HALF_UP
-        from decimal import Decimal, InvalidOperation
+        from decimal import Decimal
+        from decimal import InvalidOperation
 
         result = Decimal(str(value)) / Decimal(str(nearest))
         result = result.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
