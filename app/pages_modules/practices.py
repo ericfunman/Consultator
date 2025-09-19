@@ -217,7 +217,9 @@ def show_consultants_by_practice():
                     st.write("**Affecter un consultant à la practice:**")
 
                     # Récupérer les consultants sans practice ou d'autres practices
-                    from app.services.consultant_service import ConsultantService
+                    from app.services.consultant_service import (
+                        ConsultantService,
+                    )
 
                     all_consultants = ConsultantService.get_all_consultants_objects(
                         page=1, per_page=10000
