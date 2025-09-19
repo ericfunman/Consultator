@@ -52,7 +52,7 @@ def load_module_safe(module_name):
         st.session_state.modules_cache[module_name] = module
         return module
 
-    except (ImportError, ModuleNotFoundError) as exc:
+    except ImportError as exc:
         st.error(f"❌ Erreur lors du chargement du module {module_name}: {exc}")
         return None
 

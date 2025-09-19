@@ -205,16 +205,13 @@ def show_upload_document_form(consultant_id: int):
         )
 
         # Boutons
-        col1, col2, col3 = st.columns([1, 1, 2])
+        col1, col2, _ = st.columns([1, 1, 2])
 
         with col1:
             submitted = st.form_submit_button("📤 Uploader", type="primary")
 
         with col2:
             cancel = st.form_submit_button("❌ Annuler")
-
-        with col3:
-            pass
 
         if submitted:
             if not uploaded_file:
@@ -439,16 +436,13 @@ def show_rename_document_form(document_id: int):
             )
 
             # Boutons
-            col1, col2, col3 = st.columns([1, 1, 2])
+            col1, col2, _ = st.columns([1, 1, 2])
 
             with col1:
                 submitted = st.form_submit_button("💾 Renommer", type="primary")
 
             with col2:
                 cancel = st.form_submit_button("❌ Annuler")
-
-            with col3:
-                pass
 
             if submitted:
                 _handle_rename_form_submission(document_id, new_name, new_description)

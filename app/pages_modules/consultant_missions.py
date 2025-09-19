@@ -764,6 +764,54 @@ def _render_edit_mission_description(mission):
     return description, competences_requises
 
 
+def _handle_mission_update(mission_id, form_data):
+    """Gère la mise à jour d'une mission."""
+    titre, client_id, date_debut, en_cours, date_fin = form_data[:5]
+    if validate_mission_form(titre, client_id, date_debut, en_cours, date_fin):
+        taux_journalier, salaire_mensuel, description, competences_requises = form_data[5:]
+        success = update_mission(
+            mission_id,
+            {
+                "titre": titre,
+                "client_id": client_id,
+                "date_debut": date_debut,
+                "date_fin": date_fin,
+                "en_cours": en_cours,
+                "taux_journalier": taux_journalier,
+                "salaire_mensuel": salaire_mensuel,
+                "description": description,
+                "competences_requises": competences_requises,
+            },
+        )
+
+        if success:
+            st.success("✅ Mission mise à jour avec succès !")
+            if "edit_mission" in st.session_state:
+                del st.session_state.edit_mission
+            st.rerun()
+        else:
+            st.error("❌ Erreur lors de la mise à jour")
+    else:
+        st.error("❌ Veuillez corriger les erreurs")
+
+
+def _handle_mission_deletion(mission_id):
+    """Gère la suppression d'une mission."""
+    st.warning("⚠️ Cette action est irréversible !")
+    if st.checkbox("Je confirme vouloir supprimer cette mission"):
+        if delete_mission(mission_id):
+            if "edit_mission" in st.session_state:
+                del st.session_state.edit_mission
+            st.rerun()
+
+
+def _handle_mission_cancellation():
+    """Gère l'annulation de l'édition d'une mission."""
+    if "edit_mission" in st.session_state:
+        del st.session_state.edit_mission
+    st.rerun()
+
+
 def _handle_edit_mission_buttons(mission_id, form_data):
     """Gère les actions des boutons du formulaire d'édition."""
     col1, col2, col3 = st.columns([1, 1, 2])
@@ -778,46 +826,13 @@ def _handle_edit_mission_buttons(mission_id, form_data):
         delete = st.form_submit_button("🗑️ Supprimer", type="secondary")
 
     if submitted:
-        titre, client_id, date_debut, en_cours, date_fin = form_data[:5]
-        if validate_mission_form(titre, client_id, date_debut, en_cours, date_fin):
-            taux_journalier, salaire_mensuel, description, competences_requises = form_data[5:]
-            success = update_mission(
-                mission_id,
-                {
-                    "titre": titre,
-                    "client_id": client_id,
-                    "date_debut": date_debut,
-                    "date_fin": date_fin,
-                    "en_cours": en_cours,
-                    "taux_journalier": taux_journalier,
-                    "salaire_mensuel": salaire_mensuel,
-                    "description": description,
-                    "competences_requises": competences_requises,
-                },
-            )
-
-            if success:
-                st.success("✅ Mission mise à jour avec succès !")
-                if "edit_mission" in st.session_state:
-                    del st.session_state.edit_mission
-                st.rerun()
-            else:
-                st.error("❌ Erreur lors de la mise à jour")
-        else:
-            st.error("❌ Veuillez corriger les erreurs")
+        _handle_mission_update(mission_id, form_data)
 
     if delete:
-        st.warning("⚠️ Cette action est irréversible !")
-        if st.checkbox("Je confirme vouloir supprimer cette mission"):
-            if delete_mission(mission_id):
-                if "edit_mission" in st.session_state:
-                    del st.session_state.edit_mission
-                st.rerun()
+        _handle_mission_deletion(mission_id)
 
     if cancel:
-        if "edit_mission" in st.session_state:
-            del st.session_state.edit_mission
-        st.rerun()
+        _handle_mission_cancellation()
 
 
 def show_edit_mission_form(mission_id: int):
@@ -1127,11 +1142,8 @@ def _display_missions_by_client_and_status(client_counts, status_counts):
                 st.write(f"**{status} :** {count} mission(s)")
 
 
-def _analyze_missions_by_year(missions):
-    """Analyse temporelle des missions par année avec revenus."""
-    st.markdown("#### 📈 Analyse temporelle")
-
-    # Grouper par année
+def _group_missions_by_year(missions):
+    """Groupe les missions par année."""
     missions_by_year = {}
     for mission in missions:
         if mission.date_debut:
@@ -1139,29 +1151,41 @@ def _analyze_missions_by_year(missions):
             if year not in missions_by_year:
                 missions_by_year[year] = []
             missions_by_year[year].append(mission)
+    return missions_by_year
+
+
+def _calculate_year_revenue(year_missions, year):
+    """Calcule les revenus pour une année donnée."""
+    year_revenue = 0
+    for mission in year_missions:
+        if mission.taux_journalier and mission.date_fin:
+            # Revenus pour les missions terminées
+            duration_days = (mission.date_fin - mission.date_debut).days
+            year_revenue += mission.taux_journalier * (duration_days // 7 * 5)
+        elif (
+            mission.taux_journalier
+            and mission.en_cours
+            and mission.date_debut.year == year
+        ):
+            # Estimation pour les missions en cours de l'année
+            today = date.today()
+            if today.year == year:
+                duration_days = (today - mission.date_debut).days
+                year_revenue += mission.taux_journalier * (duration_days // 7 * 5)
+    return year_revenue
+
+
+def _analyze_missions_by_year(missions):
+    """Analyse temporelle des missions par année avec revenus."""
+    st.markdown("#### 📈 Analyse temporelle")
+
+    missions_by_year = _group_missions_by_year(missions)
 
     for year in sorted(missions_by_year.keys(), reverse=True):
         year_missions = missions_by_year[year]
         st.write(f"**{year} :** {len(year_missions)} mission(s)")
 
-        # Calcul des revenus pour l'année
-        year_revenue = 0
-        for mission in year_missions:
-            if mission.taux_journalier and mission.date_fin:
-                # Revenus pour les missions terminées
-                duration_days = (mission.date_fin - mission.date_debut).days
-                year_revenue += mission.taux_journalier * (duration_days // 7 * 5)
-            elif (
-                mission.taux_journalier
-                and mission.en_cours
-                and mission.date_debut.year == year
-            ):
-                # Estimation pour les missions en cours de l'année
-                today = date.today()
-                if today.year == year:
-                    duration_days = (today - mission.date_debut).days
-                    year_revenue += mission.taux_journalier * (duration_days // 7 * 5)
-
+        year_revenue = _calculate_year_revenue(year_missions, year)
         if year_revenue > 0:
             st.write(f"**Revenus {year} :** {year_revenue:,.0f}€")
 

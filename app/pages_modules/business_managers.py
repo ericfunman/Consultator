@@ -491,15 +491,15 @@ def _get_mission_data(consultant, session):
     role_mission = (
         mission_en_cours.role if mission_en_cours and mission_en_cours.role else "N/A"
     )
-    tjm_mission = (
-        mission_en_cours.tjm
-        if mission_en_cours and mission_en_cours.tjm
-        else (
-            mission_en_cours.taux_journalier
-            if mission_en_cours and mission_en_cours.taux_journalier
-            else "N/A"
-        )
-    )
+    
+    # Extraire la logique de récupération du TJM
+    tjm_mission = "N/A"
+    if mission_en_cours:
+        if mission_en_cours.tjm:
+            tjm_mission = mission_en_cours.tjm
+        elif mission_en_cours.taux_journalier:
+            tjm_mission = mission_en_cours.taux_journalier
+    
     date_debut_mission = (
         mission_en_cours.date_debut.strftime(DATE_FORMAT) if mission_en_cours else "N/A"
     )
@@ -1252,9 +1252,6 @@ def show_statistics():
             total_active_bms = (
                 session.query(BusinessManager).filter(BusinessManager.actif).count()
             )
-            total_assignments = session.query(
-                ConsultantBusinessManager
-            ).count()  # noqa: F841
             active_assignments = (
                 session.query(ConsultantBusinessManager)
                 .filter(ConsultantBusinessManager.date_fin.is_(None))

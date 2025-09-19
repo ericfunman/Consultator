@@ -221,7 +221,7 @@ def show_consultant_profile():
     consultant_id = st.session_state.view_consultant_profile
 
     try:
-        consultant_data, session = _load_consultant_data(consultant_id)
+        consultant_data, _ = _load_consultant_data(consultant_id)
         
         if not consultant_data:
             _show_consultant_not_found(consultant_id)
@@ -310,21 +310,21 @@ def show_cv_analysis_fullwidth():
         )
 
         with tab1:
-            show_cv_missions_tab(analysis.get("missions", []), consultant)
+            show_cv_missions_tab(analysis.get("missions", []))
 
         with tab2:
             show_cv_skills_tab(analysis)
 
         with tab3:
-            show_cv_summary_tab(analysis, consultant)
+            show_cv_summary_tab(analysis)
 
         with tab4:
-            show_cv_actions_tab(analysis, consultant)
+            show_cv_actions_tab(analysis)
 
         st.markdown("</div>", unsafe_allow_html=True)
 
 
-def show_cv_missions_tab(missions, consultant):
+def show_cv_missions_tab(missions):
     """Affiche l'onglet des missions du CV"""
     st.markdown("### 📋 Missions détectées")
 
@@ -369,7 +369,7 @@ def show_cv_skills_tab(analysis):
         st.markdown("---")
 
 
-def show_cv_summary_tab(analysis, consultant):
+def show_cv_summary_tab(analysis):
     """Affiche l'onglet de résumé du CV"""
     st.markdown("### 📊 Résumé de l'analyse")
 
@@ -402,7 +402,7 @@ def show_cv_summary_tab(analysis, consultant):
         st.write(resume)
 
 
-def show_cv_actions_tab(analysis, consultant):
+def show_cv_actions_tab(analysis):
     """Affiche l'onglet des actions du CV"""
     st.markdown("### 💾 Actions disponibles")
 

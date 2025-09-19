@@ -403,7 +403,7 @@ def calculate_cv_quality_score(analysis: Dict) -> int:
     return min(score, 100)
 
 
-def show_cv_recommendations(analysis: Dict, consultant=None):
+def show_cv_recommendations(analysis: Dict):
     """Affiche les recommandations basées sur l'analyse CV"""
 
     st.markdown("**💡 Recommandations :**")
@@ -668,13 +668,24 @@ def save_cv_analysis_to_profile(analysis: Dict, consultant):
     """Sauvegarde l'analyse CV dans le profil du consultant"""
 
     try:
-        # Cette fonction pourrait mettre à jour le profil avec les informations
-        # extraites
+        # Extraction des compétences pour mise à jour du profil
+        competences_detectees = analysis.get("competences", [])
+        missions_detectees = analysis.get("missions", [])
+        
+        if competences_detectees:
+            st.info(f"💡 {len(competences_detectees)} compétences détectées pour ajout potentiel")
+        
+        if missions_detectees:
+            st.info(f"💼 {len(missions_detectees)} missions détectées pour ajout potentiel")
+        
         st.success(
             "✅ Analyse sauvegardée dans le profil (fonctionnalité à implémenter)"
         )
 
         # TODO: Implémenter la sauvegarde effective des données extraites
+        # - Ajouter les compétences manquantes au profil consultant
+        # - Créer les missions détectées si elles n'existent pas
+        # - Mettre à jour les informations de contact si nécessaire
 
     except Exception as e:
         st.error(f"❌ Erreur lors de la sauvegarde: {e}")
@@ -804,7 +815,7 @@ def compare_cv_with_profile(analysis: Dict, consultant):
         st.error(f"❌ Erreur lors de la comparaison: {e}")
 
 
-def show_career_suggestions(analysis: Dict, consultant):
+def show_career_suggestions(analysis: Dict):
     """Affiche des suggestions d'évolution de carrière"""
 
     st.markdown("### 📈 Suggestions d'évolution")
