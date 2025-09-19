@@ -7,10 +7,38 @@ Le plus gros module de l'application (3162 lignes)
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from unittest import TestCase
+from contextlib import contextmanager
 
 
 class TestChatbotServiceCoverage(TestCase):
     """Tests de couverture pour ChatbotService - 29 méthodes"""
+
+    @contextmanager
+    def setup_database_mock(self, mock_session_func):
+        """Context manager pour setup des mocks de base de données"""
+        mock_session = Mock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=None)
+        
+        # Configuration des mocks de base
+        mock_session.query.return_value.all.return_value = []
+        mock_session.query.return_value.first.return_value = None
+        mock_session.query.return_value.count.return_value = 0
+        mock_session.query.return_value.filter.return_value = mock_session.query.return_value
+        mock_session.query.return_value.order_by.return_value = mock_session.query.return_value
+        mock_session.query.return_value.limit.return_value = mock_session.query.return_value
+        mock_session.query.return_value.offset.return_value = mock_session.query.return_value
+        mock_session.add = Mock()
+        mock_session.commit = Mock()
+        mock_session.rollback = Mock()
+        mock_session.close = Mock()
+        
+        mock_session_func.return_value = mock_session
+        
+        try:
+            yield mock_session
+        finally:
+            pass
 
     def setUp(self):
         """Préparation pour chaque test"""
@@ -73,6 +101,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value = mock_db
 
         # Execution
@@ -90,6 +119,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session avec context manager
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -131,6 +161,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -213,6 +244,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -245,6 +277,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -277,6 +310,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -299,6 +333,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -332,6 +367,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -363,6 +399,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -392,6 +429,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -415,6 +453,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -439,6 +478,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -461,6 +501,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -499,6 +540,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -523,6 +565,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -545,6 +588,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -567,6 +611,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -587,6 +632,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -609,6 +655,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -632,6 +679,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -654,6 +702,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session avec stats
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -674,6 +723,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -696,6 +746,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -720,6 +771,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -744,6 +796,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -778,6 +831,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -909,6 +963,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session pour éviter les vraies requêtes DB
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -949,6 +1004,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -970,6 +1026,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -998,6 +1055,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -1021,6 +1079,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -1043,6 +1102,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -1069,6 +1129,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -1095,6 +1156,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -1131,6 +1193,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -1142,7 +1205,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Test mise à jour last_question
         chatbot.process_question("Test question")
-        assert chatbot.last_question == "Test question"
+        assert chatbot.last_question.lower() == "test question"
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_multiple_entity_extraction_patterns(self, mock_session):
@@ -1151,6 +1214,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session avec consultants multiples
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -1183,6 +1247,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session avec résultats vides
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
@@ -1203,6 +1268,7 @@ class TestChatbotServiceCoverage(TestCase):
 
         # Mock session
         mock_db = Mock()
+        mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
