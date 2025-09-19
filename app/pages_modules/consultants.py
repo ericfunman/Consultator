@@ -244,7 +244,7 @@ def _display_consultant_metrics(consultant_data):
         st.metric(LABEL_PRACTICE, consultant_data["practice_name"])
 
 
-def _show_consultant_not_found(consultant_id):
+def _show_consultant_not_found():
     """Affiche un message d'erreur pour un consultant introuvable."""
     st.error("❌ Consultant introuvable")
     if st.button("← Retour à la liste", key="back_to_list_error"):
@@ -261,7 +261,7 @@ def show_consultant_profile():
         consultant_data, _ = _load_consultant_data(consultant_id)
 
         if not consultant_data:
-            _show_consultant_not_found(consultant_id)
+            _show_consultant_not_found()
             return
 
         _display_consultant_header(consultant_data)
@@ -569,7 +569,7 @@ def show_consultant_info(consultant):
         _display_consultant_status(consultant_db)
 
         # Bouton de sauvegarde
-        col1, col2, col3 = st.columns([2, 1, 2])
+        _, col2, _ = st.columns([2, 1, 2])
         with col2:
             submitted = st.form_submit_button(
                 "💾 Sauvegarder", type="primary", use_container_width=True
@@ -662,9 +662,9 @@ def show_consultant_info(consultant):
         # Affichage textuel (salaire le plus récent en haut)
         for salaire in salaires:
             st.write(
-                f"- **{salaire.salaire:,.0f} €** du {salaire.date_debut.strftime('%d/%m/%Y')} "
+                f"- **{salaire.salaire:,.0f} €** du {salaire.date_debut.strftime(FORMAT_DATE)} "
                 + (
-                    f"au {salaire.date_fin.strftime('%d/%m/%Y')}"
+                    f"au {salaire.date_fin.strftime(FORMAT_DATE)}"
                     if salaire.date_fin
                     else "(en cours)"
                 )
@@ -1379,7 +1379,7 @@ def show_mission_readonly(mission):
 
     with col1:
         st.write(f"**🏢 Client**: {mission.client}")
-        st.write("**👤 Rôle**: " + (mission.role or "Non spécifié"))
+        st.write("**👤 Rôle**: " + (mission.role or VALEUR_NON_SPECIFIE))
         st.write(
             f"**📅 Début**: {mission.date_debut.strftime('%Y-%m-%d') if mission.date_debut else 'N/A'}"
         )
@@ -1463,7 +1463,7 @@ def show_mission_edit_form(mission):
                 key=f"edit_fin_{mission.id}",
             )
             statut = st.selectbox(
-                "📊 Statut",
+                LABEL_STATUT,
                 ["en_cours", "terminee", "en_pause"],
                 index=(
                     ["en_cours", "terminee", "en_pause"].index(mission.statut)
@@ -1474,7 +1474,7 @@ def show_mission_edit_form(mission):
             )
 
         technologies = st.text_input(
-            "🛠️ Technologies",
+            LABEL_TECHNOLOGIES,
             value=mission.technologies_utilisees or "",
             key=f"edit_tech_{mission.id}",
         )
@@ -1533,10 +1533,10 @@ def show_add_mission_form(consultant):
         with col2:
             date_debut = st.date_input("📅 Date début")
             date_fin = st.date_input("📅 Date fin (optionnel)", value=None)
-            statut = st.selectbox("📊 Statut", ["en_cours", "terminee", "en_pause"])
+            statut = st.selectbox(LABEL_STATUT, ["en_cours", "terminee", "en_pause"])
 
         technologies_str = st.text_input(
-            "🛠️ Technologies", placeholder="Ex: Python, Django, PostgreSQL"
+            LABEL_TECHNOLOGIES, placeholder="Ex: Python, Django, PostgreSQL"
         )
         description = st.text_area(
             "📝 Description",
@@ -2111,7 +2111,7 @@ def show_consultant_documents(consultant):
                 size_display = f"{file_size / 1024:.1f} MB"
             else:
                 size_display = f"{file_size:.1f} KB"
-            st.metric("📊 Taille", size_display)
+            st.metric(LABEL_TAILLE, size_display)
 
         with col3:
             # Détection automatique du type basé sur l'extension et le nom
@@ -2300,7 +2300,7 @@ def show_existing_documents(consultant):
             with col1:
                 st.write(f"📄 **{display_name}**")
                 st.caption(
-                    f"{doc_type} • {size_display} • {modified_time.strftime('%d/%m/%Y')}"
+                    f"{doc_type} • {size_display} • {modified_time.strftime(FORMAT_DATE)}"
                 )
 
             with col2:
@@ -2311,7 +2311,7 @@ def show_existing_documents(consultant):
                 if st.button(
                     "�️", key=f"preview_{file_path.name}", help="Prévisualiser"
                 ):
-                    preview_document(file_path, consultant)
+                    preview_document(file_path)
 
             with col4:
                 # Bouton d'analyse CV pour TOUS les documents
@@ -2352,7 +2352,7 @@ def delete_consultant_document(file_path):
             st.success("✅ Document supprimé avec succès")
             st.rerun()
         else:
-            st.error("❌ Fichier introuvable")
+            st.error(MSG_FICHIER_INTROUVABLE)
     except (SQLAlchemyError, ValueError, TypeError, AttributeError, OSError) as exc:
         st.error(f"❌ Erreur lors de la suppression: {exc}")
 
@@ -2514,7 +2514,7 @@ def download_document_direct(file_path, consultant, display_name):
 
     try:
         if not file_path.exists():
-            st.error("❌ Fichier introuvable")
+            st.error(MSG_FICHIER_INTROUVABLE)
             return
 
         # Lire le fichier
@@ -2540,7 +2540,7 @@ def download_document(file_path, consultant):
 
     try:
         if not file_path.exists():
-            st.error("❌ Fichier introuvable")
+            st.error(MSG_FICHIER_INTROUVABLE)
             return
 
         # Lire le fichier
@@ -2560,12 +2560,12 @@ def download_document(file_path, consultant):
         st.error(f"❌ Erreur lors du téléchargement: {exc}")
 
 
-def preview_document(file_path, consultant):
+def preview_document(file_path):
     """Affiche un aperçu du document"""
 
     try:
         if not file_path.exists():
-            st.error("❌ Fichier introuvable")
+            st.error(MSG_FICHIER_INTROUVABLE)
             return
 
         file_extension = file_path.suffix.lower()
@@ -2636,10 +2636,10 @@ def preview_word(file_path):
 
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("📊 Taille", size_display)
+            st.metric(LABEL_TAILLE, size_display)
         with col2:
             modified_time = datetime.fromtimestamp(file_stats.st_mtime)
-            st.metric("📅 Modifié", modified_time.strftime("%d/%m/%Y"))
+            st.metric("📅 Modifié", modified_time.strftime(FORMAT_DATE))
 
         # Tenter d'extraire le texte si possible
         st.info("📄 Aperçu textuel non disponible")
@@ -2675,10 +2675,10 @@ def preview_powerpoint(file_path):
 
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("📊 Taille", size_display)
+            st.metric(LABEL_TAILLE, size_display)
         with col2:
             modified_time = datetime.fromtimestamp(file_stats.st_mtime)
-            st.metric("📅 Modifié", modified_time.strftime("%d/%m/%Y"))
+            st.metric("📅 Modifié", modified_time.strftime(FORMAT_DATE))
 
         # Note pour l'utilisateur
         st.markdown(
@@ -2817,7 +2817,7 @@ def show_cv_missions(missions, consultant):
             # Client avec validation visuelle
             client_error = f"mission_{i}_client" in validation_errors
             if client_error:
-                st.markdown("**🚨 Client requis**", help="Ce champ est obligatoire")
+                st.markdown("**🚨 Client requis**", help=MSG_CHAMP_OBLIGATOIRE)
 
             client = st.text_input(
                 "🏢 Client *" + (" 🚨" if client_error else ""),
@@ -2830,7 +2830,7 @@ def show_cv_missions(missions, consultant):
             # Titre avec validation visuelle
             titre_error = f"mission_{i}_titre" in validation_errors
             if titre_error:
-                st.markdown("**🚨 Rôle/Titre requis**", help="Ce champ est obligatoire")
+                st.markdown("**🚨 Rôle/Titre requis**", help=MSG_CHAMP_OBLIGATOIRE)
 
             titre = st.text_input(
                 "👤 Rôle/Titre *" + (" 🚨" if titre_error else ""),
@@ -2846,7 +2846,7 @@ def show_cv_missions(missions, consultant):
                 date_error = f"mission_{i}_debut" in validation_errors
                 if date_error:
                     st.markdown(
-                        "**🚨 Date de début requise**", help="Ce champ est obligatoire"
+                        "**🚨 Date de début requise**", help=MSG_CHAMP_OBLIGATOIRE
                     )
 
                 date_debut = st.date_input(
@@ -2925,7 +2925,7 @@ def show_cv_missions(missions, consultant):
             # Afficher un aperçu rapide de ce qui sera sauvegardé
             if client and titre and date_debut:
                 st.info(
-                    f"✅ Prêt à sauvegarder: {titre} chez {client} (début: {date_debut.strftime('%d/%m/%Y')})"
+                    f"✅ Prêt à sauvegarder: {titre} chez {client} (début: {date_debut.strftime(FORMAT_DATE)})"
                 )
             else:
                 missing = []
@@ -3164,9 +3164,9 @@ def save_mission_to_consultant(
             with st.expander("📋 Mission ajoutée au profil", expanded=False):
                 st.write(f"**Client:** {client}")
                 st.write(f"**Rôle:** {titre}")
-                st.write(f"**Début:** {date_debut.strftime('%d/%m/%Y')}")
+                st.write(f"**Début:** {date_debut.strftime(FORMAT_DATE)}")
                 if date_fin:
-                    st.write(f"**Fin:** {date_fin.strftime('%d/%m/%Y')}")
+                    st.write(f"**Fin:** {date_fin.strftime(FORMAT_DATE)}")
                 else:
                     st.write("**Statut:** En cours")
                 if description:
@@ -3261,7 +3261,7 @@ def show_cv_skills(analysis):
                 st.warning("⚠️ Aucune compétence fonctionnelle à ajouter")
 
 
-def show_cv_summary(analysis, consultant):
+def show_cv_summary(analysis):
     """Affiche un résumé de l'analyse"""
 
     st.subheader("📊 Résumé de l'analyse")
@@ -3274,7 +3274,7 @@ def show_cv_summary(analysis, consultant):
 
     with col2:
         tech_count = len(analysis.get("langages_techniques", []))
-        st.metric("🛠️ Technologies", tech_count)
+        st.metric(LABEL_TECHNOLOGIES, tech_count)
 
     with col3:
         comp_count = len(analysis.get("competences_fonctionnelles", []))
@@ -3310,7 +3310,7 @@ def show_cv_actions(analysis, consultant):
     with col_stat1:
         st.metric("🏢 Missions détectées", len(missions))
     with col_stat2:
-        st.metric("🛠️ Technologies", len(technologies))
+        st.metric(LABEL_TECHNOLOGIES, len(technologies))
     with col_stat3:
         st.metric(LABEL_COMPETENCES, len(competences))
 
@@ -3438,8 +3438,8 @@ def show_cv_actions(analysis, consultant):
             col1, col2 = st.columns(2)
 
             with col1:
-                st.write("**🏢 Client:**", mission.get("client", "Non spécifié"))
-                st.write("**🎯 Rôle:**", mission.get("role", "Non spécifié"))
+                st.write("**🏢 Client:**", mission.get("client", VALEUR_NON_SPECIFIE))
+                st.write("**🎯 Rôle:**", mission.get("role", VALEUR_NON_SPECIFIE))
 
                 if mission.get("dates"):
                     st.write("**📅 Période:**", mission["dates"])
