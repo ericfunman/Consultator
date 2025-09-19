@@ -146,7 +146,9 @@ def _create_search_filters(df: pd.DataFrame) -> tuple:
     return search_term, practice_filter, availability_filter
 
 
-def _apply_filters(df: pd.DataFrame, search_term: str, practice_filter: str, availability_filter: str) -> pd.DataFrame:
+def _apply_filters(
+    df: pd.DataFrame, search_term: str, practice_filter: str, availability_filter: str
+) -> pd.DataFrame:
     """Applique les filtres au DataFrame"""
     filtered_df = df.copy()
 
@@ -161,7 +163,10 @@ def _apply_filters(df: pd.DataFrame, search_term: str, practice_filter: str, ava
         filtered_df = filtered_df[filtered_df[PRACTICE_COL] == practice_filter]
 
     if availability_filter != FILTRE_TOUS:
-        status_map = {FILTRE_DISPONIBLE: STATUS_DISPONIBLE, FILTRE_EN_MISSION: STATUS_EN_MISSION}
+        status_map = {
+            FILTRE_DISPONIBLE: STATUS_DISPONIBLE,
+            FILTRE_EN_MISSION: STATUS_EN_MISSION,
+        }
         filtered_df = filtered_df[
             filtered_df[DISPONIBILITE_COL] == status_map[availability_filter]
         ]
@@ -221,9 +226,7 @@ def _create_column_config() -> dict:
             DATE_DISPONIBILITE_COL, width="small"
         ),
         GRADE_COL: st.column_config.TextColumn(GRADE_COL, width="small"),
-        TYPE_CONTRAT_COL: st.column_config.TextColumn(
-            TYPE_CONTRAT_COL, width="small"
-        ),
+        TYPE_CONTRAT_COL: st.column_config.TextColumn(TYPE_CONTRAT_COL, width="small"),
         PRACTICE_COL: st.column_config.TextColumn(PRACTICE_COL, width="medium"),
     }
 
@@ -236,7 +239,9 @@ def _handle_consultant_selection(event, filtered_df: pd.DataFrame) -> None:
         selected_id = int(selected_consultant_data[ID_COL])
         selected_name = f"{selected_consultant_data[PRENOM_COL]} {selected_consultant_data[NOM_COL]}"
 
-        st.success(MSG_CONSULTANT_SELECTIONNE.format(name=selected_name, id=selected_id))
+        st.success(
+            MSG_CONSULTANT_SELECTIONNE.format(name=selected_name, id=selected_id)
+        )
 
         col1, col2, col3 = st.columns(3)
 
@@ -345,7 +350,9 @@ def show_consultants_list():
         search_term, practice_filter, availability_filter = _create_search_filters(df)
 
         # Appliquer les filtres
-        filtered_df = _apply_filters(df, search_term, practice_filter, availability_filter)
+        filtered_df = _apply_filters(
+            df, search_term, practice_filter, availability_filter
+        )
 
         # Statistiques
         _display_statistics(filtered_df)

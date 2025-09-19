@@ -419,34 +419,32 @@ def show_add_mission_form(consultant_id: int):
             cancel = st.form_submit_button("❌ Annuler")
 
         if submitted:
-                if validate_mission_form(
-                    titre, client_id, date_debut, en_cours, date_fin
-                ):
-                    success = create_mission(
-                        consultant_id,
-                        {
-                            "titre": titre,
-                            "client_id": client_id,
-                            "date_debut": date_debut,
-                            "date_fin": date_fin,
-                            "en_cours": en_cours,
-                            "taux_journalier": taux_journalier,
-                            "tjm": tjm,  # Nouveau champ TJM V1.2.2
-                            "salaire_mensuel": salaire_mensuel,
-                            "description": description,
-                            "competences_requises": competences_requises,
-                        },
-                    )
+            if validate_mission_form(titre, client_id, date_debut, en_cours, date_fin):
+                success = create_mission(
+                    consultant_id,
+                    {
+                        "titre": titre,
+                        "client_id": client_id,
+                        "date_debut": date_debut,
+                        "date_fin": date_fin,
+                        "en_cours": en_cours,
+                        "taux_journalier": taux_journalier,
+                        "tjm": tjm,  # Nouveau champ TJM V1.2.2
+                        "salaire_mensuel": salaire_mensuel,
+                        "description": description,
+                        "competences_requises": competences_requises,
+                    },
+                )
 
-                    if success:
-                        st.success("✅ Mission créée avec succès !")
-                        if "add_mission" in st.session_state:
-                            del st.session_state.add_mission
-                        st.rerun()
-                    else:
-                        st.error("❌ Erreur lors de la création de la mission")
+                if success:
+                    st.success("✅ Mission créée avec succès !")
+                    if "add_mission" in st.session_state:
+                        del st.session_state.add_mission
+                    st.rerun()
                 else:
-                    st.error("❌ Veuillez corriger les erreurs ci-dessus")
+                    st.error("❌ Erreur lors de la création de la mission")
+            else:
+                st.error("❌ Veuillez corriger les erreurs ci-dessus")
 
         if cancel:
             if "add_mission" in st.session_state:

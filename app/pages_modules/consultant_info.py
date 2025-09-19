@@ -72,18 +72,14 @@ def _display_identity_info(consultant) -> None:
 def _display_affectation_info(consultant) -> None:
     """Affiche les informations d'affectation du consultant"""
     st.markdown("#### 🏢 Affectation")
-    practice_name = (
-        consultant.practice.nom if consultant.practice else DEFAULT_PRACTICE
-    )
+    practice_name = consultant.practice.nom if consultant.practice else DEFAULT_PRACTICE
     st.write(f"**Practice :** {practice_name}")
 
     status = STATUS_DISPONIBLE if consultant.disponibilite else STATUS_EN_MISSION
     st.write(f"**Statut :** {status}")
 
     if consultant.date_creation:
-        st.write(
-            f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}"
-        )
+        st.write(f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}")
 
 
 def _display_financial_info(consultant) -> None:
@@ -132,9 +128,7 @@ def _display_action_buttons(consultant) -> None:
             st.rerun()
 
     with col2:
-        if st.button(
-            "💰 Historique salaire", key=f"salary_history_{consultant.id}"
-        ):
+        if st.button("💰 Historique salaire", key=f"salary_history_{consultant.id}"):
             st.session_state.show_salary_history = consultant.id
             st.rerun()
 
