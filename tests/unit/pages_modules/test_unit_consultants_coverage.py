@@ -16,6 +16,7 @@ import streamlit as st
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 
 try:
+    from app.pages_modules.consultants import show
     import app.pages_modules.consultants as consultants
 except ImportError:
     consultants = None
@@ -48,13 +49,15 @@ class TestConsultantsImports:
 class TestShowFunction:
     """Tests pour la fonction show principale"""
 
+    @patch("streamlit.session_state", {})
     @patch("streamlit.title")
     @patch("streamlit.tabs")
     @patch("app.pages_modules.consultants.show_cv_analysis_fullwidth")
     @patch("app.pages_modules.consultants.show_consultant_profile")
     @patch("app.pages_modules.consultants.show_consultants_list")
+    @patch("app.pages_modules.consultants.imports_ok", True)
     def test_show_basic_structure(
-        self, mock_list, mock_profile, mock_cv, mock_tabs, mock_title
+        self, mock_imports_ok, mock_list, mock_profile, mock_cv, mock_tabs, mock_title, mock_session_state
     ):
         """Test de la structure de base de la fonction show"""
         mock_tabs.return_value = [MagicMock(), MagicMock(), MagicMock()]
