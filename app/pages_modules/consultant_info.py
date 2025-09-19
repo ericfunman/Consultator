@@ -10,6 +10,28 @@ from typing import Optional
 
 import streamlit as st
 
+# Constantes pour les messages
+MSG_SERVICES_INDISPONIBLES = "❌ Les services de base ne sont pas disponibles"
+MSG_CONSULTANT_NON_FOURNI = "❌ Consultant non fourni"
+MSG_ERREUR_AFFICHAGE = "❌ Erreur lors de l'affichage des informations"
+MSG_ERREUR_HISTORIQUE = "⚠️ Impossible de charger l'historique des salaires"
+MSG_ERREUR_HISTORIQUE_DETAILLE = "❌ Erreur lors du chargement de l'historique détaillé"
+MSG_ERREUR_MODIFICATION = "❌ Erreur lors de la modification"
+MSG_ERREUR_RAPPORT = "❌ Erreur lors de la génération du rapport"
+MSG_AUCUN_HISTORIQUE = "ℹ️ Aucun historique salarial trouvé"
+MSG_SUCCESS_MODIFICATION = "✅ Informations mises à jour avec succès !"
+
+# Constantes pour les statuts
+STATUS_DISPONIBLE = "✅ Disponible"
+STATUS_EN_MISSION = "🔴 En mission"
+DEFAULT_PRACTICE = "Non affecté"
+DEFAULT_VALUE = "N/A"
+
+# Constantes pour les calculs financiers
+COEFF_CJM = 1.8
+COEFF_TJM = 1.5
+JOURS_TRAVAIL_ANNUEL = 216
+
 # Ajouter les chemins nécessaires
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.dirname(current_dir)
@@ -36,15 +58,117 @@ except ImportError:
     pass
 
 
+def _display_identity_info(consultant) -> None:
+    """Affiche les informations d'identité du consultant"""
+    st.markdown("#### 👤 Identité")
+    st.write(f"**Prénom :** {consultant.prenom}")
+    st.write(f"**Nom :** {consultant.nom}")
+    st.write(f"**Email :** {consultant.email}")
+
+    if consultant.telephone:
+        st.write(f"**Téléphone :** {consultant.telephone}")
+
+
+def _display_affectation_info(consultant) -> None:
+    """Affiche les informations d'affectation du consultant"""
+    st.markdown("#### 🏢 Affectation")
+    practice_name = (
+        consultant.practice.nom if consultant.practice else DEFAULT_PRACTICE
+    )
+    st.write(f"**Practice :** {practice_name}")
+
+    status = STATUS_DISPONIBLE if consultant.disponibilite else STATUS_EN_MISSION
+    st.write(f"**Statut :** {status}")
+
+    if consultant.date_creation:
+        st.write(
+            f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}"
+        )
+
+
+def _display_financial_info(consultant) -> None:
+    """Affiche les informations financières du consultant"""
+    st.markdown("#### 💰 Informations financières")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        salaire = consultant.salaire_actuel or 0
+        st.metric("Salaire annuel", f"{salaire:,}€")
+
+    with col2:
+        # Calcul du CJM (Coût Journalier Moyen)
+        cjm = (salaire * COEFF_CJM / JOURS_TRAVAIL_ANNUEL) if salaire else 0
+        st.metric("CJM estimé", f"{cjm:,.0f}€")
+
+    with col3:
+        # Calcul du TJM (Taux Journalier Moyen)
+        tjm = (salaire * COEFF_TJM / JOURS_TRAVAIL_ANNUEL) if salaire else 0
+        st.metric("TJM estimé", f"{tjm:,.0f}€")
+
+
+def _display_notes_section(consultant) -> None:
+    """Affiche la section des notes du consultant"""
+    if consultant.notes:
+        st.markdown("#### 📝 Notes")
+        st.text_area(
+            "Notes du consultant",
+            value=consultant.notes,
+            height=100,
+            disabled=True,
+            key=f"notes_{consultant.id}",
+        )
+
+
+def _display_action_buttons(consultant) -> None:
+    """Affiche les boutons d'actions pour le consultant"""
+    st.markdown("#### 🎯 Actions")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if st.button("✏️ Modifier", key=f"edit_info_{consultant.id}"):
+            st.session_state.edit_consultant_info = consultant.id
+            st.rerun()
+
+    with col2:
+        if st.button(
+            "💰 Historique salaire", key=f"salary_history_{consultant.id}"
+        ):
+            st.session_state.show_salary_history = consultant.id
+            st.rerun()
+
+    with col3:
+        if st.button("📊 Générer rapport", key=f"generate_report_{consultant.id}"):
+            generate_consultant_report(consultant)
+
+
+def _handle_conditional_displays(consultant) -> None:
+    """Gère l'affichage conditionnel des formulaires et historiques"""
+    # Formulaire de modification (si activé)
+    if (
+        "edit_consultant_info" in st.session_state
+        and st.session_state.edit_consultant_info == consultant.id
+    ):
+        show_edit_info_form(consultant)
+
+    # Historique détaillé des salaires (si activé)
+    if (
+        "show_salary_history" in st.session_state
+        and st.session_state.show_salary_history == consultant.id
+    ):
+        show_detailed_salary_history(consultant.id)
+
+
 def show_consultant_info(consultant):
     """Affiche les informations personnelles du consultant"""
 
     if not imports_ok:
-        st.error("❌ Les services de base ne sont pas disponibles")
+        st.error(MSG_SERVICES_INDISPONIBLES)
         return
 
     if not consultant:
-        st.error("❌ Consultant non fourni")
+        st.error(MSG_CONSULTANT_NON_FOURNI)
         return
 
     st.markdown("### 📋 Informations personnelles")
@@ -54,99 +178,28 @@ def show_consultant_info(consultant):
         col1, col2 = st.columns(2)
 
         with col1:
-            st.markdown("#### 👤 Identité")
-            st.write(f"**Prénom :** {consultant.prenom}")
-            st.write(f"**Nom :** {consultant.nom}")
-            st.write(f"**Email :** {consultant.email}")
-
-            if consultant.telephone:
-                st.write(f"**Téléphone :** {consultant.telephone}")
+            _display_identity_info(consultant)
 
         with col2:
-            st.markdown("#### 🏢 Affectation")
-            practice_name = (
-                consultant.practice.nom if consultant.practice else "Non affecté"
-            )
-            st.write(f"**Practice :** {practice_name}")
-
-            status = "✅ Disponible" if consultant.disponibilite else "🔴 En mission"
-            st.write(f"**Statut :** {status}")
-
-            if consultant.date_creation:
-                st.write(
-                    f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}"
-                )
+            _display_affectation_info(consultant)
 
         # Informations financières
-        st.markdown("#### 💰 Informations financières")
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            salaire = consultant.salaire_actuel or 0
-            st.metric("Salaire annuel", f"{salaire:,}€")
-
-        with col2:
-            # Calcul du CJM (Coût Journalier Moyen)
-            cjm = (salaire * 1.8 / 216) if salaire else 0
-            st.metric("CJM estimé", f"{cjm:,.0f}€")
-
-        with col3:
-            # Calcul du TJM (Taux Journalier Moyen)
-            tjm = (salaire * 1.5 / 216) if salaire else 0
-            st.metric("TJM estimé", f"{tjm:,.0f}€")
+        _display_financial_info(consultant)
 
         # Historique des salaires
         show_salary_history(consultant.id)
 
         # Notes
-        if consultant.notes:
-            st.markdown("#### 📝 Notes")
-            st.text_area(
-                "Notes du consultant",
-                value=consultant.notes,
-                height=100,
-                disabled=True,
-                key=f"notes_{consultant.id}",
-            )
+        _display_notes_section(consultant)
 
         # Actions
-        st.markdown("#### 🎯 Actions")
+        _display_action_buttons(consultant)
 
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            if st.button("✏️ Modifier", key=f"edit_info_{consultant.id}"):
-                st.session_state.edit_consultant_info = consultant.id
-                st.rerun()
-
-        with col2:
-            if st.button(
-                "💰 Historique salaire", key=f"salary_history_{consultant.id}"
-            ):
-                st.session_state.show_salary_history = consultant.id
-                st.rerun()
-
-        with col3:
-            if st.button("📊 Générer rapport", key=f"generate_report_{consultant.id}"):
-                generate_consultant_report(consultant)
-
-        # Formulaire de modification (si activé)
-        if (
-            "edit_consultant_info" in st.session_state
-            and st.session_state.edit_consultant_info == consultant.id
-        ):
-            show_edit_info_form(consultant)
-
-        # Historique détaillé des salaires (si activé)
-        if (
-            "show_salary_history" in st.session_state
-            and st.session_state.show_salary_history == consultant.id
-        ):
-            show_detailed_salary_history(consultant.id)
+        # Gestion des affichages conditionnels
+        _handle_conditional_displays(consultant)
 
     except Exception as e:
-        st.error(f"❌ Erreur lors de l'affichage des informations: {e}")
+        st.error(f"{MSG_ERREUR_AFFICHAGE}: {e}")
         st.code(str(e))
 
 
@@ -173,7 +226,7 @@ def show_salary_history(consultant_id: int):
                     {
                         "Date": salary.date_debut.strftime("%d/%m/%Y"),
                         "Salaire": f"{salary.salaire:,}€",
-                        "Motif": salary.commentaire or "N/A",
+                        "Motif": salary.commentaire or DEFAULT_VALUE,
                     }
                 )
 
@@ -183,7 +236,7 @@ def show_salary_history(consultant_id: int):
             st.dataframe(df, use_container_width=True, hide_index=True)
 
     except Exception as e:
-        st.warning(f"⚠️ Impossible de charger l'historique des salaires: {e}")
+        st.warning(f"{MSG_ERREUR_HISTORIQUE}: {e}")
 
 
 def show_detailed_salary_history(consultant_id: int):
@@ -201,7 +254,7 @@ def show_detailed_salary_history(consultant_id: int):
             )
 
         if not salaries:
-            st.info("ℹ️ Aucun historique salarial trouvé")
+            st.info(MSG_AUCUN_HISTORIQUE)
             return
 
         # Statistiques
@@ -226,8 +279,8 @@ def show_detailed_salary_history(consultant_id: int):
                 {
                     "Date": salary.date_debut.strftime("%d/%m/%Y"),
                     "Salaire": salary.salaire,
-                    "Motif": salary.commentaire or "N/A",
-                    "Évolution": "N/A",  # Sera calculé après
+                    "Motif": salary.commentaire or DEFAULT_VALUE,
+                    "Évolution": DEFAULT_VALUE,  # Sera calculé après
                 }
             )
 
@@ -253,7 +306,7 @@ def show_detailed_salary_history(consultant_id: int):
             st.rerun()
 
     except Exception as e:
-        st.error(f"❌ Erreur lors du chargement de l'historique détaillé: {e}")
+        st.error(f"{MSG_ERREUR_HISTORIQUE_DETAILLE}: {e}")
 
 
 def show_edit_info_form(consultant):
@@ -285,16 +338,13 @@ def show_edit_info_form(consultant):
         disponibilite = st.checkbox("Disponible", value=consultant.disponibilite)
         notes = st.text_area("Notes", value=consultant.notes or "", height=100)
 
-        col1, col2, col3 = st.columns([1, 1, 2])
+        col1, col2 = st.columns(2)
 
         with col1:
             submitted = st.form_submit_button("💾 Enregistrer", type="primary")
 
         with col2:
             cancel = st.form_submit_button("❌ Annuler")
-
-        with col3:
-            pass
 
         if submitted:
             if validate_info_form(prenom, nom, email):

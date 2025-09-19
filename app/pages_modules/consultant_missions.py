@@ -14,6 +14,30 @@ from typing import Optional
 
 import streamlit as st
 
+# Constantes pour les statuts de mission
+STATUS_EN_COURS = "En cours"
+STATUS_TERMINEE = "Terminée"
+STATUS_PLANIFIEE = "Planifiée"
+
+# Constantes pour les messages d'erreur
+MSG_MISSION_INTROUVABLE = "❌ Mission introuvable"
+MSG_SERVICES_INDISPONIBLES = "❌ Les services de base ne sont pas disponibles"
+MSG_CONSULTANT_INTROUVABLE = "❌ Consultant introuvable"
+MSG_ERREUR_CHARGEMENT = "❌ Erreur lors du chargement des missions"
+MSG_ERREUR_CREATION = "❌ Erreur lors de la création de la mission"
+MSG_ERREUR_MODIFICATION = "❌ Erreur lors de la modification de la mission"
+MSG_ERREUR_SUPPRESSION = "❌ Erreur lors de la suppression de la mission"
+MSG_AUCUNE_MISSION = "ℹ️ Aucune mission trouvée pour ce consultant"
+
+# Constantes pour les messages de succès
+MSG_SUCCESS_CREATION = "✅ Mission créée avec succès !"
+MSG_SUCCESS_MODIFICATION = "✅ Mission modifiée avec succès !"
+MSG_SUCCESS_SUPPRESSION = "✅ Mission supprimée avec succès !"
+
+# Constantes pour les valeurs par défaut
+DEFAULT_VALUE = "N/A"
+DEFAULT_CLIENT = "Non renseigné"
+
 # Ajouter les chemins nécessaires
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.dirname(current_dir)
@@ -252,7 +276,7 @@ def show_missions_statistics(missions):
 
     with col2:
         current_missions = sum(1 for m in missions if m.en_cours)
-        st.metric("En cours", current_missions)
+        st.metric(STATUS_EN_COURS, current_missions)
 
     with col3:
         completed_missions = sum(1 for m in missions if m.date_fin and not m.en_cours)
@@ -386,18 +410,15 @@ def show_add_mission_form(consultant_id: int):
             )
 
             # Boutons
-            col1, col2, col3 = st.columns([1, 1, 2])
+        col1, col2 = st.columns(2)
 
-            with col1:
-                submitted = st.form_submit_button("💾 Créer", type="primary")
+        with col1:
+            submitted = st.form_submit_button("💾 Créer", type="primary")
 
-            with col2:
-                cancel = st.form_submit_button("❌ Annuler")
+        with col2:
+            cancel = st.form_submit_button("❌ Annuler")
 
-            with col3:
-                pass
-
-            if submitted:
+        if submitted:
                 if validate_mission_form(
                     titre, client_id, date_debut, en_cours, date_fin
                 ):
@@ -427,10 +448,10 @@ def show_add_mission_form(consultant_id: int):
                 else:
                     st.error("❌ Veuillez corriger les erreurs ci-dessus")
 
-            if cancel:
-                if "add_mission" in st.session_state:
-                    del st.session_state.add_mission
-                st.rerun()
+        if cancel:
+            if "add_mission" in st.session_state:
+                del st.session_state.add_mission
+            st.rerun()
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du formulaire: {e}")
@@ -980,7 +1001,7 @@ def show_missions_analysis(missions):
 
     # Analyse par statut
     status_counts = {
-        "En cours": sum(1 for m in missions if m.en_cours),
+        STATUS_EN_COURS: sum(1 for m in missions if m.en_cours),
         "Terminées": sum(1 for m in missions if m.date_fin and not m.en_cours),
         "Planifiées": sum(
             1
