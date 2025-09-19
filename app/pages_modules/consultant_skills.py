@@ -33,19 +33,38 @@ try:
 
     imports_ok = True
 except ImportError:
-    # Imports échoués, on continue quand même
     pass
+
+# Messages d'erreur constants
+MSG_SERVICES_INDISPONIBLES = "❌ Les services de base ne sont pas disponibles"
+MSG_CONSULTANT_NON_FOURNI = "❌ Consultant non fourni"
+MSG_ERREUR_AFFICHAGE_COMPETENCES = "❌ Erreur lors de l'affichage des compétences:"
+MSG_COMPETENCE_AJOUTEE = "✅ Compétence ajoutée avec succès !"
+MSG_ERREUR_AJOUT_COMPETENCE = "❌ Erreur lors de l'ajout de la compétence"
+MSG_ERREUR_CHARGEMENT_FORMULAIRE = "❌ Erreur lors du chargement du formulaire:"
+MSG_COMPETENCE_DEJA_ASSOCIEE = "❌ Cette compétence est déjà associée au consultant"
+MSG_COMPETENCE_INTROUVABLE = "❌ Compétence introuvable"
+MSG_COMPETENCE_MISE_A_JOUR = "✅ Compétence mise à jour avec succès !"
+MSG_ERREUR_MISE_A_JOUR = "❌ Erreur lors de la mise à jour"
+MSG_ERREUR_CHARGEMENT_MODIFICATION = (
+    "❌ Erreur lors du chargement du formulaire de modification:"
+)
+
+# Emojis pour la certification
+EMOJI_CERTIFIE = "✅"
+EMOJI_NON_CERTIFIE = "❌"
+EMOJI_ANNULER = "❌ Annuler"
 
 
 def show_consultant_skills(consultant):
     """Affiche les compétences du consultant"""
 
     if not imports_ok:
-        st.error("❌ Les services de base ne sont pas disponibles")
+        st.error(MSG_SERVICES_INDISPONIBLES)
         return
 
     if not consultant:
-        st.error("❌ Consultant non fourni")
+        st.error(MSG_CONSULTANT_NON_FOURNI)
         return
 
     st.markdown("### 💼 Compétences")
@@ -98,7 +117,11 @@ def show_consultant_skills(consultant):
                             if skill["annees_experience"]
                             else "N/A"
                         ),
-                        "Certification": "✅" if skill["certification"] else "❌",
+                        "Certification": (
+                            EMOJI_CERTIFIE
+                            if skill["certification"]
+                            else EMOJI_NON_CERTIFIE
+                        ),
                         "Actions": f"edit_{skill['id']}",
                     }
                 )
@@ -168,7 +191,7 @@ def show_consultant_skills(consultant):
             show_edit_skill_form(st.session_state.edit_skill)
 
     except Exception as e:
-        st.error(f"❌ Erreur lors de l'affichage des compétences: {e}")
+        st.error(f"{MSG_ERREUR_AFFICHAGE_COMPETENCES} {e}")
         st.code(str(e))
 
 

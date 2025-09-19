@@ -46,6 +46,89 @@ except ImportError:
     pass
 
 
+def _load_practices():
+    """Charge la liste des practices disponibles"""
+    with get_database_session() as session:
+        practices = session.query(Practice).all()
+        practice_options = {p.id: p.nom for p in practices}
+    return practice_options
+
+
+def _render_consultant_personal_info(practice_options):
+    """Rend les champs d'informations personnelles du consultant"""
+    st.markdown("#### 📋 Informations personnelles")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        prenom = st.text_input("Prénom *", help="Prénom du consultant")
+
+        email = st.text_input("Email *", help="Adresse email professionnelle")
+
+        salaire_actuel = st.number_input(
+            "Salaire annuel (€)",
+            min_value=0,
+            step=1000,
+            help="Salaire annuel brut en euros",
+        )
+
+    with col2:
+        nom = st.text_input("Nom *", help="Nom de famille du consultant")
+
+        telephone = st.text_input("Téléphone", help="Numéro de téléphone professionnel")
+
+        practice_id = st.selectbox(
+            "Practice *",
+            options=list(practice_options.keys()),
+            format_func=lambda x: practice_options[x],
+            help="Practice d'affectation",
+        )
+
+    return prenom, nom, email, telephone, salaire_actuel, practice_id
+
+
+def _render_consultant_additional_info():
+    """Rend les champs d'informations complémentaires du consultant"""
+    st.markdown("#### 📝 Informations complémentaires")
+
+    disponibilite = st.checkbox(
+        "Disponible pour de nouvelles missions",
+        value=True,
+        help="Cochez si le consultant est disponible",
+    )
+
+    notes = st.text_area(
+        "Notes",
+        height=100,
+        help="Informations complémentaires sur le consultant",
+    )
+
+    return disponibilite, notes
+
+
+def _handle_consultant_form_submission(form_data):
+    """Gère la soumission du formulaire de consultant"""
+    if validate_consultant_form(
+        form_data["prenom"],
+        form_data["nom"],
+        form_data["email"],
+        form_data["practice_id"],
+    ):
+        success = create_consultant(form_data)
+
+        if success:
+            st.success("✅ Consultant ajouté avec succès !")
+            st.balloons()
+            st.rerun()
+            return True
+        else:
+            st.error("❌ Erreur lors de l'ajout du consultant")
+            return False
+    else:
+        st.error("❌ Veuillez corriger les erreurs ci-dessus")
+        return False
+
+
 def show_add_consultant_form():
     """Affiche le formulaire d'ajout d'un nouveau consultant"""
 
@@ -55,11 +138,8 @@ def show_add_consultant_form():
 
     st.markdown("### ➕ Ajouter un nouveau consultant")
 
-    # Récupérer les practices disponibles
     try:
-        with get_database_session() as session:
-            practices = session.query(Practice).all()
-            practice_options = {p.id: p.nom for p in practices}
+        practice_options = _load_practices()
 
         if not practice_options:
             st.warning(
@@ -68,49 +148,12 @@ def show_add_consultant_form():
             return
 
         with st.form("add_consultant_form", clear_on_submit=True):
-            st.markdown("#### 📋 Informations personnelles")
+            # Informations personnelles
+            personal_info = _render_consultant_personal_info(practice_options)
+            prenom, nom, email, telephone, salaire_actuel, practice_id = personal_info
 
-            col1, col2 = st.columns(2)
-
-            with col1:
-                prenom = st.text_input("Prénom *", help="Prénom du consultant")
-
-                email = st.text_input("Email *", help="Adresse email professionnelle")
-
-                salaire_actuel = st.number_input(
-                    "Salaire annuel (€)",
-                    min_value=0,
-                    step=1000,
-                    help="Salaire annuel brut en euros",
-                )
-
-            with col2:
-                nom = st.text_input("Nom *", help="Nom de famille du consultant")
-
-                telephone = st.text_input(
-                    "Téléphone", help="Numéro de téléphone professionnel"
-                )
-
-                practice_id = st.selectbox(
-                    "Practice *",
-                    options=list(practice_options.keys()),
-                    format_func=lambda x: practice_options[x],
-                    help="Practice d'affectation",
-                )
-
-            st.markdown("#### 📝 Informations complémentaires")
-
-            disponibilite = st.checkbox(
-                "Disponible pour de nouvelles missions",
-                value=True,
-                help="Cochez si le consultant est disponible",
-            )
-
-            notes = st.text_area(
-                "Notes",
-                height=100,
-                help="Informations complémentaires sur le consultant",
-            )
+            # Informations complémentaires
+            disponibilite, notes = _render_consultant_additional_info()
 
             # Boutons du formulaire
             col1, col2, col3 = st.columns([1, 1, 2])
@@ -126,29 +169,17 @@ def show_add_consultant_form():
 
             # Traitement du formulaire
             if submitted:
-                if validate_consultant_form(prenom, nom, email, practice_id):
-                    success = create_consultant(
-                        {
-                            "prenom": prenom,
-                            "nom": nom,
-                            "email": email,
-                            "telephone": telephone,
-                            "salaire_actuel": salaire_actuel,
-                            "practice_id": practice_id,
-                            "disponibilite": disponibilite,
-                            "notes": notes,
-                        }
-                    )
-
-                    if success:
-                        st.success("✅ Consultant ajouté avec succès !")
-                        st.balloons()
-                        # Recharger la page pour afficher le nouveau consultant
-                        st.rerun()
-                    else:
-                        st.error("❌ Erreur lors de l'ajout du consultant")
-                else:
-                    st.error("❌ Veuillez corriger les erreurs ci-dessus")
+                form_data = {
+                    "prenom": prenom,
+                    "nom": nom,
+                    "email": email,
+                    "telephone": telephone,
+                    "salaire_actuel": salaire_actuel,
+                    "practice_id": practice_id,
+                    "disponibilite": disponibilite,
+                    "notes": notes,
+                }
+                _handle_consultant_form_submission(form_data)
 
             if reset:
                 st.rerun()

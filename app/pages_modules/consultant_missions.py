@@ -297,6 +297,137 @@ def show_missions_statistics(missions):
         st.metric("Revenus estimés", f"{total_revenue:,.0f}€")
 
 
+def _load_clients_for_mission():
+    """Charge la liste des clients disponibles pour les missions"""
+    with get_database_session() as session:
+        clients = session.query(Client).all()
+        client_options = {c.id: c.nom for c in clients}
+    return client_options
+
+
+def _render_mission_general_info():
+    """Rend les champs d'informations générales de la mission"""
+    st.markdown("#### 📋 Informations générales")
+
+    titre = st.text_input(
+        "Titre de la mission *", help="Titre descriptif de la mission"
+    )
+
+    client_options = _load_clients_for_mission()
+    if not client_options:
+        st.warning("⚠️ Aucun client trouvé. Veuillez créer des clients d'abord.")
+        return None, None, None, None, None
+
+    client_id = st.selectbox(
+        "Client *",
+        options=list(client_options.keys()),
+        format_func=lambda x: client_options[x],
+        help="Client pour lequel la mission est réalisée",
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        date_debut = st.date_input(
+            "Date de début *",
+            value=datetime.now().date(),
+            help="Date de début de la mission",
+        )
+
+        en_cours = st.checkbox(
+            "Mission en cours",
+            value=True,
+            help="La mission est-elle toujours en cours ?",
+        )
+
+    with col2:
+        date_fin = st.date_input(
+            "Date de fin",
+            value=None,
+            disabled=en_cours,
+            help="Date de fin de la mission (laisser vide si en cours)",
+        )
+
+    return titre, client_id, date_debut, date_fin, en_cours
+
+
+def _render_mission_remuneration():
+    """Rend les champs de rémunération de la mission"""
+    st.markdown("#### 💰 Rémunération")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        taux_journalier = st.number_input(
+            "Taux journalier (€)",
+            min_value=0,
+            step=10,
+            help="Taux journalier moyen de la mission (ancien champ)",
+        )
+
+    with col2:
+        tjm = st.number_input(
+            "TJM Mission (€)",
+            min_value=0,
+            step=10,
+            help="Taux Journalier Moyen spécifique à cette mission",
+        )
+
+    with col3:
+        salaire_mensuel = st.number_input(
+            "Salaire mensuel (€)",
+            min_value=0,
+            step=100,
+            help="Salaire mensuel fixe (si applicable)",
+        )
+
+    return taux_journalier, tjm, salaire_mensuel
+
+
+def _render_mission_description():
+    """Rend les champs de description de la mission"""
+    st.markdown("#### 📝 Description")
+
+    description = st.text_area(
+        "Description de la mission",
+        height=100,
+        help="Description détaillée de la mission, responsabilités, livrables...",
+    )
+
+    competences_requises = st.text_area(
+        "Compétences requises",
+        height=80,
+        help="Liste des compétences techniques et fonctionnelles requises",
+    )
+
+    return description, competences_requises
+
+
+def _handle_mission_form_submission(consultant_id: int, mission_data: dict):
+    """Gère la soumission du formulaire de mission"""
+    if validate_mission_form(
+        mission_data["titre"],
+        mission_data["client_id"],
+        mission_data["date_debut"],
+        mission_data["en_cours"],
+        mission_data["date_fin"],
+    ):
+        success = create_mission(consultant_id, mission_data)
+
+        if success:
+            st.success("✅ Mission créée avec succès !")
+            if "add_mission" in st.session_state:
+                del st.session_state.add_mission
+            st.rerun()
+            return True
+        else:
+            st.error("❌ Erreur lors de la création de la mission")
+            return False
+    else:
+        st.error("❌ Veuillez corriger les erreurs ci-dessus")
+        return False
+
+
 def show_add_mission_form(consultant_id: int):
     """
     Affiche le formulaire d'ajout d'une nouvelle mission.
@@ -321,135 +452,48 @@ def show_add_mission_form(consultant_id: int):
     st.markdown("### ➕ Ajouter une mission")
 
     try:
-        # Récupérer les clients disponibles
-        with get_database_session() as session:
-            clients = session.query(Client).all()
-            client_options = {c.id: c.nom for c in clients}
-
-        if not client_options:
-            st.warning("⚠️ Aucun client trouvé. Veuillez créer des clients d'abord.")
-            return
-
         with st.form(f"add_mission_form_{consultant_id}", clear_on_submit=True):
-            st.markdown("#### 📋 Informations générales")
+            # Informations générales
+            general_info = _render_mission_general_info()
+            if general_info[0] is None:  # Pas de clients disponibles
+                return
 
-            titre = st.text_input(
-                "Titre de la mission *", help="Titre descriptif de la mission"
-            )
+            titre, client_id, date_debut, date_fin, en_cours = general_info
 
-            client_id = st.selectbox(
-                "Client *",
-                options=list(client_options.keys()),
-                format_func=lambda x: client_options[x],
-                help="Client pour lequel la mission est réalisée",
-            )
+            # Rémunération
+            taux_journalier, tjm, salaire_mensuel = _render_mission_remuneration()
 
+            # Description
+            description, competences_requises = _render_mission_description()
+
+            # Boutons
             col1, col2 = st.columns(2)
 
             with col1:
-                date_debut = st.date_input(
-                    "Date de début *",
-                    value=datetime.now().date(),
-                    help="Date de début de la mission",
-                )
-
-                en_cours = st.checkbox(
-                    "Mission en cours",
-                    value=True,
-                    help="La mission est-elle toujours en cours ?",
-                )
+                submitted = st.form_submit_button("💾 Créer", type="primary")
 
             with col2:
-                date_fin = st.date_input(
-                    "Date de fin",
-                    value=None,
-                    disabled=en_cours,
-                    help="Date de fin de la mission (laisser vide si en cours)",
-                )
+                cancel = st.form_submit_button("❌ Annuler")
 
-            st.markdown("#### 💰 Rémunération")
+            if submitted:
+                mission_data = {
+                    "titre": titre,
+                    "client_id": client_id,
+                    "date_debut": date_debut,
+                    "date_fin": date_fin,
+                    "en_cours": en_cours,
+                    "taux_journalier": taux_journalier,
+                    "tjm": tjm,  # Nouveau champ TJM V1.2.2
+                    "salaire_mensuel": salaire_mensuel,
+                    "description": description,
+                    "competences_requises": competences_requises,
+                }
+                _handle_mission_form_submission(consultant_id, mission_data)
 
-            col1, col2, col3 = st.columns(3)
-
-            with col1:
-                taux_journalier = st.number_input(
-                    "Taux journalier (€)",
-                    min_value=0,
-                    step=10,
-                    help="Taux journalier moyen de la mission (ancien champ)",
-                )
-
-            with col2:
-                tjm = st.number_input(
-                    "TJM Mission (€)",
-                    min_value=0,
-                    step=10,
-                    help="Taux Journalier Moyen spécifique à cette mission",
-                )
-
-            with col3:
-                salaire_mensuel = st.number_input(
-                    "Salaire mensuel (€)",
-                    min_value=0,
-                    step=100,
-                    help="Salaire mensuel fixe (si applicable)",
-                )
-
-            st.markdown("#### 📝 Description")
-
-            description = st.text_area(
-                "Description de la mission",
-                height=100,
-                help="Description détaillée de la mission, responsabilités, livrables...",
-            )
-
-            competences_requises = st.text_area(
-                "Compétences requises",
-                height=80,
-                help="Liste des compétences techniques et fonctionnelles requises",
-            )
-
-            # Boutons
-        col1, col2 = st.columns(2)
-
-        with col1:
-            submitted = st.form_submit_button("💾 Créer", type="primary")
-
-        with col2:
-            cancel = st.form_submit_button("❌ Annuler")
-
-        if submitted:
-            if validate_mission_form(titre, client_id, date_debut, en_cours, date_fin):
-                success = create_mission(
-                    consultant_id,
-                    {
-                        "titre": titre,
-                        "client_id": client_id,
-                        "date_debut": date_debut,
-                        "date_fin": date_fin,
-                        "en_cours": en_cours,
-                        "taux_journalier": taux_journalier,
-                        "tjm": tjm,  # Nouveau champ TJM V1.2.2
-                        "salaire_mensuel": salaire_mensuel,
-                        "description": description,
-                        "competences_requises": competences_requises,
-                    },
-                )
-
-                if success:
-                    st.success("✅ Mission créée avec succès !")
-                    if "add_mission" in st.session_state:
-                        del st.session_state.add_mission
-                    st.rerun()
-                else:
-                    st.error("❌ Erreur lors de la création de la mission")
-            else:
-                st.error("❌ Veuillez corriger les erreurs ci-dessus")
-
-        if cancel:
-            if "add_mission" in st.session_state:
-                del st.session_state.add_mission
-            st.rerun()
+            if cancel:
+                if "add_mission" in st.session_state:
+                    del st.session_state.add_mission
+                st.rerun()
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du formulaire: {e}")

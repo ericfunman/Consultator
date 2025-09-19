@@ -370,20 +370,59 @@ def reanalyze_document(document_id: int, consultant) -> bool:
         return False
 
 
+def _load_document_for_rename(document_id: int):
+    """Charge un document pour renommage"""
+    with get_database_session() as session:
+        document = session.query(Document).filter(Document.id == document_id).first()
+        if not document:
+            st.error(ERROR_DOCUMENT_NOT_FOUND)
+            return None
+        return document
+
+
+def _handle_rename_form_submission(
+    document_id: int, new_name: str, new_description: str
+):
+    """Gère la soumission du formulaire de renommage"""
+    if not new_name or not new_name.strip():
+        st.error("❌ Le nom du fichier est obligatoire")
+        return False
+
+    success = rename_document(
+        document_id,
+        {
+            "new_name": new_name.strip(),
+            "new_description": (new_description.strip() if new_description else None),
+        },
+    )
+
+    if success:
+        st.success("✅ Document renommé avec succès !")
+        if "rename_document" in st.session_state:
+            del st.session_state.rename_document
+        st.rerun()
+        return True
+    else:
+        st.error("❌ Erreur lors du renommage")
+        return False
+
+
+def _handle_rename_form_cancellation():
+    """Gère l'annulation du formulaire de renommage"""
+    if "rename_document" in st.session_state:
+        del st.session_state.rename_document
+    st.rerun()
+
+
 def show_rename_document_form(document_id: int):
     """Affiche le formulaire de renommage de document"""
 
     st.markdown("### ✏️ Renommer un document")
 
     try:
-        with get_database_session() as session:
-            document = (
-                session.query(Document).filter(Document.id == document_id).first()
-            )
-
-            if not document:
-                st.error(ERROR_DOCUMENT_NOT_FOUND)
-                return
+        document = _load_document_for_rename(document_id)
+        if not document:
+            return
 
         with st.form(f"rename_document_form_{document_id}", clear_on_submit=False):
             new_name = st.text_input(
@@ -412,31 +451,10 @@ def show_rename_document_form(document_id: int):
                 pass
 
             if submitted:
-                if not new_name or not new_name.strip():
-                    st.error("❌ Le nom du fichier est obligatoire")
-                else:
-                    success = rename_document(
-                        document_id,
-                        {
-                            "new_name": new_name.strip(),
-                            "new_description": (
-                                new_description.strip() if new_description else None
-                            ),
-                        },
-                    )
-
-                    if success:
-                        st.success("✅ Document renommé avec succès !")
-                        if "rename_document" in st.session_state:
-                            del st.session_state.rename_document
-                        st.rerun()
-                    else:
-                        st.error("❌ Erreur lors du renommage")
+                _handle_rename_form_submission(document_id, new_name, new_description)
 
             if cancel:
-                if "rename_document" in st.session_state:
-                    del st.session_state.rename_document
-                st.rerun()
+                _handle_rename_form_cancellation()
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du formulaire: {e}")
@@ -548,6 +566,57 @@ def analyze_consultant_cv(consultant):
         st.error(f"❌ Erreur lors de l'analyse du CV: {e}")
 
 
+def _display_cv_resume(analysis):
+    """Affiche le résumé du CV"""
+    if "resume" in analysis:
+        st.markdown("#### 📋 Résumé")
+        st.write(analysis["resume"])
+
+
+def _display_cv_missions(analysis):
+    """Affiche les missions détectées dans le CV"""
+    if "missions" in analysis and analysis["missions"]:
+        st.markdown("#### 🚀 Missions détectées")
+        for i, mission in enumerate(analysis["missions"], 1):
+            with st.expander(f"Mission {i}: {mission.get('titre', 'Sans titre')}"):
+                st.write(f"**Client :** {mission.get('client', 'N/A')}")
+                st.write(f"**Période :** {mission.get('periode', 'N/A')}")
+                if mission.get("description"):
+                    st.write(f"**Description :** {mission['description']}")
+
+
+def _display_cv_competences(analysis):
+    """Affiche les compétences détectées dans le CV"""
+    if "competences" in analysis and analysis["competences"]:
+        st.markdown("#### 🛠️ Compétences détectées")
+        for competence in analysis["competences"]:
+            st.write(f"• {competence}")
+
+
+def _display_cv_contact(analysis):
+    """Affiche les informations de contact détectées"""
+    if "contact" in analysis and analysis["contact"]:
+        st.markdown("#### 📞 Informations de contact")
+        contact = analysis["contact"]
+        if contact.get("email"):
+            st.write(f"**Email :** {contact['email']}")
+        if contact.get("telephone"):
+            st.write(f"**Téléphone :** {contact['telephone']}")
+
+
+def _display_cv_actions(analysis, consultant):
+    """Affiche les actions disponibles sur l'analyse CV"""
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("💾 Sauvegarder l'analyse", key="save_analysis"):
+            st.success("✅ Analyse sauvegardée dans le profil du consultant")
+
+    with col2:
+        if st.button("📊 Générer rapport", key="generate_cv_report"):
+            generate_cv_report(analysis, consultant)
+
+
 def show_full_cv_analysis(analysis, file_name, consultant):
     """Affiche l'analyse complète du CV"""
 
@@ -555,46 +624,11 @@ def show_full_cv_analysis(analysis, file_name, consultant):
     st.markdown(f"**Consultant :** {consultant.prenom} {consultant.nom}")
 
     try:
-        # Résumé général
-        if "resume" in analysis:
-            st.markdown("#### 📋 Résumé")
-            st.write(analysis["resume"])
-
-        # Missions détectées
-        if "missions" in analysis and analysis["missions"]:
-            st.markdown("#### 🚀 Missions détectées")
-            for i, mission in enumerate(analysis["missions"], 1):
-                with st.expander(f"Mission {i}: {mission.get('titre', 'Sans titre')}"):
-                    st.write(f"**Client :** {mission.get('client', 'N/A')}")
-                    st.write(f"**Période :** {mission.get('periode', 'N/A')}")
-                    if mission.get("description"):
-                        st.write(f"**Description :** {mission['description']}")
-
-        # Compétences détectées
-        if "competences" in analysis and analysis["competences"]:
-            st.markdown("#### 🛠️ Compétences détectées")
-            for competence in analysis["competences"]:
-                st.write(f"• {competence}")
-
-        # Informations de contact
-        if "contact" in analysis and analysis["contact"]:
-            st.markdown("#### 📞 Informations de contact")
-            contact = analysis["contact"]
-            if contact.get("email"):
-                st.write(f"**Email :** {contact['email']}")
-            if contact.get("telephone"):
-                st.write(f"**Téléphone :** {contact['telephone']}")
-
-        # Actions sur l'analyse
-        col1, col2 = st.columns(2)
-
-        with col1:
-            if st.button("💾 Sauvegarder l'analyse", key="save_analysis"):
-                st.success("✅ Analyse sauvegardée dans le profil du consultant")
-
-        with col2:
-            if st.button("📊 Générer rapport", key="generate_cv_report"):
-                generate_cv_report(analysis, consultant)
+        _display_cv_resume(analysis)
+        _display_cv_missions(analysis)
+        _display_cv_competences(analysis)
+        _display_cv_contact(analysis)
+        _display_cv_actions(analysis, consultant)
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'affichage de l'analyse complète: {e}")
