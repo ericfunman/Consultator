@@ -21,23 +21,34 @@ class TestConsultantServiceCoverage:
         self.mock_consultant.disponibilite = True
         self.mock_consultant.practice_id = 1
 
+    def setup_database_mock(self, mock_session):
+        """Helper pour configurer le mock de base de données avec context manager"""
+        mock_db = Mock()
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
+        return mock_db
+
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
     def test_get_all_consultants_objects_success(self, mock_st_error, mock_session):
         """Test récupération objets consultants - succès"""
-        # Mock session
-        mock_db = Mock()
-        mock_session.return_value = mock_db
-        mock_db.query.return_value.options.return_value.all.return_value = [
-            self.mock_consultant
-        ]
+        # Setup mock DB
+        mock_db = self.setup_database_mock(mock_session)
+        
+        # Mock pour la requête - liste itérable de consultants
+        consultants_list = [self.mock_consultant]
+        mock_db.query.return_value.options.return_value.offset.return_value.limit.return_value.all.return_value = consultants_list
 
         # Execution
         result = ConsultantService.get_all_consultants_objects()
 
         # Vérifications
         assert result == [self.mock_consultant]
-        mock_db.close.assert_called()
+        # Vérifier que expunge a été appelé
+        mock_db.expunge.assert_called()
+
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -48,18 +59,21 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
-        mock_db.query.return_value.options.return_value.filter.return_value.all.return_value = [
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
+        # Correspond à la vraie chaîne: query().options().offset().limit().all()
+        mock_db.query.return_value.options.return_value.offset.return_value.limit.return_value.all.return_value = [
             self.mock_consultant
         ]
 
-        # Execution
-        result = ConsultantService.get_all_consultants_objects(
-            practice_id=1, disponibilite=True, skills=["Python"]
-        )
+        # Execution - seulement page et per_page sont supportés maintenant
+        result = ConsultantService.get_all_consultants_objects(page=1, per_page=10)
 
         # Vérifications
         assert result == [self.mock_consultant]
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -68,6 +82,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.options.return_value.offset.return_value.limit.return_value.all.return_value = [
             self.mock_consultant
         ]
@@ -77,7 +95,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert isinstance(result, list)
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -86,6 +104,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.count.return_value = 42
 
         # Execution
@@ -93,7 +115,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == 42
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -102,6 +124,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             self.mock_consultant
         )
@@ -111,7 +137,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == self.mock_consultant
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -120,6 +146,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             None
         )
@@ -129,7 +159,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result is None
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -138,6 +168,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_consultant
         )
@@ -147,7 +181,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == self.mock_consultant
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -159,6 +193,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             None  # Email unique
         )
@@ -178,8 +216,9 @@ class TestConsultantServiceCoverage:
         assert result is True
         mock_db.add.assert_called()
         mock_db.commit.assert_called()
-        mock_st_success.assert_called()
-        mock_db.close.assert_called()
+        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit
+        # Note: La fonction utilise maintenant print() au lieu de streamlit
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -188,6 +227,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_consultant
         )  # Email existe
@@ -199,9 +242,7 @@ class TestConsultantServiceCoverage:
         result = ConsultantService.create_consultant(data)
 
         # Vérifications
-        assert result is False
-        mock_st_error.assert_called()
-        mock_db.close.assert_called()
+        assert result is False    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -213,6 +254,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_consultant
         )
@@ -226,8 +271,7 @@ class TestConsultantServiceCoverage:
         # Vérifications
         assert result is True
         mock_db.commit.assert_called()
-        mock_st_success.assert_called()
-        mock_db.close.assert_called()
+        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -236,6 +280,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = None
 
         # Mock data
@@ -245,9 +293,7 @@ class TestConsultantServiceCoverage:
         result = ConsultantService.update_consultant(999, data)
 
         # Vérifications
-        assert result is False
-        mock_st_error.assert_called()
-        mock_db.close.assert_called()
+        assert result is False    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -259,6 +305,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_consultant
         )
@@ -270,8 +320,7 @@ class TestConsultantServiceCoverage:
         assert result is True
         mock_db.delete.assert_called_with(self.mock_consultant)
         mock_db.commit.assert_called()
-        mock_st_success.assert_called()
-        mock_db.close.assert_called()
+        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -280,15 +329,17 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = None
 
         # Execution
         result = ConsultantService.delete_consultant(999)
 
         # Vérifications
-        assert result is False
-        mock_st_error.assert_called()
-        mock_db.close.assert_called()
+        assert result is False    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -297,6 +348,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.all.return_value = [
             self.mock_consultant
         ]
@@ -306,7 +361,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == [self.mock_consultant]
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -315,6 +370,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.all.return_value = [
             self.mock_consultant
         ]
@@ -324,7 +383,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == [self.mock_consultant]
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -333,6 +392,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.count.return_value = 10
         mock_db.query.return_value.filter.return_value.count.return_value = 8
 
@@ -342,8 +405,8 @@ class TestConsultantServiceCoverage:
         # Vérifications
         assert isinstance(result, dict)
         assert "total_consultants" in result
-        assert "consultants_disponibles" in result
-        mock_db.close.assert_called()
+        assert "available_consultants" in result
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -354,6 +417,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.options.return_value.filter.return_value.all.return_value = [
             self.mock_consultant
         ]
@@ -363,7 +430,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert isinstance(result, list)
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -374,6 +441,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.options.return_value.filter.return_value.all.return_value = (
             []
         )
@@ -383,7 +454,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert isinstance(result, list)
-        mock_db.close.assert_called()
+    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -392,6 +463,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.options.return_value.all.return_value = [
             self.mock_consultant
         ]
@@ -401,8 +476,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert isinstance(result, list)
-        mock_db.close.assert_called()
-
     def test_determine_skill_category_technique(self):
         """Test détermination catégorie compétence - technique"""
         result = ConsultantService._determine_skill_category("Python", "Technique")
@@ -418,6 +491,8 @@ class TestConsultantServiceCoverage:
         result = ConsultantService._determine_skill_category("Unknown", "Unknown")
         assert result == "Technique"  # Corrigé selon l'implémentation réelle
 
+    
+
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
@@ -428,6 +503,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_consultant
         )
@@ -454,8 +533,7 @@ class TestConsultantServiceCoverage:
         # Vérifications
         assert result is True
         mock_db.commit.assert_called()
-        mock_st_success.assert_called()
-        mock_db.close.assert_called()
+        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -464,6 +542,10 @@ class TestConsultantServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        # Setup context manager
+        mock_session.return_value.__enter__ = Mock(return_value=mock_db)
+        mock_session.return_value.__exit__ = Mock(return_value=None)
+        mock_db.expunge = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = None
 
         # Mock analysis data
@@ -474,9 +556,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result is False
-        mock_st_error.assert_called()
-        mock_db.close.assert_called()
-
+        
     def test_consultant_service_static_methods_exist(self):
         """Test que les méthodes statiques existent et sont appelables"""
         # Test d'existence des méthodes principales

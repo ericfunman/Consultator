@@ -20,33 +20,36 @@ class TestPracticeServiceCoverage:
         self.mock_practice.responsable = "Jean Dupont"
         self.mock_practice.actif = True
 
-    @patch("app.services.practice_service.get_database_session")
+    @patch("app.services.practice_service.get_session")
     @patch("streamlit.error")
     def test_get_all_practices_success(self, mock_st_error, mock_session):
         """Test récupération de toutes les practices"""
-        # Mock session avec context manager
+        # Mock session (pas de context manager)
         mock_db = Mock()
-        mock_session.return_value.__enter__.return_value = mock_db
-        mock_session.return_value.__exit__.return_value = None
+        mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = [
             self.mock_practice
         ]
+        mock_db.close = Mock()
 
         # Execution
         result = PracticeService.get_all_practices()
 
         # Vérifications
         assert result == [self.mock_practice]
+        mock_db.close.assert_called()
 
-    @patch("app.services.practice_service.get_database_session")
+    @patch("app.services.practice_service.get_session")
     @patch("streamlit.error")
     def test_get_all_practices_error(self, mock_st_error, mock_session):
         """Test récupération practices avec erreur"""
         # Mock session avec erreur
         mock_db = Mock()
-        mock_session.return_value.__enter__.return_value = mock_db
-        mock_session.return_value.__exit__.return_value = None
+        mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.side_effect = Exception("DB Error")
+        mock_db.close = Mock()
 
         # Execution
         result = PracticeService.get_all_practices()
@@ -63,6 +66,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_practice
         )
@@ -81,6 +85,7 @@ class TestPracticeServiceCoverage:
         # Mock session avec erreur
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.side_effect = Exception("DB Error")
 
         # Execution
@@ -98,6 +103,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_practice
         )
@@ -119,6 +125,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             None  # Pas d'existant
         )
@@ -146,6 +153,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_practice
         )  # Déjà existant
@@ -167,6 +175,7 @@ class TestPracticeServiceCoverage:
         # Mock session avec erreur
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = None
         mock_db.add.side_effect = Exception("Test error")
 
@@ -190,6 +199,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_practice
         )
@@ -210,6 +220,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = None
 
         # Execution
@@ -227,6 +238,7 @@ class TestPracticeServiceCoverage:
         # Mock session avec erreur
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_practice
         )
@@ -253,6 +265,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = [
             mock_consultant
         ]
@@ -275,6 +288,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.all.return_value = [
             self.mock_practice
         ]
@@ -299,6 +313,7 @@ class TestPracticeServiceCoverage:
         # Mock session avec erreur
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.side_effect = Exception("DB Error")
 
         # Execution
@@ -324,6 +339,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
 
         # Premier appel pour consultant, deuxième pour practice
         mock_db.query.return_value.filter.return_value.first.side_effect = [
@@ -349,6 +365,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = (
             None  # Consultant not found
         )
@@ -371,6 +388,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
 
         # Premier appel pour consultant (trouvé), deuxième pour practice (non trouvée)
         mock_db.query.return_value.filter.return_value.first.side_effect = [
@@ -396,6 +414,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.all.return_value = mock_practices
         mock_db.query.return_value.filter.return_value.count.return_value = 5
         mock_db.query.return_value.count.return_value = 2
@@ -416,6 +435,7 @@ class TestPracticeServiceCoverage:
         # Mock session avec erreur
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.side_effect = Exception("DB Error")
 
         # Execution
@@ -436,6 +456,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.all.return_value = []  # Pas de practices existantes
 
         # Execution
@@ -454,6 +475,7 @@ class TestPracticeServiceCoverage:
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.all.return_value = [
             self.mock_practice
         ]  # Practices déjà existantes
@@ -472,6 +494,7 @@ class TestPracticeServiceCoverage:
         # Mock session avec erreur
         mock_db = Mock()
         mock_session.return_value = mock_db
+        mock_db.close = Mock()
         mock_db.query.return_value.all.return_value = []
         mock_db.add.side_effect = Exception("DB Error")
 

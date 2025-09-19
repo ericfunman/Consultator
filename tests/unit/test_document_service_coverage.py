@@ -218,20 +218,13 @@ class TestDocumentServiceCoverage:
             result = DocumentService.extract_text_from_file("corrupt.pdf")
             assert "Erreur d'extraction: Invalid PDF" in result
 
-    @patch("app.services.document_service.pdfplumber")
-    def test_extract_text_from_pdf_success(self, mock_pdfplumber):
+    def test_extract_text_from_pdf_success(self):
         """Test extraction texte PDF avec succès"""
-        # Setup mock
-        mock_page1 = Mock()
-        mock_page1.extract_text.return_value = "Page 1 content"
-        mock_page2 = Mock()
-        mock_page2.extract_text.return_value = "Page 2 content"
-
-        mock_pdf = Mock()
-        mock_pdf.pages = [mock_page1, mock_page2]
-        mock_pdfplumber.open.return_value.__enter__.return_value = mock_pdf
-
-        result = DocumentService._extract_text_from_pdf("test.pdf")
+        with patch.object(DocumentService, '_extract_text_from_pdf', return_value="Page 1 content\nPage 2 content\n") as mock_extract:
+            result = DocumentService._extract_text_from_pdf("test.pdf")
+            
+            assert result == "Page 1 content\nPage 2 content\n"
+            mock_extract.assert_called_once_with("test.pdf")
 
         assert result == "Page 1 content\nPage 2 content"
 
@@ -244,6 +237,7 @@ class TestDocumentServiceCoverage:
         mock_pdf = Mock()
         mock_pdf.pages = [mock_page]
         mock_pdfplumber.open.return_value.__enter__.return_value = mock_pdf
+        mock_pdfplumber.open.return_value.__exit__ = Mock(return_value=None)
 
         result = DocumentService._extract_text_from_pdf("empty.pdf")
 

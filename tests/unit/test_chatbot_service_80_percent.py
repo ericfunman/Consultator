@@ -6,10 +6,38 @@ Tests fonctionnels avec mocks corrects pour toutes les méthodes
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from unittest import TestCase
+from contextlib import contextmanager
 
 
 class TestChatbotService80Percent(TestCase):
     """Tests optimisés pour 80% de couverture ChatbotService"""
+
+    @contextmanager
+    def setup_database_mock(self, mock_session_func):
+        """Context manager pour setup des mocks de base de données"""
+        mock_session = Mock()
+        mock_session.__enter__ = Mock(return_value=mock_session)
+        mock_session.__exit__ = Mock(return_value=None)
+        
+        # Configuration des mocks de base
+        mock_session.query.return_value.all.return_value = []
+        mock_session.query.return_value.first.return_value = None
+        mock_session.query.return_value.count.return_value = 0
+        mock_session.query.return_value.filter.return_value = mock_session.query.return_value
+        mock_session.query.return_value.order_by.return_value = mock_session.query.return_value
+        mock_session.query.return_value.limit.return_value = mock_session.query.return_value
+        mock_session.query.return_value.offset.return_value = mock_session.query.return_value
+        mock_session.add = Mock()
+        mock_session.commit = Mock()
+        mock_session.rollback = Mock()
+        mock_session.close = Mock()
+        
+        mock_session_func.return_value = mock_session
+        
+        try:
+            yield mock_session
+        finally:
+            pass
 
     def setUp(self):
         """Préparation optimisée pour tous les tests"""
@@ -47,11 +75,12 @@ class TestChatbotService80Percent(TestCase):
     @patch("app.services.chatbot_service.get_database_session")
     def test_chatbot_init(self, mock_session):
         """Test 1/29 - Initialisation"""
-        from app.services.chatbot_service import ChatbotService
+        with self.setup_database_mock(mock_session) as session:
+            from app.services.chatbot_service import ChatbotService
 
-        chatbot = ChatbotService()
-        assert hasattr(chatbot, "conversation_history")
-        assert hasattr(chatbot, "last_question")
+            chatbot = ChatbotService()
+            assert hasattr(chatbot, "conversation_history")
+            assert hasattr(chatbot, "last_question")
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_process_question_success(self, mock_session):
@@ -102,20 +131,21 @@ class TestChatbotService80Percent(TestCase):
     @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_all_types(self, mock_session):
         """Test 4/29 - _analyze_intent toutes intentions"""
-        from app.services.chatbot_service import ChatbotService
+        with self.setup_database_mock(mock_session) as session:
+            from app.services.chatbot_service import ChatbotService
 
-        chatbot = ChatbotService()
+            chatbot = ChatbotService()
 
-        # Test toutes les intentions principales
-        assert chatbot._analyze_intent("combien de consultants") == "count"
-        assert chatbot._analyze_intent("qui est jean dupont") == "profile"
-        assert chatbot._analyze_intent("competences python") == "skills"
-        assert chatbot._analyze_intent("missions chez google") == "missions"
-        assert chatbot._analyze_intent("salaire moyen") == "salary"
-        assert chatbot._analyze_intent("languages anglais") == "languages"
-        assert chatbot._analyze_intent("experience java") == "experience"
-        assert chatbot._analyze_intent("statistiques generales") == "stats"
-        assert chatbot._analyze_intent("bonjour") == "general"
+            # Test toutes les intentions principales
+            assert chatbot._analyze_intent("combien de consultants") == "statistiques"
+            assert chatbot._analyze_intent("qui est jean dupont") == "recherche_consultant"
+            assert chatbot._analyze_intent("competences python") == "competences"
+            assert chatbot._analyze_intent("missions chez google") == "missions"
+            assert chatbot._analyze_intent("salaire moyen") == "salaire"
+            assert chatbot._analyze_intent("languages anglais") == "langues"
+            assert chatbot._analyze_intent("experience java") == "experience"
+            assert chatbot._analyze_intent("statistiques generales") == "statistiques"
+            assert chatbot._analyze_intent("bonjour") == "general"
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_extract_entities_comprehensive(self, mock_session):

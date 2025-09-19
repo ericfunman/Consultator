@@ -203,11 +203,11 @@ class TestConsultants(BaseUITest):
         ]
 
         # Mock columns as context managers
-        mock_col1, mock_col2, mock_col3 = Mock(), Mock(), Mock()
-        for col in [mock_col1, mock_col2, mock_col3]:
+        mock_col1, mock_col2, mock_col3, mock_col4 = Mock(), Mock(), Mock(), Mock()
+        for col in [mock_col1, mock_col2, mock_col3, mock_col4]:
             col.__enter__ = Mock(return_value=col)
             col.__exit__ = Mock(return_value=None)
-        mock_columns.return_value = (mock_col1, mock_col2, mock_col3)
+        mock_columns.return_value = (mock_col1, mock_col2, mock_col3, mock_col4)
 
         with patch(
             "app.pages_modules.consultants.st.selectbox"

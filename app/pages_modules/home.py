@@ -204,13 +204,11 @@ def show_getting_started():
     # Actions rapides
     st.subheader("⚡ Actions rapides")
 
-    col1, col2, col3, col4 = st.columns(4)
+    col1, = st.columns(1)
 
     with col1:
         if st.button("➕ Ajouter un consultant", type="primary"):
             st.switch_page("pages/consultants.py")
-
-    # Bloc col2 supprimé car vide
 
     # Conseils et astuces
     st.markdown("---")

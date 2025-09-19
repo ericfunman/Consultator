@@ -100,7 +100,7 @@ class TestSimpleDocumentAnalyzerCoverage:
 
         assert "Erreur d'extraction: Invalid encoding" in result
 
-    @patch("app.services.simple_analyzer.PyPDF2")
+    @patch("pypdf.PdfReader")
     @patch("builtins.open", new_callable=mock_open)
     def test_extract_text_from_file_pdf_success(self, mock_file, mock_pypdf):
         """Test extraction PDF avec succès"""
@@ -112,23 +112,23 @@ class TestSimpleDocumentAnalyzerCoverage:
 
         mock_reader = Mock()
         mock_reader.pages = [mock_page1, mock_page2]
-        mock_pypdf.PdfReader.return_value = mock_reader
+        mock_pypdf.return_value = mock_reader
 
         result = SimpleDocumentAnalyzer.extract_text_from_file("test.pdf")
 
         assert result == "Page 1 contentPage 2 content"
 
-    @patch("app.services.simple_analyzer.PyPDF2")
+    @patch("pypdf.PdfReader")
     @patch("builtins.open", new_callable=mock_open)
     def test_extract_text_from_file_pdf_error(self, mock_file, mock_pypdf):
         """Test extraction PDF avec erreur"""
-        mock_pypdf.PdfReader.side_effect = Exception("PDF error")
+        mock_pypdf.side_effect = Exception("PDF error")
 
         result = SimpleDocumentAnalyzer.extract_text_from_file("error.pdf")
 
         assert result == "Erreur lors de l'extraction PDF"
 
-    @patch("app.services.simple_analyzer.Document")
+    @patch("docx.Document")
     def test_extract_text_from_file_docx_success(self, mock_document):
         """Test extraction DOCX avec succès"""
         # Setup mock
@@ -145,7 +145,7 @@ class TestSimpleDocumentAnalyzerCoverage:
 
         assert result == "Paragraph 1\nParagraph 2"
 
-    @patch("app.services.simple_analyzer.Document")
+    @patch("docx.Document")
     def test_extract_text_from_file_docx_error(self, mock_document):
         """Test extraction DOCX avec erreur"""
         mock_document.side_effect = Exception("DOCX error")
@@ -154,7 +154,7 @@ class TestSimpleDocumentAnalyzerCoverage:
 
         assert result == "Erreur lors de l'extraction DOCX"
 
-    @patch("app.services.simple_analyzer.Presentation")
+    @patch("pptx.Presentation")
     def test_extract_text_from_file_pptx_success(self, mock_presentation):
         """Test extraction PPTX avec succès"""
         # Setup mock
@@ -176,7 +176,7 @@ class TestSimpleDocumentAnalyzerCoverage:
 
         assert result == "Slide 1 content\nSlide 2 content"
 
-    @patch("app.services.simple_analyzer.Presentation")
+    @patch("pptx.Presentation")
     def test_extract_text_from_file_pptx_os_error(self, mock_presentation):
         """Test extraction PPTX avec erreur OS"""
         mock_presentation.side_effect = OSError("File access error")
@@ -185,7 +185,7 @@ class TestSimpleDocumentAnalyzerCoverage:
 
         assert "Erreur lors de l'extraction PowerPoint: File access error" in result
 
-    @patch("app.services.simple_analyzer.Presentation")
+    @patch("pptx.Presentation")
     def test_extract_text_from_file_pptx_value_error(self, mock_presentation):
         """Test extraction PPTX avec erreur de valeur"""
         mock_presentation.side_effect = ValueError("Invalid format")
@@ -194,7 +194,7 @@ class TestSimpleDocumentAnalyzerCoverage:
 
         assert "Erreur lors de l'extraction PowerPoint: Invalid format" in result
 
-    @patch("app.services.simple_analyzer.Presentation")
+    @patch("pptx.Presentation")
     def test_extract_text_from_file_pptx_type_error(self, mock_presentation):
         """Test extraction PPTX avec erreur de type"""
         mock_presentation.side_effect = TypeError("Type mismatch")
@@ -203,7 +203,7 @@ class TestSimpleDocumentAnalyzerCoverage:
 
         assert "Erreur lors de l'extraction PowerPoint: Type mismatch" in result
 
-    @patch("app.services.simple_analyzer.Presentation")
+    @patch("pptx.Presentation")
     def test_extract_text_from_file_pptx_attribute_error(self, mock_presentation):
         """Test extraction PPTX avec erreur d'attribut"""
         mock_presentation.side_effect = AttributeError("Missing attribute")
@@ -214,7 +214,7 @@ class TestSimpleDocumentAnalyzerCoverage:
 
     def test_extract_text_from_file_ppt_format(self):
         """Test extraction format PPT (ancien)"""
-        with patch("app.services.simple_analyzer.Presentation") as mock_prs:
+        with patch("pptx.Presentation") as mock_prs:
             mock_prs.side_effect = Exception("PPT error")
 
             result = SimpleDocumentAnalyzer.extract_text_from_file("test.ppt")
