@@ -17,6 +17,120 @@ TELEPHONE_LABEL = "Téléphone"
 DATE_FORMAT = "%d/%m/%Y"
 DUREE_LABEL = "Durée"
 
+# Messages d'erreur fréquents
+ERROR_INVALID_BM_ID = "❌ Erreur : ID du Business Manager invalide"
+ERROR_GENERIC = "❌ Erreur : {}"
+ERROR_ASSIGNMENT = "❌ Erreur lors de l'assignation : {}"
+ERROR_PROFILE_LOADING = "❌ Erreur lors du chargement du profil : {}"
+ERROR_UPDATE = "❌ Erreur lors de la mise à jour : {}"
+ERROR_DELETE = "❌ Erreur lors de la suppression : {}"
+ERROR_LIST_LOADING = "❌ Erreur lors du chargement de la liste : {}"
+ERROR_CREATION = "❌ Erreur lors de la création : {}"
+ERROR_STATISTICS = "❌ Erreur lors du calcul des statistiques : {}"
+
+# Messages de succès fréquents
+SUCCESS_BM_CREATED = "✅ Business Manager {} {} créé avec succès !"
+SUCCESS_TRANSFER = "✅ Transfert réussi ! {} {} est maintenant assigné(e) à {} {}"
+SUCCESS_ASSIGNMENT = "✅ Assignation créée ! {} {} est maintenant assigné(e) à {} {}"
+
+# Messages d'information
+INFO_ASSIGNMENT_CLOSE = "✅ En confirmant, l'assignation actuelle sera automatiquement clôturée et une nouvelle assignation sera créée."
+
+
+def _validate_and_convert_bm_id(bm_id):
+    """Valide et convertit l'ID du Business Manager en entier."""
+    # S'assurer que bm_id est un entier
+    if isinstance(bm_id, str):
+        try:
+            return int(bm_id)
+        except ValueError as e:
+            st.error(f"❌ Erreur : ID du Business Manager invalide ({bm_id})")
+            print(
+                f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}"
+            )
+            return None
+    elif not isinstance(bm_id, int):
+        try:
+            return int(str(bm_id))
+        except (ValueError, TypeError) as e:
+            st.error(f"❌ Erreur : ID du Business Manager invalide ({bm_id})")
+            print(
+                f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}"
+            )
+            return None
+    return bm_id
+
+
+def _display_bm_header_and_info(bm):
+    """Affiche l'en-tête et les informations générales du BM."""
+    # En-tête avec bouton retour
+    col1, col2 = st.columns([6, 1])
+
+    with col1:
+        st.title(f"👔 Profil de {bm.prenom} {bm.nom}")
+
+    with col2:
+        if st.button("← Retour", key="back_to_bm_list"):
+            del st.session_state.view_bm_profile
+            st.rerun()
+
+    st.markdown("---")
+
+
+def _display_bm_general_info(bm, session):
+    """Affiche les informations générales et métriques du BM."""
+    # Informations principales du BM
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("📋 Informations générales")
+        st.write(f"**Nom complet :** {bm.prenom} {bm.nom}")
+        st.write(f"**Email :** {bm.email}")
+        st.write(f"**{TELEPHONE_LABEL} :** {bm.telephone or 'Non renseigné'}")
+        st.write(
+            f"**Date de création :** {bm.date_creation.strftime(DATE_FORMAT) if bm.date_creation else 'N/A'}"
+        )
+        st.write(f"**Statut :** {'🟢 Actif' if bm.actif else '🔴 Inactif'}")
+
+    with col2:
+        # Métriques
+        consultants_count = (
+            session.query(ConsultantBusinessManager)
+            .filter(
+                and_(
+                    ConsultantBusinessManager.business_manager_id == bm.id,
+                    ConsultantBusinessManager.date_fin.is_(None),
+                )
+            )
+            .count()
+        )
+
+        st.metric("👥 Consultants actuels", consultants_count)
+
+        # Actions sur le BM
+        st.subheader("🔧 Actions")
+
+        col_edit, col_delete = st.columns(2)
+
+        with col_edit:
+            if st.button("✏️ Modifier", width="stretch"):
+                st.session_state.edit_bm_mode = True
+
+        with col_delete:
+            if st.button("🗑️ Supprimer", width="stretch", type="primary"):
+                st.session_state.delete_bm_mode = True
+
+
+def _handle_bm_form_actions(bm):
+    """Gère l'affichage des formulaires de modification et suppression."""
+    # Formulaire de modification
+    if st.session_state.get("edit_bm_mode", False):
+        show_edit_bm_form(bm)
+
+    # Confirmation de suppression
+    if st.session_state.get("delete_bm_mode", False):
+        show_delete_bm_confirmation(bm)
+
 
 def show():
     """
@@ -74,35 +188,18 @@ def show_bm_profile():
     """
     bm_id = st.session_state.view_bm_profile
 
-    # S'assurer que bm_id est un entier
-    if isinstance(bm_id, str):
-        try:
-            bm_id = int(bm_id)
-        except ValueError as e:
-            st.error(f"❌ Erreur : ID du Business Manager invalide ({bm_id})")
-            print(
-                f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}"
-            )
-            del st.session_state.view_bm_profile
-            st.rerun()
-            return
-    elif not isinstance(bm_id, int):
-        try:
-            bm_id = int(str(bm_id))
-        except (ValueError, TypeError) as e:
-            st.error(f"❌ Erreur : ID du Business Manager invalide ({bm_id})")
-            print(
-                f"Erreur de conversion d'ID dans show_bm_profile: {e}, valeur: {bm_id}, type: {type(bm_id)}"
-            )
-            del st.session_state.view_bm_profile
-            st.rerun()
-            return
+    # Valider et convertir l'ID
+    validated_id = _validate_and_convert_bm_id(bm_id)
+    if validated_id is None:
+        del st.session_state.view_bm_profile
+        st.rerun()
+        return
 
     try:
         with get_database_session() as session:
             bm = (
                 session.query(BusinessManager)
-                .filter(BusinessManager.id == bm_id)
+                .filter(BusinessManager.id == validated_id)
                 .first()
             )
 
@@ -112,67 +209,12 @@ def show_bm_profile():
                 st.rerun()
                 return
 
-            # En-tête avec bouton retour
-            col1, col2 = st.columns([6, 1])
+            # Afficher l'en-tête et informations
+            _display_bm_header_and_info(bm)
+            _display_bm_general_info(bm, session)
 
-            with col1:
-                st.title(f"👔 Profil de {bm.prenom} {bm.nom}")
-
-            with col2:
-                if st.button("← Retour", key="back_to_bm_list"):
-                    del st.session_state.view_bm_profile
-                    st.rerun()
-
-            st.markdown("---")
-
-            # Informations principales du BM
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.subheader("📋 Informations générales")
-                st.write(f"**Nom complet :** {bm.prenom} {bm.nom}")
-                st.write(f"**Email :** {bm.email}")
-                st.write(f"**{TELEPHONE_LABEL} :** {bm.telephone or 'Non renseigné'}")
-                st.write(
-                    f"**Date de création :** {bm.date_creation.strftime(DATE_FORMAT) if bm.date_creation else 'N/A'}"
-                )
-                st.write(f"**Statut :** {'🟢 Actif' if bm.actif else '🔴 Inactif'}")
-
-            with col2:
-                # Métriques
-                consultants_count = (
-                    session.query(ConsultantBusinessManager)
-                    .filter(
-                        and_(
-                            ConsultantBusinessManager.business_manager_id == bm.id,
-                            ConsultantBusinessManager.date_fin.is_(None),
-                        )
-                    )
-                    .count()
-                )
-
-                st.metric("👥 Consultants actuels", consultants_count)
-
-                # Actions sur le BM
-                st.subheader("🔧 Actions")
-
-                col_edit, col_delete = st.columns(2)
-
-                with col_edit:
-                    if st.button("✏️ Modifier", width="stretch"):
-                        st.session_state.edit_bm_mode = True
-
-                with col_delete:
-                    if st.button("🗑️ Supprimer", width="stretch", type="primary"):
-                        st.session_state.delete_bm_mode = True
-
-            # Formulaire de modification
-            if st.session_state.get("edit_bm_mode", False):
-                show_edit_bm_form(bm)
-
-            # Confirmation de suppression
-            if st.session_state.get("delete_bm_mode", False):
-                show_delete_bm_confirmation(bm)
+            # Gestion des formulaires
+            _handle_bm_form_actions(bm)
 
             st.markdown("---")
 
@@ -180,7 +222,7 @@ def show_bm_profile():
             show_bm_consultants_management(bm, session)
 
     except Exception as e:
-        st.error(f"❌ Erreur lors du chargement du profil : {e}")
+        st.error(ERROR_PROFILE_LOADING.format(e))
 
 
 def show_edit_bm_form(bm):
@@ -256,7 +298,7 @@ def show_edit_bm_form(bm):
                         st.rerun()
 
             except Exception as e:
-                st.error(f"❌ Erreur lors de la mise à jour : {e}")
+                st.error(ERROR_UPDATE.format(e))
 
 
 def show_delete_bm_confirmation(bm):
@@ -364,7 +406,7 @@ def show_delete_bm_confirmation(bm):
                         st.rerun()
 
                     except Exception as e:
-                        st.error(f"❌ Erreur lors de la suppression : {e}")
+                        st.error(ERROR_DELETE.format(e))
 
             with col2:
                 if st.button("❌ Non, annuler", width="stretch"):
@@ -415,6 +457,180 @@ def show_bm_consultants_management(bm, session):
         show_bm_assignments_history(bm, session)
 
 
+def _get_current_assignments(bm_id, session):
+    """Récupère les assignations actuelles du Business Manager."""
+    return (
+        session.query(ConsultantBusinessManager, Consultant)
+        .join(Consultant, ConsultantBusinessManager.consultant_id == Consultant.id)
+        .filter(
+            and_(
+                ConsultantBusinessManager.business_manager_id == bm_id,
+                ConsultantBusinessManager.date_fin.is_(None),
+            )
+        )
+        .all()
+    )
+
+
+def _get_mission_data(consultant, session):
+    """Récupère les données de mission pour un consultant."""
+    mission_en_cours = (
+        session.query(Mission)
+        .filter(
+            and_(
+                Mission.consultant_id == consultant.id,
+                Mission.statut == "en_cours",
+            )
+        )
+        .order_by(Mission.date_debut.desc())
+        .first()
+    )
+
+    # Préparer les données de mission
+    client_mission = mission_en_cours.client if mission_en_cours else "N/A"
+    role_mission = (
+        mission_en_cours.role if mission_en_cours and mission_en_cours.role else "N/A"
+    )
+    tjm_mission = (
+        mission_en_cours.tjm
+        if mission_en_cours and mission_en_cours.tjm
+        else (
+            mission_en_cours.taux_journalier
+            if mission_en_cours and mission_en_cours.taux_journalier
+            else "N/A"
+        )
+    )
+    date_debut_mission = (
+        mission_en_cours.date_debut.strftime(DATE_FORMAT) if mission_en_cours else "N/A"
+    )
+
+    return {
+        "client": client_mission,
+        "role": role_mission,
+        "tjm": tjm_mission,
+        "date_debut": date_debut_mission,
+    }
+
+
+def _format_consultant_data(assignment, consultant, mission_data):
+    """Formate les données d'un consultant pour le tableau."""
+    # Formatage du TJM
+    tjm_display = (
+        f"{mission_data['tjm']}€"
+        if isinstance(mission_data["tjm"], (int, float))
+        else mission_data["tjm"]
+    )
+
+    # Formatage du salaire
+    salaire_display = (
+        f"{consultant.salaire_actuel}€" if consultant.salaire_actuel else "N/A"
+    )
+
+    return {
+        "Consultant": f"{consultant.prenom} {consultant.nom}",
+        "Email": consultant.email,
+        "Type Contrat": consultant.type_contrat or "N/A",
+        "Disponibilité": ("🟢 Disponible" if consultant.disponibilite else "🔴 Occupé"),
+        "Client actuel": mission_data["client"],
+        "Rôle mission": mission_data["role"],
+        "TJM": tjm_display,
+        "Salaire": salaire_display,
+        "Début mission": mission_data["date_debut"],
+        "Date assignation": assignment.date_debut.strftime(DATE_FORMAT),
+        DUREE_LABEL: (
+            (datetime.now().date() - assignment.date_debut).days
+            if assignment.date_debut
+            else 0
+        ),
+        "Commentaire": assignment.commentaire or "Aucun",
+    }
+
+
+def _handle_assignment_selection(current_assignments, data, session):
+    """Gère la sélection et les actions sur les assignations."""
+    # Affichage avec sélection
+    event = st.dataframe(
+        pd.DataFrame(data),
+        width="stretch",
+        hide_index=True,
+        on_select="rerun",
+        selection_mode="single-row",
+    )
+
+    # Actions sur sélection
+    if event.selection.rows:
+        selected_row = event.selection.rows[0]
+        selected_consultant_name = data[selected_row]["Consultant"]
+        assignment_to_end = current_assignments[selected_row][0]
+
+        st.success(f"✅ Consultant sélectionné : **{selected_consultant_name}**")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button("🔚 Terminer l'assignation", type="primary"):
+                _end_assignment(assignment_to_end, session)
+
+        with col2:
+            # Ajouter commentaire
+            if st.button("📝 Ajouter un commentaire"):
+                st.session_state.add_comment_assignment = assignment_to_end.id
+
+
+def _end_assignment(assignment_to_end, session):
+    """Termine une assignation."""
+    try:
+        assignment_to_end.date_fin = datetime.now().date()
+        assignment_to_end.commentaire = (
+            f"Assignation terminée le {datetime.now().strftime(DATE_FORMAT)}"
+        )
+        session.commit()
+        st.success("✅ Assignation terminée avec succès !")
+        st.rerun()
+    except Exception as e:
+        st.error(f"❌ Erreur : {e}")
+
+
+def _handle_comment_form(session):
+    """Gère le formulaire d'ajout de commentaire."""
+    if st.session_state.get("add_comment_assignment"):
+        assignment_id = st.session_state.add_comment_assignment
+
+        with st.form("comment_form"):
+            comment = st.text_area("Commentaire", height=100)
+
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("💾 Ajouter"):
+                    _add_comment_to_assignment(assignment_id, comment, session)
+
+            with col2:
+                if st.form_submit_button("❌ Annuler"):
+                    del st.session_state.add_comment_assignment
+                    st.rerun()
+
+
+def _add_comment_to_assignment(assignment_id, comment, session):
+    """Ajoute un commentaire à une assignation."""
+    try:
+        assignment = session.query(ConsultantBusinessManager).get(assignment_id)
+        if assignment:
+            existing_comment = assignment.commentaire or ""
+            date_str = datetime.now().strftime(DATE_FORMAT)
+            new_comment = (
+                f"{existing_comment}\n{date_str}: {comment}"
+                if existing_comment
+                else f"{date_str}: {comment}"
+            )
+            assignment.commentaire = new_comment
+            session.commit()
+            st.success("✅ Commentaire ajouté !")
+            del st.session_state.add_comment_assignment
+            st.rerun()
+    except Exception as e:
+        st.error(f"❌ Erreur : {e}")
+
+
 def show_current_bm_consultants(bm, session):
     """
     Affiche la liste des consultants actuellement assignés au Business Manager.
@@ -441,163 +657,153 @@ def show_current_bm_consultants(bm, session):
         en cours pour chaque consultant assigné.
     """
     try:
-        # Consultants actuels (assignations actives)
-        current_assignments = (
-            session.query(ConsultantBusinessManager, Consultant)
-            .join(Consultant, ConsultantBusinessManager.consultant_id == Consultant.id)
-            .filter(
-                and_(
-                    ConsultantBusinessManager.business_manager_id == bm.id,
-                    ConsultantBusinessManager.date_fin.is_(None),
-                )
-            )
-            .all()
-        )
+        # Récupérer les assignations actuelles
+        current_assignments = _get_current_assignments(bm.id, session)
 
         if not current_assignments:
             st.info("👥 Aucun consultant actuellement assigné")
             return
 
-        # Tableau des consultants actuels avec nouvelles colonnes
+        # Construire les données du tableau
         data = []
         for assignment, consultant in current_assignments:
-            # Récupérer la mission en cours (la plus récente active)
-            mission_en_cours = (
-                session.query(Mission)
-                .filter(
-                    and_(
-                        Mission.consultant_id == consultant.id,
-                        Mission.statut == "en_cours",
-                    )
-                )
-                .order_by(Mission.date_debut.desc())
-                .first()
+            mission_data = _get_mission_data(consultant, session)
+            consultant_data = _format_consultant_data(
+                assignment, consultant, mission_data
             )
+            data.append(consultant_data)
 
-            # Préparer les données de mission
-            client_mission = mission_en_cours.client if mission_en_cours else "N/A"
-            role_mission = (
-                mission_en_cours.role
-                if mission_en_cours and mission_en_cours.role
-                else "N/A"
-            )
-            tjm_mission = (
-                mission_en_cours.tjm
-                if mission_en_cours and mission_en_cours.tjm
-                else (
-                    mission_en_cours.taux_journalier
-                    if mission_en_cours and mission_en_cours.taux_journalier
-                    else "N/A"
-                )
-            )
-            date_debut_mission = (
-                mission_en_cours.date_debut.strftime(DATE_FORMAT)
-                if mission_en_cours
-                else "N/A"
-            )
-
-            # Formatage du TJM
-            tjm_display = (
-                f"{tjm_mission}€"
-                if isinstance(tjm_mission, (int, float))
-                else tjm_mission
-            )
-
-            # Formatage du salaire
-            salaire_display = (
-                f"{consultant.salaire_actuel}€" if consultant.salaire_actuel else "N/A"
-            )
-
-            data.append(
-                {
-                    "Consultant": f"{consultant.prenom} {consultant.nom}",
-                    "Email": consultant.email,
-                    "Type Contrat": consultant.type_contrat or "N/A",
-                    "Disponibilité": (
-                        "🟢 Disponible" if consultant.disponibilite else "🔴 Occupé"
-                    ),
-                    "Client": client_mission,
-                    "Rôle": role_mission,
-                    "Salaire": salaire_display,
-                    "TJM Mission": tjm_display,
-                    "Début Mission": date_debut_mission,
-                }
-            )
-
-        df = pd.DataFrame(data)
-
-        # Affichage avec sélection
-        event = st.dataframe(
-            df,
-            width="stretch",
-            hide_index=True,
-            on_select="rerun",
-            selection_mode="single-row",
-        )
-
-        # Actions sur sélection
-        if event.selection.rows:
-            selected_row = event.selection.rows[0]
-            selected_consultant_name = data[selected_row]["Consultant"]
-            assignment_to_end = current_assignments[selected_row][0]
-
-            st.success(f"✅ Consultant sélectionné : **{selected_consultant_name}**")
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-                if st.button("🔚 Terminer l'assignation", type="primary"):
-                    try:
-                        assignment_to_end.date_fin = datetime.now().date()
-                        assignment_to_end.commentaire = f"Assignation terminée le {datetime.now().strftime(DATE_FORMAT)}"
-                        session.commit()
-                        st.success("✅ Assignation terminée avec succès !")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"❌ Erreur : {e}")
-
-            with col2:
-                # Ajouter commentaire
-                if st.button("📝 Ajouter un commentaire"):
-                    st.session_state.add_comment_assignment = assignment_to_end.id
+        # Gestion de la sélection et des actions
+        _handle_assignment_selection(current_assignments, data, session)
 
         # Formulaire de commentaire
-        if st.session_state.get("add_comment_assignment"):
-            assignment_id = st.session_state.add_comment_assignment
-
-            with st.form("comment_form"):
-                comment = st.text_area("Commentaire", height=100)
-
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.form_submit_button("💾 Ajouter"):
-                        try:
-                            assignment = session.query(ConsultantBusinessManager).get(
-                                assignment_id
-                            )
-                            if assignment:
-                                existing_comment = assignment.commentaire or ""
-                                date_str = datetime.now().strftime(DATE_FORMAT)
-                                new_comment = (
-                                    f"{existing_comment}\n{date_str}: {comment}"
-                                    if existing_comment
-                                    else f"{date_str}: {comment}"
-                                )
-                                assignment.commentaire = new_comment
-                                session.commit()
-                                st.success("✅ Commentaire ajouté !")
-                                del st.session_state.add_comment_assignment
-                                st.rerun()
-                        except Exception as e:
-                            st.error(f"❌ Erreur : {e}")
-
-                with col2:
-                    if st.form_submit_button("❌ Annuler"):
-                        del st.session_state.add_comment_assignment
-                        st.rerun()
+        _handle_comment_form(session)
 
     except Exception as e:
         st.error(f"❌ Erreur : {e}")
+
+
+def _get_consultant_assignment_status(bm_id, session):
+    """Récupère le statut d'assignation des consultants pour un BM."""
+    # Récupérer les consultants déjà assignés à ce BM
+    assigned_consultant_ids = [
+        cbm.consultant_id
+        for cbm in session.query(ConsultantBusinessManager)
+        .filter(
+            and_(
+                ConsultantBusinessManager.business_manager_id == bm_id,
+                ConsultantBusinessManager.date_fin.is_(None),
+            )
+        )
+        .all()
+    ]
+
+    # Récupérer TOUS les consultants
+    all_consultants = session.query(Consultant).all()
+
+    # Séparer les consultants selon leur statut d'assignation
+    available_consultants = []
+    assigned_to_other_bm = []
+
+    for consultant in all_consultants:
+        if consultant.id in assigned_consultant_ids:
+            continue  # Déjà assigné à ce BM
+
+        # Vérifier s'il a une assignation active avec un autre BM
+        existing_assignment = (
+            session.query(ConsultantBusinessManager)
+            .filter(
+                and_(
+                    ConsultantBusinessManager.consultant_id == consultant.id,
+                    ConsultantBusinessManager.date_fin.is_(None),
+                )
+            )
+            .first()
+        )
+
+        if existing_assignment:
+            # Récupérer le BM actuel
+            current_bm = (
+                session.query(BusinessManager)
+                .filter(BusinessManager.id == existing_assignment.business_manager_id)
+                .first()
+            )
+            assigned_to_other_bm.append((consultant, current_bm, existing_assignment))
+        else:
+            available_consultants.append(consultant)
+
+    return available_consultants, assigned_to_other_bm
+
+
+def _build_consultant_options(available_consultants, assigned_to_other_bm):
+    """Construit les options de sélection des consultants."""
+    consultant_options = {}
+
+    # Consultants disponibles (aucune assignation active)
+    if available_consultants:
+        st.write("**🟢 Consultants disponibles :**")
+        for consultant in available_consultants:
+            key = f"🟢 {consultant.prenom} {consultant.nom} ({consultant.email}) - DISPONIBLE"
+            consultant_options[key] = {
+                "consultant": consultant,
+                "status": "available",
+                "existing_assignment": None,
+                "current_bm": None,
+            }
+
+    # Consultants assignés à d'autres BMs
+    if assigned_to_other_bm:
+        st.write("**🔄 Consultants assignés à d'autres BMs (nécessite transfert) :**")
+        for consultant, current_bm, existing_assignment in assigned_to_other_bm:
+            since_date = existing_assignment.date_debut.strftime(DATE_FORMAT)
+            key = f"🔄 {consultant.prenom} {consultant.nom} ({consultant.email}) - Actuellement avec {current_bm.prenom} {current_bm.nom} depuis le {since_date}"
+            consultant_options[key] = {
+                "consultant": consultant,
+                "status": "assigned",
+                "existing_assignment": existing_assignment,
+                "current_bm": current_bm,
+            }
+
+    return consultant_options
+
+
+def _process_assignment_creation(
+    bm, selected_consultant_data, date_debut, commentaire, session
+):
+    """Traite la création d'une nouvelle assignation."""
+    consultant = selected_consultant_data["consultant"]
+    status = selected_consultant_data["status"]
+    existing_assignment = selected_consultant_data["existing_assignment"]
+    current_bm = selected_consultant_data["current_bm"]
+
+    # Si transfert nécessaire, clôturer l'assignation existante
+    if status == "assigned" and existing_assignment:
+        existing_assignment.date_fin = datetime.now().date()
+        existing_assignment.commentaire = f"Transfert vers {bm.prenom} {bm.nom} le {datetime.now().strftime(DATE_FORMAT)}"
+
+    # Créer la nouvelle assignation
+    new_assignment = ConsultantBusinessManager(
+        consultant_id=consultant.id,
+        business_manager_id=bm.id,
+        date_debut=date_debut or datetime.now().date(),
+        commentaire=commentaire
+        or (
+            f"Transfert depuis {current_bm.prenom} {current_bm.nom}"
+            if status == "assigned"
+            else "Nouvelle assignation"
+        ),
+    )
+
+    session.add(new_assignment)
+    session.commit()
+
+    success_message = (
+        f"✅ {consultant.prenom} {consultant.nom} transféré depuis {current_bm.prenom} {current_bm.nom} vers {bm.prenom} {bm.nom} !"
+        if status == "assigned"
+        else f"✅ {consultant.prenom} {consultant.nom} assigné à {bm.prenom} {bm.nom} !"
+    )
+
+    return success_message
 
 
 def show_add_bm_assignment(bm, session):
@@ -642,72 +848,17 @@ def show_add_bm_assignment(bm, session):
         all_consultants = session.query(Consultant).all()
 
         # Séparer les consultants selon leur statut d'assignation
-        available_consultants = []
-        assigned_to_other_bm = []
-
-        for consultant in all_consultants:
-            if consultant.id in assigned_consultant_ids:
-                continue  # Déjà assigné à ce BM
-
-            # Vérifier s'il a une assignation active avec un autre BM
-            existing_assignment = (
-                session.query(ConsultantBusinessManager)
-                .filter(
-                    and_(
-                        ConsultantBusinessManager.consultant_id == consultant.id,
-                        ConsultantBusinessManager.date_fin.is_(None),
-                    )
-                )
-                .first()
-            )
-
-            if existing_assignment:
-                # Récupérer le BM actuel
-                current_bm = (
-                    session.query(BusinessManager)
-                    .filter(
-                        BusinessManager.id == existing_assignment.business_manager_id
-                    )
-                    .first()
-                )
-                assigned_to_other_bm.append(
-                    (consultant, current_bm, existing_assignment)
-                )
-            else:
-                available_consultants.append(consultant)
+        available_consultants, assigned_to_other_bm = _separate_consultants_by_status(
+            all_consultants, assigned_consultant_ids, session
+        )
 
         with st.form("add_bm_assignment_form"):
             st.write(f"**Assigner un consultant à {bm.prenom} {bm.nom}**")
 
-            # Afficher les options selon le statut
-            consultant_options = {}
-
-            # Consultants disponibles (aucune assignation active)
-            if available_consultants:
-                st.write("**🟢 Consultants disponibles :**")
-                for consultant in available_consultants:
-                    key = f"🟢 {consultant.prenom} {consultant.nom} ({consultant.email}) - DISPONIBLE"
-                    consultant_options[key] = {
-                        "consultant": consultant,
-                        "status": "available",
-                        "existing_assignment": None,
-                        "current_bm": None,
-                    }
-
-            # Consultants assignés à d'autres BMs
-            if assigned_to_other_bm:
-                st.write(
-                    "**🔄 Consultants assignés à d'autres BMs (nécessite transfert) :**"
-                )
-                for consultant, current_bm, existing_assignment in assigned_to_other_bm:
-                    since_date = existing_assignment.date_debut.strftime(DATE_FORMAT)
-                    key = f"🔄 {consultant.prenom} {consultant.nom} ({consultant.email}) - Actuellement avec {current_bm.prenom} {current_bm.nom} depuis le {since_date}"
-                    consultant_options[key] = {
-                        "consultant": consultant,
-                        "status": "assigned",
-                        "existing_assignment": existing_assignment,
-                        "current_bm": current_bm,
-                    }
+            # Construire les options selon le statut
+            consultant_options = _build_consultant_options_for_assignment(
+                available_consultants, assigned_to_other_bm
+            )
 
             if not consultant_options:
                 st.info(
@@ -730,13 +881,12 @@ def show_add_bm_assignment(bm, session):
             selected_data = consultant_options[selected_consultant_key]
 
             # Afficher un avertissement si le consultant est déjà assigné
+            cloture_comment = None
             if selected_data["status"] == "assigned":
                 st.warning(
                     f"⚠️ **ATTENTION :** Ce consultant est actuellement assigné à {selected_data['current_bm'].prenom} {selected_data['current_bm'].nom}"
                 )
-                st.info(
-                    "✅ En confirmant, l'assignation actuelle sera automatiquement clôturée et une nouvelle assignation sera créée."
-                )
+                st.info(INFO_ASSIGNMENT_CLOSE)
 
                 # Commentaire pour la clôture de l'ancienne assignation
                 cloture_comment = st.text_input(
@@ -750,7 +900,6 @@ def show_add_bm_assignment(bm, session):
             else:
                 submit_text = "🔗 Créer l'assignation"
                 submit_type = "secondary"
-                cloture_comment = None
 
             submitted = st.form_submit_button(submit_text, type=submit_type)
 
@@ -760,57 +909,18 @@ def show_add_bm_assignment(bm, session):
                 try:
                     # Si le consultant est déjà assigné, clôturer l'ancienne assignation
                     if selected_data["status"] == "assigned":
-                        existing_assignment = selected_data["existing_assignment"]
-                        existing_assignment.date_fin = (
-                            date_debut  # Fin = début de la nouvelle assignation
-                        )
-
-                        # Ajouter le commentaire de clôture
-                        existing_comment = existing_assignment.commentaire or ""
-                        new_comment = f"Transfert vers {bm.prenom} {bm.nom} le {date_debut.strftime(DATE_FORMAT)}"
-                        if cloture_comment:
-                            new_comment += f" - Raison: {cloture_comment}"
-
-                        if existing_comment:
-                            existing_assignment.commentaire = (
-                                f"{existing_comment}\n{new_comment}"
-                            )
-                        else:
-                            existing_assignment.commentaire = new_comment
-
-                        # Message de confirmation du transfert
-                        old_bm_name = (
-                            selected_data["current_bm"].prenom
-                            + " "
-                            + selected_data["current_bm"].nom
-                        )
-                        st.info(
-                            f"🔄 Assignation avec {old_bm_name} clôturée automatiquement"
+                        _handle_assignment_transfer(
+                            selected_data, date_debut, bm, cloture_comment
                         )
 
                     # Créer la nouvelle assignation
-                    assignment = ConsultantBusinessManager(
-                        consultant_id=consultant.id,
-                        business_manager_id=bm.id,
-                        date_debut=date_debut,
-                        date_creation=datetime.now(),
-                        commentaire=commentaire.strip() if commentaire else None,
+                    _create_new_assignment(
+                        consultant, bm, date_debut, commentaire, session
                     )
-
-                    session.add(assignment)
                     session.commit()
 
-                    if selected_data["status"] == "assigned":
-                        st.success(
-                            f"✅ Transfert réussi ! {consultant.prenom} {consultant.nom} est maintenant assigné(e) à {bm.prenom} {bm.nom}"
-                        )
-                    else:
-                        st.success(
-                            f"✅ Assignation créée ! {consultant.prenom} {consultant.nom} est maintenant assigné(e) à {bm.prenom} {bm.nom}"
-                        )
-
-                    st.balloons()
-                    st.rerun()
+                    # Afficher le message de succès approprié
+                    _display_assignment_success_message(selected_data, consultant, bm)
 
                 except Exception as e:
                     st.error(f"❌ Erreur lors de l'assignation : {e}")
@@ -977,35 +1087,7 @@ def show_business_managers_list():
             return
 
         # Préparer les données pour le tableau à partir du service
-        bms_data = []
-        for bm_dict in bms_data_from_service:
-            # Calculer le total des assignations avec une nouvelle session
-            with get_database_session() as session:
-                total_assignments = (
-                    session.query(ConsultantBusinessManager)
-                    .filter(
-                        ConsultantBusinessManager.business_manager_id == bm_dict["id"]
-                    )
-                    .count()
-                )
-
-            bms_data.append(
-                {
-                    "ID": int(bm_dict["id"]),  # Force la conversion en entier
-                    "Prénom": bm_dict["prenom"],
-                    "Nom": bm_dict["nom"],
-                    "Email": bm_dict["email"],
-                    TELEPHONE_LABEL: bm_dict["telephone"] or "N/A",
-                    "Consultants actuels": bm_dict["consultants_count"],
-                    "Total assignations": total_assignments,
-                    "Statut": "🟢 Actif" if bm_dict["actif"] else "🔴 Inactif",
-                    "Créé le": (
-                        bm_dict["date_creation"].strftime(DATE_FORMAT)
-                        if bm_dict["date_creation"]
-                        else "N/A"
-                    ),
-                }
-            )
+        bms_data = _build_bm_data_table(bms_data_from_service)
 
         # Afficher le tableau avec noms cliquables
         df = pd.DataFrame(bms_data)
@@ -1018,195 +1100,20 @@ def show_business_managers_list():
         st.markdown("### 📋 Liste des Business Managers")
 
         # CSS pour styliser les boutons comme des liens hypertextes
-        st.markdown(
-            """
-        <style>
-        /* Style pour transformer les boutons en liens hypertextes - sélecteurs très spécifiques */
-        .stButton button,
-        .stButton > div > button,
-        div[data-testid="column"] button,
-        div[data-testid="column"] > div button,
-        div[data-testid="column"] > div > div button,
-        div[data-testid="column"] > div > div > div button,
-        div[data-testid="column"] > div > div > div > div button {
-            background: transparent !important;
-            background-color: transparent !important;
-            border: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            color: #1f77b4 !important;
-            text-decoration: underline !important;
-            cursor: pointer !important;
-            font-size: 14px !important;
-            font-weight: 400 !important;
-            text-align: left !important;
-            box-shadow: none !important;
-            min-height: auto !important;
-            height: auto !important;
-            width: auto !important;
-            border-width: 0 !important;
-            outline: none !important;
-        }
+        _apply_bm_list_css()
 
-        .stButton button:hover,
-        .stButton > div > button:hover,
-        div[data-testid="column"] button:hover,
-        div[data-testid="column"] > div button:hover,
-        div[data-testid="column"] > div > div button:hover,
-        div[data-testid="column"] > div > div > div button:hover,
-        div[data-testid="column"] > div > div > div > div button:hover {
-            color: #0d47a1 !important;
-            text-decoration: underline !important;
-            background: transparent !important;
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-
-        .stButton button:focus,
-        .stButton > div > button:focus,
-        div[data-testid="column"] button:focus,
-        div[data-testid="column"] > div button:focus,
-        div[data-testid="column"] > div > div button:focus,
-        div[data-testid="column"] > div > div > div button:focus,
-        div[data-testid="column"] > div > div > div > div button:focus {
-            background: transparent !important;
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            outline: 1px dotted #1f77b4 !important;
-        }
-
-        .stButton button:active,
-        .stButton > div > button:active,
-        div[data-testid="column"] button:active,
-        div[data-testid="column"] > div button:active,
-        div[data-testid="column"] > div > div button:active,
-        div[data-testid="column"] > div > div > div button:active,
-        div[data-testid="column"] > div > div > div > div button:active {
-            background: transparent !important;
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            color: #0d47a1 !important;
-        }
-        </style>
-        """,
-            unsafe_allow_html=True,
-        )
-
-        # En-tête avec colonnes
-        header_cols = st.columns([1, 3, 3, 2, 2, 2, 2])
-        with header_cols[0]:
-            st.markdown("**ID**")
-        with header_cols[1]:
-            st.markdown("**👤 Nom complet**")
-        with header_cols[2]:
-            st.markdown("**Email**")
-        with header_cols[3]:
-            st.markdown(f"**📱 {TELEPHONE_LABEL}**")
-        with header_cols[4]:
-            st.markdown("**👥 Consultants**")
-        with header_cols[5]:
-            st.markdown("**📊 Total**")
-        with header_cols[6]:
-            st.markdown("**🔄 Statut**")
-
-        st.markdown("---")
+        # En-tête du tableau
+        _display_bm_table_header()
 
         # Lignes de données
         for i, row in enumerate(bms_data):
-            cols = st.columns([1, 3, 3, 2, 2, 2, 2])
-
-            with cols[0]:
-                st.write(f"`{row['ID']}`")
-
-            with cols[1]:
-                # Nom comme vrai lien hypertexte HTML + bouton invisible pour la navigation
-                nom_complet = f"{row['Prénom']} {row['Nom']}"
-
-                # Nom comme lien hypertexte cliquable
-                if st.button(
-                    f"👤 {nom_complet}",
-                    key=f"btn_bm_{row['ID']}",
-                    help=f"Voir le profil de {nom_complet}",
-                ):
-                    try:
-                        # S'assurer que l'ID est un entier valide
-                        bm_id = row["ID"]
-                        if isinstance(bm_id, str):
-                            bm_id = int(bm_id)
-                        elif not isinstance(bm_id, int):
-                            bm_id = int(str(bm_id))
-
-                        st.session_state.view_bm_profile = bm_id
-                        st.rerun()
-                    except (ValueError, TypeError) as e:
-                        st.error(
-                            f"❌ Erreur : ID du Business Manager invalide ({row['ID']})"
-                        )
-                        print(
-                            f"Erreur de conversion d'ID: {e}, valeur: {row['ID']}, type: {type(row['ID'])}"
-                        )
-
-            with cols[2]:
-                # Email simple non cliquable (utilisation du HTML pour éviter la détection automatique)
-                st.markdown(
-                    f"""
-                <div style="color: #262730; font-size: 14px;">
-                    {row['Email']}
-                </div>
-                """,
-                    unsafe_allow_html=True,
-                )
-
-            with cols[3]:
-                st.write(row[TELEPHONE_LABEL])
-
-            with cols[4]:
-                st.write(f"**{row['Consultants actuels']}**")
-
-            with cols[5]:
-                st.write(f"{row['Total assignations']}")
-
-            with cols[6]:
-                st.write(row["Statut"])
-
-            # Ligne de séparation subtile
-            if i < len(bms_data) - 1:
-                st.markdown(
-                    "<hr style='margin: 0.5rem 0; border: 0; border-top: 1px solid #eee;'>",
-                    unsafe_allow_html=True,
-                )
+            _display_bm_table_row(row, i, len(bms_data))
 
         # Métriques générales
-        st.markdown("---")
-        col1, col2, col3, col4 = st.columns(4)
-
-        with col1:
-            st.write(f"**👔 Total BMs:** {len(bms_data_from_service)}")
-
-        with col2:
-            actifs = len([bm for bm in bms_data_from_service if bm["actif"]])
-            st.write(f"**🟢 Actifs:** {actifs}")
-
-        with col3:
-            total_consultants = sum(
-                bm_data["Consultants actuels"] for bm_data in bms_data
-            )
-            st.write(f"**👥 Total consultants gérés:** {total_consultants}")
-
-        with col4:
-            avg_consultants = (
-                total_consultants / len(bms_data_from_service)
-                if len(bms_data_from_service) > 0
-                else 0
-            )
-            st.write(f"**📊 Moyenne consultants/BM:** {avg_consultants:.1f}")
+        _display_bm_metrics(bms_data_from_service, bms_data)
 
     except Exception as e:
-        st.error(f"❌ Erreur lors du chargement de la liste : {e}")
+        st.error(ERROR_LIST_LOADING.format(e))
 
 
 def show_add_business_manager():
@@ -1298,14 +1205,14 @@ def show_add_business_manager():
                     session.add(new_bm)
                     session.commit()
 
-                    st.success(f"✅ Business Manager {prenom} {nom} créé avec succès !")
+                    st.success(SUCCESS_BM_CREATED.format(prenom, nom))
                     st.balloons()
 
                     # Rafraîchir la page pour mettre à jour la liste
                     st.rerun()
 
             except Exception as e:
-                st.error(f"❌ Erreur lors de la création : {e}")
+                st.error(ERROR_CREATION.format(e))
 
 
 def show_statistics():
@@ -1448,4 +1355,359 @@ def show_statistics():
                 st.line_chart(df_monthly.set_index("Mois"))
 
     except Exception as e:
-        st.error(f"❌ Erreur lors du calcul des statistiques : {e}")
+        st.error(ERROR_STATISTICS.format(e))
+
+
+# Helper methods pour show_add_bm_assignment()
+
+
+def _separate_consultants_by_status(all_consultants, assigned_consultant_ids, session):
+    """Sépare les consultants entre disponibles et assignés à d'autres BMs."""
+    available_consultants = []
+    assigned_to_other_bm = []
+
+    for consultant in all_consultants:
+        if consultant.id in assigned_consultant_ids:
+            continue  # Déjà assigné à ce BM
+
+        # Vérifier s'il a une assignation active avec un autre BM
+        existing_assignment = (
+            session.query(ConsultantBusinessManager)
+            .filter(
+                and_(
+                    ConsultantBusinessManager.consultant_id == consultant.id,
+                    ConsultantBusinessManager.date_fin.is_(None),
+                )
+            )
+            .first()
+        )
+
+        if existing_assignment:
+            # Récupérer le BM actuel
+            current_bm = (
+                session.query(BusinessManager)
+                .filter(BusinessManager.id == existing_assignment.business_manager_id)
+                .first()
+            )
+            assigned_to_other_bm.append((consultant, current_bm, existing_assignment))
+        else:
+            available_consultants.append(consultant)
+
+    return available_consultants, assigned_to_other_bm
+
+
+def _build_consultant_options_for_assignment(
+    available_consultants, assigned_to_other_bm
+):
+    """Construit les options de consultants pour le selectbox d'assignation."""
+    consultant_options = {}
+
+    # Consultants disponibles (aucune assignation active)
+    if available_consultants:
+        st.write("**🟢 Consultants disponibles :**")
+        for consultant in available_consultants:
+            key = f"🟢 {consultant.prenom} {consultant.nom} ({consultant.email}) - DISPONIBLE"
+            consultant_options[key] = {
+                "consultant": consultant,
+                "status": "available",
+                "existing_assignment": None,
+                "current_bm": None,
+            }
+
+    # Consultants assignés à d'autres BMs
+    if assigned_to_other_bm:
+        st.write("**🔄 Consultants assignés à d'autres BMs (nécessite transfert) :**")
+        for consultant, current_bm, existing_assignment in assigned_to_other_bm:
+            since_date = existing_assignment.date_debut.strftime(DATE_FORMAT)
+            key = f"🔄 {consultant.prenom} {consultant.nom} ({consultant.email}) - Actuellement avec {current_bm.prenom} {current_bm.nom} depuis le {since_date}"
+            consultant_options[key] = {
+                "consultant": consultant,
+                "status": "assigned",
+                "existing_assignment": existing_assignment,
+                "current_bm": current_bm,
+            }
+
+    return consultant_options
+
+
+def _handle_assignment_transfer(selected_data, date_debut, bm, cloture_comment):
+    """Gère le transfert d'un consultant d'un BM à un autre."""
+    existing_assignment = selected_data["existing_assignment"]
+    existing_assignment.date_fin = date_debut  # Fin = début de la nouvelle assignation
+
+    # Ajouter le commentaire de clôture
+    existing_comment = existing_assignment.commentaire or ""
+    new_comment = (
+        f"Transfert vers {bm.prenom} {bm.nom} le {date_debut.strftime(DATE_FORMAT)}"
+    )
+    if cloture_comment:
+        new_comment += f" - Raison: {cloture_comment}"
+
+    if existing_comment:
+        existing_assignment.commentaire = f"{existing_comment}\n{new_comment}"
+    else:
+        existing_assignment.commentaire = new_comment
+
+    # Message de confirmation du transfert
+    old_bm_name = (
+        selected_data["current_bm"].prenom + " " + selected_data["current_bm"].nom
+    )
+    st.info(f"🔄 Assignation avec {old_bm_name} clôturée automatiquement")
+
+
+def _create_new_assignment(consultant, bm, date_debut, commentaire, session):
+    """Crée une nouvelle assignation consultant-BM."""
+    assignment = ConsultantBusinessManager(
+        consultant_id=consultant.id,
+        business_manager_id=bm.id,
+        date_debut=date_debut,
+        date_creation=datetime.now(),
+        commentaire=commentaire.strip() if commentaire else None,
+    )
+    session.add(assignment)
+    return assignment
+
+
+def _display_assignment_success_message(selected_data, consultant, bm):
+    """Affiche le message de succès approprié après création d'assignation."""
+    if selected_data["status"] == "assigned":
+        st.success(
+            SUCCESS_TRANSFER.format(
+                consultant.prenom, consultant.nom, bm.prenom, bm.nom
+            )
+        )
+    else:
+        st.success(
+            SUCCESS_ASSIGNMENT.format(
+                consultant.prenom, consultant.nom, bm.prenom, bm.nom
+            )
+        )
+    st.balloons()
+    st.rerun()
+
+
+# Helper methods pour show_business_managers_list()
+
+
+def _apply_bm_list_css():
+    """Applique le CSS pour styliser les boutons comme des liens hypertextes."""
+    st.markdown(
+        """
+    <style>
+    /* Style pour transformer les boutons en liens hypertextes - sélecteurs très spécifiques */
+    .stButton button,
+    .stButton > div > button,
+    div[data-testid="column"] button,
+    div[data-testid="column"] > div button,
+    div[data-testid="column"] > div > div button,
+    div[data-testid="column"] > div > div > div button,
+    div[data-testid="column"] > div > div > div > div button {
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        color: #1f77b4 !important;
+        text-decoration: underline !important;
+        cursor: pointer !important;
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        text-align: left !important;
+        box-shadow: none !important;
+        min-height: auto !important;
+        height: auto !important;
+        width: auto !important;
+        border-width: 0 !important;
+        outline: none !important;
+    }
+
+    .stButton button:hover,
+    .stButton > div > button:hover,
+    div[data-testid="column"] button:hover,
+    div[data-testid="column"] > div button:hover,
+    div[data-testid="column"] > div > div button:hover,
+    div[data-testid="column"] > div > div > div button:hover,
+    div[data-testid="column"] > div > div > div > div button:hover {
+        color: #0d47a1 !important;
+        text-decoration: underline !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .stButton button:focus,
+    .stButton > div > button:focus,
+    div[data-testid="column"] button:focus,
+    div[data-testid="column"] > div button:focus,
+    div[data-testid="column"] > div > div button:focus,
+    div[data-testid="column"] > div > div > div button:focus,
+    div[data-testid="column"] > div > div > div > div button:focus {
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: 1px dotted #1f77b4 !important;
+    }
+
+    .stButton button:active,
+    .stButton > div > button:active,
+    div[data-testid="column"] button:active,
+    div[data-testid="column"] > div button:active,
+    div[data-testid="column"] > div > div button:active,
+    div[data-testid="column"] > div > div > div button:active,
+    div[data-testid="column"] > div > div > div > div button:active {
+        background: transparent !important;
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #0d47a1 !important;
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+def _build_bm_data_table(bms_data_from_service):
+    """Construit les données du tableau à partir du service BM."""
+    bms_data = []
+    for bm_dict in bms_data_from_service:
+        # Calculer le total des assignations avec une nouvelle session
+        with get_database_session() as session:
+            total_assignments = (
+                session.query(ConsultantBusinessManager)
+                .filter(ConsultantBusinessManager.business_manager_id == bm_dict["id"])
+                .count()
+            )
+
+        bms_data.append(
+            {
+                "ID": int(bm_dict["id"]),  # Force la conversion en entier
+                "Prénom": bm_dict["prenom"],
+                "Nom": bm_dict["nom"],
+                "Email": bm_dict["email"],
+                TELEPHONE_LABEL: bm_dict["telephone"] or "N/A",
+                "Consultants actuels": bm_dict["consultants_count"],
+                "Total assignations": total_assignments,
+                "Statut": "🟢 Actif" if bm_dict["actif"] else "🔴 Inactif",
+                "Créé le": (
+                    bm_dict["date_creation"].strftime(DATE_FORMAT)
+                    if bm_dict["date_creation"]
+                    else "N/A"
+                ),
+            }
+        )
+    return bms_data
+
+
+def _display_bm_table_header():
+    """Affiche l'en-tête du tableau des Business Managers."""
+    # En-tête avec colonnes
+    header_cols = st.columns([1, 3, 3, 2, 2, 2, 2])
+    with header_cols[0]:
+        st.markdown("**ID**")
+    with header_cols[1]:
+        st.markdown("**👤 Nom complet**")
+    with header_cols[2]:
+        st.markdown("**Email**")
+    with header_cols[3]:
+        st.markdown(f"**📱 {TELEPHONE_LABEL}**")
+    with header_cols[4]:
+        st.markdown("**👥 Consultants**")
+    with header_cols[5]:
+        st.markdown("**📊 Total**")
+    with header_cols[6]:
+        st.markdown("**🔄 Statut**")
+
+    st.markdown("---")
+
+
+def _display_bm_table_row(row, i, total_rows):
+    """Affiche une ligne du tableau des Business Managers."""
+    cols = st.columns([1, 3, 3, 2, 2, 2, 2])
+
+    with cols[0]:
+        st.write(f"`{row['ID']}`")
+
+    with cols[1]:
+        # Nom comme vrai lien hypertexte HTML + bouton invisible pour la navigation
+        nom_complet = f"{row['Prénom']} {row['Nom']}"
+
+        # Nom comme lien hypertexte cliquable
+        if st.button(
+            f"👤 {nom_complet}",
+            key=f"btn_bm_{row['ID']}",
+            help=f"Voir le profil de {nom_complet}",
+        ):
+            try:
+                # S'assurer que l'ID est un entier valide
+                bm_id = row["ID"]
+                if isinstance(bm_id, str):
+                    bm_id = int(bm_id)
+                elif not isinstance(bm_id, int):
+                    bm_id = int(str(bm_id))
+
+                st.session_state.view_bm_profile = bm_id
+                st.rerun()
+            except (ValueError, TypeError) as e:
+                st.error(f"❌ Erreur : ID du Business Manager invalide ({row['ID']})")
+                print(
+                    f"Erreur de conversion d'ID: {e}, valeur: {row['ID']}, type: {type(row['ID'])}"
+                )
+
+    with cols[2]:
+        # Email simple non cliquable (utilisation du HTML pour éviter la détection automatique)
+        st.markdown(
+            f"""
+        <div style="color: #262730; font-size: 14px;">
+            {row['Email']}
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    with cols[3]:
+        st.write(row[TELEPHONE_LABEL])
+
+    with cols[4]:
+        st.write(f"**{row['Consultants actuels']}**")
+
+    with cols[5]:
+        st.write(f"{row['Total assignations']}")
+
+    with cols[6]:
+        st.write(row["Statut"])
+
+    # Ligne de séparation subtile
+    if i < total_rows - 1:
+        st.markdown(
+            "<hr style='margin: 0.5rem 0; border: 0; border-top: 1px solid #eee;'>",
+            unsafe_allow_html=True,
+        )
+
+
+def _display_bm_metrics(bms_data_from_service, bms_data):
+    """Affiche les métriques générales des Business Managers."""
+    st.markdown("---")
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.write(f"**👔 Total BMs:** {len(bms_data_from_service)}")
+
+    with col2:
+        actifs = len([bm for bm in bms_data_from_service if bm["actif"]])
+        st.write(f"**🟢 Actifs:** {actifs}")
+
+    with col3:
+        total_consultants = sum(bm_data["Consultants actuels"] for bm_data in bms_data)
+        st.write(f"**👥 Total consultants gérés:** {total_consultants}")
+
+    with col4:
+        avg_consultants = (
+            total_consultants / len(bms_data_from_service)
+            if len(bms_data_from_service) > 0
+            else 0
+        )
+        st.write(f"**📊 Moyenne consultants/BM:** {avg_consultants:.1f}")
