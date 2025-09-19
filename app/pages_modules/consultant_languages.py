@@ -38,6 +38,133 @@ except ImportError:
     pass
 
 
+# Constantes pour les labels des colonnes et messages
+NIVEAU_ECRIT_LABEL = "Niveau écrit"
+NIVEAU_PARLE_LABEL = "Niveau parlé"
+LANGUE_MATERNELLE_LABEL = "Langue maternelle"
+LANGUE_INTROUVABLE_ERROR = "❌ Langue introuvable"
+ECART_LABEL = "Écart"
+
+
+def _get_consultant_languages_data(consultant_id: int):
+    """Récupère les données des langues du consultant depuis la base de données."""
+    with get_database_session() as session:
+        consultant_langues = (
+            session.query(ConsultantLangue)
+            .join(Langue)
+            .filter(ConsultantLangue.consultant_id == consultant_id)
+            .all()
+        )
+    return consultant_langues
+
+
+def _create_language_data_table(consultant_langues):
+    """Crée un tableau de données pandas à partir des langues du consultant."""
+    language_data = []
+    for cl in consultant_langues:
+        language_data.append(
+            {
+                "id": cl.id,
+                "Langue": cl.langue.nom,
+                "Niveau": get_niveau_label(cl.niveau),
+                NIVEAU_ECRIT_LABEL: (
+                    get_niveau_label(cl.niveau_ecrit) if cl.niveau_ecrit else "N/A"
+                ),
+                NIVEAU_PARLE_LABEL: (
+                    get_niveau_label(cl.niveau_parle) if cl.niveau_parle else "N/A"
+                ),
+                "Certification": "✅" if cl.certification else "❌",
+                LANGUE_MATERNELLE_LABEL: "✅" if cl.langue_maternelle else "❌",
+            }
+        )
+
+    import pandas as pd
+
+    return pd.DataFrame(language_data)
+
+
+def _display_language_table(df):
+    """Affiche le tableau des langues."""
+    st.dataframe(
+        df[
+            [
+                "Langue",
+                "Niveau",
+                NIVEAU_ECRIT_LABEL,
+                NIVEAU_PARLE_LABEL,
+                "Certification",
+                LANGUE_MATERNELLE_LABEL,
+            ]
+        ],
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+def _display_language_actions(df):
+    """Affiche les actions par langue."""
+    st.markdown("#### 🎯 Actions par langue")
+
+    for index, row in df.iterrows():
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([2, 2, 2, 2, 2, 2, 2])
+
+        with col1:
+            st.write(f"**{row['Langue']}**")
+        with col2:
+            st.write(row["Niveau"])
+        with col3:
+            st.write(row[NIVEAU_ECRIT_LABEL])
+        with col4:
+            st.write(row[NIVEAU_PARLE_LABEL])
+        with col5:
+            st.write(row["Certification"])
+        with col6:
+            st.write(row[LANGUE_MATERNELLE_LABEL])
+        with col7:
+            language_id = row["id"]
+            if st.button("✏️", key=f"edit_lang_{language_id}", help="Modifier"):
+                st.session_state.edit_language = language_id
+                st.rerun()
+            if st.button("🗑️", key=f"delete_lang_{language_id}", help="Supprimer"):
+                if delete_language(language_id):
+                    st.rerun()
+
+
+def _display_general_actions(consultant):
+    """Affiche les actions générales."""
+    st.markdown("#### 🎯 Actions générales")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if st.button("➕ Ajouter langue", key=f"add_lang_{consultant.id}"):
+            st.session_state.add_language = consultant.id
+            st.rerun()
+
+    with col2:
+        if st.button("📊 Analyse langues", key=f"analyze_lang_{consultant.id}"):
+            consultant_langues = _get_consultant_languages_data(consultant.id)
+            show_languages_analysis(consultant_langues)
+
+    with col3:
+        if st.button("🌍 Comparaison", key=f"compare_lang_{consultant.id}"):
+            show_languages_comparison(consultant.id)
+
+
+def _handle_form_display(consultant):
+    """Gère l'affichage des formulaires d'ajout et de modification."""
+    # Formulaire d'ajout (si activé)
+    if (
+        "add_language" in st.session_state
+        and st.session_state.add_language == consultant.id
+    ):
+        show_add_language_form(consultant.id)
+
+    # Formulaire de modification (si activé)
+    if "edit_language" in st.session_state:
+        show_edit_language_form(st.session_state.edit_language)
+
+
 def show_consultant_languages(consultant):
     """
     Affiche la page complète des langues d'un consultant.
@@ -73,122 +200,28 @@ def show_consultant_languages(consultant):
 
     try:
         # Récupérer les langues du consultant
-        with get_database_session() as session:
-            consultant_langues = (
-                session.query(ConsultantLangue)
-                .join(Langue)
-                .filter(ConsultantLangue.consultant_id == consultant.id)
-                .all()
-            )
+        consultant_langues = _get_consultant_languages_data(consultant.id)
 
         if not consultant_langues:
             st.info("ℹ️ Aucune langue enregistrée pour ce consultant")
             show_add_language_form(consultant.id)
             return
 
-        # Créer un tableau des langues
-        language_data = []
-        for cl in consultant_langues:
-            language_data.append(
-                {
-                    "id": cl.id,
-                    "Langue": cl.langue.nom,
-                    "Niveau": get_niveau_label(cl.niveau),
-                    "Niveau écrit": (
-                        get_niveau_label(cl.niveau_ecrit) if cl.niveau_ecrit else "N/A"
-                    ),
-                    "Niveau parlé": (
-                        get_niveau_label(cl.niveau_parle) if cl.niveau_parle else "N/A"
-                    ),
-                    "Certification": "✅" if cl.certification else "❌",
-                    "Langue maternelle": "✅" if cl.langue_maternelle else "❌",
-                }
-            )
+        # Créer et afficher le tableau des langues
+        df = _create_language_data_table(consultant_langues)
+        _display_language_table(df)
 
-        import pandas as pd
-
-        df = pd.DataFrame(language_data)
-
-        # Afficher le tableau avec actions
-        st.dataframe(
-            df[
-                [
-                    "Langue",
-                    "Niveau",
-                    "Niveau écrit",
-                    "Niveau parlé",
-                    "Certification",
-                    "Langue maternelle",
-                ]
-            ],
-            use_container_width=True,
-            hide_index=True,
-        )
-
-        # Actions sur chaque langue
-        st.markdown("#### 🎯 Actions par langue")
-
-        for index, row in df.iterrows():
-            col1, col2, col3, col4, col5, col6, col7 = st.columns([2, 2, 2, 2, 2, 2, 2])
-
-            with col1:
-                st.write(f"**{row['Langue']}**")
-
-            with col2:
-                st.write(row["Niveau"])
-
-            with col3:
-                st.write(row["Niveau écrit"])
-
-            with col4:
-                st.write(row["Niveau parlé"])
-
-            with col5:
-                st.write(row["Certification"])
-
-            with col6:
-                st.write(row["Langue maternelle"])
-
-            with col7:
-                language_id = row["id"]
-                if st.button("✏️", key=f"edit_lang_{language_id}", help="Modifier"):
-                    st.session_state.edit_language = language_id
-                    st.rerun()
-                if st.button("🗑️", key=f"delete_lang_{language_id}", help="Supprimer"):
-                    if delete_language(language_id):
-                        st.rerun()
+        # Afficher les actions par langue
+        _display_language_actions(df)
 
         # Statistiques des langues
         show_languages_statistics(consultant_langues)
 
         # Actions générales
-        st.markdown("#### 🎯 Actions générales")
+        _display_general_actions(consultant)
 
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            if st.button("➕ Ajouter langue", key=f"add_lang_{consultant.id}"):
-                st.session_state.add_language = consultant.id
-                st.rerun()
-
-        with col2:
-            if st.button("📊 Analyse langues", key=f"analyze_lang_{consultant.id}"):
-                show_languages_analysis(consultant_langues)
-
-        with col3:
-            if st.button("🌍 Comparaison", key=f"compare_lang_{consultant.id}"):
-                show_languages_comparison(consultant.id)
-
-        # Formulaire d'ajout (si activé)
-        if (
-            "add_language" in st.session_state
-            and st.session_state.add_language == consultant.id
-        ):
-            show_add_language_form(consultant.id)
-
-        # Formulaire de modification (si activé)
-        if "edit_language" in st.session_state:
-            show_edit_language_form(st.session_state.edit_language)
+        # Gestion des formulaires
+        _handle_form_display(consultant)
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'affichage des langues: {e}")
@@ -337,7 +370,7 @@ def show_add_language_form(consultant_id: int):
                 )
 
                 niveau_ecrit = st.slider(
-                    "Niveau écrit",
+                    NIVEAU_ECRIT_LABEL,
                     min_value=1,
                     max_value=6,
                     value=3,
@@ -346,7 +379,7 @@ def show_add_language_form(consultant_id: int):
 
             with col2:
                 niveau_parle = st.slider(
-                    "Niveau parlé",
+                    NIVEAU_PARLE_LABEL,
                     min_value=1,
                     max_value=6,
                     value=3,
@@ -354,7 +387,7 @@ def show_add_language_form(consultant_id: int):
                 )
 
                 langue_maternelle = st.checkbox(
-                    "Langue maternelle",
+                    LANGUE_MATERNELLE_LABEL,
                     help="Cette langue est-elle la langue maternelle du consultant ?",
                 )
 
@@ -364,16 +397,13 @@ def show_add_language_form(consultant_id: int):
             )
 
             # Boutons
-            col1, col2, col3 = st.columns([1, 1, 2])
+            col1, col2, _ = st.columns([1, 1, 2])
 
             with col1:
                 submitted = st.form_submit_button("💾 Ajouter", type="primary")
 
             with col2:
                 cancel = st.form_submit_button("❌ Annuler")
-
-            with col3:
-                pass
 
             if submitted:
                 success = add_language_to_consultant(
@@ -513,7 +543,7 @@ def show_edit_language_form(consultant_langue_id: int):
             )
 
             if not cl:
-                st.error("❌ Langue introuvable")
+                st.error(LANGUE_INTROUVABLE_ERROR)
                 return
 
         with st.form(
@@ -533,7 +563,7 @@ def show_edit_language_form(consultant_langue_id: int):
                 )
 
                 niveau_ecrit = st.slider(
-                    "Niveau écrit",
+                    NIVEAU_ECRIT_LABEL,
                     min_value=1,
                     max_value=6,
                     value=cl.niveau_ecrit or 3,
@@ -542,7 +572,7 @@ def show_edit_language_form(consultant_langue_id: int):
 
             with col2:
                 niveau_parle = st.slider(
-                    "Niveau parlé",
+                    NIVEAU_PARLE_LABEL,
                     min_value=1,
                     max_value=6,
                     value=cl.niveau_parle or 3,
@@ -550,7 +580,7 @@ def show_edit_language_form(consultant_langue_id: int):
                 )
 
                 langue_maternelle = st.checkbox(
-                    "Langue maternelle",
+                    LANGUE_MATERNELLE_LABEL,
                     value=cl.langue_maternelle,
                     help="Cette langue est-elle la langue maternelle du consultant ?",
                 )
@@ -562,16 +592,13 @@ def show_edit_language_form(consultant_langue_id: int):
             )
 
             # Boutons
-            col1, col2, col3 = st.columns([1, 1, 2])
+            col1, col2, _ = st.columns([1, 1, 2])
 
             with col1:
                 submitted = st.form_submit_button("💾 Enregistrer", type="primary")
 
             with col2:
                 cancel = st.form_submit_button("❌ Annuler")
-
-            with col3:
-                pass
 
             if submitted:
                 success = update_consultant_language(
@@ -632,7 +659,7 @@ def update_consultant_language(consultant_langue_id: int, data: Dict[str, Any]) 
             )
 
             if not cl:
-                st.error("❌ Langue introuvable")
+                st.error(LANGUE_INTROUVABLE_ERROR)
                 return False
 
             # Mettre à jour les données
@@ -683,7 +710,7 @@ def delete_language(consultant_langue_id: int) -> bool:
             )
 
             if not cl:
-                st.error("❌ Langue introuvable")
+                st.error(LANGUE_INTROUVABLE_ERROR)
                 return False
 
             session.delete(cl)
@@ -841,7 +868,7 @@ def show_languages_comparison(consultant_id: int):
                             "Langue": lang_name,
                             "Votre niveau": get_niveau_label(consultant_level),
                             "Moyenne équipe": f"{avg_level:.1f}/6",
-                            "Écart": f"{difference:+.1f}",
+                            ECART_LABEL: f"{difference:+.1f}",
                             "Comparé à": f"{count} consultants",
                         }
                     )
@@ -854,10 +881,10 @@ def show_languages_comparison(consultant_id: int):
 
                 # Résumé
                 above_avg = sum(
-                    1 for item in comparison_data if float(item["Écart"]) > 0
+                    1 for item in comparison_data if float(item[ECART_LABEL]) > 0
                 )
                 below_avg = sum(
-                    1 for item in comparison_data if float(item["Écart"]) < 0
+                    1 for item in comparison_data if float(item[ECART_LABEL]) < 0
                 )
 
                 col1, col2 = st.columns(2)
