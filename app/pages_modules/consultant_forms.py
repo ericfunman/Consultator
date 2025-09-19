@@ -277,7 +277,6 @@ def show_edit_consultant_form(consultant_id: int):
             # Traitement du formulaire
             if submitted:
                 _handle_form_submission(
-                    submitted,
                     consultant_id,
                     prenom,
                     nom,
@@ -307,7 +306,7 @@ def update_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
             )
 
             if not consultant:
-                st.error("❌ Consultant introuvable")
+                st.error(ERROR_CONSULTANT_NOT_FOUND)
                 return False
 
             # Vérifier si l'email existe déjà pour un autre consultant
@@ -354,7 +353,7 @@ def delete_consultant(consultant_id: int) -> bool:
             )
 
             if not consultant:
-                st.error("❌ Consultant introuvable")
+                st.error(ERROR_CONSULTANT_NOT_FOUND)
                 return False
 
             # Supprimer le consultant (les relations seront supprimées automatiquement
@@ -459,7 +458,6 @@ def _display_form_buttons():
 
 
 def _handle_form_submission(
-    submitted,
     consultant_id,
     prenom,
     nom,

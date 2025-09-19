@@ -457,9 +457,7 @@ class ConsultantLangue(Base):
         Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
     )
     langue_id: Mapped[int] = Column(Integer, ForeignKey("langues.id"), nullable=False)
-    # 1=Débutant, 2=Élémentaire, 3=Intermédiaire, 4=Avancé, 5=Natif
     niveau: Mapped[int] = Column(Integer, nullable=False)
-    # ex: "Lu, écrit, parlé", "Certification TOEIC 850", etc.
     commentaire: Mapped[Optional[str]] = Column(Text)
     date_ajout: Mapped[datetime] = Column(DateTime, default=datetime.now)
 

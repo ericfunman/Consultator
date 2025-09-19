@@ -618,7 +618,7 @@ def show_edit_mission_form(mission_id: int):
             )
 
             if not mission:
-                st.error("❌ Mission introuvable")
+                st.error(MSG_MISSION_INTROUVABLE)
                 return
 
             clients = session.query(Client).all()
@@ -790,7 +790,7 @@ def update_mission(mission_id: int, data: Dict[str, Any]) -> bool:
             mission = session.query(Mission).filter(Mission.id == mission_id).first()
 
             if not mission:
-                st.error("❌ Mission introuvable")
+                st.error(MSG_MISSION_INTROUVABLE)
                 return False
 
             # Mettre à jour les données
@@ -851,7 +851,7 @@ def delete_mission(mission_id: int) -> bool:
             mission = session.query(Mission).filter(Mission.id == mission_id).first()
 
             if not mission:
-                st.error("❌ Mission introuvable")
+                st.error(MSG_MISSION_INTROUVABLE)
                 return False
 
             session.delete(mission)

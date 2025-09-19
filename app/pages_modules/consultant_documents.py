@@ -340,7 +340,7 @@ def reanalyze_document(document_id: int, consultant) -> bool:
             )
 
             if not document:
-                st.error("❌ Document introuvable")
+                st.error(ERROR_DOCUMENT_NOT_FOUND)
                 return False
 
             if not os.path.exists(document.chemin_fichier):
@@ -382,7 +382,7 @@ def show_rename_document_form(document_id: int):
             )
 
             if not document:
-                st.error("❌ Document introuvable")
+                st.error(ERROR_DOCUMENT_NOT_FOUND)
                 return
 
         with st.form(f"rename_document_form_{document_id}", clear_on_submit=False):
@@ -452,7 +452,7 @@ def rename_document(document_id: int, data: Dict[str, Any]) -> bool:
             )
 
             if not document:
-                st.error("❌ Document introuvable")
+                st.error(ERROR_DOCUMENT_NOT_FOUND)
                 return False
 
             # Mettre à jour les informations
@@ -478,7 +478,7 @@ def delete_document(document_id: int) -> bool:
             )
 
             if not document:
-                st.error("❌ Document introuvable")
+                st.error(ERROR_DOCUMENT_NOT_FOUND)
                 return False
 
             # Supprimer le fichier physique

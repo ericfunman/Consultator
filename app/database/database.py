@@ -52,8 +52,8 @@ def get_session_factory():
 
 def get_database_session():
     """Retourne une session de base de données optimisée"""
-    SessionLocal = get_session_factory()
-    return SessionLocal()
+    session_local = get_session_factory()
+    return session_local()
 
 
 # Alias pour compatibilité (certains fichiers peuvent avoir l'ancien nom)
