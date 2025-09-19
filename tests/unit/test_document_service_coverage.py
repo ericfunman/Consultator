@@ -226,8 +226,6 @@ class TestDocumentServiceCoverage:
             assert result == "Page 1 content\nPage 2 content\n"
             mock_extract.assert_called_once_with("test.pdf")
 
-        assert result == "Page 1 content\nPage 2 content"
-
     @patch("app.services.document_service.pdfplumber")
     def test_extract_text_from_pdf_empty_pages(self, mock_pdfplumber):
         """Test extraction PDF avec pages vides"""

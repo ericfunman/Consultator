@@ -16,7 +16,7 @@ import streamlit as st
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 
 try:
-    from app.pages_modules import consultants
+    import app.pages_modules.consultants as consultants
 except ImportError:
     consultants = None
 
@@ -27,7 +27,7 @@ class TestConsultantsImports:
     def test_imports_available(self):
         """Test que les imports sont disponibles"""
         # Cette fonction teste la logique d'imports du module
-        assert hasattr(consultants, "imports_ok")
+        assert consultants is not None and hasattr(consultants, "imports_ok")
         # En mode test, les imports peuvent échouer, c'est normal
 
     def test_imports_fallback(self):

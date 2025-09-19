@@ -14,7 +14,7 @@ import streamlit as st
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 
 try:
-    from app.pages_modules import home
+    import app.pages_modules.home as home
 except ImportError:
     home = None
 
