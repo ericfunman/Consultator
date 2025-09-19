@@ -35,7 +35,7 @@ try:
 except ImportError:
     pass
 
-# Messages d'erreur constants
+# Messages d'erreur constants (nettoyage des doublons)
 MSG_SERVICES_INDISPONIBLES = "❌ Les services de base ne sont pas disponibles"
 MSG_CONSULTANT_NON_FOURNI = "❌ Consultant non fourni"
 MSG_ERREUR_AFFICHAGE_COMPETENCES = "❌ Erreur lors de l'affichage des compétences:"
@@ -46,14 +46,141 @@ MSG_COMPETENCE_DEJA_ASSOCIEE = "❌ Cette compétence est déjà associée au co
 MSG_COMPETENCE_INTROUVABLE = "❌ Compétence introuvable"
 MSG_COMPETENCE_MISE_A_JOUR = "✅ Compétence mise à jour avec succès !"
 MSG_ERREUR_MISE_A_JOUR = "❌ Erreur lors de la mise à jour"
-MSG_ERREUR_CHARGEMENT_MODIFICATION = (
-    "❌ Erreur lors du chargement du formulaire de modification:"
-)
+MSG_ERREUR_CHARGEMENT_MODIFICATION = "❌ Erreur lors du chargement du formulaire de modification:"
 
 # Emojis pour la certification
 EMOJI_CERTIFIE = "✅"
 EMOJI_NON_CERTIFIE = "❌"
-EMOJI_ANNULER = "❌ Annuler"
+
+
+def _load_consultant_competences(consultant_id):
+    """Charge les compétences d'un consultant."""
+    with get_database_session() as session:
+        consultant_competences = (
+            session.query(ConsultantCompetence)
+            .join(Competence)
+            .filter(ConsultantCompetence.consultant_id == consultant_id)
+            .all()
+        )
+    return consultant_competences
+
+
+def _organize_skills_by_category(consultant_competences):
+    """Organise les compétences par catégorie."""
+    skills_by_category = {}
+    for cc in consultant_competences:
+        category = cc.competence.categorie or "Autre"
+        if category not in skills_by_category:
+            skills_by_category[category] = []
+        skills_by_category[category].append(
+            {
+                "id": cc.id,
+                "nom": cc.competence.nom,
+                "niveau": cc.niveau,
+                "annees_experience": cc.annees_experience,
+                "certification": cc.certification,
+                "date_acquisition": cc.date_acquisition,
+            }
+        )
+    return skills_by_category
+
+
+def _create_skill_data_row(skill):
+    """Crée une ligne de données pour une compétence."""
+    return {
+        "Compétence": skill["nom"],
+        "Niveau": get_niveau_label(skill["niveau"]),
+        "Expérience": (
+            f"{skill['annees_experience']} an(s)"
+            if skill["annees_experience"]
+            else "N/A"
+        ),
+        "Certification": (
+            EMOJI_CERTIFIE
+            if skill["certification"]
+            else EMOJI_NON_CERTIFIE
+        ),
+        "Actions": f"edit_{skill['id']}",
+    }
+
+
+def _display_skill_row(row, index):
+    """Affiche une ligne de compétence avec les boutons d'action."""
+    col1, col2, col3, col4, col5 = st.columns([3, 2, 2, 2, 2])
+
+    with col1:
+        st.write(f"**{row['Compétence']}**")
+
+    with col2:
+        st.write(row["Niveau"])
+
+    with col3:
+        st.write(row["Expérience"])
+
+    with col4:
+        st.write(row["Certification"])
+
+    with col5:
+        skill_id = row["Actions"].replace("edit_", "")
+        if st.button("✏️", key=f"edit_skill_{skill_id}", help="Modifier"):
+            st.session_state.edit_skill = int(skill_id)
+            st.rerun()
+        if st.button("🗑️", key=f"delete_skill_{skill_id}", help="Supprimer"):
+            if delete_skill(int(skill_id)):
+                st.rerun()
+
+
+def _display_skills_by_category(skills_by_category):
+    """Affiche les compétences organisées par catégorie."""
+    import pandas as pd
+
+    for category, skills in skills_by_category.items():
+        st.markdown(f"#### 🏷️ {category}")
+
+        # Créer un tableau pour cette catégorie
+        skill_data = []
+        for skill in skills:
+            skill_data.append(_create_skill_data_row(skill))
+
+        df = pd.DataFrame(skill_data)
+
+        # Afficher le tableau avec actions
+        for index, row in df.iterrows():
+            _display_skill_row(row, index)
+
+
+def _display_action_buttons(consultant_id, consultant_competences):
+    """Affiche les boutons d'action généraux."""
+    st.markdown("#### 🎯 Actions")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if st.button("➕ Ajouter compétence", key=f"add_skill_{consultant_id}"):
+            st.session_state.add_skill = consultant_id
+            st.rerun()
+
+    with col2:
+        if st.button("📊 Analyse compétences", key=f"analyze_skills_{consultant_id}"):
+            show_skills_analysis(consultant_competences)
+
+    with col3:
+        if st.button("📈 Évolution", key=f"skills_evolution_{consultant_id}"):
+            show_skills_evolution(consultant_id)
+
+
+def _handle_skill_forms(consultant_id):
+    """Gère l'affichage des formulaires d'ajout et de modification."""
+    # Formulaire d'ajout (si activé)
+    if (
+        "add_skill" in st.session_state
+        and st.session_state.add_skill == consultant_id
+    ):
+        show_add_skill_form(consultant_id)
+
+    # Formulaire de modification (si activé)
+    if "edit_skill" in st.session_state:
+        show_edit_skill_form(st.session_state.edit_skill)
 
 
 def show_consultant_skills(consultant):
@@ -70,125 +197,21 @@ def show_consultant_skills(consultant):
     st.markdown("### 💼 Compétences")
 
     try:
-        # Récupérer les compétences du consultant
-        with get_database_session() as session:
-            consultant_competences = (
-                session.query(ConsultantCompetence)
-                .join(Competence)
-                .filter(ConsultantCompetence.consultant_id == consultant.id)
-                .all()
-            )
+        consultant_competences = _load_consultant_competences(consultant.id)
 
         if not consultant_competences:
             st.info("ℹ️ Aucune compétence enregistrée pour ce consultant")
             show_add_skill_form(consultant.id)
             return
 
-        # Organiser les compétences par catégorie
-        skills_by_category = {}
-        for cc in consultant_competences:
-            category = cc.competence.categorie or "Autre"
-            if category not in skills_by_category:
-                skills_by_category[category] = []
-            skills_by_category[category].append(
-                {
-                    "id": cc.id,
-                    "nom": cc.competence.nom,
-                    "niveau": cc.niveau,
-                    "annees_experience": cc.annees_experience,
-                    "certification": cc.certification,
-                    "date_acquisition": cc.date_acquisition,
-                }
-            )
-
-        # Afficher les compétences par catégorie
-        for category, skills in skills_by_category.items():
-            st.markdown(f"#### 🏷️ {category}")
-
-            # Créer un tableau pour cette catégorie
-            skill_data = []
-            for skill in skills:
-                skill_data.append(
-                    {
-                        "Compétence": skill["nom"],
-                        "Niveau": get_niveau_label(skill["niveau"]),
-                        "Expérience": (
-                            f"{skill['annees_experience']} an(s)"
-                            if skill["annees_experience"]
-                            else "N/A"
-                        ),
-                        "Certification": (
-                            EMOJI_CERTIFIE
-                            if skill["certification"]
-                            else EMOJI_NON_CERTIFIE
-                        ),
-                        "Actions": f"edit_{skill['id']}",
-                    }
-                )
-
-            import pandas as pd
-
-            df = pd.DataFrame(skill_data)
-
-            # Afficher le tableau avec actions
-            for index, row in df.iterrows():
-                col1, col2, col3, col4, col5 = st.columns([3, 2, 2, 2, 2])
-
-                with col1:
-                    st.write(f"**{row['Compétence']}**")
-
-                with col2:
-                    st.write(row["Niveau"])
-
-                with col3:
-                    st.write(row["Expérience"])
-
-                with col4:
-                    st.write(row["Certification"])
-
-                with col5:
-                    skill_id = row["Actions"].replace("edit_", "")
-                    if st.button("✏️", key=f"edit_skill_{skill_id}", help="Modifier"):
-                        st.session_state.edit_skill = int(skill_id)
-                        st.rerun()
-                    if st.button("🗑️", key=f"delete_skill_{skill_id}", help="Supprimer"):
-                        if delete_skill(int(skill_id)):
-                            st.rerun()
+        skills_by_category = _organize_skills_by_category(consultant_competences)
+        _display_skills_by_category(skills_by_category)
 
         # Statistiques des compétences
         show_skills_statistics(consultant_competences)
 
-        # Actions générales
-        st.markdown("#### 🎯 Actions")
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            if st.button("➕ Ajouter compétence", key=f"add_skill_{consultant.id}"):
-                st.session_state.add_skill = consultant.id
-                st.rerun()
-
-        with col2:
-            if st.button(
-                "📊 Analyse compétences",
-                key=f"analyze_skills_{consultant.id}",
-            ):
-                show_skills_analysis(consultant_competences)
-
-        with col3:
-            if st.button("📈 Évolution", key=f"skills_evolution_{consultant.id}"):
-                show_skills_evolution(consultant.id)
-
-        # Formulaire d'ajout (si activé)
-        if (
-            "add_skill" in st.session_state
-            and st.session_state.add_skill == consultant.id
-        ):
-            show_add_skill_form(consultant.id)
-
-        # Formulaire de modification (si activé)
-        if "edit_skill" in st.session_state:
-            show_edit_skill_form(st.session_state.edit_skill)
+        _display_action_buttons(consultant.id, consultant_competences)
+        _handle_skill_forms(consultant.id)
 
     except Exception as e:
         st.error(f"{MSG_ERREUR_AFFICHAGE_COMPETENCES} {e}")
@@ -299,16 +322,13 @@ def show_add_skill_form(consultant_id: int):
                 )
 
             # Boutons
-            col1, col2, col3 = st.columns([1, 1, 2])
+            col1, col2, _ = st.columns([1, 1, 2])
 
             with col1:
                 submitted = st.form_submit_button("💾 Ajouter", type="primary")
 
             with col2:
                 cancel = st.form_submit_button("❌ Annuler")
-
-            with col3:
-                pass
 
             if submitted:
                 success = add_skill_to_consultant(
@@ -429,16 +449,13 @@ def show_edit_skill_form(consultant_competence_id: int):
                 )
 
             # Boutons
-            col1, col2, col3 = st.columns([1, 1, 2])
+            col1, col2, _ = st.columns([1, 1, 2])
 
             with col1:
                 submitted = st.form_submit_button("💾 Enregistrer", type="primary")
 
             with col2:
                 cancel = st.form_submit_button("❌ Annuler")
-
-            with col3:
-                pass
 
             if submitted:
                 success = update_consultant_skill(

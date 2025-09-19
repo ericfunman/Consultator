@@ -67,155 +67,175 @@ def show():
         show_add_consultant_form_tab()
 
 
+def _load_consultant_data(consultant_id):
+    """Charge les données d'un consultant avec gestion d'erreurs."""
+    with get_database_session() as session:
+        consultant = (
+            session.query(Consultant)
+            .options(joinedload(Consultant.practice))
+            .filter(Consultant.id == consultant_id)
+            .first()
+        )
+
+        if not consultant:
+            return None, None
+
+        # Charger toutes les données nécessaires dans la session
+        practice_name = (
+            consultant.practice.nom if consultant.practice else "Non affecté"
+        )
+
+        # Créer un dictionnaire avec toutes les données nécessaires
+        consultant_data = {
+            "id": consultant.id,
+            "prenom": consultant.prenom,
+            "nom": consultant.nom,
+            "email": consultant.email,
+            "telephone": consultant.telephone,
+            "salaire_actuel": consultant.salaire_actuel,
+            "disponibilite": consultant.disponibilite,
+            "notes": consultant.notes,
+            "date_creation": consultant.date_creation,
+            "practice_name": practice_name,
+        }
+
+        return consultant_data, session
+
+
+def _show_consultant_not_found(consultant_id):
+    """Affiche une erreur si le consultant n'est pas trouvé."""
+    st.error(f"❌ Consultant introuvable (ID: {consultant_id})")
+    st.warning(
+        "💡 Vérifiez que l'ID est correct et que le consultant existe dans la base de données"
+    )
+
+    # Debug: Lister tous les consultants pour voir lesquels existent
+    with get_database_session() as session:
+        all_consultants = session.query(Consultant).all()
+        st.write("**🔍 Consultants existants dans la DB:**")
+        for c in all_consultants[:10]:  # Afficher les 10 premiers
+            st.write(f"- ID: {c.id}, Nom: {c.prenom} {c.nom}")
+        if len(all_consultants) > 10:
+            st.write(f"... et {len(all_consultants) - 10} autres")
+
+    if st.button("← Retour à la liste", key="back_to_list_error"):
+        del st.session_state.view_consultant_profile
+        st.rerun()
+
+
+def _display_consultant_header(consultant_data):
+    """Affiche l'en-tête du profil consultant."""
+    col1, col2 = st.columns([6, 1])
+
+    with col1:
+        st.title(
+            "👤 Profil de "
+            + consultant_data["prenom"]
+            + " "
+            + consultant_data["nom"]
+        )
+
+    with col2:
+        if st.button("← Retour", key="back_to_list"):
+            del st.session_state.view_consultant_profile
+            st.rerun()
+
+    st.markdown("---")
+
+
+def _display_consultant_metrics(consultant_data):
+    """Affiche les métriques principales du consultant."""
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    with col1:
+        salaire = consultant_data["salaire_actuel"] or 0
+        st.metric("💰 Salaire annuel", f"{salaire:,}€")
+
+    with col2:
+        # Calcul du CJM (Coût Journalier Moyen)
+        cjm = (salaire * 1.8 / 216) if salaire else 0
+        st.metric("📈 CJM", f"{cjm:,.0f}€")
+
+    with col3:
+        status = (
+            "✅ Disponible" if consultant_data["disponibilite"] else "🔴 En mission"
+        )
+        st.metric("📊 Statut", status)
+
+    with col4:
+        creation_date = (
+            consultant_data["date_creation"].strftime("%d/%m/%Y")
+            if consultant_data["date_creation"]
+            else "N/A"
+        )
+        st.metric("📅 Membre depuis", creation_date)
+
+    with col5:
+        st.metric("🏢 Practice", consultant_data["practice_name"])
+
+    st.markdown("---")
+
+
+def _display_consultant_tabs(consultant_id):
+    """Affiche les onglets de détail du consultant."""
+    with get_database_session() as session:
+        consultant_obj = (
+            session.query(Consultant).filter(Consultant.id == consultant_id).first()
+        )
+
+        # Onglets de détail
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(
+            [
+                "📋 Informations",
+                "💼 Compétences",
+                "🌍 Langues",
+                "🚀 Missions",
+                "📁 Documents",
+            ]
+        )
+
+        with tab1:
+            from .consultants import show_consultant_info_tab
+            show_consultant_info_tab(consultant_obj)
+
+        with tab2:
+            from .consultants import show_consultant_skills_tab
+            show_consultant_skills_tab(consultant_obj)
+
+        with tab3:
+            from .consultants import show_consultant_languages_tab
+            show_consultant_languages_tab(consultant_obj)
+
+        with tab4:
+            from .consultants import show_consultant_missions_tab
+            show_consultant_missions_tab(consultant_obj)
+
+        with tab5:
+            from .consultants import show_consultant_documents_tab
+            show_consultant_documents_tab(consultant_obj)
+
+
 def show_consultant_profile():
     """Affiche le profil détaillé d'un consultant avec gestion d'erreurs améliorée"""
 
     consultant_id = st.session_state.view_consultant_profile
 
     try:
-        # Charger le consultant avec toutes les relations nécessaires dans la même
-        # session
-        with get_database_session() as session:
-            consultant = (
-                session.query(Consultant)
-                .options(joinedload(Consultant.practice))
-                .filter(Consultant.id == consultant_id)
-                .first()
-            )
+        consultant_data, session = _load_consultant_data(consultant_id)
+        
+        if not consultant_data:
+            _show_consultant_not_found(consultant_id)
+            return
 
-            if not consultant:
-                st.error(f"❌ Consultant introuvable (ID: {consultant_id})")
-                st.warning(
-                    "💡 Vérifiez que l'ID est correct et que le consultant existe dans la base de données"
-                )
-
-                # Debug: Lister tous les consultants pour voir lesquels existent
-                all_consultants = session.query(Consultant).all()
-                st.write("**🔍 Consultants existants dans la DB:**")
-                for c in all_consultants[:10]:  # Afficher les 10 premiers
-                    st.write(f"- ID: {c.id}, Nom: {c.prenom} {c.nom}")
-                if len(all_consultants) > 10:
-                    st.write(f"... et {len(all_consultants) - 10} autres")
-
-                if st.button("← Retour à la liste", key="back_to_list_error"):
-                    del st.session_state.view_consultant_profile
-                    st.rerun()
-                return
-
-            # Charger toutes les données nécessaires dans la session
-            practice_name = (
-                consultant.practice.nom if consultant.practice else "Non affecté"
-            )
-
-            # Créer un dictionnaire avec toutes les données nécessaires
-            consultant_data = {
-                "id": consultant.id,
-                "prenom": consultant.prenom,
-                "nom": consultant.nom,
-                "email": consultant.email,
-                "telephone": consultant.telephone,
-                "salaire_actuel": consultant.salaire_actuel,
-                "disponibilite": consultant.disponibilite,
-                "notes": consultant.notes,
-                "date_creation": consultant.date_creation,
-                "practice_name": practice_name,
-            }
-
-        # En-tête avec bouton retour
-        col1, col2 = st.columns([6, 1])
-
-        with col1:
-            st.title(
-                "👤 Profil de "
-                + consultant_data["prenom"]
-                + " "
-                + consultant_data["nom"]
-            )
-
-        with col2:
-            if st.button("← Retour", key="back_to_list"):
-                del st.session_state.view_consultant_profile
-                st.rerun()
-
-        st.markdown("---")
-
-        # Métriques principales
-        col1, col2, col3, col4, col5 = st.columns(5)
-
-        with col1:
-            salaire = consultant_data["salaire_actuel"] or 0
-            st.metric("💰 Salaire annuel", f"{salaire:,}€")
-
-        with col2:
-            # Calcul du CJM (Coût Journalier Moyen)
-            cjm = (salaire * 1.8 / 216) if salaire else 0
-            st.metric("📈 CJM", f"{cjm:,.0f}€")
-
-        with col3:
-            status = (
-                "✅ Disponible" if consultant_data["disponibilite"] else "🔴 En mission"
-            )
-            st.metric("📊 Statut", status)
-
-        with col4:
-            creation_date = (
-                consultant_data["date_creation"].strftime("%d/%m/%Y")
-                if consultant_data["date_creation"]
-                else "N/A"
-            )
-            st.metric("📅 Membre depuis", creation_date)
-
-        with col5:
-            st.metric("🏢 Practice", consultant_data["practice_name"])
-
-        st.markdown("---")
+        _display_consultant_header(consultant_data)
+        _display_consultant_metrics(consultant_data)
 
         # Affichage de l'analyse CV en PLEINE LARGEUR (si disponible)
         if "cv_analysis" in st.session_state:
             show_cv_analysis_fullwidth()
             st.markdown("---")
 
-        # Pour les onglets, on va récupérer l'objet consultant avec une nouvelle session
-        with get_database_session() as session:
-            consultant_obj = (
-                session.query(Consultant).filter(Consultant.id == consultant_id).first()
-            )
-
-            # Onglets de détail
-            tab1, tab2, tab3, tab4, tab5 = st.tabs(
-                [
-                    "📋 Informations",
-                    "💼 Compétences",
-                    "🌍 Langues",
-                    "🚀 Missions",
-                    "📁 Documents",
-                ]
-            )
-
-            with tab1:
-                from .consultants import show_consultant_info_tab
-
-                show_consultant_info_tab(consultant_obj)
-
-            with tab2:
-                from .consultants import show_consultant_skills_tab
-
-                show_consultant_skills_tab(consultant_obj)
-
-            with tab3:
-                from .consultants import show_consultant_languages_tab
-
-                show_consultant_languages_tab(consultant_obj)
-
-            with tab4:
-                from .consultants import show_consultant_missions_tab
-
-                show_consultant_missions_tab(consultant_obj)
-
-            with tab5:
-                from .consultants import show_consultant_documents_tab
-
-                show_consultant_documents_tab(consultant_obj)
+        _display_consultant_tabs(consultant_id)
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement du profil consultant: {e}")
