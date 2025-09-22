@@ -28,7 +28,7 @@ except ImportError as e:
     st.error(f" Erreur d'import: {e}")
 
 
-def show_document_upload_section(consultant_id=None):
+def show_document_upload_section(_=None):
     """Affiche la section d'upload de documents"""
 
     if not imports_ok:
@@ -47,10 +47,10 @@ def show_document_upload_section(consultant_id=None):
 
     if uploaded_file is not None:
         # Afficher les informations du fichier
-        col1, col2, col3 = st.columns(3)
+        col1, col2, _ = st.columns(3)
 
         with col1:
-            st.metric(" Nom du fichier", uploaded_file.name)
+            st.metric("📄 Nom du fichier", uploaded_file.name)
 
         with col2:
             file_size = uploaded_file.size / 1024  # en KB

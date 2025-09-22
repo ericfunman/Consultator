@@ -86,7 +86,7 @@ def show_consultant_documents(consultant):
     show_existing_documents(consultant)
 
 
-def save_consultant_document(uploaded_file, consultant, document_type, description):
+def save_consultant_document(uploaded_file, consultant, document_type, _):
     """Sauvegarde un document pour le consultant"""
 
     try:
@@ -127,9 +127,64 @@ def save_consultant_document(uploaded_file, consultant, document_type, descripti
         st.error(f" Erreur lors de la sauvegarde: {e}")
 
 
+def _get_file_size_display(file_size_bytes):
+    """Formate la taille du fichier pour l'affichage"""
+    file_size_kb = file_size_bytes / 1024
+    if file_size_kb > 1024:
+        return f"{file_size_kb / 1024:.1f} MB"
+    else:
+        return f"{file_size_kb:.1f} KB"
+
+
+def _extract_document_type(file_name):
+    """Extrait le type de document du nom de fichier"""
+    doc_types = ["CV", "Lettre_de_motivation", "Certificat", "Contrat", "Autre"]
+    for dtype in doc_types:
+        if dtype in file_name:
+            return dtype.replace("_", " ")
+    return "Inconnu"
+
+
+def _render_document_metrics(file_stats, doc_type):
+    """Affiche les métriques d'un document"""
+    col1, col2, col3, col4 = st.columns(4)
+
+    size_display = _get_file_size_display(file_stats.st_size)
+    modified_time = datetime.fromtimestamp(file_stats.st_mtime)
+
+    with col1:
+        st.metric("📏 Taille", size_display)
+
+    with col2:
+        st.metric("📅 Modifie", modified_time.strftime("%d/%m/%Y"))
+
+    with col3:
+        st.metric("📄 Type", doc_type)
+
+    return col4
+
+
+def _render_document_actions(file_path, doc_type):
+    """Affiche les boutons d'action pour un document"""
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if doc_type == "CV" and st.button(
+            "🔍 Analyser", key=f"analyze_existing_{file_path.name}"
+        ):
+            st.info("🔍 Analyse de CV en cours de developpement...")
+
+    with col2:
+        if st.button("⬇️ Telecharger", key=f"download_{file_path.name}"):
+            st.info("⬇️ Telechargement en cours de developpement...")
+
+    with col3:
+        if st.button("👁️ Previsualiser", key=f"preview_{file_path.name}"):
+            st.info("👁️ Previsualisation en cours de developpement...")
+
+
 def show_existing_documents(consultant):
     """Affiche les documents existants du consultant"""
-
     try:
         upload_dir = DocumentService.init_upload_directory()
 
@@ -138,72 +193,32 @@ def show_existing_documents(consultant):
         matching_files = list(upload_dir.glob(consultant_pattern))
 
         if not matching_files:
-            st.info(" Aucun document trouve pour ce consultant")
+            st.info("📄 Aucun document trouve pour ce consultant")
             return
 
-        st.subheader(f" Documents existants ({len(matching_files)})")
+        st.subheader(f"📁 Documents existants ({len(matching_files)})")
 
         # Afficher chaque document dans un expander
         for file_path in sorted(
             matching_files, key=lambda x: x.stat().st_mtime, reverse=True
         ):
             file_stats = file_path.stat()
-            file_size = file_stats.st_size / 1024  # KB
-            if file_size > 1024:
-                size_display = f"{file_size / 1024:.1f} MB"
-            else:
-                size_display = f"{file_size:.1f} KB"
+            doc_type = _extract_document_type(file_path.name)
 
-            modified_time = datetime.fromtimestamp(file_stats.st_mtime)
+            with st.expander(f"📄 {doc_type} - {file_path.name}", expanded=False):
+                # Métriques du document
+                col4 = _render_document_metrics(file_stats, doc_type)
 
-            # Extraire le type de document du nom de fichier
-            doc_type = "Inconnu"
-            for dtype in [
-                "CV",
-                "Lettre_de_motivation",
-                "Certificat",
-                "Contrat",
-                "Autre",
-            ]:
-                if dtype in file_path.name:
-                    doc_type = dtype.replace("_", " ")
-                    break
-
-            with st.expander(f" {doc_type} - {file_path.name}", expanded=False):
-                col1, col2, col3, col4 = st.columns(4)
-
-                with col1:
-                    st.metric(" Taille", size_display)
-
-                with col2:
-                    st.metric(" Modifie", modified_time.strftime("%d/%m/%Y"))
-
-                with col3:
-                    st.metric(" Type", doc_type)
-
+                # Bouton de suppression
                 with col4:
-                    if st.button(" Supprimer", key=f"delete_{file_path.name}"):
+                    if st.button("🗑️ Supprimer", key=f"delete_{file_path.name}"):
                         delete_consultant_document(file_path)
 
                 # Boutons d'action
-                col1, col2, col3 = st.columns(3)
-
-                with col1:
-                    if doc_type == "CV" and st.button(
-                        " Analyser", key=f"analyze_existing_{file_path.name}"
-                    ):
-                        st.info(" Analyse de CV en cours de developpement...")
-
-                with col2:
-                    if st.button(" Telecharger", key=f"download_{file_path.name}"):
-                        st.info(" Telechargement en cours de developpement...")
-
-                with col3:
-                    if st.button(" Previsualiser", key=f"preview_{file_path.name}"):
-                        st.info(" Previsualisation en cours de developpement...")
+                _render_document_actions(file_path, doc_type)
 
     except Exception as e:
-        st.error(f" Erreur lors de l'affichage des documents: {e}")
+        st.error(f"❌ Erreur lors de l'affichage des documents: {e}")
 
 
 def delete_consultant_document(file_path):
