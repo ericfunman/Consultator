@@ -37,6 +37,7 @@ class ChatbotService:
     CONSULTANT_FOUND_SUFFIX = " consultant(s) trouvé(s)**"
     STATS_PREFIX = "\n\n📊 **"
     BULLET_POINT = " • "
+    BULLET_POINT_INDENT = "   • "
     DATE_FORMAT = "%d/%m/%Y"
 
     def __init__(self):
@@ -2769,7 +2770,7 @@ class ChatbotService:
                             response += "⚠️ **Attention :** Le consultant a des missions en cours mais est marqué disponible\n"
                             for mission in missions_en_cours:
                                 response += (
-                                    "   • "
+                                    self.BULLET_POINT_INDENT
                                     + mission.nom_mission
                                     + " chez "
                                     + mission.client
