@@ -1128,9 +1128,9 @@ class ChatbotService:
                                     response += "\n"
 
                                 response += (
-                                    "\n📊 **Total : "
+                                    self.TOTAL_PREFIX
                                     + str(len(consultants_societe))
-                                    + " consultant(s)**"
+                                    + self.CONSULTANT_FOUND_SUFFIX
                                 )
                             else:
                                 response = f"❓ Aucun consultant trouvé chez {societe_recherchee}."
