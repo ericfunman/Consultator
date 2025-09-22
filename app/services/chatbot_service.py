@@ -30,6 +30,15 @@ from database.models import Mission
 class ChatbotService:
     """Service principal du chatbot pour Consultator"""
 
+    # Constantes pour les chaînes de format répétées
+    SECTION_HEADER_SUFFIX = "** :\n\n"
+    YEARS_SUFFIX = " années\n"
+    TOTAL_PREFIX = "\n📊 **Total : "
+    CONSULTANT_FOUND_SUFFIX = " consultant(s) trouvé(s)**"
+    STATS_PREFIX = "\n\n📊 **"
+    BULLET_POINT = " • "
+    DATE_FORMAT = "%d/%m/%Y"
+
     def __init__(self):
         # Suppression de la session partagée pour éviter les timeouts
         # Chaque méthode utilisera une session fraîche via context manager
@@ -58,6 +67,39 @@ class ChatbotService:
             with get_database_session() as session:
                 return query_func(session)
 
+    def _route_question_to_handler(self, intent: str, entities: dict) -> Dict[str, Any]:
+        """Route la question vers le bon handler selon l'intention"""
+        if intent == "salaire":
+            return self._handle_salary_question(entities)
+        elif intent == "experience":
+            return self._handle_experience_question(entities)
+        elif intent == "profil_professionnel":
+            return self._handle_professional_profile_question(entities)
+        elif intent == "competences":
+            return self._handle_skills_question(entities)
+        elif intent == "langues":
+            return self._handle_languages_question(entities)
+        elif intent == "missions":
+            return self._handle_missions_question(entities)
+        elif intent == "contact":
+            return self._handle_contact_question(entities)
+        elif intent == "liste_consultants":
+            return self._handle_list_consultants_question()
+        elif intent == "practices":
+            return self._handle_practices_question(entities)
+        elif intent == "cvs":
+            return self._handle_cvs_question(entities)
+        elif intent == "statistiques":
+            return self._handle_stats_question()
+        elif intent == "disponibilite":  # Nouveau handler V1.2.2
+            return self._handle_availability_question(entities)
+        elif intent == "tjm_mission":  # Nouveau handler V1.2.2
+            return self._handle_mission_tjm_question(entities)
+        elif intent == "recherche_consultant":
+            return self._handle_consultant_search(entities)
+        else:
+            return self._handle_general_question()
+
     def process_question(self, question: str) -> Dict[str, Any]:
         """
         Traite une question et retourne une réponse structurée
@@ -75,47 +117,10 @@ class ChatbotService:
             intent = self._analyze_intent(clean_question)
             entities = self._extract_entities(clean_question)
 
-            # Générer la réponse selon l'intention
-            if intent == "salaire":
-                return self._handle_salary_question(entities)
-            elif intent == "experience":
-                return self._handle_experience_question(entities)
-            elif intent == "profil_professionnel":
-                return self._handle_professional_profile_question(entities)
-            elif intent == "competences":
-                return self._handle_skills_question(entities)
-            elif intent == "langues":
-                return self._handle_languages_question(entities)
-            elif intent == "missions":
-                return self._handle_missions_question(entities)
-            elif intent == "contact":
-                return self._handle_contact_question(entities)
-            elif intent == "liste_consultants":
-                return self._handle_list_consultants_question()
-            elif intent == "practices":
-                return self._handle_practices_question(entities)
-            elif intent == "cvs":
-                return self._handle_cvs_question(entities)
-            elif intent == "statistiques":
-                return self._handle_stats_question()
-            elif intent == "disponibilite":  # Nouveau handler V1.2.2
-                return self._handle_availability_question(entities)
-            elif intent == "tjm_mission":  # Nouveau handler V1.2.2
-                return self._handle_mission_tjm_question(entities)
-            elif intent == "recherche_consultant":
-                return self._handle_consultant_search(entities)
-            else:
-                return self._handle_general_question()
+            # Router vers le bon handler
+            return self._route_question_to_handler(intent, entities)
 
-        except (
-            SQLAlchemyError,
-            OSError,
-            ValueError,
-            TypeError,
-            AttributeError,
-            KeyError,
-            Exception,
-        ) as e:
+        except Exception as e:
             return {
                 "response": f"❌ Désolé, j'ai rencontré une erreur : {str(e)}",
                 "data": None,
@@ -670,7 +675,7 @@ class ChatbotService:
                                     + consultant.prenom
                                     + " "
                                     + consultant.nom
-                                    + "** :\n\n"
+                                    + self.SECTION_HEADER_SUFFIX
                                 )
                                 response += f"🚀 **Première mission :** {consultant_db.date_premiere_mission.strftime('%d/%m/%Y')}\n"
                                 response += f"⏱️ **Expérience totale :** **{experience_annees} années**\n"
@@ -783,17 +788,17 @@ class ChatbotService:
                         response += (
                             "• **Expérience moyenne :** "
                             + str(sum(experiences) / len(experiences))
-                            + " années\n"
+                            + self.YEARS_SUFFIX
                         )
                         response += (
                             "• **Expérience minimum :** "
                             + str(min(experiences))
-                            + " années\n"
+                            + self.YEARS_SUFFIX
                         )
                         response += (
                             "• **Expérience maximum :** "
                             + str(max(experiences))
-                            + " années\n"
+                            + self.YEARS_SUFFIX
                         )
 
                         # Top 3 des plus expérimentés
@@ -812,7 +817,7 @@ class ChatbotService:
                                 + consultant.nom
                                 + "** : "
                                 + str(consultant.experience_annees)
-                                + " années\n"
+                                + self.YEARS_SUFFIX
                             )
 
                     else:
@@ -894,7 +899,7 @@ class ChatbotService:
 
                             else:
                                 # Profil complet
-                                response = f"👔 **Profil professionnel de {consultant.prenom} {consultant.nom}** :\n\n"
+                                response = f"👔 **Profil professionnel de {consultant.prenom} {consultant.nom}{self.SECTION_HEADER_SUFFIX}"
                                 response += f"🎯 **Grade :** {consultant_db.grade or 'Non renseigné'}\n"
                                 response += f"📋 **Type de contrat :** {consultant_db.type_contrat or 'Non renseigné'}\n"
                                 response += f"🏢 **Société :** {consultant_db.societe or 'Non renseigné'}\n"
