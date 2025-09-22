@@ -60,6 +60,7 @@ LABEL_TECHNOLOGIES = "🛠️ Technologies"
 LABEL_TAILLE = "📊 Taille"
 MSG_FICHIER_INTROUVABLE = "❌ Fichier introuvable"
 MSG_CHAMP_OBLIGATOIRE = "Ce champ est obligatoire"
+MSG_CHAMPS_OBLIGATOIRES = "❌ Veuillez remplir tous les champs obligatoires (*)"
 
 
 def show():
@@ -566,7 +567,7 @@ def _process_consultant_form_submission(consultant, form_data):
     prenom, nom, email = form_data["prenom"], form_data["nom"], form_data["email"]
 
     if not prenom or not nom or not email:
-        st.error("❌ Veuillez remplir tous les champs obligatoires (*)")
+        st.error(MSG_CHAMPS_OBLIGATOIRES)
         return False
     
     # Vérifier l'unicité de l'email
@@ -739,10 +740,15 @@ def _display_salary_evolution_chart(consultant, salaires_sorted):
         st.plotly_chart(fig, use_container_width=True)
 
 
-def _process_consultant_form_data(consultant, prenom, nom, email, telephone, salaire, disponibilite, selected_practice_id, notes, societe, date_entree, date_sortie, date_premiere_mission, grade, type_contrat):
+def _process_consultant_form_data(consultant, form_data):
     """Traite les données du formulaire de modification du consultant"""
+    # Extraire les champs de base
+    prenom = form_data.get("prenom", "")
+    nom = form_data.get("nom", "")
+    email = form_data.get("email", "")
+    
     if not prenom or not nom or not email:
-        st.error("❌ Veuillez remplir tous les champs obligatoires (*)")
+        st.error(MSG_CHAMPS_OBLIGATOIRES)
         return False
     
     # Vérifier l'unicité de l'email
@@ -752,27 +758,8 @@ def _process_consultant_form_data(consultant, prenom, nom, email, telephone, sal
         return False
     
     try:
-        update_data = {
-            "prenom": prenom.strip(),
-            "nom": nom.strip(),
-            "email": email.strip().lower(),
-            "telephone": (telephone.strip() if telephone else None),
-            "salaire_actuel": salaire,
-            "disponibilite": disponibilite,
-            "notes": notes.strip() if notes else None,
-            "practice_id": selected_practice_id,
-            # Nouveaux champs V1.2
-            "societe": societe,
-            "date_entree_societe": date_entree,
-            "date_sortie_societe": date_sortie if date_sortie else None,
-            "date_premiere_mission": (
-                date_premiere_mission if date_premiere_mission else None
-            ),
-            # Nouveaux champs V1.2.1
-            "grade": grade,
-            "type_contrat": type_contrat,
-        }
-
+        update_data = _build_update_data_from_form(form_data)
+        
         if ConsultantService.update_consultant(consultant.id, update_data):
             st.success(f"✅ {prenom} {nom} modifié avec succès !")
             st.rerun()
@@ -786,10 +773,48 @@ def _process_consultant_form_data(consultant, prenom, nom, email, telephone, sal
         return False
 
 
+def _build_update_data_from_form(form_data):
+    """Construit le dictionnaire de données à partir du formulaire"""
+    return {
+        "prenom": form_data["prenom"].strip(),
+        "nom": form_data["nom"].strip(),
+        "email": form_data["email"].strip().lower(),
+        "telephone": (form_data["telephone"].strip() if form_data["telephone"] else None),
+        "salaire_actuel": form_data["salaire"],
+        "disponibilite": form_data["disponibilite"],
+        "notes": form_data["notes"].strip() if form_data["notes"] else None,
+        "practice_id": form_data["selected_practice_id"],
+        # Nouveaux champs V1.2
+        "societe": form_data["societe"],
+        "date_entree_societe": form_data["date_entree"],
+        "date_sortie_societe": form_data["date_sortie"] if form_data["date_sortie"] else None,
+        "date_premiere_mission": (
+            form_data["date_premiere_mission"] if form_data["date_premiere_mission"] else None
+        ),
+        # Nouveaux champs V1.2.1
+        "grade": form_data["grade"],
+        "type_contrat": form_data["type_contrat"],
+    }
+
+
 def _manage_consultant_salary_history(consultant):
     """Gère l'affichage complet de l'historique des salaires"""
     st.markdown("---")
     st.subheader("📈 Historique des salaires")
+    
+    salaires = _load_and_ensure_salary_history(consultant)
+    
+    if salaires:
+        _display_salary_history_content(consultant, salaires)
+    else:
+        st.info("Aucune évolution de salaire enregistrée.")
+
+    # Formulaire d'ajout
+    _handle_salary_evolution_form(consultant)
+
+
+def _load_and_ensure_salary_history(consultant):
+    """Charge l'historique des salaires et ajoute une entrée si nécessaire"""
     from datetime import date
 
     with get_database_session() as session:
@@ -799,18 +824,10 @@ def _manage_consultant_salary_history(consultant):
             .order_by(ConsultantSalaire.date_debut.desc())
             .all()
         )
-        # Ajout automatique d'une entrée historique
-        if consultant.salaire_actuel and not any(
-            s.date_debut.year == date.today().year for s in salaires
-        ):
-            salaire_init = ConsultantSalaire(
-                consultant_id=consultant.id,
-                salaire=consultant.salaire_actuel,
-                date_debut=date(date.today().year, 1, 1),
-                commentaire="Salaire initial (auto)",
-            )
-            session.add(salaire_init)
-            session.commit()
+        
+        # Ajout automatique d'une entrée historique si nécessaire
+        if _should_add_initial_salary_entry(consultant, salaires):
+            _add_initial_salary_entry(session, consultant)
             # Recharge la liste
             salaires = (
                 session.query(ConsultantSalaire)
@@ -819,41 +836,73 @@ def _manage_consultant_salary_history(consultant):
                 .all()
             )
     
-    if salaires:
-        salaires_sorted = sorted(salaires, key=lambda s: s.date_debut)
-        # Affichage textuel
-        for salaire in salaires:
-            st.write(
-                f"- **{salaire.salaire:,.0f} €** du {salaire.date_debut.strftime(FORMAT_DATE)} "
-                + (
-                    f"au {salaire.date_fin.strftime(FORMAT_DATE)}"
-                    if salaire.date_fin
-                    else "(en cours)"
-                )
-                + (f" — {salaire.commentaire}" if salaire.commentaire else "")
-            )
-        # Mise à jour du salaire actuel
-        salaire_max = max(salaires, key=lambda s: s.date_debut)
-        if consultant.salaire_actuel != salaire_max.salaire:
-            try:
-                with get_database_session() as session:
-                    c = (
-                        session.query(Consultant)
-                        .filter(Consultant.id == consultant.id)
-                        .first()
-                    )
-                    c.salaire_actuel = salaire_max.salaire
-                    session.commit()
-            except (SQLAlchemyError, ValueError, TypeError) as exc:
-                st.warning(f"⚠️ Erreur lors de la mise à jour du salaire: {exc}")
-        
-        # Graphique
-        _display_salary_evolution_chart(consultant, salaires_sorted)
-    else:
-        st.info("Aucune évolution de salaire enregistrée.")
+    return salaires
 
-    # Formulaire d'ajout
-    _handle_salary_evolution_form(consultant)
+
+def _should_add_initial_salary_entry(consultant, salaires):
+    """Vérifie si une entrée de salaire initial doit être ajoutée"""
+    from datetime import date
+    return consultant.salaire_actuel and not any(
+        s.date_debut.year == date.today().year for s in salaires
+    )
+
+
+def _add_initial_salary_entry(session, consultant):
+    """Ajoute une entrée de salaire initial"""
+    from datetime import date
+    salaire_init = ConsultantSalaire(
+        consultant_id=consultant.id,
+        salaire=consultant.salaire_actuel,
+        date_debut=date(date.today().year, 1, 1),
+        commentaire="Salaire initial (auto)",
+    )
+    session.add(salaire_init)
+    session.commit()
+
+
+def _display_salary_history_content(consultant, salaires):
+    """Affiche le contenu de l'historique des salaires"""
+    salaires_sorted = sorted(salaires, key=lambda s: s.date_debut)
+    
+    # Affichage textuel
+    _display_salary_list(salaires)
+    
+    # Mise à jour du salaire actuel si nécessaire
+    _update_current_salary_if_needed(consultant, salaires)
+    
+    # Graphique
+    _display_salary_evolution_chart(consultant, salaires_sorted)
+
+
+def _display_salary_list(salaires):
+    """Affiche la liste textuelle des salaires"""
+    for salaire in salaires:
+        st.write(
+            f"- **{salaire.salaire:,.0f} €** du {salaire.date_debut.strftime(FORMAT_DATE)} "
+            + (
+                f"au {salaire.date_fin.strftime(FORMAT_DATE)}"
+                if salaire.date_fin
+                else "(en cours)"
+            )
+            + (f" — {salaire.commentaire}" if salaire.commentaire else "")
+        )
+
+
+def _update_current_salary_if_needed(consultant, salaires):
+    """Met à jour le salaire actuel du consultant si nécessaire"""
+    salaire_max = max(salaires, key=lambda s: s.date_debut)
+    if consultant.salaire_actuel != salaire_max.salaire:
+        try:
+            with get_database_session() as session:
+                c = (
+                    session.query(Consultant)
+                    .filter(Consultant.id == consultant.id)
+                    .first()
+                )
+                c.salaire_actuel = salaire_max.salaire
+                session.commit()
+        except (SQLAlchemyError, ValueError, TypeError) as exc:
+            st.warning(f"⚠️ Erreur lors de la mise à jour du salaire: {exc}")
 
 
 def show_consultant_info(consultant):
@@ -905,11 +954,23 @@ def show_consultant_info(consultant):
             )
 
         if submitted:
-            _process_consultant_form_data(
-                consultant, prenom, nom, email, telephone, salaire, 
-                disponibilite, selected_practice_id, notes, societe, 
-                date_entree, date_sortie, date_premiere_mission, grade, type_contrat
-            )
+            form_data = {
+                "prenom": prenom,
+                "nom": nom,
+                "email": email,
+                "telephone": telephone,
+                "salaire": salaire,
+                "disponibilite": disponibilite,
+                "selected_practice_id": selected_practice_id,
+                "notes": notes,
+                "societe": societe,
+                "date_entree": date_entree,
+                "date_sortie": date_sortie,
+                "date_premiere_mission": date_premiere_mission,
+                "grade": grade,
+                "type_contrat": type_contrat,
+            }
+            _process_consultant_form_data(consultant, form_data)
 
     # Historique des salaires
     _manage_consultant_salary_history(consultant)
@@ -1013,7 +1074,7 @@ def _display_mission_technologies(technologies_missions):
     if technologies_missions:
         st.write("**🏷️ Technologies des missions**")
         cols = st.columns(4)
-        tech_list = sorted(list(technologies_missions))
+        tech_list = sorted(technologies_missions)
 
         for i, tech in enumerate(tech_list):
             with cols[i % 4]:
@@ -1058,41 +1119,62 @@ def _display_functional_skills_by_category(competences_func):
     """Affiche les compétences fonctionnelles groupées par catégorie"""
     if competences_func:
         st.write("**🏦 Compétences fonctionnelles enregistrées**")
-
-        # Grouper par catégorie
-        categories = {}
-        for consultant_comp, competence in competences_func:
-            if competence.categorie not in categories:
-                categories[competence.categorie] = []
-            categories[competence.categorie].append((consultant_comp, competence))
-
-        for categorie, comps in categories.items():
-            with st.expander(f"📂 {categorie} ({len(comps)} compétences)"):
-                for consultant_comp, competence in comps:
-                    col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
-
-                    with col1:
-                        st.write(f"**{competence.nom}**")
-
-                    with col2:
-                        st.write("📊 " + consultant_comp.niveau_maitrise)
-
-                    with col3:
-                        st.write(f"⏱️ {consultant_comp.annees_experience} ans")
-
-                    with col4:
-                        if st.button("🗑️", key=f"del_func_{consultant_comp.id}"):
-                            _delete_consultant_competence(consultant_comp.id)
-                            st.rerun()
-
-        # Métriques
-        total_competences = len(competences_func)
-        st.metric("🏦 Total compétences fonctionnelles", total_competences)
+        categories = _group_functional_skills_by_category(competences_func)
+        _display_functional_skills_categories(categories)
+        _display_functional_skills_metrics(competences_func)
     else:
-        st.info("📝 Aucune compétence fonctionnelle enregistrée")
-        st.write(
-            "Utilisez l'onglet **'Ajouter Compétences'** pour ajouter des compétences bancaires/assurance."
-        )
+        _display_no_functional_skills_message()
+
+
+def _group_functional_skills_by_category(competences_func):
+    """Groupe les compétences fonctionnelles par catégorie"""
+    categories = {}
+    for consultant_comp, competence in competences_func:
+        if competence.categorie not in categories:
+            categories[competence.categorie] = []
+        categories[competence.categorie].append((consultant_comp, competence))
+    return categories
+
+
+def _display_functional_skills_categories(categories):
+    """Affiche les catégories de compétences fonctionnelles"""
+    for categorie, comps in categories.items():
+        with st.expander(f"📂 {categorie} ({len(comps)} compétences)"):
+            _display_functional_skills_in_category(comps)
+
+
+def _display_functional_skills_in_category(comps):
+    """Affiche les compétences d'une catégorie"""
+    for consultant_comp, competence in comps:
+        col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
+
+        with col1:
+            st.write(f"**{competence.nom}**")
+
+        with col2:
+            st.write("📊 " + consultant_comp.niveau_maitrise)
+
+        with col3:
+            st.write(f"⏱️ {consultant_comp.annees_experience} ans")
+
+        with col4:
+            if st.button("🗑️", key=f"del_func_{consultant_comp.id}"):
+                _delete_consultant_competence(consultant_comp.id)
+                st.rerun()
+
+
+def _display_functional_skills_metrics(competences_func):
+    """Affiche les métriques des compétences fonctionnelles"""
+    total_competences = len(competences_func)
+    st.metric("🏦 Total compétences fonctionnelles", total_competences)
+
+
+def _display_no_functional_skills_message():
+    """Affiche le message quand aucune compétence fonctionnelle n'est enregistrée"""
+    st.info("📝 Aucune compétence fonctionnelle enregistrée")
+    st.write(
+        "Utilisez l'onglet **'Ajouter Compétences'** pour ajouter des compétences bancaires/assurance."
+    )
 
 
 def _add_skills_form(consultant):
@@ -2177,7 +2259,7 @@ def _process_consultant_creation(
     prenom, nom, email = basic_data["prenom"], basic_data["nom"], basic_data["email"]
 
     if not prenom or not nom or not email:
-        st.error("❌ Veuillez remplir tous les champs obligatoires (*)")
+        st.error(MSG_CHAMPS_OBLIGATOIRES)
         return
 
     # Vérifier l'unicité de l'email
