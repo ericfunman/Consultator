@@ -131,8 +131,8 @@ class ChatbotService:
     def _clean_question(self, question: str) -> str:
         """Nettoie et normalise la question"""
         # Supprimer la ponctuation excessive
-        question = re.sub(r"[!]{2,}", "!", question)
-        question = re.sub(r"[?]{2,}", "?", question)
+        question = re.sub(r"!{2,}", "!", question)
+        question = re.sub(r"\?{2,}", "?", question)
 
         # Normaliser les espaces
         question = re.sub(r"\s+", " ", question.strip())
@@ -846,125 +846,146 @@ class ChatbotService:
                 "confidence": 0.8,
             }
 
+    def _get_profile_response_for_grade(self, consultant, consultant_db):
+        """Retourne la réponse pour une question sur le grade"""
+        return f"🎯 **Grade de {consultant.prenom} {consultant.nom}** : **{consultant_db.grade or 'Non renseigné'}**"
+
+    def _get_profile_response_for_contract(self, consultant, consultant_db):
+        """Retourne la réponse pour une question sur le type de contrat"""
+        return f"📋 **Type de contrat de {consultant.prenom} {consultant.nom}** : **{consultant_db.type_contrat or 'Non renseigné'}**"
+
+    def _get_profile_response_for_company(self, consultant, consultant_db):
+        """Retourne la réponse pour une question sur la société"""
+        response = f"🏢 **Société de {consultant.prenom} {consultant.nom}** : **{consultant_db.societe or 'Non renseigné'}**"
+        if consultant_db.date_entree_societe:
+            response += f"\n📅 **Date d'entrée :** {consultant_db.date_entree_societe.strftime(self.DATE_FORMAT)}"
+        if consultant_db.date_sortie_societe:
+            response += f"\n📅 **Date de sortie :** {consultant_db.date_sortie_societe.strftime(self.DATE_FORMAT)}"
+        else:
+            response += "\n✅ **Toujours en poste**"
+        return response
+
+    def _get_complete_profile_response(self, consultant, consultant_db):
+        """Retourne le profil professionnel complet"""
+        response = f"👔 **Profil professionnel de {consultant.prenom} {consultant.nom}{self.SECTION_HEADER_SUFFIX}"
+        response += f"🎯 **Grade :** {consultant_db.grade or 'Non renseigné'}\n"
+        response += f"📋 **Type de contrat :** {consultant_db.type_contrat or 'Non renseigné'}\n"
+        response += f"🏢 **Société :** {consultant_db.societe or 'Non renseigné'}\n"
+
+        if consultant_db.date_entree_societe:
+            response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime(self.DATE_FORMAT)}\n"
+
+        if consultant_db.date_sortie_societe:
+            response += f"📅 **Date de sortie société :** {consultant_db.date_sortie_societe.strftime(self.DATE_FORMAT)}\n"
+        else:
+            response += "✅ **Statut :** Toujours en poste\n"
+
+        if consultant_db.experience_annees:
+            response += f"⏱️ **Expérience :** {consultant_db.experience_annees}{self.YEARS_SUFFIX}"
+
+        # Informations salariales si disponibles
+        if consultant_db.salaire_actuel:
+            cjm = consultant_db.salaire_actuel * 1.8 / 216
+            response += f"💰 **Salaire :** {consultant_db.salaire_actuel:,.0f} €/an\n"
+            response += f"📈 **CJM :** {cjm:,.0f} €/jour"
+
+        return response
+
+    def _handle_individual_profile_question(
+        self, entities: Dict, question_lower: str
+    ) -> Dict[str, Any]:
+        """Gère les questions de profil pour un consultant spécifique"""
+        nom_recherche: str = entities["noms"][0]
+        consultant = self._find_consultant_by_name(nom_recherche)
+
+        if not consultant:
+            return {
+                "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom_recherche}** dans la base de données.",
+                "data": None,
+                "intent": "profil_professionnel",
+                "confidence": 0.7,
+            }
+
+        try:
+            with get_database_session() as session:
+                consultant_db = (
+                    session.query(Consultant)
+                    .filter(Consultant.id == consultant.id)
+                    .first()
+                )
+
+                if not consultant_db:
+                    response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {consultant.nom}**."
+                else:
+                    # Déterminer le type d'information demandée
+                    if any(
+                        word in question_lower
+                        for word in ["grade", "niveau", "poste", "fonction"]
+                    ):
+                        response = self._get_profile_response_for_grade(
+                            consultant, consultant_db
+                        )
+                    elif any(
+                        word in question_lower
+                        for word in ["contrat", "type contrat", "cdi", "cdd"]
+                    ):
+                        response = self._get_profile_response_for_contract(
+                            consultant, consultant_db
+                        )
+                    elif any(
+                        word in question_lower
+                        for word in [
+                            "société",
+                            "societe",
+                            "entreprise",
+                            "quanteam",
+                            "asigma",
+                        ]
+                    ):
+                        response = self._get_profile_response_for_company(
+                            consultant, consultant_db
+                        )
+                    else:
+                        response = self._get_complete_profile_response(
+                            consultant, consultant_db
+                        )
+
+        except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
+            response = f"❌ Erreur lors de la récupération du profil : {str(e)}"
+            consultant_db = None
+
+        return {
+            "response": response,
+            "data": {
+                "consultant": {
+                    "nom": consultant.nom,
+                    "prenom": consultant.prenom,
+                    "grade": (
+                        getattr(consultant_db, "grade", None) if consultant_db else None
+                    ),
+                    "type_contrat": (
+                        getattr(consultant_db, "type_contrat", None)
+                        if consultant_db
+                        else None
+                    ),
+                    "societe": (
+                        getattr(consultant_db, "societe", None)
+                        if consultant_db
+                        else None
+                    ),
+                }
+            },
+            "intent": "profil_professionnel",
+            "confidence": 0.9,
+        }
+
     def _handle_professional_profile_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur le profil professionnel (grade, type contrat, société)"""
-
         question_lower: str = self.last_question.lower()
 
         # Si un nom est mentionné, chercher ce consultant spécifique
         if entities["noms"]:
-            nom_recherche: str = entities["noms"][0]
-            consultant = self._find_consultant_by_name(nom_recherche)
-
-            if consultant:
-                try:
-                    with get_database_session() as session:
-                        consultant_db = (
-                            session.query(Consultant)
-                            .filter(Consultant.id == consultant.id)
-                            .first()
-                        )
-
-                        if consultant_db:
-                            # Déterminer le type d'information demandée
-                            if any(
-                                word in question_lower
-                                for word in ["grade", "niveau", "poste", "fonction"]
-                            ):
-                                response = f"🎯 **Grade de {consultant.prenom} {consultant.nom}** : **{consultant_db.grade or 'Non renseigné'}**"
-
-                            elif any(
-                                word in question_lower
-                                for word in ["contrat", "type contrat", "cdi", "cdd"]
-                            ):
-                                response = f"📋 **Type de contrat de {consultant.prenom} {consultant.nom}** : **{consultant_db.type_contrat or 'Non renseigné'}**"
-
-                            elif any(
-                                word in question_lower
-                                for word in [
-                                    "société",
-                                    "societe",
-                                    "entreprise",
-                                    "quanteam",
-                                    "asigma",
-                                ]
-                            ):
-                                response = f"🏢 **Société de {consultant.prenom} {consultant.nom}** : **{consultant_db.societe or 'Non renseigné'}**"
-                                if consultant_db.date_entree_societe:
-                                    response += f"\n📅 **Date d'entrée :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}"
-                                if consultant_db.date_sortie_societe:
-                                    response += f"\n📅 **Date de sortie :** {consultant_db.date_sortie_societe.strftime('%d/%m/%Y')}"
-                                else:
-                                    response += "\n✅ **Toujours en poste**"
-
-                            else:
-                                # Profil complet
-                                response = f"👔 **Profil professionnel de {consultant.prenom} {consultant.nom}{self.SECTION_HEADER_SUFFIX}"
-                                response += f"🎯 **Grade :** {consultant_db.grade or 'Non renseigné'}\n"
-                                response += f"📋 **Type de contrat :** {consultant_db.type_contrat or 'Non renseigné'}\n"
-                                response += f"🏢 **Société :** {consultant_db.societe or 'Non renseigné'}\n"
-
-                                if consultant_db.date_entree_societe:
-                                    response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
-
-                                if consultant_db.date_sortie_societe:
-                                    response += f"📅 **Date de sortie société :** {consultant_db.date_sortie_societe.strftime('%d/%m/%Y')}\n"
-                                else:
-                                    response += "✅ **Statut :** Toujours en poste\n"
-
-                                if consultant_db.experience_annees:
-                                    response += f"⏱️ **Expérience :** {consultant_db.experience_annees} années\n"
-
-                                # Informations salariales si disponibles
-                                if consultant_db.salaire_actuel:
-                                    cjm = consultant_db.salaire_actuel * 1.8 / 216
-                                    response += (
-                                        "💰 **Salaire :** "
-                                        + f"{consultant_db.salaire_actuel:,.0f}"
-                                        + " €/an\n"
-                                    )
-                                    response += (
-                                        "📈 **CJM :** " + f"{cjm:,.0f}" + " €/jour"
-                                    )
-                        else:
-                            response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {consultant.nom}**."
-
-                except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
-                    response = f"❌ Erreur lors de la récupération du profil : {str(e)}"
-
-                return {
-                    "response": response,
-                    "data": {
-                        "consultant": {
-                            "nom": consultant.nom,
-                            "prenom": consultant.prenom,
-                            "grade": (
-                                getattr(consultant_db, "grade", None)
-                                if "consultant_db" in locals()
-                                else None
-                            ),
-                            "type_contrat": (
-                                getattr(consultant_db, "type_contrat", None)
-                                if "consultant_db" in locals()
-                                else None
-                            ),
-                            "societe": (
-                                getattr(consultant_db, "societe", None)
-                                if "consultant_db" in locals()
-                                else None
-                            ),
-                        }
-                    },
-                    "intent": "profil_professionnel",
-                    "confidence": 0.9,
-                }
-            else:
-                return {
-                    "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom_recherche}** dans la base de données.",
-                    "data": None,
-                    "intent": "profil_professionnel",
-                    "confidence": 0.7,
-                }
+            return self._handle_individual_profile_question(entities, question_lower)
 
         # Questions générales par critère
         else:
@@ -1217,7 +1238,9 @@ class ChatbotService:
 
                 # Ajouter les détails des compétences
                 response += (
-                    "\n\n📊 **" + str(len(consultants)) + " consultant(s) trouvé(s)**"
+                    self.STATS_PREFIX
+                    + str(len(consultants))
+                    + self.CONSULTANT_FOUND_SUFFIX
                 )
             else:
                 response = (
