@@ -140,22 +140,20 @@ class ChatbotService:
 
         return question.lower()
 
-    def _analyze_intent(self, question: str) -> str:
-        """Analyse l'intention de la question"""
-
-        # D'abord, vérifier s'il y a un nom de consultant mentionné
+    def _check_consultant_name_mentioned(self, question: str) -> bool:
+        """Vérifie si un nom de consultant est mentionné dans la question"""
         with get_database_session() as session:
             all_consultants = session.query(Consultant).all()
-            has_consultant_name: bool = False
             for consultant in all_consultants:
                 if re.search(
                     rf"\b{re.escape(consultant.prenom.lower())}\b", question
                 ) or re.search(rf"\b{re.escape(consultant.nom.lower())}\b", question):
-                    has_consultant_name = True
-                    break
+                    return True
+            return False
 
-        # Patterns pour identifier les intentions
-        intent_patterns = {
+    def _get_intent_patterns(self) -> Dict[str, List[str]]:
+        """Retourne les patterns pour identifier les intentions"""
+        return {
             "salaire": [
                 r"salaire",
                 r"rémunération",
@@ -358,7 +356,8 @@ class ChatbotService:
             ],
         }
 
-        # Scorer chaque intention
+    def _calculate_intent_scores(self, question: str, intent_patterns: Dict[str, List[str]]) -> Dict[str, int]:
+        """Calcule les scores pour chaque intention"""
         intent_scores: Dict[str, int] = {}
         for intent, patterns in intent_patterns.items():
             score: int = 0
@@ -366,7 +365,10 @@ class ChatbotService:
                 if re.search(pattern, question):
                     score += 1
             intent_scores[intent] = score
+        return intent_scores
 
+    def _apply_special_intent_rules(self, question: str, intent_scores: Dict[str, int], has_consultant_name: bool) -> Optional[str]:
+        """Applique les règles spéciales pour déterminer l'intention"""
         # Si un nom de consultant est mentionné et qu'on parle de salaire,
         # c'est forcément une question de salaire spécifique
         if has_consultant_name and intent_scores.get("salaire", 0) > 0:
@@ -414,6 +416,25 @@ class ChatbotService:
         # Si c'est une question de type "combien de consultants", c'est des statistiques
         if re.search(r"combien.+(consultants?|dans.+base)", question):
             return "statistiques"
+
+        return None
+
+    def _analyze_intent(self, question: str) -> str:
+        """Analyse l'intention de la question"""
+
+        # D'abord, vérifier s'il y a un nom de consultant mentionné
+        has_consultant_name = self._check_consultant_name_mentioned(question)
+
+        # Patterns pour identifier les intentions
+        intent_patterns = self._get_intent_patterns()
+
+        # Scorer chaque intention
+        intent_scores = self._calculate_intent_scores(question, intent_patterns)
+
+        # Appliquer les règles spéciales
+        special_intent = self._apply_special_intent_rules(question, intent_scores, has_consultant_name)
+        if special_intent:
+            return special_intent
 
         # Retourner l'intention avec le meilleur score
         if max(intent_scores.values()) > 0:
@@ -980,6 +1001,151 @@ class ChatbotService:
             "confidence": 0.9,
         }
 
+    def _handle_grade_statistics(self, session) -> str:
+        """Gère les statistiques par grade"""
+        consultants = (
+            session.query(Consultant)
+            .filter(Consultant.grade.isnot(None))
+            .all()
+        )
+
+        if consultants:
+            grades_count: Dict[str, List[Consultant]] = {}
+            for consultant in consultants:
+                grade = consultant.grade
+                if grade not in grades_count:
+                    grades_count[grade] = []
+                grades_count[grade].append(consultant)
+
+            response = "🎯 **Répartition par grade :**\n\n"
+            for grade, consultants_list in grades_count.items():
+                response += f"• **{grade}** : {len(consultants_list)} consultant(s)\n"
+                if len(consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                    for c in consultants_list:
+                        response += f"  - {c.prenom} {c.nom}\n"
+        else:
+            response = "❓ Aucun consultant n'a de grade renseigné."
+        
+        return response
+
+    def _handle_contract_statistics(self, session, question_lower: str) -> str:
+        """Gère les statistiques par type de contrat"""
+        consultants = (
+            session.query(Consultant)
+            .filter(Consultant.type_contrat.isnot(None))
+            .all()
+        )
+
+        # Si c'est une question "combien de consultants en CDI/CDD"
+        if any(word in question_lower for word in ["combien"]):
+            if "cdi" in question_lower:
+                consultants_cdi = [
+                    c for c in consultants
+                    if c.type_contrat and c.type_contrat.upper() == "CDI"
+                ]
+                return f"📋 **{len(consultants_cdi)} consultant(s) en CDI**"
+            elif "cdd" in question_lower:
+                consultants_cdd = [
+                    c for c in consultants
+                    if c.type_contrat and c.type_contrat.upper() == "CDD"
+                ]
+                return f"📋 **{len(consultants_cdd)} consultant(s) en CDD**"
+            elif "stagiaire" in question_lower:
+                consultants_stagiaire = [
+                    c for c in consultants
+                    if c.type_contrat and c.type_contrat.lower() == "stagiaire"
+                ]
+                return f"📋 **{len(consultants_stagiaire)} consultant(s) stagiaire(s)**"
+            else:
+                # Statistiques complètes
+                contrats_count: Dict[str, int] = {}
+                for consultant in consultants:
+                    contrat = consultant.type_contrat
+                    if contrat not in contrats_count:
+                        contrats_count[contrat] = 0
+                    contrats_count[contrat] += 1
+
+                response = "📋 **Nombre de consultants par type de contrat :**\n\n"
+                for contrat, count in contrats_count.items():
+                    response += f"• **{contrat}** : {count} consultant(s)\n"
+                return response
+        else:
+            # Répartition complète par type de contrat
+            if consultants:
+                contrats_list: Dict[str, List[Consultant]] = {}
+                for consultant in consultants:
+                    contrat = consultant.type_contrat
+                    if contrat not in contrats_list:
+                        contrats_list[contrat] = []
+                    contrats_list[contrat].append(consultant)
+
+                response = "📋 **Répartition par type de contrat :**\n\n"
+                for contrat, consultants_list in contrats_list.items():
+                    response += f"• **{contrat}** : {len(consultants_list)} consultant(s)\n"
+                    if len(consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                        for c in consultants_list:
+                            response += f"  - {c.prenom} {c.nom}\n"
+            else:
+                response = "❓ Aucun consultant n'a de type de contrat renseigné."
+            
+            return response
+
+    def _handle_company_statistics(self, session, question_lower: str) -> str:
+        """Gère les statistiques par société"""
+        consultants = (
+            session.query(Consultant)
+            .filter(Consultant.societe.isnot(None))
+            .all()
+        )
+
+        # Si c'est une recherche spécifique pour une société
+        if any(word in question_lower for word in ["quanteam", "asigma"]):
+            societe_recherchee = (
+                "Quanteam" if "quanteam" in question_lower else "Asigma"
+            )
+            consultants_societe = [
+                c for c in consultants
+                if c.societe and c.societe.lower() == societe_recherchee.lower()
+            ]
+
+            if consultants_societe:
+                response = f"🏢 **Consultants chez {societe_recherchee}** :\n\n"
+                for i, consultant in enumerate(consultants_societe, 1):
+                    status_icon = "🟢" if consultant.disponibilite else "🔴"
+                    response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
+                    if consultant.grade:
+                        response += f" - {consultant.grade}"
+                    if consultant.type_contrat:
+                        response += f" ({consultant.type_contrat})"
+                    response += "\n"
+
+                response += (
+                    self.TOTAL_PREFIX + str(len(consultants_societe)) + 
+                    self.CONSULTANT_FOUND_SUFFIX
+                )
+            else:
+                response = f"❓ Aucun consultant trouvé chez {societe_recherchee}."
+        else:
+            # Statistiques générales par société
+            if consultants:
+                societes_count: Dict[str, List[Consultant]] = {}
+                for consultant in consultants:
+                    societe = consultant.societe
+                    if societe not in societes_count:
+                        societes_count[societe] = []
+                    societes_count[societe].append(consultant)
+
+                response = "🏢 **Répartition par société :**\n\n"
+                for societe, consultants_list in societes_count.items():
+                    response += f"• **{societe}** : {len(consultants_list)} consultant(s)\n"
+                    if len(consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                        for c in consultants_list:
+                            response += f"  - {c.prenom} {c.nom}\n"
+            else:
+                response = "❓ Aucun consultant n'a de société renseignée."
+        
+        return response
+
     def _handle_professional_profile_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur le profil professionnel (grade, type contrat, société)"""
         question_lower: str = self.last_question.lower()
@@ -992,203 +1158,22 @@ class ChatbotService:
         else:
             try:
                 with get_database_session() as session:
-                    if any(
-                        word in question_lower
-                        for word in [
-                            "grade",
-                            "niveau",
-                            "junior",
-                            "confirmé",
-                            "manager",
-                            "directeur",
-                        ]
-                    ):
-                        # Statistiques par grade
-                        consultants = (
-                            session.query(Consultant)
-                            .filter(Consultant.grade.isnot(None))
-                            .all()
-                        )
-
-                        if consultants:
-                            grades_count: Dict[str, List[Consultant]] = {}
-                            for consultant in consultants:
-                                grade = consultant.grade
-                                if grade not in grades_count:
-                                    grades_count[grade] = []
-                                grades_count[grade].append(consultant)
-
-                            response = "🎯 **Répartition par grade :**\n\n"
-                            for grade, consultants_list in grades_count.items():
-                                response += f"• **{grade}** : {len(consultants_list)} consultant(s)\n"
-                                if (
-                                    len(consultants_list) <= 5
-                                ):  # Afficher les noms si pas trop nombreux
-                                    for c in consultants_list:
-                                        response += f"  - {c.prenom} {c.nom}\n"
-                        else:
-                            response = "❓ Aucun consultant n'a de grade renseigné."
-
-                    elif any(
-                        word in question_lower
-                        for word in ["contrat", "cdi", "cdd", "stagiaire"]
-                    ):
-                        # Statistiques par type de contrat ou recherche spécifique
-                        consultants = (
-                            session.query(Consultant)
-                            .filter(Consultant.type_contrat.isnot(None))
-                            .all()
-                        )
-
-                        # Si c'est une question "combien de consultants en CDI/CDD"
-                        if any(word in question_lower for word in ["combien"]):
-                            if "cdi" in question_lower:
-                                consultants_cdi = [
-                                    c
-                                    for c in consultants
-                                    if c.type_contrat
-                                    and c.type_contrat.upper() == "CDI"
-                                ]
-                                response = f"📋 **{len(consultants_cdi)} consultant(s) en CDI**"
-                            elif "cdd" in question_lower:
-                                consultants_cdd = [
-                                    c
-                                    for c in consultants
-                                    if c.type_contrat
-                                    and c.type_contrat.upper() == "CDD"
-                                ]
-                                response = f"📋 **{len(consultants_cdd)} consultant(s) en CDD**"
-                            elif "stagiaire" in question_lower:
-                                consultants_stagiaire = [
-                                    c
-                                    for c in consultants
-                                    if c.type_contrat
-                                    and c.type_contrat.lower() == "stagiaire"
-                                ]
-                                response = f"📋 **{len(consultants_stagiaire)} consultant(s) stagiaire(s)**"
-                            else:
-                                # Statistiques complètes
-                                contrats_count: Dict[str, int] = {}
-                                for consultant in consultants:
-                                    contrat = consultant.type_contrat
-                                    if contrat not in contrats_count:
-                                        contrats_count[contrat] = 0
-                                    contrats_count[contrat] += 1
-
-                                response = "📋 **Nombre de consultants par type de contrat :**\n\n"
-                                for contrat, count in contrats_count.items():
-                                    response += (
-                                        f"• **{contrat}** : {count} consultant(s)\n"
-                                    )
-                        else:
-                            # Répartition complète par type de contrat
-                            if consultants:
-                                contrats_list: Dict[str, List[Consultant]] = {}
-                                for consultant in consultants:
-                                    contrat = consultant.type_contrat
-                                    if contrat not in contrats_list:
-                                        contrats_list[contrat] = []
-                                    contrats_list[contrat].append(consultant)
-
-                                response = (
-                                    "📋 **Répartition par type de contrat :**\n\n"
-                                )
-                                for contrat, consultants_list in contrats_list.items():
-                                    response += f"• **{contrat}** : {len(consultants_list)} consultant(s)\n"
-                                    if (
-                                        len(consultants_list) <= 5
-                                    ):  # Afficher les noms si pas trop nombreux
-                                        for c in consultants_list:
-                                            response += f"  - {c.prenom} {c.nom}\n"
-                            else:
-                                response = "❓ Aucun consultant n'a de type de contrat renseigné."
-
-                    elif any(
-                        word in question_lower
-                        for word in [
-                            "société",
-                            "societe",
-                            "quanteam",
-                            "asigma",
-                            "qui travaille",
-                            "qui est",
-                        ]
-                    ):
-                        # Statistiques par société ou recherche de consultants par
-                        # société
-                        consultants = (
-                            session.query(Consultant)
-                            .filter(Consultant.societe.isnot(None))
-                            .all()
-                        )
-
-                        # Si c'est une recherche spécifique pour une société
-                        if any(
-                            word in question_lower for word in ["quanteam", "asigma"]
-                        ):
-                            societe_recherchee = (
-                                "Quanteam" if "quanteam" in question_lower else "Asigma"
-                            )
-                            consultants_societe = [
-                                c
-                                for c in consultants
-                                if c.societe
-                                and c.societe.lower() == societe_recherchee.lower()
-                            ]
-
-                            if consultants_societe:
-                                response = f"🏢 **Consultants chez {societe_recherchee}** :\n\n"
-                                for i, consultant in enumerate(consultants_societe, 1):
-                                    status_icon = (
-                                        "🟢" if consultant.disponibilite else "🔴"
-                                    )
-                                    response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
-                                    if consultant.grade:
-                                        response += f" - {consultant.grade}"
-                                    if consultant.type_contrat:
-                                        response += f" ({consultant.type_contrat})"
-                                    response += "\n"
-
-                                response += (
-                                    self.TOTAL_PREFIX
-                                    + str(len(consultants_societe))
-                                    + self.CONSULTANT_FOUND_SUFFIX
-                                )
-                            else:
-                                response = f"❓ Aucun consultant trouvé chez {societe_recherchee}."
-                        else:
-                            # Statistiques générales par société
-                            if consultants:
-                                societes_count: Dict[str, List[Consultant]] = {}
-                                for consultant in consultants:
-                                    societe = consultant.societe
-                                    if societe not in societes_count:
-                                        societes_count[societe] = []
-                                    societes_count[societe].append(consultant)
-
-                                response = "🏢 **Répartition par société :**\n\n"
-                                for societe, consultants_list in societes_count.items():
-                                    response += f"• **{societe}** : {len(consultants_list)} consultant(s)\n"
-                                    if (
-                                        len(consultants_list) <= 5
-                                    ):  # Afficher les noms si pas trop nombreux
-                                        for c in consultants_list:
-                                            response += f"  - {c.prenom} {c.nom}\n"
-                            else:
-                                response = (
-                                    "❓ Aucun consultant n'a de société renseignée."
-                                )
-
+                    if any(word in question_lower for word in [
+                        "grade", "niveau", "junior", "confirmé", "manager", "directeur"
+                    ]):
+                        response = self._handle_grade_statistics(session)
+                    elif any(word in question_lower for word in [
+                        "contrat", "cdi", "cdd", "stagiaire"
+                    ]):
+                        response = self._handle_contract_statistics(session, question_lower)
+                    elif any(word in question_lower for word in [
+                        "société", "societe", "quanteam", "asigma", "qui travaille", "qui est"
+                    ]):
+                        response = self._handle_company_statistics(session, question_lower)
                     else:
                         response = "🤔 Précisez quel aspect du profil professionnel vous intéresse : grade, type de contrat, ou société ?"
 
-            except (
-                SQLAlchemyError,
-                AttributeError,
-                ValueError,
-                TypeError,
-                KeyError,
-            ) as e:
+            except (SQLAlchemyError, AttributeError, ValueError, TypeError, KeyError) as e:
                 response = f"❌ Erreur lors de la récupération des données : {str(e)}"
 
             return {
