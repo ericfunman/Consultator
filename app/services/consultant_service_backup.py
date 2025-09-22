@@ -17,12 +17,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 
-from app.database.database import get_database_session
-from app.database.models import Competence
-from app.database.models import Consultant
-from app.database.models import ConsultantCompetence
-from app.database.models import Mission
-from app.database.models import Practice
+from database.database import get_database_session
+from database.models import Competence
+from database.models import Consultant
+from database.models import ConsultantCompetence
+from database.models import Mission
+from database.models import Practice
 
 
 class ConsultantService:
@@ -114,12 +114,132 @@ class ConsultantService:
             return []
 
     @staticmethod
-    def _build_search_query(
-        session, practice_filter, grade_filter, availability_filter, search_term
-    ):
-        """Helper: Construit la requête de base avec les filtres"""
-        # Requête optimisée avec JOIN pour éviter les requêtes N+1
-        query = (
+    def search_consultants_optimized(
+        search_term: str,
+        page: int = 1,
+        per_page: int = 50,
+        practice_filter: Optional[str] = None,
+        grade_filter: Optional[str] = None,
+        availability_filter: Optional[bool] = None,
+    ) -> List[Dict]:
+        """Recherche optimisÃ©e avec cache pour de gros volumes - avec statistiques intÃ©grÃ©es"""
+        try:
+            with get_database_session() as session:
+                query = ConsultantService._build_search_base_query(session)
+                query = ConsultantService._apply_search_filters(
+                    query, search_term, practice_filter, grade_filter, availability_filter
+                )
+                query = ConsultantService._finalize_search_query(query, page, per_page)
+
+                results = query.all()
+                return ConsultantService._format_search_results(results)
+                        func.count(Mission.id).label("nb_missions"),
+                    )
+                    .outerjoin(Practice, Consultant.practice_id == Practice.id)
+                    .outerjoin(Mission, Consultant.id == Mission.consultant_id)
+                )
+
+                # Appliquer les filtres
+                if practice_filter:
+                    query = query.filter(Practice.nom == practice_filter)
+
+                if grade_filter:
+                    query = query.filter(Consultant.grade == grade_filter)
+
+                if availability_filter is not None:
+                    query = query.filter(
+                        Consultant.disponibilite == availability_filter
+                    )
+
+                if search_term:
+                    search_filter = f"%{search_term}%"
+                    query = query.filter(
+                        (Consultant.nom.ilike(search_filter))
+                        | (Consultant.prenom.ilike(search_filter))
+                        | (Consultant.email.ilike(search_filter))
+                        | (Consultant.societe.ilike(search_filter))
+                    )
+
+                query = (
+                    query.group_by(
+                        Consultant.id,
+                        Consultant.prenom,
+                        Consultant.nom,
+                        Consultant.email,
+                        Consultant.telephone,
+                        Consultant.salaire_actuel,
+                        Consultant.disponibilite,
+                        Consultant.date_creation,
+                        Consultant.societe,
+                        Consultant.date_entree_societe,
+                        Consultant.date_sortie_societe,
+                        Consultant.date_premiere_mission,
+                        Consultant.grade,
+                        Consultant.type_contrat,
+                        Practice.nom,
+                    )
+                    .offset((page - 1) * per_page)
+                    .limit(per_page)
+                )
+
+                results = query.all()
+
+                # Convertir en dictionnaires avec calculs optimisÃ©s
+                consultant_list = []
+                for row in results:
+                    salaire = row.salaire_actuel or 0
+                    cjm = (salaire * 1.8 / 216) if salaire else 0
+
+                    # Calcul de l'expÃ©rience
+                    experience_annees = 0
+                    if row.date_premiere_mission:
+                        from datetime import date
+
+                        today = date.today()
+                        delta = today - row.date_premiere_mission
+                        experience_annees = round(delta.days / 365.25, 1)
+
+                    consultant_dict = {
+                        "id": row.id,
+                        "prenom": row.prenom,
+                        "nom": row.nom,
+                        "email": row.email,
+                        "telephone": row.telephone,
+                        "salaire_actuel": salaire,
+                        "disponibilite": row.disponibilite,
+                        "grade": row.grade or "Junior",
+                        "type_contrat": row.type_contrat or "CDI",
+                        "practice_name": row.practice_name or "Non affectÃ©",
+                        "date_creation": row.date_creation,
+                        "nb_missions": row.nb_missions,
+                        "cjm": cjm,
+                        "salaire_formatted": f"{salaire:,}â¬",
+                        "cjm_formatted": f"{cjm:,.0f}â¬",
+                        "statut": (
+                            ConsultantService.STATUS_AVAILABLE
+                            if row.disponibilite
+                            else ConsultantService.STATUS_BUSY
+                        ),
+                        # Nouveaux champs V1.2
+                        "societe": row.societe or "Quanteam",
+                        "experience_annees": experience_annees,
+                        "experience_formatted": (
+                            f"{experience_annees} ans"
+                            if experience_annees > 0
+                            else "N/A"
+                        ),
+                    }
+                    consultant_list.append(consultant_dict)
+
+                return consultant_list
+        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
+            print(f"Erreur lors de la recherche optimisÃ©e: {e}")
+            return []
+
+    @staticmethod
+    def _build_search_base_query(session):
+        """Construit la requête de base pour la recherche"""
+        return (
             session.query(
                 Consultant.id,
                 Consultant.prenom,
@@ -142,16 +262,9 @@ class ConsultantService:
             .outerjoin(Mission, Consultant.id == Mission.consultant_id)
         )
 
-        return ConsultantService._apply_search_filters(
-            query, practice_filter, grade_filter, availability_filter, search_term
-        )
-
     @staticmethod
-    def _apply_search_filters(
-        query, practice_filter, grade_filter, availability_filter, search_term
-    ):
-        """Helper: Applique tous les filtres de recherche"""
-        # Appliquer les filtres
+    def _apply_search_filters(query, search_term, practice_filter, grade_filter, availability_filter):
+        """Applique tous les filtres à la requête"""
         if practice_filter:
             query = query.filter(Practice.nom == practice_filter)
 
@@ -174,7 +287,7 @@ class ConsultantService:
 
     @staticmethod
     def _finalize_search_query(query, page, per_page):
-        """Helper: Finalise la requête avec grouping et pagination"""
+        """Finalise la requête avec grouping et pagination"""
         return (
             query.group_by(
                 Consultant.id,
@@ -198,15 +311,20 @@ class ConsultantService:
         )
 
     @staticmethod
-    def _convert_consultant_row_to_dict(row):
-        """Helper: Convertit une ligne de résultat en dictionnaire"""
-        salaire = row.salaire_actuel or 0
-        cjm = (salaire * 1.8 / 216) if salaire else 0
+    def _format_search_results(results):
+        """Formate les résultats de recherche en dictionnaires"""
+        consultant_list = []
+        for row in results:
+            consultant_dict = ConsultantService._build_consultant_dict(row)
+            consultant_list.append(consultant_dict)
+        return consultant_list
 
-        # Calcul de l'expérience
-        experience_annees = ConsultantService._calculate_experience_years(
-            row.date_premiere_mission
-        )
+    @staticmethod
+    def _build_consultant_dict(row):
+        """Construit le dictionnaire consultant avec calculs"""
+        salaire = row.salaire_actuel or 0
+        cjm = ConsultantService._calculate_cjm(salaire)
+        experience_annees = ConsultantService._calculate_experience(row.date_premiere_mission)
 
         return {
             "id": row.id,
@@ -218,18 +336,17 @@ class ConsultantService:
             "disponibilite": row.disponibilite,
             "grade": row.grade or "Junior",
             "type_contrat": row.type_contrat or "CDI",
-            "practice_name": row.practice_name or "Non affecté",
+            "practice_name": row.practice_name or "Non affectÃ©",
             "date_creation": row.date_creation,
             "nb_missions": row.nb_missions,
             "cjm": cjm,
-            "salaire_formatted": f"{salaire:,}€",
-            "cjm_formatted": f"{cjm:,.0f}€",
+            "salaire_formatted": f"{salaire:,}â¬",
+            "cjm_formatted": f"{cjm:,.0f}â¬",
             "statut": (
                 ConsultantService.STATUS_AVAILABLE
                 if row.disponibilite
                 else ConsultantService.STATUS_BUSY
             ),
-            # Nouveaux champs V1.2
             "societe": row.societe or "Quanteam",
             "experience_annees": experience_annees,
             "experience_formatted": (
@@ -238,51 +355,20 @@ class ConsultantService:
         }
 
     @staticmethod
-    def _calculate_experience_years(date_premiere_mission):
-        """Helper: Calcule l'expérience en années"""
+    def _calculate_cjm(salaire):
+        """Calcule le coût journalier moyen"""
+        return (salaire * 1.8 / 216) if salaire else 0
+
+    @staticmethod
+    def _calculate_experience(date_premiere_mission):
+        """Calcule l'expérience en années"""
         if not date_premiere_mission:
             return 0
-
+        
         from datetime import date
-
         today = date.today()
         delta = today - date_premiere_mission
-        return round(delta.days / 365.25, 1) @ staticmethod
-
-    def search_consultants_optimized(
-        search_term: str,
-        page: int = 1,
-        per_page: int = 50,
-        practice_filter: Optional[str] = None,
-        grade_filter: Optional[str] = None,
-        availability_filter: Optional[bool] = None,
-    ) -> List[Dict]:
-        """Recherche optimisée avec cache pour de gros volumes - avec statistiques intégrées"""
-        try:
-            with get_database_session() as session:
-                # Construire et exécuter la requête
-                query = ConsultantService._build_search_query(
-                    session,
-                    practice_filter,
-                    grade_filter,
-                    availability_filter,
-                    search_term,
-                )
-                query = ConsultantService._finalize_search_query(query, page, per_page)
-                results = query.all()
-
-                # Convertir en dictionnaires avec calculs optimisés
-                consultant_list = []
-                for row in results:
-                    consultant_dict = ConsultantService._convert_consultant_row_to_dict(
-                        row
-                    )
-                    consultant_list.append(consultant_dict)
-
-                return consultant_list
-        except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la recherche optimisée: {e}")
-            return []
+        return round(delta.days / 365.25, 1)
 
     @staticmethod
     def get_consultants_count() -> int:
@@ -295,121 +381,6 @@ class ConsultantService:
             return 0
 
     @staticmethod
-    def _build_stats_query(session, practice_filter, grade_filter, availability_filter):
-        """Helper: Construit la requête optimisée pour les stats des consultants"""
-        # Une seule requête avec LEFT JOIN pour récupérer consultants + nombre de missions
-        query = (
-            session.query(
-                Consultant.id,
-                Consultant.prenom,
-                Consultant.nom,
-                Consultant.email,
-                Consultant.telephone,
-                Consultant.salaire_actuel,
-                Consultant.disponibilite,
-                Consultant.date_creation,
-                Consultant.derniere_maj,
-                Consultant.societe,
-                Consultant.date_entree_societe,
-                Consultant.date_sortie_societe,
-                Consultant.date_premiere_mission,
-                Consultant.grade,
-                Consultant.type_contrat,
-                Practice.nom.label("practice_name"),
-                func.count(Mission.id).label("nb_missions"),
-            )
-            .outerjoin(Practice, Consultant.practice_id == Practice.id)
-            .outerjoin(Mission, Consultant.id == Mission.consultant_id)
-        )
-
-        return ConsultantService._apply_stats_filters(
-            query, practice_filter, grade_filter, availability_filter
-        )
-
-    @staticmethod
-    def _apply_stats_filters(query, practice_filter, grade_filter, availability_filter):
-        """Helper: Applique les filtres pour les statistiques"""
-        # Appliquer les filtres
-        if practice_filter:
-            query = query.filter(Practice.nom == practice_filter)
-
-        if grade_filter:
-            query = query.filter(Consultant.grade == grade_filter)
-
-        if availability_filter is not None:
-            query = query.filter(Consultant.disponibilite == availability_filter)
-
-        return query
-
-    @staticmethod
-    def _finalize_stats_query(query, page, per_page):
-        """Helper: Finalise la requête stats avec grouping et pagination"""
-        return (
-            query.group_by(
-                Consultant.id,
-                Consultant.prenom,
-                Consultant.nom,
-                Consultant.email,
-                Consultant.telephone,
-                Consultant.salaire_actuel,
-                Consultant.disponibilite,
-                Consultant.date_creation,
-                Consultant.derniere_maj,
-                Consultant.societe,
-                Consultant.date_entree_societe,
-                Consultant.date_sortie_societe,
-                Consultant.date_premiere_mission,
-                Consultant.grade,
-                Consultant.type_contrat,
-                Practice.nom,
-            )
-            .offset((page - 1) * per_page)
-            .limit(per_page)
-        )
-
-    @staticmethod
-    def _convert_stats_row_to_dict(row):
-        """Helper: Convertit une ligne de résultat stats en dictionnaire"""
-        salaire = row.salaire_actuel or 0
-        cjm = (salaire * 1.8 / 216) if salaire else 0
-
-        # Calcul de l'expérience
-        experience_annees = ConsultantService._calculate_experience_years(
-            row.date_premiere_mission
-        )
-
-        return {
-            "id": row.id,
-            "prenom": row.prenom,
-            "nom": row.nom,
-            "email": row.email,
-            "telephone": row.telephone,
-            "salaire_actuel": salaire,
-            "disponibilite": row.disponibilite,
-            "practice_name": row.practice_name or "Non affecté",
-            "date_creation": row.date_creation,
-            "derniere_maj": row.derniere_maj,
-            "nb_missions": row.nb_missions,
-            "cjm": cjm,
-            "salaire_formatted": f"{salaire:,}€",
-            "cjm_formatted": f"{cjm:,.0f}€",
-            "statut": (
-                ConsultantService.STATUS_AVAILABLE
-                if row.disponibilite
-                else ConsultantService.STATUS_BUSY
-            ),
-            # Nouveaux champs V1.2
-            "societe": row.societe or "Quanteam",
-            "experience_annees": experience_annees,
-            "experience_formatted": (
-                f"{experience_annees} ans" if experience_annees > 0 else "N/A"
-            ),
-            # Nouveaux champs V1.2.1
-            "grade": row.grade or "Junior",
-            "type_contrat": row.type_contrat or "CDI",
-        }
-
-    @staticmethod
     def get_all_consultants_with_stats(
         page: int = 1,
         per_page: int = 50,
@@ -418,27 +389,126 @@ class ConsultantService:
         availability_filter: Optional[bool] = None,
     ) -> List[Dict]:
         """
-        Récupère tous les consultants avec leurs statistiques en une seule requête optimisée
-        Résout le problème N+1 des requêtes pour compter les missions
+        RÃ©cupÃ¨re tous les consultants avec leurs statistiques en une seule requÃªte optimisÃ©e
+        RÃ©sout le problÃ¨me N+1 des requÃªtes pour compter les missions
         """
         try:
             with get_database_session() as session:
-                # Construire et exécuter la requête
-                query = ConsultantService._build_stats_query(
-                    session, practice_filter, grade_filter, availability_filter
+                # Une seule requÃªte avec LEFT JOIN pour rÃ©cupÃ©rer consultants + nombre
+                # de missions
+                query = (
+                    session.query(
+                        Consultant.id,
+                        Consultant.prenom,
+                        Consultant.nom,
+                        Consultant.email,
+                        Consultant.telephone,
+                        Consultant.salaire_actuel,
+                        Consultant.disponibilite,
+                        Consultant.date_creation,
+                        Consultant.derniere_maj,
+                        Consultant.societe,
+                        Consultant.date_entree_societe,
+                        Consultant.date_sortie_societe,
+                        Consultant.date_premiere_mission,
+                        Consultant.grade,
+                        Consultant.type_contrat,
+                        Practice.nom.label("practice_name"),
+                        func.count(Mission.id).label("nb_missions"),
+                    )
+                    .outerjoin(Practice, Consultant.practice_id == Practice.id)
+                    .outerjoin(Mission, Consultant.id == Mission.consultant_id)
                 )
-                query = ConsultantService._finalize_stats_query(query, page, per_page)
+
+                # Appliquer les filtres
+                if practice_filter:
+                    query = query.filter(Practice.nom == practice_filter)
+
+                if grade_filter:
+                    query = query.filter(Consultant.grade == grade_filter)
+
+                if availability_filter is not None:
+                    query = query.filter(
+                        Consultant.disponibilite == availability_filter
+                    )
+
+                query = (
+                    query.group_by(
+                        Consultant.id,
+                        Consultant.prenom,
+                        Consultant.nom,
+                        Consultant.email,
+                        Consultant.telephone,
+                        Consultant.salaire_actuel,
+                        Consultant.disponibilite,
+                        Consultant.date_creation,
+                        Consultant.derniere_maj,
+                        Consultant.societe,
+                        Consultant.date_entree_societe,
+                        Consultant.date_sortie_societe,
+                        Consultant.date_premiere_mission,
+                        Consultant.grade,
+                        Consultant.type_contrat,
+                        Practice.nom,
+                    )
+                    .offset((page - 1) * per_page)
+                    .limit(per_page)
+                )
+
                 results = query.all()
 
-                # Convertir en dictionnaires avec calculs optimisés
+                # Convertir en dictionnaires avec calculs optimisÃ©s
                 consultant_list = []
                 for row in results:
-                    consultant_dict = ConsultantService._convert_stats_row_to_dict(row)
+                    salaire = row.salaire_actuel or 0
+                    cjm = (salaire * 1.8 / 216) if salaire else 0
+
+                    # Calcul de l'expÃ©rience
+                    experience_annees = 0
+                    if row.date_premiere_mission:
+                        from datetime import date
+
+                        today = date.today()
+                        delta = today - row.date_premiere_mission
+                        experience_annees = round(delta.days / 365.25, 1)
+
+                    consultant_dict = {
+                        "id": row.id,
+                        "prenom": row.prenom,
+                        "nom": row.nom,
+                        "email": row.email,
+                        "telephone": row.telephone,
+                        "salaire_actuel": salaire,
+                        "disponibilite": row.disponibilite,
+                        "practice_name": row.practice_name or "Non affectÃ©",
+                        "date_creation": row.date_creation,
+                        "derniere_maj": row.derniere_maj,
+                        "nb_missions": row.nb_missions,
+                        "cjm": cjm,
+                        "salaire_formatted": f"{salaire:,}â¬",
+                        "cjm_formatted": f"{cjm:,.0f}â¬",
+                        "statut": (
+                            ConsultantService.STATUS_AVAILABLE
+                            if row.disponibilite
+                            else ConsultantService.STATUS_BUSY
+                        ),
+                        # Nouveaux champs V1.2
+                        "societe": row.societe or "Quanteam",
+                        "experience_annees": experience_annees,
+                        "experience_formatted": (
+                            f"{experience_annees} ans"
+                            if experience_annees > 0
+                            else "N/A"
+                        ),
+                        # Nouveaux champs V1.2.1
+                        "grade": row.grade or "Junior",
+                        "type_contrat": row.type_contrat or "CDI",
+                    }
                     consultant_list.append(consultant_dict)
 
                 return consultant_list
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
-            print(f"Erreur lors de la récupération optimisée des consultants: {e}")
+            print(f"Erreur lors de la rÃ©cupÃ©ration optimisÃ©e des consultants: {e}")
             return []
 
     @staticmethod
