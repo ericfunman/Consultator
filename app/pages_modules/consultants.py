@@ -1871,7 +1871,6 @@ def show_consultants_list():
 
 def show_consultants_list_enhanced():
     """Version améliorée de la liste des consultants avec filtres avancés"""
-
     from app.ui.enhanced_ui import AdvancedUIFilters
     from app.ui.enhanced_ui import DataTableEnhancer
     from app.ui.enhanced_ui import LoadingSpinner
@@ -1879,118 +1878,149 @@ def show_consultants_list_enhanced():
     from app.ui.enhanced_ui import RealTimeSearch
 
     # Initialisation des composants
-    filters = AdvancedUIFilters()
-    search = RealTimeSearch()
-    enhancer = DataTableEnhancer()
+    filters, search, enhancer = _initialize_ui_components()
 
     # Titre principal
     st.title("👥 Gestion des consultants - Version Améliorée")
 
     # Recherche en temps réel
-    search_term = st.text_input(
+    search_term = _render_search_input()
+
+    # Chargement des données
+    consultants = _load_consultants_data(search, search_term)
+    if not consultants:
+        return
+
+    # Traitement et affichage des données
+    consultants_data = _convert_consultants_to_data(consultants)
+    filtered_data = filters.apply_filters(consultants_data)
+    
+    if filtered_data:
+        _display_enhanced_metrics(filtered_data)
+        _handle_enhanced_table_interactions(enhancer, filtered_data)
+    else:
+        _display_no_consultants_message()
+
+
+def _initialize_ui_components():
+    """Initialise les composants UI pour la liste améliorée"""
+    from app.ui.enhanced_ui import AdvancedUIFilters
+    from app.ui.enhanced_ui import DataTableEnhancer
+    from app.ui.enhanced_ui import RealTimeSearch
+    
+    filters = AdvancedUIFilters()
+    search = RealTimeSearch()
+    enhancer = DataTableEnhancer()
+    return filters, search, enhancer
+
+
+def _render_search_input():
+    """Affiche le champ de recherche en temps réel"""
+    return st.text_input(
         "🔍 Recherche en temps réel",
         placeholder="Tapez pour rechercher instantanément...",
         help="La recherche se met à jour automatiquement pendant que vous tapez",
     )
 
-    # Chargement des données avec cache
+
+def _load_consultants_data(search, search_term):
+    """Charge les données des consultants avec gestion d'erreur"""
+    from app.ui.enhanced_ui import LoadingSpinner
+    
     with LoadingSpinner.show_loading("Chargement des données..."):
         try:
             if search_term and search.should_search():
-                consultants = ConsultantService.search_consultants_optimized(
-                    search_term.strip()
-                )
+                return ConsultantService.search_consultants_optimized(search_term.strip())
             else:
-                consultants = ConsultantService.get_all_consultants_with_stats()
+                return ConsultantService.get_all_consultants_with_stats()
         except (SQLAlchemyError, AttributeError) as exc:
             st.error(f"Erreur lors du chargement des données: {str(exc)}")
-            return
+            return None
 
-    # Appliquer les filtres avancés
-    if consultants:
-        # Convertir les données pour les filtres
-        consultants_data = []
-        for consultant in consultants:
-            consultants_data.append(
-                {
-                    "id": consultant["id"],
-                    "prenom": consultant["prenom"],
-                    "nom": consultant["nom"],
-                    "email": consultant["email"],
-                    "societe": consultant["societe"],
-                    "grade": consultant["grade"],
-                    "type_contrat": consultant["type_contrat"],
-                    "salaire_actuel": consultant.get("salaire_actuel", 0),
-                    "disponibilite": consultant.get("disponibilite", False),
-                    "practice_name": consultant.get("practice_name", ""),
-                    "experience_annees": consultant.get("experience_annees", 0),
-                    "nb_missions": consultant.get("nb_missions", 0),
-                    "salaire_formatted": consultant.get("salaire_formatted", "0€"),
-                    "cjm_formatted": consultant.get("cjm_formatted", "0€"),
-                    "experience_formatted": consultant.get(
-                        "experience_formatted", "0 ans"
-                    ),
-                    "statut": consultant.get("statut", "N/A"),
-                }
-            )
 
-        # Appliquer les filtres
-        filtered_data = filters.apply_filters(consultants_data)
+def _convert_consultants_to_data(consultants):
+    """Convertit les données des consultants pour les filtres"""
+    consultants_data = []
+    for consultant in consultants:
+        consultants_data.append({
+            "id": consultant["id"],
+            "prenom": consultant["prenom"],
+            "nom": consultant["nom"],
+            "email": consultant["email"],
+            "societe": consultant["societe"],
+            "grade": consultant["grade"],
+            "type_contrat": consultant["type_contrat"],
+            "salaire_actuel": consultant.get("salaire_actuel", 0),
+            "disponibilite": consultant.get("disponibilite", False),
+            "practice_name": consultant.get("practice_name", ""),
+            "experience_annees": consultant.get("experience_annees", 0),
+            "nb_missions": consultant.get("nb_missions", 0),
+            "salaire_formatted": consultant.get("salaire_formatted", "0€"),
+            "cjm_formatted": consultant.get("cjm_formatted", "0€"),
+            "experience_formatted": consultant.get("experience_formatted", "0 ans"),
+            "statut": consultant.get("statut", "N/A"),
+        })
+    return consultants_data
 
-        # Afficher les métriques
-        if filtered_data:
-            col1, col2, col3, col4 = st.columns(4)
 
-            with col1:
-                st.metric("👥 Total filtré", len(filtered_data))
+def _display_enhanced_metrics(filtered_data):
+    """Affiche les métriques des consultants filtrés"""
+    col1, col2, col3, col4 = st.columns(4)
 
-            with col2:
-                disponibles = len(
-                    [c for c in filtered_data if c.get("disponibilite", False)]
-                )
-                st.metric("✅ Disponibles", disponibles)
+    with col1:
+        st.metric("👥 Total filtré", len(filtered_data))
 
-            with col3:
-                st.metric("🔴 Occupés", len(filtered_data) - disponibles)
+    with col2:
+        disponibles = len([c for c in filtered_data if c.get("disponibilite", False)])
+        st.metric("✅ Disponibles", disponibles)
 
-            with col4:
-                salaire_moyen = (
-                    sum(c.get("salaire_actuel", 0) for c in filtered_data)
-                    / len(filtered_data)
-                    if filtered_data
-                    else 0
-                )
-                st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
+    with col3:
+        st.metric("🔴 Occupés", len(filtered_data) - disponibles)
 
-        # Afficher le tableau amélioré
-        event = enhancer.render_enhanced_table(filtered_data, "consultants_enhanced")
-
-        # Gérer les actions sur la sélection
-        if event and event.selection.rows:
-            selected_idx = event.selection.rows[0]
-            if selected_idx < len(filtered_data):
-                selected_consultant = filtered_data[selected_idx]
-
-                action = enhancer.render_action_buttons(
-                    selected_consultant, ["view", "edit", "delete"]
-                )
-
-                if action in ["view", "edit"]:
-                    st.session_state.view_consultant_profile = selected_consultant["id"]
-                    st.rerun()
-                elif action == "delete":
-                    if ConsultantService.delete_consultant(selected_consultant["id"]):
-                        NotificationManager.show_success(
-                            "Consultant supprimé avec succès!"
-                        )
-                        st.rerun()
-                    else:
-                        NotificationManager.show_error("Erreur lors de la suppression")
-    else:
-        st.info("📝 Aucun consultant enregistré")
-        st.markdown(
-            "💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil"
+    with col4:
+        salaire_moyen = (
+            sum(c.get("salaire_actuel", 0) for c in filtered_data) / len(filtered_data)
+            if filtered_data
+            else 0
         )
+        st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
+
+
+def _handle_enhanced_table_interactions(enhancer, filtered_data):
+    """Gère les interactions avec le tableau amélioré"""
+    from app.ui.enhanced_ui import NotificationManager
+    
+    event = enhancer.render_enhanced_table(filtered_data, "consultants_enhanced")
+
+    if event and event.selection.rows:
+        selected_idx = event.selection.rows[0]
+        if selected_idx < len(filtered_data):
+            _process_selected_consultant(enhancer, filtered_data[selected_idx])
+
+
+def _process_selected_consultant(enhancer, selected_consultant):
+    """Traite la sélection d'un consultant dans le tableau"""
+    from app.ui.enhanced_ui import NotificationManager
+    
+    action = enhancer.render_action_buttons(selected_consultant, ["view", "edit", "delete"])
+
+    if action in ["view", "edit"]:
+        st.session_state.view_consultant_profile = selected_consultant["id"]
+        st.rerun()
+    elif action == "delete":
+        if ConsultantService.delete_consultant(selected_consultant["id"]):
+            NotificationManager.show_success("Consultant supprimé avec succès!")
+            st.rerun()
+        else:
+            NotificationManager.show_error("Erreur lors de la suppression")
+
+
+def _display_no_consultants_message():
+    """Affiche le message quand aucun consultant n'est enregistré"""
+    st.info("📝 Aucun consultant enregistré")
+    st.markdown(
+        "💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil"
+    )
 
 
 def show_consultants_list_classic():
@@ -2296,7 +2326,7 @@ def _process_consultant_creation(
 
     try:
         consultant_data = _build_consultant_data(
-            basic_data, company_data, professional_data, notes, practice_options
+            basic_data, company_data, professional_data, notes
         )
 
         if ConsultantService.create_consultant(consultant_data):
@@ -2311,7 +2341,7 @@ def _process_consultant_creation(
 
 
 def _build_consultant_data(
-    basic_data, company_data, professional_data, notes, practice_options
+    basic_data, company_data, professional_data, notes
 ):
     """Construit les données du consultant à créer"""
     return {
@@ -3525,77 +3555,105 @@ def save_mission_to_consultant(
 
 def show_cv_skills(analysis):
     """Affiche les compétences extraites du CV avec une présentation améliorée"""
-
     st.write("**Compétences détectées dans le CV :**")
     st.markdown("---")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("🛠️ Technologies & Outils")
-        technologies = analysis.get("langages_techniques", [])
-        if technologies:
-            # Affichage en badges/pills
-            tech_html = ""
-            for tech in technologies:
-                tech_html += f'<span style="display: inline-block; background-color: #e1f5fe; color: #01579b; padding: 4px 12px; margin: 2px; border-radius: 20px; font-size: 0.85em;">{tech}</span>'
-            st.markdown(tech_html, unsafe_allow_html=True)
-
-            st.markdown("")  # Espace
-            st.info(f"💡 {len(technologies)} technologie(s) détectée(s)")
-        else:
-            st.info("Aucune technologie spécifique détectée")
+        _display_cv_technologies(analysis)
 
     with col2:
-        st.subheader("💼 Compétences Fonctionnelles")
-        competences = analysis.get("competences_fonctionnelles", [])
-        if competences:
-            # Affichage en liste avec icônes
-            for comp in competences:
-                st.write(f"✅ {comp}")
-
-            st.markdown("")  # Espace
-            st.info(f"💡 {len(competences)} compétence(s) fonctionnelle(s) détectée(s)")
-        else:
-            st.info("Aucune compétence fonctionnelle spécifique détectée")
+        _display_cv_functional_skills(analysis)
 
     # Section d'actions pour les compétences
+    _display_cv_skills_actions(analysis)
+
+
+def _display_cv_technologies(analysis):
+    """Affiche les technologies détectées dans le CV"""
+    st.subheader("🛠️ Technologies & Outils")
+    technologies = analysis.get("langages_techniques", [])
+    
+    if technologies:
+        # Affichage en badges/pills
+        tech_html = ""
+        for tech in technologies:
+            tech_html += f'<span style="display: inline-block; background-color: #e1f5fe; color: #01579b; padding: 4px 12px; margin: 2px; border-radius: 20px; font-size: 0.85em;">{tech}</span>'
+        st.markdown(tech_html, unsafe_allow_html=True)
+
+        st.markdown("")  # Espace
+        st.info(f"💡 {len(technologies)} technologie(s) détectée(s)")
+    else:
+        st.info("Aucune technologie spécifique détectée")
+
+
+def _display_cv_functional_skills(analysis):
+    """Affiche les compétences fonctionnelles détectées dans le CV"""
+    st.subheader("💼 Compétences Fonctionnelles")
+    competences = analysis.get("competences_fonctionnelles", [])
+    
+    if competences:
+        # Affichage en liste avec icônes
+        for comp in competences:
+            st.write(f"✅ {comp}")
+
+        st.markdown("")  # Espace
+        st.info(f"💡 {len(competences)} compétence(s) fonctionnelle(s) détectée(s)")
+    else:
+        st.info("Aucune compétence fonctionnelle spécifique détectée")
+
+
+def _display_cv_skills_actions(analysis):
+    """Affiche les actions pour les compétences CV"""
     st.markdown("---")
     st.subheader("💾 Actions pour les compétences")
 
     col_action1, col_action2 = st.columns(2)
+    technologies = analysis.get("langages_techniques", [])
+    competences = analysis.get("competences_fonctionnelles", [])
 
     with col_action1:
-        if st.button(
-            "🛠️ Ajouter toutes les technologies au profil",
-            type="primary",
-            use_container_width=True,
-        ):
-            if technologies:
-                st.success(
-                    f"✅ {len(technologies)} technologie(s) prête(s) à être ajoutée(s)"
-                )
-                st.info(
-                    "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement"
-                )
-                # Fonctionnalité à implémenter : ajout automatique des compétences techniques détectées
-            else:
-                st.warning("⚠️ Aucune technologie à ajouter")
+        _display_technologies_action_button(technologies)
 
     with col_action2:
-        if st.button(
-            "💼 Ajouter les compétences fonctionnelles", use_container_width=True
-        ):
-            if competences:
-                st.success(
-                    f"✅ {len(competences)} compétence(s) prête(s) à être ajoutée(s)"
-                )
-                st.info(
-                    "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement"
-                )
-                # Fonctionnalité à implémenter : ajout automatique des compétences fonctionnelles détectées
-            else:
-                st.warning("⚠️ Aucune compétence fonctionnelle à ajouter")
+        _display_functional_skills_action_button(competences)
+
+
+def _display_technologies_action_button(technologies):
+    """Affiche le bouton d'action pour les technologies"""
+    if st.button(
+        "🛠️ Ajouter toutes les technologies au profil",
+        type="primary",
+        use_container_width=True,
+    ):
+        if technologies:
+            st.success(
+                f"✅ {len(technologies)} technologie(s) prête(s) à être ajoutée(s)"
+            )
+            st.info(
+                "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement"
+            )
+            # Fonctionnalité à implémenter : ajout automatique des compétences techniques détectées
+        else:
+            st.warning("⚠️ Aucune technologie à ajouter")
+
+
+def _display_functional_skills_action_button(competences):
+    """Affiche le bouton d'action pour les compétences fonctionnelles"""
+    if st.button(
+        "💼 Ajouter les compétences fonctionnelles", use_container_width=True
+    ):
+        if competences:
+            st.success(
+                f"✅ {len(competences)} compétence(s) prête(s) à être ajoutée(s)"
+            )
+            st.info(
+                "🚧 Fonctionnalité de sauvegarde automatique des compétences en cours de développement"
+            )
+            # Fonctionnalité à implémenter : ajout automatique des compétences fonctionnelles détectées
+        else:
+            st.warning("⚠️ Aucune compétence fonctionnelle à ajouter")
 
 
 def show_cv_summary(analysis):
