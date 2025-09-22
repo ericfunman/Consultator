@@ -2242,7 +2242,7 @@ def show_add_consultant_form():
 
         if submitted:
             _process_consultant_creation(
-                basic_data, company_data, professional_data, notes, practice_options
+                basic_data, company_data, professional_data, notes
             )
 
 
@@ -2354,7 +2354,7 @@ def _render_professional_profile_section():
 
 
 def _process_consultant_creation(
-    basic_data, company_data, professional_data, notes, practice_options
+    basic_data, company_data, professional_data, notes
 ):
     """Traite la création du consultant"""
     prenom, nom, email = basic_data["prenom"], basic_data["nom"], basic_data["email"]
@@ -3204,12 +3204,18 @@ def analyze_cv_document(file_path, consultant):
 
 def show_cv_missions(missions, consultant):
     """Affiche les missions extraites du CV avec possibilité d'édition et sauvegarde"""
-
     if not missions:
         st.info("📋 Aucune mission détectée dans le CV")
         return
 
-    # Utiliser explicitement toute la largeur disponible
+    _setup_cv_missions_styling()
+    _display_cv_missions_header(missions)
+    _display_cv_missions_global_save_button(missions, consultant)
+    _display_cv_missions_list(missions, consultant)
+
+
+def _setup_cv_missions_styling():
+    """Configure le CSS pour l'affichage des missions CV"""
     st.markdown(
         """
     <style>
@@ -3225,177 +3231,267 @@ def show_cv_missions(missions, consultant):
         unsafe_allow_html=True,
     )
 
-    # En-tête avec métriques
+
+def _display_cv_missions_header(missions):
+    """Affiche l'en-tête avec le nombre de missions"""
     st.markdown(f"### 📋 {len(missions)} mission(s) détectée(s) dans le CV")
 
-    # Bouton global en pleine largeur avec validation globale
+
+def _display_cv_missions_global_save_button(missions, consultant):
+    """Affiche le bouton de sauvegarde globale"""
     if st.button(
         "💾 Sauvegarder TOUTES les missions", type="primary", use_container_width=True
     ):
-        # Validation globale de toutes les missions
-        all_valid = True
-        for i, mission in enumerate(missions, 1):
-            client = mission.get("client", "")
-            titre = mission.get("titre", "")
+        _handle_global_missions_save(missions, consultant)
 
-            if not client or not titre:
-                all_valid = False
-                st.error(f"❌ Mission {i}: Client et titre sont obligatoires")
 
-        if all_valid:
-            save_all_missions_to_consultant(missions, consultant)
-        else:
-            st.warning(
-                "⚠️ Veuillez corriger les missions ci-dessous avant de sauvegarder toutes les missions."
-            )
-            st.info(
-                "💡 Conseil: Utilisez les boutons de sauvegarde individuels pour voir les erreurs détaillées."
-            )
+def _handle_global_missions_save(missions, consultant):
+    """Gère la sauvegarde globale de toutes les missions"""
+    all_valid = _validate_all_missions(missions)
+    
+    if all_valid:
+        save_all_missions_to_consultant(missions, consultant)
+    else:
+        _display_global_validation_errors()
 
+
+def _validate_all_missions(missions):
+    """Valide toutes les missions et retourne True si toutes sont valides"""
+    all_valid = True
+    for i, mission in enumerate(missions, 1):
+        client = mission.get("client", "")
+        titre = mission.get("titre", "")
+
+        if not client or not titre:
+            all_valid = False
+            st.error(f"❌ Mission {i}: Client et titre sont obligatoires")
+    
+    return all_valid
+
+
+def _display_global_validation_errors():
+    """Affiche les erreurs de validation globale"""
+    st.warning(
+        "⚠️ Veuillez corriger les missions ci-dessous avant de sauvegarder toutes les missions."
+    )
+    st.info(
+        "💡 Conseil: Utilisez les boutons de sauvegarde individuels pour voir les erreurs détaillées."
+    )
+
+
+def _display_cv_missions_list(missions, consultant):
+    """Affiche la liste des missions avec formulaires individuels"""
     st.markdown("---")
 
-    # Afficher chaque mission individuellement - PLEINE LARGEUR
     for i, mission in enumerate(missions, 1):
-        # Container pleine largeur pour chaque mission
-        with st.container():
-            client_name = mission.get("client", "Client inconnu")
-            st.markdown(f"### 🏢 Mission {i}: {client_name}")
+        _display_single_cv_mission(mission, i, consultant, len(missions))
 
-            # Champs principaux - layout optimisé avec validation visuelle
 
-            # Initialiser la validation dans session_state si nécessaire
-            if f"validation_errors_{i}" not in st.session_state:
-                st.session_state[f"validation_errors_{i}"] = []
+def _display_single_cv_mission(mission, mission_index, consultant, total_missions):
+    """Affiche une mission individuelle avec son formulaire"""
+    with st.container():
+        _display_cv_mission_header(mission, mission_index)
+        _display_cv_mission_form(mission, mission_index, consultant)
+        _display_cv_mission_preview(mission_index)
+        _display_cv_mission_separator(mission_index, total_missions)
 
-            validation_errors = st.session_state.get(f"validation_errors_{i}", [])
 
-            # Client avec validation visuelle
-            client_error = f"mission_{i}_client" in validation_errors
-            if client_error:
-                st.markdown("**🚨 Client requis**", help=MSG_CHAMP_OBLIGATOIRE)
+def _display_cv_mission_header(mission, mission_index):
+    """Affiche l'en-tête d'une mission"""
+    client_name = mission.get("client", "Client inconnu")
+    st.markdown(f"### 🏢 Mission {mission_index}: {client_name}")
 
-            client = st.text_input(
-                "🏢 Client *" + (" 🚨" if client_error else ""),
-                value=mission.get("client", ""),
-                key=f"mission_{i}_client",
-                help="Nom du client pour cette mission (OBLIGATOIRE)",
-                placeholder="Exemple: Société Générale, BNP Paribas...",
-            )
 
-            # Titre avec validation visuelle
-            titre_error = f"mission_{i}_titre" in validation_errors
-            if titre_error:
-                st.markdown("**🚨 Rôle/Titre requis**", help=MSG_CHAMP_OBLIGATOIRE)
+def _display_cv_mission_form(mission, mission_index, consultant):
+    """Affiche le formulaire d'édition d'une mission"""
+    _initialize_mission_validation_state(mission_index)
+    validation_errors = st.session_state.get(f"validation_errors_{mission_index}", [])
 
-            titre = st.text_input(
-                "👤 Rôle/Titre *" + (" 🚨" if titre_error else ""),
-                value=mission.get("titre", ""),
-                key=f"mission_{i}_titre",
-                help="Votre rôle ou titre dans cette mission (OBLIGATOIRE)",
-                placeholder="Exemple: Développeur Full Stack, Consultant...",
-            )
+    # Champs client et titre
+    client = _display_cv_mission_client_field(mission, mission_index, validation_errors)
+    titre = _display_cv_mission_titre_field(mission, mission_index, validation_errors)
+    
+    # Champs dates
+    date_debut, date_fin = _display_cv_mission_dates_fields(mission_index, validation_errors)
+    
+    # Champs description et technologies
+    description = _display_cv_mission_description_field(mission, mission_index)
+    technologies = _display_cv_mission_technologies_field(mission, mission_index)
+    
+    # Bouton de sauvegarde
+    _display_cv_mission_save_button(
+        mission_index, consultant, client, titre, date_debut, date_fin, description, technologies
+    )
 
-            # Dates côte à côte mais dans un layout flexible
-            col_date1, col_date2 = st.columns(2)
-            with col_date1:
-                date_error = f"mission_{i}_debut" in validation_errors
-                if date_error:
-                    st.markdown(
-                        "**🚨 Date de début requise**", help=MSG_CHAMP_OBLIGATOIRE
-                    )
 
-                date_debut = st.date_input(
-                    "📅 Date de début *" + (" 🚨" if date_error else ""),
-                    value=None,
-                    key=f"mission_{i}_debut",
-                    help="Date de début de la mission (OBLIGATOIRE)",
-                )
-            with col_date2:
-                date_fin = st.date_input(
-                    "📅 Date de fin",
-                    value=None,
-                    key=f"mission_{i}_fin",
-                    help="Date de fin (laisser vide si en cours)",
-                )
+def _initialize_mission_validation_state(mission_index):
+    """Initialise l'état de validation pour une mission"""
+    if f"validation_errors_{mission_index}" not in st.session_state:
+        st.session_state[f"validation_errors_{mission_index}"] = []
 
-            # Description en pleine largeur
-            description = st.text_area(
-                "📝 Description de la mission",
-                value=mission.get("description", ""),
-                height=120,
-                key=f"mission_{i}_description",
-                help="Description détaillée de vos activités et responsabilités",
-            )
 
-            # Technologies en pleine largeur
-            technologies_text = ", ".join(mission.get("langages_techniques", []))
-            technologies = st.text_area(
-                "🛠️ Technologies et outils utilisés",
-                value=technologies_text,
-                height=80,
-                key=f"mission_{i}_technologies",
-                help="Technologies, langages, outils séparés par des virgules (ex: Python, React, AWS, Docker)",
-            )
+def _display_cv_mission_client_field(mission, mission_index, validation_errors):
+    """Affiche le champ client avec validation"""
+    client_error = f"mission_{mission_index}_client" in validation_errors
+    if client_error:
+        st.markdown("**🚨 Client requis**", help=MSG_CHAMP_OBLIGATOIRE)
 
-            # Bouton de sauvegarde en pleine largeur avec validation
-            if st.button(
-                f"💾 Sauvegarder Mission {i}",
-                key=f"save_mission_{i}",
-                type="primary",
-                use_container_width=True,
-                help="Ajouter cette mission au profil du consultant",
-            ):
-                # Validation avant sauvegarde
-                validation_errors = validate_mission_fields(
-                    client, titre, date_debut, i
-                )
-                st.session_state[f"validation_errors_{i}"] = validation_errors
+    return st.text_input(
+        "🏢 Client *" + (" 🚨" if client_error else ""),
+        value=mission.get("client", ""),
+        key=f"mission_{mission_index}_client",
+        help="Nom du client pour cette mission (OBLIGATOIRE)",
+        placeholder="Exemple: Société Générale, BNP Paribas...",
+    )
 
-                if validation_errors:
-                    # Afficher les erreurs et rerun pour mettre à jour l'affichage
-                    show_validation_errors(validation_errors, i)
-                    st.rerun()
-                else:
-                    # Nettoyer les erreurs précédentes
-                    st.session_state[f"validation_errors_{i}"] = []
 
-                    # Sauvegarder la mission
-                    success = save_mission_to_consultant(
-                        consultant,
-                        client,
-                        titre,
-                        date_debut,
-                        date_fin,
-                        description,
-                        technologies,
-                        i,
-                    )
+def _display_cv_mission_titre_field(mission, mission_index, validation_errors):
+    """Affiche le champ titre avec validation"""
+    titre_error = f"mission_{mission_index}_titre" in validation_errors
+    if titre_error:
+        st.markdown("**🚨 Rôle/Titre requis**", help=MSG_CHAMP_OBLIGATOIRE)
 
-                    if success:
-                        # Optionnel: nettoyer le formulaire après succès
-                        st.success(
-                            "Mission sauvegardée ! Vous pouvez maintenant remplir la mission suivante."
-                        )
+    return st.text_input(
+        "👤 Rôle/Titre *" + (" 🚨" if titre_error else ""),
+        value=mission.get("titre", ""),
+        key=f"mission_{mission_index}_titre",
+        help="Votre rôle ou titre dans cette mission (OBLIGATOIRE)",
+        placeholder="Exemple: Développeur Full Stack, Consultant...",
+    )
 
-            # Afficher un aperçu rapide de ce qui sera sauvegardé
-            if client and titre and date_debut:
-                st.info(
-                    f"✅ Prêt à sauvegarder: {titre} chez {client} (début: {date_debut.strftime(FORMAT_DATE)})"
-                )
-            else:
-                missing = []
-                if not client:
-                    missing.append("Client")
-                if not titre:
-                    missing.append("Rôle/Titre")
-                if not date_debut:
-                    missing.append("Date de début")
-                st.warning(f"⚠️ Champs manquants: {', '.join(missing)}")
 
-            # Séparateur entre les missions
-            if i < len(missions):
-                st.markdown("---")
-                st.markdown("")  # Espace supplémentaire
+def _display_cv_mission_dates_fields(mission_index, validation_errors):
+    """Affiche les champs de dates avec validation"""
+    col_date1, col_date2 = st.columns(2)
+    
+    with col_date1:
+        date_debut = _display_cv_mission_date_debut_field(mission_index, validation_errors)
+    
+    with col_date2:
+        date_fin = _display_cv_mission_date_fin_field(mission_index)
+    
+    return date_debut, date_fin
+
+
+def _display_cv_mission_date_debut_field(mission_index, validation_errors):
+    """Affiche le champ date de début"""
+    date_error = f"mission_{mission_index}_debut" in validation_errors
+    if date_error:
+        st.markdown("**🚨 Date de début requise**", help=MSG_CHAMP_OBLIGATOIRE)
+
+    return st.date_input(
+        "📅 Date de début *" + (" 🚨" if date_error else ""),
+        value=None,
+        key=f"mission_{mission_index}_debut",
+        help="Date de début de la mission (OBLIGATOIRE)",
+    )
+
+
+def _display_cv_mission_date_fin_field(mission_index):
+    """Affiche le champ date de fin"""
+    return st.date_input(
+        "📅 Date de fin",
+        value=None,
+        key=f"mission_{mission_index}_fin",
+        help="Date de fin (laisser vide si en cours)",
+    )
+
+
+def _display_cv_mission_description_field(mission, mission_index):
+    """Affiche le champ description"""
+    return st.text_area(
+        "📝 Description de la mission",
+        value=mission.get("description", ""),
+        height=120,
+        key=f"mission_{mission_index}_description",
+        help="Description détaillée de vos activités et responsabilités",
+    )
+
+
+def _display_cv_mission_technologies_field(mission, mission_index):
+    """Affiche le champ technologies"""
+    technologies_text = ", ".join(mission.get("langages_techniques", []))
+    return st.text_area(
+        "🛠️ Technologies et outils utilisés",
+        value=technologies_text,
+        height=80,
+        key=f"mission_{mission_index}_technologies",
+        help="Technologies, langages, outils séparés par des virgules (ex: Python, React, AWS, Docker)",
+    )
+
+
+def _display_cv_mission_save_button(mission_index, consultant, client, titre, date_debut, date_fin, description, technologies):
+    """Affiche le bouton de sauvegarde d'une mission"""
+    if st.button(
+        f"💾 Sauvegarder Mission {mission_index}",
+        key=f"save_mission_{mission_index}",
+        type="primary",
+        use_container_width=True,
+        help="Ajouter cette mission au profil du consultant",
+    ):
+        _handle_single_mission_save(
+            mission_index, consultant, client, titre, date_debut, date_fin, description, technologies
+        )
+
+
+def _handle_single_mission_save(mission_index, consultant, client, titre, date_debut, date_fin, description, technologies):
+    """Gère la sauvegarde d'une mission individuelle"""
+    validation_errors = validate_mission_fields(client, titre, date_debut, mission_index)
+    st.session_state[f"validation_errors_{mission_index}"] = validation_errors
+
+    if validation_errors:
+        show_validation_errors(validation_errors, mission_index)
+        st.rerun()
+    else:
+        _save_validated_mission(
+            consultant, client, titre, date_debut, date_fin, description, technologies, mission_index
+        )
+
+
+def _save_validated_mission(consultant, client, titre, date_debut, date_fin, description, technologies, mission_index):
+    """Sauvegarde une mission validée"""
+    st.session_state[f"validation_errors_{mission_index}"] = []
+
+    success = save_mission_to_consultant(
+        consultant, client, titre, date_debut, date_fin, description, technologies, mission_index
+    )
+
+    if success:
+        st.success("Mission sauvegardée ! Vous pouvez maintenant remplir la mission suivante.")
+
+
+def _display_cv_mission_preview(mission_index):
+    """Affiche l'aperçu de la mission à sauvegarder"""
+    client = st.session_state.get(f"mission_{mission_index}_client", "")
+    titre = st.session_state.get(f"mission_{mission_index}_titre", "")
+    date_debut = st.session_state.get(f"mission_{mission_index}_debut")
+
+    if client and titre and date_debut:
+        st.info(
+            f"✅ Prêt à sauvegarder: {titre} chez {client} (début: {date_debut.strftime(FORMAT_DATE)})"
+        )
+    else:
+        _display_mission_missing_fields(client, titre, date_debut)
+
+
+def _display_mission_missing_fields(client, titre, date_debut):
+    """Affiche les champs manquants pour une mission"""
+    missing = []
+    if not client:
+        missing.append("Client")
+    if not titre:
+        missing.append("Rôle/Titre")
+    if not date_debut:
+        missing.append("Date de début")
+    st.warning(f"⚠️ Champs manquants: {', '.join(missing)}")
+
+
+def _display_cv_mission_separator(mission_index, total_missions):
+    """Affiche le séparateur entre les missions"""
+    if mission_index < total_missions:
+        st.markdown("---")
+        st.markdown("")  # Espace supplémentaire
+
 
 
 def save_all_missions_to_consultant(missions, consultant):
@@ -3779,16 +3875,24 @@ def show_cv_summary(analysis):
 
 def show_cv_actions(analysis, consultant):
     """Affiche les actions possibles après analyse avec une interface améliorée"""
-
     st.subheader("💾 Actions globales")
     st.write("Effectuez des actions sur l'ensemble des données analysées.")
     st.markdown("---")
 
-    # Statistiques rapides
+    # Extraire les données d'analyse
     missions = analysis.get("missions", [])
     technologies = analysis.get("langages_techniques", [])
     competences = analysis.get("competences_fonctionnelles", [])
 
+    # Afficher les statistiques et actions principales
+    _display_cv_actions_statistics(missions, technologies, competences)
+    _display_cv_main_actions(missions, technologies, competences)
+    _display_cv_export_tools(consultant, missions, technologies, competences)
+    _display_cv_detected_missions(missions)
+
+
+def _display_cv_actions_statistics(missions, technologies, competences):
+    """Affiche les statistiques rapides des actions CV"""
     col_stat1, col_stat2, col_stat3 = st.columns(3)
     with col_stat1:
         st.metric("🏢 Missions détectées", len(missions))
@@ -3799,148 +3903,219 @@ def show_cv_actions(analysis, consultant):
 
     st.markdown("---")
 
-    # Actions principales
+
+def _display_cv_main_actions(missions, technologies, competences):
+    """Affiche les actions principales pour les missions et compétences"""
     col1, col2 = st.columns(2)
 
     with col1:
-        st.write("**📋 Gestion des missions**")
-        if st.button(
-            "📋 Ajouter toutes les missions au profil",
-            type="primary",
-            use_container_width=True,
-        ):
-            if missions:
-                added_count = 0
-                for i, mission in enumerate(missions, 1):
-                    # Logique d'ajout automatique simplifié
-                    client = mission.get("client", f"Client Mission {i}")
-                    titre = mission.get("titre", f"Mission {i}")
-
-                    if client and titre:  # Validation minimale
-                        try:
-                            # Simulation d'ajout (remplacer par la vraie logique)
-                            added_count += 1
-                        except (SQLAlchemyError, ValueError, TypeError):
-                            pass
-
-                if added_count > 0:
-                    st.success(f"✅ {added_count} mission(s) ajoutée(s) avec succès!")
-                    st.info(
-                        "💡 Consultez l'onglet 'Missions' du profil pour voir les ajouts"
-                    )
-                else:
-                    st.warning("⚠️ Aucune mission n'a pu être ajoutée automatiquement")
-                    st.info(
-                        "� Utilisez l'onglet 'Missions' ci-dessus pour les ajouter manuellement"
-                    )
-            else:
-                st.warning("⚠️ Aucune mission à ajouter")
-
-        st.markdown("")
-        if missions:
-            st.info(
-                f"💡 {len(missions)} mission(s) peuvent être ajoutée(s) individuellement dans l'onglet 'Missions'"
-            )
+        _display_missions_actions(missions)
 
     with col2:
-        st.write("**🛠️ Gestion des compétences**")
-        if st.button(
-            "🛠️ Ajouter toutes les compétences au profil", use_container_width=True
-        ):
-            total_skills = len(technologies) + len(competences)
-            if total_skills > 0:
-                st.success(f"✅ {total_skills} compétence(s) identifiée(s)")
-                st.info(
-                    "🚧 Ajout automatique des compétences en cours de développement"
-                )
-                st.write("**Technologies à ajouter:**")
-                for tech in technologies[:5]:  # Limiter l'affichage
-                    st.write(f"• {tech}")
-                if len(technologies) > 5:
-                    st.write(f"• ... et {len(technologies) - 5} autres")
-            else:
-                st.warning("⚠️ Aucune compétence à ajouter")
+        _display_skills_actions(technologies, competences)
 
-        st.markdown("")
-        if technologies:
-            st.info(
-                f"💡 {len(technologies)} technologie(s) peuvent être ajoutée(s) manuellement"
-            )
 
-    # Export et outils avancés
+def _display_missions_actions(missions):
+    """Affiche les actions pour les missions"""
+    st.write("**📋 Gestion des missions**")
+    if st.button(
+        "📋 Ajouter toutes les missions au profil",
+        type="primary",
+        use_container_width=True,
+    ):
+        _handle_add_all_missions(missions)
+
+    st.markdown("")
+    if missions:
+        st.info(
+            f"💡 {len(missions)} mission(s) peuvent être ajoutée(s) individuellement dans l'onglet 'Missions'"
+        )
+
+
+def _handle_add_all_missions(missions):
+    """Gère l'ajout automatique de toutes les missions"""
+    if missions:
+        added_count = _process_missions_addition(missions)
+        _display_missions_addition_result(added_count)
+    else:
+        st.warning("⚠️ Aucune mission à ajouter")
+
+
+def _process_missions_addition(missions):
+    """Traite l'ajout des missions et retourne le nombre ajouté"""
+    added_count = 0
+    for i, mission in enumerate(missions, 1):
+        client = mission.get("client", f"Client Mission {i}")
+        titre = mission.get("titre", f"Mission {i}")
+
+        if client and titre:  # Validation minimale
+            try:
+                # Simulation d'ajout (remplacer par la vraie logique)
+                added_count += 1
+            except (SQLAlchemyError, ValueError, TypeError):
+                pass
+    return added_count
+
+
+def _display_missions_addition_result(added_count):
+    """Affiche le résultat de l'ajout des missions"""
+    if added_count > 0:
+        st.success(f"✅ {added_count} mission(s) ajoutée(s) avec succès!")
+        st.info("💡 Consultez l'onglet 'Missions' du profil pour voir les ajouts")
+    else:
+        st.warning("⚠️ Aucune mission n'a pu être ajoutée automatiquement")
+        st.info("ℹ Utilisez l'onglet 'Missions' ci-dessus pour les ajouter manuellement")
+
+
+def _display_skills_actions(technologies, competences):
+    """Affiche les actions pour les compétences"""
+    st.write("**🛠️ Gestion des compétences**")
+    if st.button(
+        "🛠️ Ajouter toutes les compétences au profil", use_container_width=True
+    ):
+        _handle_add_all_skills(technologies, competences)
+
+    st.markdown("")
+    if technologies:
+        st.info(f"💡 {len(technologies)} technologie(s) peuvent être ajoutée(s) manuellement")
+
+
+def _handle_add_all_skills(technologies, competences):
+    """Gère l'ajout automatique de toutes les compétences"""
+    total_skills = len(technologies) + len(competences)
+    if total_skills > 0:
+        st.success(f"✅ {total_skills} compétence(s) identifiée(s)")
+        st.info("🚧 Ajout automatique des compétences en cours de développement")
+        _display_technologies_preview(technologies)
+    else:
+        st.warning("⚠️ Aucune compétence à ajouter")
+
+
+def _display_technologies_preview(technologies):
+    """Affiche un aperçu des technologies à ajouter"""
+    st.write("**Technologies à ajouter:**")
+    for tech in technologies[:5]:  # Limiter l'affichage
+        st.write(f"• {tech}")
+    if len(technologies) > 5:
+        st.write(f"• ... et {len(technologies) - 5} autres")
+
+
+def _display_cv_export_tools(consultant, missions, technologies, competences):
+    """Affiche les outils d'export et actions avancées"""
     st.markdown("---")
     st.subheader("📤 Export et outils")
 
     col_exp1, col_exp2, col_exp3 = st.columns(3)
 
     with col_exp1:
-        if st.button("📄 Export JSON", use_container_width=True):
-            import json
-
-            export_data = {
-                "consultant": f"{consultant.prenom} {consultant.nom}",
-                "missions": missions,
-                "technologies": technologies,
-                "competences_fonctionnelles": competences,
-                "date_analyse": datetime.now().isoformat(),
-            }
-            st.json(export_data)
-            st.success("✅ Données exportées au format JSON")
+        _display_json_export_button(consultant, missions, technologies, competences)
 
     with col_exp2:
-        if st.button("📊 Résumé formaté", use_container_width=True):
-            resume_text = f"""
+        _display_formatted_summary_button(consultant, missions, technologies, competences)
+
+    with col_exp3:
+        _display_new_analysis_button()
+
+
+def _display_json_export_button(consultant, missions, technologies, competences):
+    """Affiche le bouton d'export JSON"""
+    if st.button("📄 Export JSON", use_container_width=True):
+        import json
+        from datetime import datetime
+
+        export_data = {
+            "consultant": f"{consultant.prenom} {consultant.nom}",
+            "missions": missions,
+            "technologies": technologies,
+            "competences_fonctionnelles": competences,
+            "date_analyse": datetime.now().isoformat(),
+        }
+        st.json(export_data)
+        st.success("✅ Données exportées au format JSON")
+
+
+def _display_formatted_summary_button(consultant, missions, technologies, competences):
+    """Affiche le bouton de résumé formaté"""
+    if st.button("📊 Résumé formaté", use_container_width=True):
+        resume_text = _generate_formatted_summary(consultant, missions, technologies, competences)
+        st.text_area("Résumé de l'analyse", resume_text, height=300)
+        st.success("✅ Résumé généré")
+
+
+def _generate_formatted_summary(consultant, missions, technologies, competences):
+    """Génère le texte du résumé formaté"""
+    missions_text = chr(10).join([
+        f"• {m.get('client', 'N/A')} - {m.get('titre', 'N/A')}" 
+        for m in missions[:10]
+    ])
+    
+    return f"""
 **Analyse CV - {consultant.prenom} {consultant.nom}**
 
 **Missions ({len(missions)}):**
-{chr(10).join([f"• {m.get('client', 'N/A')} - {m.get('titre', 'N/A')}" for m in missions[:10]])}
+{missions_text}
 
 **Technologies ({len(technologies)}):**
 {', '.join(technologies[:20])}
 
 **Compétences ({len(competences)}):**
 {', '.join(competences[:10])}
-            """
-            st.text_area("Résumé de l'analyse", resume_text, height=300)
-            st.success("✅ Résumé généré")
+    """
 
-    with col_exp3:
-        if st.button("� Nouvelle analyse", use_container_width=True):
-            st.info(
-                "� Uploadez un nouveau document dans l'onglet 'Documents' pour une nouvelle analyse"
-            )
-            st.info("🔄 Ou rafraîchissez la page pour réanalyser le même document")
 
+def _display_new_analysis_button():
+    """Affiche le bouton de nouvelle analyse"""
+    if st.button("🔄 Nouvelle analyse", use_container_width=True):
+        st.info("📁 Uploadez un nouveau document dans l'onglet 'Documents' pour une nouvelle analyse")
+        st.info("🔄 Ou rafraîchissez la page pour réanalyser le même document")
+
+
+def _display_cv_detected_missions(missions):
+    """Affiche les missions détectées avec leurs détails"""
     st.subheader(f"🚀 Missions détectées ({len(missions)})")
 
     for i, mission in enumerate(missions, 1):
-        with st.expander(
-            f"Mission {i}: {mission.get('client', 'Client non spécifié')}",
-            expanded=True,
-        ):
-            col1, col2 = st.columns(2)
+        _display_single_detected_mission(mission, i)
 
-            with col1:
-                st.write("**🏢 Client:**", mission.get("client", VALEUR_NON_SPECIFIE))
-                st.write("**🎯 Rôle:**", mission.get("role", VALEUR_NON_SPECIFIE))
 
-                if mission.get("dates"):
-                    st.write("**📅 Période:**", mission["dates"])
+def _display_single_detected_mission(mission, mission_number):
+    """Affiche une mission détectée individuelle"""
+    with st.expander(
+        f"Mission {mission_number}: {mission.get('client', 'Client non spécifié')}",
+        expanded=True,
+    ):
+        col1, col2 = st.columns(2)
 
-            with col2:
-                if mission.get("langages_techniques"):
-                    st.write("**🛠️ Technologies:**")
-                    for tech in mission["langages_techniques"]:
-                        st.markdown(f"• {tech}")
+        with col1:
+            _display_mission_basic_info(mission)
 
-                if mission.get("description"):
-                    st.write("**📝 Description:**")
-                    st.write(
-                        mission["description"][:200] + "..."
-                        if len(mission["description"]) > 200
-                        else mission["description"]
-                    )
+        with col2:
+            _display_mission_technical_info(mission)
 
+
+def _display_mission_basic_info(mission):
+    """Affiche les informations de base d'une mission"""
+    st.write("**🏢 Client:**", mission.get("client", VALEUR_NON_SPECIFIE))
+    st.write("**🎯 Rôle:**", mission.get("role", VALEUR_NON_SPECIFIE))
+
+    if mission.get("dates"):
+        st.write("**📅 Période:**", mission["dates"])
+
+
+def _display_mission_technical_info(mission):
+    """Affiche les informations techniques d'une mission"""
+    if mission.get("langages_techniques"):
+        st.write("**🛠️ Technologies:**")
+        for tech in mission["langages_techniques"]:
+            st.markdown(f"• {tech}")
+
+    if mission.get("description"):
+        st.write("**📝 Description:**")
+        description = mission["description"]
+        display_description = (
+            description[:200] + "..." if len(description) > 200 else description
+        )
+        st.write(display_description)
 
 def import_missions_to_profile(missions, consultant):
     """
