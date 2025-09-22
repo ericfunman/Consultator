@@ -2636,8 +2636,9 @@ class ChatbotService:
 
     def _get_top_consultants_by_cvs(self) -> List:
         """Récupère le top 3 des consultants avec le plus de CVs"""
-        from database.models import CV
         from sqlalchemy import func
+
+        from database.models import CV
 
         with get_database_session() as session:
             return (
