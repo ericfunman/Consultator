@@ -677,7 +677,7 @@ class ChatbotService:
                                     + consultant.nom
                                     + self.SECTION_HEADER_SUFFIX
                                 )
-                                response += f"🚀 **Première mission :** {consultant_db.date_premiere_mission.strftime('%d/%m/%Y')}\n"
+                                response += f"🚀 **Première mission :** {consultant_db.date_premiere_mission.strftime(self.DATE_FORMAT)}\n"
                                 response += f"⏱️ **Expérience totale :** **{experience_annees} années**\n"
 
                                 # Ajouter des informations contextuelles
@@ -692,7 +692,7 @@ class ChatbotService:
                                     )
 
                                 if consultant_db.date_entree_societe:
-                                    response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime('%d/%m/%Y')}\n"
+                                    response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime(self.DATE_FORMAT)}\n"
 
                                 # Calculer l'ancienneté dans la société
                                 if consultant_db.date_entree_societe:
@@ -1844,8 +1844,7 @@ class ChatbotService:
                 consultants = (
                     session.query(Consultant).filter(Consultant.disponibilite).all()
                 )
-            titre = "👥 **Consultants actifs :**"
-            titre = "👥 **Consultants actifs :**"
+            _ = "👥 **Consultants actifs :**"
         else:
             # Tous les consultants
             with get_database_session() as session:
