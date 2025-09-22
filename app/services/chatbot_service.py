@@ -2029,58 +2029,26 @@ class ChatbotService:
     def _handle_contact_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les contacts (email, téléphone)"""
 
-        if entities["noms"]:
-            nom: str = entities["noms"][0]
-            consultant = self._find_consultant_by_name(nom)
+        if not entities["noms"]:
+            return self._handle_generic_contact_question()
 
-            if consultant:
-                # Déterminer le type d'information demandée
-                question_lower: str = self.last_question.lower()
+        nom: str = entities["noms"][0]
+        consultant = self._find_consultant_by_name(nom)
 
-                if any(word in question_lower for word in ["mail", "email", "e-mail"]):
-                    if consultant.email:
-                        response = f"📧 L'email de **{consultant.prenom} {consultant.nom}** est : **{consultant.email}**"
-                    else:
-                        response = f"❓ Désolé, l'email de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+        if not consultant:
+            return self._handle_consultant_not_found_contact(nom)
 
-                elif any(
-                    word in question_lower for word in ["téléphone", "tel", "numéro"]
-                ):
-                    if consultant.telephone:
-                        response = f"📞 Le téléphone de **{consultant.prenom} {consultant.nom}** est : **{consultant.telephone}**"
-                    else:
-                        response = f"❓ Désolé, le téléphone de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+        question_lower: str = self.last_question.lower()
 
-                else:
-                    # Information de contact complète
-                    response = (
-                        f"📞 **Contact de {consultant.prenom} {consultant.nom} :**\n\n"
-                    )
-                    response += (
-                        f"📧 Email : **{consultant.email or 'Non renseigné'}**\n"
-                    )
-                    response += (
-                        f"📞 Téléphone : **{consultant.telephone or 'Non renseigné'}**"
-                    )
+        if self._is_email_question(question_lower):
+            return self._handle_email_request(consultant)
+        elif self._is_phone_question(question_lower):
+            return self._handle_phone_request(consultant)
+        else:
+            return self._handle_complete_contact_request(consultant)
 
-                return {
-                    "response": response,
-                    "data": {
-                        "consultant": consultant.nom,
-                        "email": consultant.email,
-                        "telephone": consultant.telephone,
-                    },
-                    "intent": "contact",
-                    "confidence": 0.9,
-                }
-            else:
-                return {
-                    "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom}** dans la base de données.",
-                    "data": None,
-                    "intent": "contact",
-                    "confidence": 0.7,
-                }
-
+    def _handle_generic_contact_question(self) -> Dict[str, Any]:
+        """Gère les questions de contact génériques sans nom spécifique"""
         return {
             "response": "🤔 De quel consultant souhaitez-vous connaître les coordonnées ?",
             "data": None,
@@ -2088,135 +2056,258 @@ class ChatbotService:
             "confidence": 0.5,
         }
 
+    def _handle_consultant_not_found_contact(self, nom: str) -> Dict[str, Any]:
+        """Gère le cas où le consultant n'est pas trouvé pour une question de contact"""
+        return {
+            "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom}** dans la base de données.",
+            "data": None,
+            "intent": "contact",
+            "confidence": 0.7,
+        }
+
+    def _is_email_question(self, question_lower: str) -> bool:
+        """Détermine si la question concerne l'email"""
+        return any(word in question_lower for word in ["mail", "email", "e-mail"])
+
+    def _is_phone_question(self, question_lower: str) -> bool:
+        """Détermine si la question concerne le téléphone"""
+        return any(word in question_lower for word in ["téléphone", "tel", "numéro"])
+
+    def _handle_email_request(self, consultant) -> Dict[str, Any]:
+        """Gère les demandes spécifiques d'email"""
+        if consultant.email:
+            response = f"� L'email de **{consultant.prenom} {consultant.nom}** est : **{consultant.email}**"
+        else:
+            response = f"❓ Désolé, l'email de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+
+        return {
+            "response": response,
+            "data": {
+                "consultant": consultant.nom,
+                "email": consultant.email,
+                "telephone": consultant.telephone,
+            },
+            "intent": "contact",
+            "confidence": 0.9,
+        }
+
+    def _handle_phone_request(self, consultant) -> Dict[str, Any]:
+        """Gère les demandes spécifiques de téléphone"""
+        if consultant.telephone:
+            response = f"📞 Le téléphone de **{consultant.prenom} {consultant.nom}** est : **{consultant.telephone}**"
+        else:
+            response = f"❓ Désolé, le téléphone de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+
+        return {
+            "response": response,
+            "data": {
+                "consultant": consultant.nom,
+                "email": consultant.email,
+                "telephone": consultant.telephone,
+            },
+            "intent": "contact",
+            "confidence": 0.9,
+        }
+
+    def _handle_complete_contact_request(self, consultant) -> Dict[str, Any]:
+        """Gère les demandes de contact complet"""
+        response = f"📞 **Contact de {consultant.prenom} {consultant.nom} :**\n\n"
+        response += f"📧 Email : **{consultant.email or 'Non renseigné'}**\n"
+        response += f"📞 Téléphone : **{consultant.telephone or 'Non renseigné'}**"
+
+        return {
+            "response": response,
+            "data": {
+                "consultant": consultant.nom,
+                "email": consultant.email,
+                "telephone": consultant.telephone,
+            },
+            "intent": "contact",
+            "confidence": 0.9,
+        }
+
     def _handle_list_consultants_question(self) -> Dict[str, Any]:
         """Gère les questions pour lister les consultants selon des critères"""
-
         question_lower: str = self.last_question.lower()
 
-        # Déterminer le filtre à appliquer
-        if "disponibles" in question_lower or "disponible" in question_lower:
-            with get_database_session() as session:
+        consultants, titre = self._get_consultants_by_criteria(question_lower)
+
+        if not consultants:
+            return self._handle_no_consultants_found()
+
+        response = self._format_consultants_list(consultants, titre)
+        data = self._build_consultants_data(consultants)
+
+        return {
+            "response": response,
+            "data": data,
+            "intent": "liste_consultants",
+            "confidence": 0.9,
+        }
+
+    def _get_consultants_by_criteria(self, question_lower: str) -> tuple:
+        """Récupère les consultants selon les critères de la question"""
+        with get_database_session() as session:
+            if "disponibles" in question_lower or "disponible" in question_lower:
                 consultants = (
                     session.query(Consultant).filter(Consultant.disponibilite).all()
                 )
-            titre = "👥 **Consultants disponibles :**"
-        elif "indisponibles" in question_lower or "indisponible" in question_lower:
-            with get_database_session() as session:
+                titre = "👥 **Consultants disponibles :**"
+            elif "indisponibles" in question_lower or "indisponible" in question_lower:
                 consultants = (
                     session.query(Consultant)
                     .filter(Consultant.disponibilite is False)
                     .all()
                 )
-            titre = "👥 **Consultants indisponibles :**"
-        elif "actifs" in question_lower or "actif" in question_lower:
-            with get_database_session() as session:
+                titre = "👥 **Consultants indisponibles :**"
+            elif "actifs" in question_lower or "actif" in question_lower:
                 consultants = (
                     session.query(Consultant).filter(Consultant.disponibilite).all()
                 )
-            _ = "👥 **Consultants actifs :**"
-        else:
-            # Tous les consultants
-            with get_database_session() as session:
-
+                titre = "👥 **Consultants actifs :**"
+            else:
                 consultants = session.query(Consultant).all()
-            titre = "👥 **Tous les consultants :**"
+                titre = "👥 **Tous les consultants :**"
 
-        if not consultants:
-            return {
-                "response": "❓ Aucun consultant ne correspond à ce critère.",
-                "data": None,
-                "intent": "liste_consultants",
-                "confidence": 0.8,
-            }
+        return consultants, titre
 
-        # Construire la réponse
+    def _handle_no_consultants_found(self) -> Dict[str, Any]:
+        """Gère le cas où aucun consultant n'est trouvé"""
+        return {
+            "response": "❓ Aucun consultant ne correspond à ce critère.",
+            "data": None,
+            "intent": "liste_consultants",
+            "confidence": 0.8,
+        }
+
+    def _format_consultants_list(self, consultants: List, titre: str) -> str:
+        """Formate la liste des consultants pour l'affichage"""
         response = f"{titre}\n\n"
 
         for i, consultant in enumerate(consultants, 1):
-            status_icon = "🟢" if consultant.disponibilite else "🔴"
-            response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
-
-            if consultant.email:
-                response += f" - {consultant.email}"
-
-            if consultant.salaire_actuel:
-                cjm = consultant.salaire_actuel * 1.8 / 216
-                response += (
-                    f" - {consultant.salaire_actuel:,.0f} €/an - CJM: {cjm:,.0f} €"
-                )
-
-            response += "\n"
+            response += self._format_consultant_line(consultant, i)
 
         response += "\n📊 **Total : " + str(len(consultants)) + " consultant(s)**"
+        return response
 
+    def _format_consultant_line(self, consultant, index: int) -> str:
+        """Formate une ligne de consultant dans la liste"""
+        status_icon = "🟢" if consultant.disponibilite else "🔴"
+        line = f"{index}. {status_icon} **{consultant.prenom} {consultant.nom}**"
+
+        if consultant.email:
+            line += f" - {consultant.email}"
+
+        if consultant.salaire_actuel:
+            cjm = self._calculate_cjm(consultant.salaire_actuel)
+            line += f" - {consultant.salaire_actuel:,.0f} €/an - CJM: {cjm:,.0f} €"
+
+        line += "\n"
+        return line
+
+    def _calculate_cjm(self, salaire_actuel: float) -> float:
+        """Calcule le CJM à partir du salaire annuel"""
+        return salaire_actuel * 1.8 / 216
+
+    def _build_consultants_data(self, consultants: List) -> Dict:
+        """Construit les données structurées des consultants"""
         return {
-            "response": response,
-            "data": {
-                "consultants": [
-                    {
-                        "nom": c.nom,
-                        "prenom": c.prenom,
-                        "email": c.email,
-                        "disponibilite": c.disponibilite,
-                        "salaire": c.salaire_actuel,
-                        "cjm": (
-                            (c.salaire_actuel * 1.8 / 216) if c.salaire_actuel else None
-                        ),
-                    }
-                    for c in consultants
-                ],
-                "count": len(consultants),
-            },
-            "intent": "liste_consultants",
-            "confidence": 0.9,
+            "consultants": [
+                {
+                    "nom": c.nom,
+                    "prenom": c.prenom,
+                    "email": c.email,
+                    "disponibilite": c.disponibilite,
+                    "salaire": c.salaire_actuel,
+                    "cjm": (
+                        self._calculate_cjm(c.salaire_actuel)
+                        if c.salaire_actuel
+                        else None
+                    ),
+                }
+                for c in consultants
+            ],
+            "count": len(consultants),
         }
 
     def _handle_consultant_search(self, entities: Dict) -> Dict[str, Any]:
         """Gère la recherche d'informations sur un consultant"""
 
-        if entities["noms"]:
-            nom: str = entities["noms"][0]
-            consultant = self._find_consultant_by_name(nom)
+        if not entities["noms"]:
+            return self._handle_generic_consultant_search()
 
-            if consultant:
-                response = f"""👤 **{consultant.prenom} {consultant.nom}**
+        nom: str = entities["noms"][0]
+        consultant = self._find_consultant_by_name(nom)
 
-📧 Email : {consultant.email or 'Non renseigné'}
-📞 Téléphone : {consultant.telephone or 'Non renseigné'}
-📊 Disponibilité : **{'Disponible' if consultant.disponibilite else 'Indisponible'}**
-📅 Date création : {consultant.date_creation.strftime(self.DATE_FORMAT) if consultant.date_creation else 'Non renseignée'}"""
+        if not consultant:
+            return self._handle_consultant_not_found_search(nom)
 
-                if consultant.salaire_actuel:
-                    cjm = consultant.salaire_actuel * 1.8 / 216
-                    response += (
-                        "\n💰 Salaire : **"
-                        + f"{consultant.salaire_actuel:,.0f}"
-                        + " €**"
-                    )
-                    response += "\n📈 CJM : **" + f"{cjm:,.0f}" + " €**"
+        response = self._build_consultant_profile_response(consultant)
 
-                # Ajouter info sur les missions
-                missions_count = len(consultant.missions)
-                if missions_count > 0:
-                    response += f"\n💼 Missions : **{missions_count}** mission(s)"
-            else:
-                response = (
-                    f"❌ Consultant **{nom}** introuvable dans la base de données."
-                )
+        return {
+            "response": response,
+            "data": {"consultant": consultant.nom},
+            "intent": "recherche_consultant",
+            "confidence": 0.9,
+        }
 
-            return {
-                "response": response,
-                "data": {"consultant": consultant.nom if consultant else None},
-                "intent": "recherche_consultant",
-                "confidence": 0.9,
-            }
-
+    def _handle_generic_consultant_search(self) -> Dict[str, Any]:
+        """Gère les recherches génériques sans nom spécifique"""
         return {
             "response": "🤔 De quel consultant souhaitez-vous connaître les informations ?",
             "data": None,
             "intent": "recherche_consultant",
             "confidence": 0.5,
         }
+
+    def _handle_consultant_not_found_search(self, nom: str) -> Dict[str, Any]:
+        """Gère le cas où le consultant n'est pas trouvé"""
+        return {
+            "response": f"❌ Consultant **{nom}** introuvable dans la base de données.",
+            "data": {"consultant": None},
+            "intent": "recherche_consultant",
+            "confidence": 0.9,
+        }
+
+    def _build_consultant_profile_response(self, consultant) -> str:
+        """Construit la réponse complète du profil consultant"""
+        response = self._format_basic_consultant_info(consultant)
+        response += self._format_consultant_salary_info(consultant)
+        response += self._format_consultant_missions_info(consultant)
+        return response
+
+    def _format_basic_consultant_info(self, consultant) -> str:
+        """Formate les informations de base du consultant"""
+        date_creation = (
+            consultant.date_creation.strftime(self.DATE_FORMAT)
+            if consultant.date_creation
+            else "Non renseignée"
+        )
+
+        return f"""👤 **{consultant.prenom} {consultant.nom}**
+
+📧 Email : {consultant.email or 'Non renseigné'}
+📞 Téléphone : {consultant.telephone or 'Non renseigné'}
+📊 Disponibilité : **{'Disponible' if consultant.disponibilite else 'Indisponible'}**
+📅 Date création : {date_creation}"""
+
+    def _format_consultant_salary_info(self, consultant) -> str:
+        """Formate les informations salariales du consultant"""
+        if not consultant.salaire_actuel:
+            return ""
+
+        cjm = self._calculate_cjm(consultant.salaire_actuel)
+        return (
+            f"\n💰 Salaire : **{consultant.salaire_actuel:,.0f} €**"
+            + f"\n📈 CJM : **{cjm:,.0f} €**"
+        )
+
+    def _format_consultant_missions_info(self, consultant) -> str:
+        """Formate les informations sur les missions du consultant"""
+        missions_count = len(consultant.missions)
+        if missions_count > 0:
+            return f"\n💼 Missions : **{missions_count}** mission(s)"
+        return ""
 
     def _handle_general_question(self) -> Dict[str, Any]:
         """Gère les questions générales"""
@@ -2251,308 +2342,338 @@ class ChatbotService:
     def _handle_practices_question(self, entities: Dict) -> Dict[str, Any]:
         """
         Gère les questions sur les practices (équipes) des consultants.
-
-        Args:
-            entities: Dictionnaire contenant les entités extraites de la question
-                     (noms, entreprises, compétences, langues, etc.)
-
-        Returns:
-            Dictionnaire contenant :
-            - response: Réponse formatée pour l'utilisateur
-            - data: Données structurées sur les practices
-            - intent: Type d'intention détecté ("practices")
-            - confidence: Niveau de confiance de la réponse (0.0 à 1.0)
-
-        Raises:
-            SQLAlchemyError: En cas d'erreur de base de données
-            AttributeError: Si les données de practice sont malformées
-
-        Example:
-            >>> entities = {"practices": ["Data"]}
-            >>> result = chatbot._handle_practices_question(entities)
-            >>> print(result["response"])
-            👥 **Practice Data** :
-            📋 **5 consultant(s)** :
-            1. 🟢 **Jean Dupont** - CJM: 450 €
-            ...
         """
         from database.models import Practice
 
-        # Si une practice spécifique est mentionnée
         if entities["practices"]:
-            practice_name: str = entities["practices"][0]
-            with get_database_session() as session:
-                practice = (
-                    session.query(Practice)
-                    .filter(func.lower(Practice.nom) == practice_name.lower())
-                    .first()
-                )
-
-            if practice:
-                # Récupérer les consultants de cette practice
-                consultants = list(practice.consultants)
-
-                if consultants:
-                    response = f"👥 **Practice {practice.nom}** :\n\n"
-                    response += f"📋 **{len(consultants)} consultant(s)** :\n"
-
-                    for i, consultant in enumerate(consultants, 1):
-                        status_icon = "🟢" if consultant.disponibilite else "🔴"
-                        cjm = (
-                            (consultant.salaire_actuel * 1.8 / 216)
-                            if consultant.salaire_actuel
-                            else 0
-                        )
-                        response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
-                        if consultant.salaire_actuel:
-                            response += f" - CJM: {cjm:,.0f} €"
-                        response += "\n"
-
-                    if practice.responsable:
-                        response += f"\n👨‍💼 **Responsable** : {practice.responsable}"
-                else:
-                    response = (
-                        f"📋 **Practice {practice.nom}** : Aucun consultant assigné"
-                    )
-
-                return {
-                    "response": response,
-                    "data": {
-                        "practice": practice.nom,
-                        "consultants": [
-                            {
-                                "nom": c.nom,
-                                "prenom": c.prenom,
-                                "disponibilite": c.disponibilite,
-                                "cjm": (
-                                    (c.salaire_actuel * 1.8 / 216)
-                                    if c.salaire_actuel
-                                    else None
-                                ),
-                            }
-                            for c in consultants
-                        ],
-                    },
-                    "intent": "practices",
-                    "confidence": 0.9,
-                }
-            else:
-                return {
-                    "response": f"❌ Practice **{practice_name}** introuvable dans la base.",
-                    "data": None,
-                    "intent": "practices",
-                    "confidence": 0.7,
-                }
-
-        # Question générale sur les practices
+            return self._handle_specific_practice_question(entities["practices"][0])
         else:
-            with get_database_session() as session:
+            return self._handle_general_practices_question()
 
-                practices = session.query(Practice).filter(Practice.actif).all()
+    def _handle_specific_practice_question(self, practice_name: str) -> Dict[str, Any]:
+        """Gère les questions sur une practice spécifique"""
+        from database.models import Practice
 
-            if practices:
-                response = "🏢 **Practices disponibles** :\n\n"
+        with get_database_session() as session:
+            practice = (
+                session.query(Practice)
+                .filter(func.lower(Practice.nom) == practice_name.lower())
+                .first()
+            )
 
-                for practice in practices:
-                    nb_consultants = len(list(practice.consultants))
-                    nb_disponibles = len(
-                        [c for c in practice.consultants if c.disponibilite]
-                    )
+        if not practice:
+            return self._handle_practice_not_found(practice_name)
 
-                    response += f"• **{practice.nom}** : {nb_consultants} consultant(s) ({nb_disponibles} disponible(s))\n"
-                    if practice.responsable:
-                        response += f"  👨‍💼 Responsable : {practice.responsable}\n"
+        consultants = list(practice.consultants)
 
-                return {
-                    "response": response,
-                    "data": {
-                        "practices": [
-                            {
-                                "nom": p.nom,
-                                "consultants_total": len(list(p.consultants)),
-                                "consultants_disponibles": len(
-                                    [c for c in p.consultants if c.disponibilite]
-                                ),
-                                "responsable": p.responsable,
-                            }
-                            for p in practices
-                        ]
-                    },
-                    "intent": "practices",
-                    "confidence": 0.8,
+        if not consultants:
+            return self._handle_empty_practice(practice)
+
+        response = self._format_practice_consultants_response(practice, consultants)
+        data = self._build_practice_consultants_data(practice, consultants)
+
+        return {
+            "response": response,
+            "data": data,
+            "intent": "practices",
+            "confidence": 0.9,
+        }
+
+    def _handle_practice_not_found(self, practice_name: str) -> Dict[str, Any]:
+        """Gère le cas où la practice n'est pas trouvée"""
+        return {
+            "response": f"❌ Practice **{practice_name}** introuvable dans la base.",
+            "data": None,
+            "intent": "practices",
+            "confidence": 0.7,
+        }
+
+    def _handle_empty_practice(self, practice) -> Dict[str, Any]:
+        """Gère le cas où la practice n'a aucun consultant"""
+        return {
+            "response": f"📋 **Practice {practice.nom}** : Aucun consultant assigné",
+            "data": {
+                "practice": practice.nom,
+                "consultants": [],
+            },
+            "intent": "practices",
+            "confidence": 0.9,
+        }
+
+    def _format_practice_consultants_response(self, practice, consultants: List) -> str:
+        """Formate la réponse pour les consultants d'une practice"""
+        response = f"👥 **Practice {practice.nom}** :\n\n"
+        response += f"📋 **{len(consultants)} consultant(s)** :\n"
+
+        for i, consultant in enumerate(consultants, 1):
+            response += self._format_practice_consultant_line(consultant, i)
+
+        if practice.responsable:
+            response += f"\n👨‍💼 **Responsable** : {practice.responsable}"
+
+        return response
+
+    def _format_practice_consultant_line(self, consultant, index: int) -> str:
+        """Formate une ligne de consultant dans une practice"""
+        status_icon = "🟢" if consultant.disponibilite else "🔴"
+        line = f"{index}. {status_icon} **{consultant.prenom} {consultant.nom}**"
+
+        if consultant.salaire_actuel:
+            cjm = self._calculate_cjm(consultant.salaire_actuel)
+            line += f" - CJM: {cjm:,.0f} €"
+
+        line += "\n"
+        return line
+
+    def _build_practice_consultants_data(self, practice, consultants: List) -> Dict:
+        """Construit les données structurées d'une practice"""
+        return {
+            "practice": practice.nom,
+            "consultants": [
+                {
+                    "nom": c.nom,
+                    "prenom": c.prenom,
+                    "disponibilite": c.disponibilite,
+                    "cjm": (
+                        self._calculate_cjm(c.salaire_actuel)
+                        if c.salaire_actuel
+                        else None
+                    ),
                 }
-            else:
-                return {
-                    "response": "❓ Aucune practice active trouvée dans la base.",
-                    "data": None,
-                    "intent": "practices",
-                    "confidence": 0.6,
+                for c in consultants
+            ],
+        }
+
+    def _handle_general_practices_question(self) -> Dict[str, Any]:
+        """Gère les questions générales sur toutes les practices"""
+        from database.models import Practice
+
+        with get_database_session() as session:
+            practices = session.query(Practice).filter(Practice.actif).all()
+
+        if not practices:
+            return self._handle_no_practices_found()
+
+        response = self._format_all_practices_response(practices)
+        data = self._build_all_practices_data(practices)
+
+        return {
+            "response": response,
+            "data": data,
+            "intent": "practices",
+            "confidence": 0.8,
+        }
+
+    def _handle_no_practices_found(self) -> Dict[str, Any]:
+        """Gère le cas où aucune practice active n'est trouvée"""
+        return {
+            "response": "❓ Aucune practice active trouvée dans la base.",
+            "data": None,
+            "intent": "practices",
+            "confidence": 0.6,
+        }
+
+    def _format_all_practices_response(self, practices: List) -> str:
+        """Formate la réponse pour toutes les practices"""
+        response = "🏢 **Practices disponibles** :\n\n"
+
+        for practice in practices:
+            response += self._format_practice_summary_line(practice)
+
+        return response
+
+    def _format_practice_summary_line(self, practice) -> str:
+        """Formate une ligne de résumé pour une practice"""
+        nb_consultants = len(list(practice.consultants))
+        nb_disponibles = len([c for c in practice.consultants if c.disponibilite])
+
+        line = f"• **{practice.nom}** : {nb_consultants} consultant(s) ({nb_disponibles} disponible(s))\n"
+
+        if practice.responsable:
+            line += f"  👨‍💼 Responsable : {practice.responsable}\n"
+
+        return line
+
+    def _build_all_practices_data(self, practices: List) -> Dict:
+        """Construit les données structurées de toutes les practices"""
+        return {
+            "practices": [
+                {
+                    "nom": p.nom,
+                    "consultants_total": len(list(p.consultants)),
+                    "consultants_disponibles": len(
+                        [c for c in p.consultants if c.disponibilite]
+                    ),
+                    "responsable": p.responsable,
                 }
+                for p in practices
+            ]
+        }
 
     def _handle_cvs_question(self, entities: Dict) -> Dict[str, Any]:
-        """
-        Gère les questions sur les CVs des consultants.
+        """Gère les questions sur les CVs des consultants."""
 
-        Args:
-            entities: Dictionnaire contenant les entités extraites de la question
-                     (noms, entreprises, compétences, langues, etc.)
+        if entities["noms"]:
+            return self._handle_specific_consultant_cvs(entities["noms"][0])
+        else:
+            return self._handle_general_cvs_question()
 
-        Returns:
-            Dictionnaire contenant :
-            - response: Réponse formatée sur les CVs
-            - data: Données structurées sur les CVs
-            - intent: Type d'intention détecté ("cvs")
-            - confidence: Niveau de confiance de la réponse (0.0 à 1.0)
+    def _handle_specific_consultant_cvs(self, nom_recherche: str) -> Dict[str, Any]:
+        """Gère les questions sur les CVs d'un consultant spécifique"""
+        consultant = self._find_consultant_by_name(nom_recherche)
 
-        Raises:
-            SQLAlchemyError: En cas d'erreur de base de données
-            AttributeError: Si les données de CV sont malformées
+        if not consultant:
+            return self._handle_consultant_not_found_cvs(nom_recherche)
 
-        Example:
-            >>> entities = {"noms": ["Jean Dupont"]}
-            >>> result = chatbot._handle_cvs_question(entities)
-            >>> print(result["response"])
-            📁 **CVs de Jean Dupont** :
-            1. **CV_Jean_Dupont.pdf**
-               📅 Uploadé le : 15/01/2024
-               📏 Taille : 2.5 MB
-               ✅ Contenu analysé
-            📊 **Total : 1 document(s)**
-        """
+        cvs = consultant.cvs
+
+        if not cvs:
+            return self._handle_no_cvs_found(consultant)
+
+        response = self._format_consultant_cvs_response(consultant, cvs)
+        data = self._build_consultant_cvs_data(consultant, cvs)
+
+        return {
+            "response": response,
+            "data": data,
+            "intent": "cvs",
+            "confidence": 0.9,
+        }
+
+    def _handle_consultant_not_found_cvs(self, nom_recherche: str) -> Dict[str, Any]:
+        """Gère le cas où le consultant n'est pas trouvé pour les CVs"""
+        return {
+            "response": f"❌ Consultant **{nom_recherche}** introuvable.",
+            "data": None,
+            "intent": "cvs",
+            "confidence": 0.7,
+        }
+
+    def _handle_no_cvs_found(self, consultant) -> Dict[str, Any]:
+        """Gère le cas où le consultant n'a aucun CV"""
+        response = f"📁 **{consultant.prenom} {consultant.nom}** : Aucun CV uploadé"
+
+        return {
+            "response": response,
+            "data": {
+                "consultant": f"{consultant.prenom} {consultant.nom}",
+                "cvs": [],
+            },
+            "intent": "cvs",
+            "confidence": 0.9,
+        }
+
+    def _format_consultant_cvs_response(self, consultant, cvs: List) -> str:
+        """Formate la réponse des CVs d'un consultant"""
+        response = f"📁 **CVs de {consultant.prenom} {consultant.nom}{self.SECTION_HEADER_SUFFIX}"
+
+        for i, cv in enumerate(cvs, 1):
+            response += self._format_cv_details(cv, i)
+
+        response += f"📊 **Total : {len(cvs)} document(s)**"
+        return response
+
+    def _format_cv_details(self, cv, index: int) -> str:
+        """Formate les détails d'un CV"""
+        taille_mb = (cv.taille_fichier / 1024 / 1024) if cv.taille_fichier else 0
+        date_upload = (
+            cv.date_upload.strftime(self.DATE_FORMAT) if cv.date_upload else "N/A"
+        )
+
+        details = f"{index}. **{cv.fichier_nom}**\n"
+        details += f"   📅 Uploadé le : {date_upload}\n"
+        details += f"   📏 Taille : {taille_mb:.1f} MB\n"
+
+        if cv.contenu_extrait:
+            details += "   ✅ Contenu analysé\n"
+
+        details += "\n"
+        return details
+
+    def _build_consultant_cvs_data(self, consultant, cvs: List) -> Dict:
+        """Construit les données structurées des CVs d'un consultant"""
+        return {
+            "consultant": f"{consultant.prenom} {consultant.nom}",
+            "cvs": [
+                {
+                    "nom": cv.fichier_nom,
+                    "date_upload": (
+                        cv.date_upload.isoformat() if cv.date_upload else None
+                    ),
+                    "taille": cv.taille_fichier,
+                    "contenu_analyse": bool(cv.contenu_extrait),
+                }
+                for cv in cvs
+            ],
+        }
+
+    def _handle_general_cvs_question(self) -> Dict[str, Any]:
+        """Gère les questions générales sur les CVs"""
         from database.models import CV
 
-        # Si un consultant spécifique est mentionné
-        if entities["noms"]:
-            nom_recherche: str = entities["noms"][0]
-            consultant = self._find_consultant_by_name(nom_recherche)
+        stats = self._get_cvs_statistics()
+        top_consultants = self._get_top_consultants_by_cvs()
 
-            if consultant:
-                cvs = consultant.cvs
+        response = self._format_general_cvs_response(stats, top_consultants)
+        data = self._build_general_cvs_data(stats, top_consultants)
 
-                if cvs:
-                    response = (
-                        "📁 **CVs de "
-                        + consultant.prenom
-                        + " "
-                        + consultant.nom
-                        + self.SECTION_HEADER_SUFFIX
-                    )
+        return {
+            "response": response,
+            "data": data,
+            "intent": "cvs",
+            "confidence": 0.8,
+        }
 
-                    for i, cv in enumerate(cvs, 1):
-                        taille_mb = (
-                            (cv.taille_fichier / 1024 / 1024)
-                            if cv.taille_fichier
-                            else 0
-                        )
-                        date_upload = (
-                            cv.date_upload.strftime(self.DATE_FORMAT)
-                            if cv.date_upload
-                            else "N/A"
-                        )
+    def _get_cvs_statistics(self) -> Dict:
+        """Récupère les statistiques générales des CVs"""
+        from database.models import CV
 
-                        response += str(i) + ". **" + cv.fichier_nom + "**\n"
-                        response += "   📅 Uploadé le : " + date_upload + "\n"
-                        response += "   📏 Taille : " + str(taille_mb) + " MB\n"
-                        if cv.contenu_extrait:
-                            response += "   ✅ Contenu analysé\n"
-                        response += "\n"
+        with get_database_session() as session:
+            cvs_total = session.query(CV).count()
+            consultants_avec_cv = session.query(Consultant).join(CV).distinct().count()
 
-                    response += "📊 **Total : " + str(len(cvs)) + " document(s)**"
-                else:
-                    response = (
-                        "📁 **"
-                        + consultant.prenom
-                        + " "
-                        + consultant.nom
-                        + "** : Aucun CV uploadé"
-                    )
+        return {"cvs_total": cvs_total, "consultants_avec_cv": consultants_avec_cv}
 
-                return {
-                    "response": response,
-                    "data": {
-                        "consultant": f"{consultant.prenom} {consultant.nom}",
-                        "cvs": [
-                            {
-                                "nom": cv.fichier_nom,
-                                "date_upload": (
-                                    cv.date_upload.isoformat()
-                                    if cv.date_upload
-                                    else None
-                                ),
-                                "taille": cv.taille_fichier,
-                                "contenu_analyse": bool(cv.contenu_extrait),
-                            }
-                            for cv in cvs
-                        ],
-                    },
-                    "intent": "cvs",
-                    "confidence": 0.9,
-                }
-            else:
-                return {
-                    "response": f"❌ Consultant **{nom_recherche}** introuvable.",
-                    "data": None,
-                    "intent": "cvs",
-                    "confidence": 0.7,
-                }
+    def _get_top_consultants_by_cvs(self) -> List:
+        """Récupère le top 3 des consultants avec le plus de CVs"""
+        from database.models import CV
+        from sqlalchemy import func
 
-        # Question générale sur les CVs
-        else:
-            with get_database_session() as session:
+        with get_database_session() as session:
+            return (
+                session.query(Consultant, func.count(CV.id).label("nb_cvs"))
+                .join(CV)
+                .group_by(Consultant.id)
+                .order_by(func.count(CV.id).desc())
+                .limit(3)
+                .all()
+            )
 
-                cvs_total = session.query(CV).count()
-            with get_database_session() as session:
+    def _format_general_cvs_response(self, stats: Dict, top_consultants: List) -> str:
+        """Formate la réponse générale sur les CVs"""
+        response = "📁 **Statistiques des CVs** :\n\n"
+        response += f"• Total de documents : **{stats['cvs_total']}**\n"
+        response += f"• Consultants avec CV : **{stats['consultants_avec_cv']}**\n"
 
-                consultants_avec_cv = (
-                    session.query(Consultant).join(CV).distinct().count()
+        if top_consultants:
+            response += "\n🏆 **Top consultants (nombre de CVs)** :\n"
+            for consultant, nb_cvs in top_consultants:
+                response += (
+                    f"• **{consultant.prenom} {consultant.nom}** : {nb_cvs} CV(s)\n"
                 )
 
-            response = "📁 **Statistiques des CVs** :\n\n"
-            response += "• Total de documents : **" + str(cvs_total) + "**\n"
-            response += "• Consultants avec CV : **" + str(consultants_avec_cv) + "**\n"
+        return response
 
-            # Top 3 consultants avec le plus de CVs
-            from sqlalchemy import func
-
-            with get_database_session() as session:
-
-                top_consultants = session.query(
-                    Consultant,
-                    func.count(CV.id)
-                    .label("nb_cvs")
-                    .join(CV)
-                    .group_by(Consultant.id)
-                    .order_by(func.count(CV.id).desc())
-                    .limit(3)
-                    .all(),
-                )
-
-            if top_consultants:
-                response += "\n🏆 **Top consultants (nombre de CVs)** :\n"
-                for consultant, nb_cvs in top_consultants:
-                    response += (
-                        "• **"
-                        + consultant.prenom
-                        + " "
-                        + consultant.nom
-                        + "** : "
-                        + str(nb_cvs)
-                        + " CV(s)\n"
-                    )
-
-            return {
-                "response": response,
-                "data": {
-                    "cvs_total": cvs_total,
-                    "consultants_avec_cv": consultants_avec_cv,
-                    "top_consultants": [
-                        {"nom": c.nom, "prenom": c.prenom, "nb_cvs": nb}
-                        for c, nb in top_consultants
-                    ],
-                },
-                "intent": "cvs",
-                "confidence": 0.8,
-            }
+    def _build_general_cvs_data(self, stats: Dict, top_consultants: List) -> Dict:
+        """Construit les données structurées générales des CVs"""
+        return {
+            "cvs_total": stats["cvs_total"],
+            "consultants_avec_cv": stats["consultants_avec_cv"],
+            "top_consultants": [
+                {"nom": c.nom, "prenom": c.prenom, "nb_cvs": nb}
+                for c, nb in top_consultants
+            ],
+        }
 
     # Méthodes utilitaires pour les requêtes DB
 
@@ -2865,107 +2986,105 @@ class ChatbotService:
     def _get_general_stats(self) -> Dict[str, Any]:
         """
         Calcule les statistiques générales de la base de données.
-
-        Récupère des métriques complètes sur consultants, missions, practices,
-        CVs et données financières.
-
-        Returns:
-            Dictionnaire contenant toutes les statistiques :
-            - consultants_total: Nombre total de consultants
-            - consultants_actifs: Nombre de consultants disponibles
-            - consultants_inactifs: Nombre de consultants indisponibles
-            - missions_total: Nombre total de missions
-            - missions_en_cours: Nombre de missions en cours
-            - missions_terminees: Nombre de missions terminées
-            - practices_total: Nombre de practices actives
-            - cvs_total: Nombre total de CVs
-            - consultants_avec_cv: Nombre de consultants avec au moins un CV
-            - tjm_moyen: TJM moyen des missions
-            - salaire_moyen: Salaire moyen des consultants
-            - cjm_moyen: CJM moyen calculé
-
-        Raises:
-            SQLAlchemyError: En cas d'erreur de base de données
-
-        Example:
-            >>> stats = chatbot._get_general_stats()
-            >>> print(f"Base: {stats['consultants_total']} consultants")
-            >>> print(f"Missions: {stats['missions_total']} total")
-            >>> print(f"TJM moyen: {stats['tjm_moyen']:.0f} €")
         """
-        from database.models import CV
-        from database.models import Practice
-
-        # Consultants
         with get_database_session() as session:
+            consultant_stats = self._get_consultant_statistics(session)
+            mission_stats = self._get_mission_statistics(session)
+            practice_stats = self._get_practice_statistics(session)
+            cv_stats = self._get_cv_statistics(session)
+            financial_stats = self._get_financial_statistics(session)
 
-            consultants_total = session.query(Consultant).count()
-        with get_database_session() as session:
+        return {
+            **consultant_stats,
+            **mission_stats,
+            **practice_stats,
+            **cv_stats,
+            **financial_stats,
+        }
 
-            consultants_actifs = (
-                session.query(Consultant).filter(Consultant.disponibilite).count()
-            )
+    def _get_consultant_statistics(self, session) -> Dict[str, int]:
+        """Récupère les statistiques des consultants"""
+        consultants_total = session.query(Consultant).count()
+        consultants_actifs = (
+            session.query(Consultant).filter(Consultant.disponibilite).count()
+        )
         consultants_inactifs = consultants_total - consultants_actifs
-
-        # Missions
-        with get_database_session() as session:
-
-            missions_total = session.query(Mission).count()
-        with get_database_session() as session:
-
-            missions_en_cours = (
-                session.query(Mission).filter(Mission.statut == "en_cours").count()
-            )
-        missions_terminees = missions_total - missions_en_cours
-
-        # Practices
-        with get_database_session() as session:
-
-            practices_total = session.query(Practice).filter(Practice.actif).count()
-
-        # CVs
-        with get_database_session() as session:
-
-            cvs_total = session.query(CV).count()
-        with get_database_session() as session:
-
-            consultants_avec_cv = session.query(Consultant).join(CV).distinct().count()
-
-        # TJM moyen
-        with get_database_session() as session:
-
-            tjm_moyen = (
-                session.query(func.avg(Mission.taux_journalier))
-                .filter(Mission.taux_journalier.isnot(None))
-                .scalar()
-                or 0
-            )
-
-        # Salaire moyen et CJM moyen
-        with get_database_session() as session:
-
-            salaire_moyen = (
-                session.query(func.avg(Consultant.salaire_actuel))
-                .filter(Consultant.salaire_actuel.isnot(None))
-                .scalar()
-                or 0
-            )
-        cjm_moyen = (salaire_moyen * 1.8 / 216) if salaire_moyen > 0 else 0
 
         return {
             "consultants_total": consultants_total,
             "consultants_actifs": consultants_actifs,
             "consultants_inactifs": consultants_inactifs,
+        }
+
+    def _get_mission_statistics(self, session) -> Dict[str, int]:
+        """Récupère les statistiques des missions"""
+        missions_total = session.query(Mission).count()
+        missions_en_cours = (
+            session.query(Mission).filter(Mission.statut == "en_cours").count()
+        )
+        missions_terminees = missions_total - missions_en_cours
+
+        return {
             "missions_total": missions_total,
             "missions_en_cours": missions_en_cours,
             "missions_terminees": missions_terminees,
+        }
+
+    def _get_practice_statistics(self, session) -> Dict[str, int]:
+        """Récupère les statistiques des practices"""
+        from database.models import Practice
+
+        practices_total = session.query(Practice).filter(Practice.actif).count()
+
+        return {
             "practices_total": practices_total,
+        }
+
+    def _get_cv_statistics(self, session) -> Dict[str, int]:
+        """Récupère les statistiques des CVs"""
+        from database.models import CV
+
+        cvs_total = session.query(CV).count()
+        consultants_avec_cv = session.query(Consultant).join(CV).distinct().count()
+
+        return {
             "cvs_total": cvs_total,
             "consultants_avec_cv": consultants_avec_cv,
+        }
+
+    def _get_financial_statistics(self, session) -> Dict[str, float]:
+        """Récupère les statistiques financières"""
+        tjm_moyen = self._calculate_average_tjm(session)
+        salaire_moyen = self._calculate_average_salary(session)
+        cjm_moyen = self._calculate_average_cjm(salaire_moyen)
+
+        return {
             "tjm_moyen": tjm_moyen,
             "salaire_moyen": salaire_moyen,
             "cjm_moyen": cjm_moyen,
         }
+
+    def _calculate_average_tjm(self, session) -> float:
+        """Calcule le TJM moyen"""
+        return (
+            session.query(func.avg(Mission.taux_journalier))
+            .filter(Mission.taux_journalier.isnot(None))
+            .scalar()
+            or 0
+        )
+
+    def _calculate_average_salary(self, session) -> float:
+        """Calcule le salaire moyen"""
+        return (
+            session.query(func.avg(Consultant.salaire_actuel))
+            .filter(Consultant.salaire_actuel.isnot(None))
+            .scalar()
+            or 0
+        )
+
+    def _calculate_average_cjm(self, salaire_moyen: float) -> float:
+        """Calcule le CJM moyen à partir du salaire moyen"""
+        return (salaire_moyen * 1.8 / 216) if salaire_moyen > 0 else 0
 
     def _handle_availability_question(self, entities: Dict) -> Dict[str, Any]:
         """
