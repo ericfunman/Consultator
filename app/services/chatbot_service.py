@@ -585,8 +585,6 @@ class ChatbotService:
             "practices": self._extract_practices(question),
         }
 
-        return entities
-
     def _calculate_cjm(self, salaire: float) -> float:
         """Calcule le CJM (Coût Journalier Moyen) à partir du salaire"""
         return salaire * 1.8 / 216
@@ -1144,59 +1142,107 @@ class ChatbotService:
 
     def _handle_company_statistics(self, session, question_lower: str) -> str:
         """Gère les statistiques par société"""
-        consultants = (
+        consultants = self._get_consultants_with_company(session)
+        
+        if self._is_specific_company_search(question_lower):
+            return self._handle_specific_company_search(consultants, question_lower)
+        else:
+            return self._handle_general_company_statistics(consultants)
+
+    def _get_consultants_with_company(self, session) -> List:
+        """Récupère tous les consultants ayant une société renseignée"""
+        return (
             session.query(Consultant)
             .filter(Consultant.societe.isnot(None))
             .all()
         )
 
-        # Si c'est une recherche spécifique pour une société
-        if any(word in question_lower for word in ["quanteam", "asigma"]):
-            societe_recherchee = (
-                "Quanteam" if "quanteam" in question_lower else "Asigma"
-            )
-            consultants_societe = [
-                c for c in consultants
-                if c.societe and c.societe.lower() == societe_recherchee.lower()
-            ]
+    def _is_specific_company_search(self, question_lower: str) -> bool:
+        """Vérifie si la question concerne une société spécifique"""
+        return any(word in question_lower for word in ["quanteam", "asigma"])
 
-            if consultants_societe:
-                response = f"🏢 **Consultants chez {societe_recherchee}** :\n\n"
-                for i, consultant in enumerate(consultants_societe, 1):
-                    status_icon = "🟢" if consultant.disponibilite else "🔴"
-                    response += f"{i}. {status_icon} **{consultant.prenom} {consultant.nom}**"
-                    if consultant.grade:
-                        response += f" - {consultant.grade}"
-                    if consultant.type_contrat:
-                        response += f" ({consultant.type_contrat})"
-                    response += "\n"
-
-                response += (
-                    self.TOTAL_PREFIX + str(len(consultants_societe)) + 
-                    self.CONSULTANT_FOUND_SUFFIX
-                )
-            else:
-                response = f"❓ Aucun consultant trouvé chez {societe_recherchee}."
+    def _handle_specific_company_search(self, consultants: List, question_lower: str) -> str:
+        """Gère la recherche pour une société spécifique"""
+        societe_recherchee = self._extract_target_company(question_lower)
+        consultants_societe = self._filter_consultants_by_company(consultants, societe_recherchee)
+        
+        if consultants_societe:
+            return self._format_specific_company_response(consultants_societe, societe_recherchee)
         else:
-            # Statistiques générales par société
-            if consultants:
-                societes_count: Dict[str, List[Consultant]] = {}
-                for consultant in consultants:
-                    societe = consultant.societe
-                    if societe not in societes_count:
-                        societes_count[societe] = []
-                    societes_count[societe].append(consultant)
+            return f"❓ Aucun consultant trouvé chez {societe_recherchee}."
 
-                response = "🏢 **Répartition par société :**\n\n"
-                for societe, consultants_list in societes_count.items():
-                    response += f"• **{societe}** : {len(consultants_list)} consultant(s)\n"
-                    if len(consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
-                        for c in consultants_list:
-                            response += f"  - {c.prenom} {c.nom}\n"
-            else:
-                response = "❓ Aucun consultant n'a de société renseignée."
+    def _extract_target_company(self, question_lower: str) -> str:
+        """Extrait le nom de la société recherchée"""
+        return "Quanteam" if "quanteam" in question_lower else "Asigma"
+
+    def _filter_consultants_by_company(self, consultants: List, target_company: str) -> List:
+        """Filtre les consultants par société"""
+        return [
+            c for c in consultants
+            if c.societe and c.societe.lower() == target_company.lower()
+        ]
+
+    def _format_specific_company_response(self, consultants_societe: List, societe_recherchee: str) -> str:
+        """Formate la réponse pour une société spécifique"""
+        response = f"🏢 **Consultants chez {societe_recherchee}** :\n\n"
+        
+        for i, consultant in enumerate(consultants_societe, 1):
+            response += self._format_consultant_company_line(consultant, i)
+        
+        response += (
+            self.TOTAL_PREFIX + str(len(consultants_societe)) + 
+            self.CONSULTANT_FOUND_SUFFIX
+        )
+        return response
+
+    def _format_consultant_company_line(self, consultant, index: int) -> str:
+        """Formate une ligne consultant pour l'affichage par société"""
+        status_icon = "🟢" if consultant.disponibilite else "🔴"
+        line = f"{index}. {status_icon} **{consultant.prenom} {consultant.nom}**"
+        
+        if consultant.grade:
+            line += f" - {consultant.grade}"
+        if consultant.type_contrat:
+            line += f" ({consultant.type_contrat})"
+        line += "\n"
+        
+        return line
+
+    def _handle_general_company_statistics(self, consultants: List) -> str:
+        """Gère les statistiques générales par société"""
+        if not consultants:
+            return "❓ Aucun consultant n'a de société renseignée."
+        
+        societes_count = self._group_consultants_by_company(consultants)
+        return self._format_general_company_statistics(societes_count)
+
+    def _group_consultants_by_company(self, consultants: List) -> Dict[str, List]:
+        """Groupe les consultants par société"""
+        societes_count: Dict[str, List[Consultant]] = {}
+        for consultant in consultants:
+            societe = consultant.societe
+            if societe not in societes_count:
+                societes_count[societe] = []
+            societes_count[societe].append(consultant)
+        return societes_count
+
+    def _format_general_company_statistics(self, societes_count: Dict[str, List]) -> str:
+        """Formate les statistiques générales par société"""
+        response = "🏢 **Répartition par société :**\n\n"
+        
+        for societe, consultants_list in societes_count.items():
+            response += f"• **{societe}** : {len(consultants_list)} consultant(s)\n"
+            if len(consultants_list) <= 5:  # Afficher les noms si pas trop nombreux
+                response += self._format_company_consultant_details(consultants_list)
         
         return response
+
+    def _format_company_consultant_details(self, consultants_list: List) -> str:
+        """Formate les détails des consultants pour une société"""
+        details = ""
+        for c in consultants_list:
+            details += f"  - {c.prenom} {c.nom}\n"
+        return details
 
     def _handle_professional_profile_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur le profil professionnel (grade, type contrat, société)"""
@@ -1301,55 +1347,105 @@ class ChatbotService:
         """Gère les questions sur les compétences d'un consultant spécifique"""
         consultant = self._find_consultant_by_name(nom)
 
-        if consultant:
-            skills = self._get_consultant_skills(consultant.id, type_competence)
+        if not consultant:
+            return self._format_consultant_not_found_response(nom)
 
-            if skills:
-                response = f"🎯 **Compétences de {consultant.prenom} {consultant.nom} :**\n\n"
+        skills = self._get_consultant_skills(consultant.id, type_competence)
+        
+        if not skills:
+            return self._format_no_skills_response(consultant)
 
-                # Grouper par catégorie
-                categories: Dict[str, List[Dict[str, Any]]] = {}
-                for skill in skills:
-                    categorie = skill["categorie"] or "Autre"
-                    if categorie not in categories:
-                        categories[categorie] = []
-                    categories[categorie].append(skill)
-
-                # Afficher par catégorie
-                for categorie, competences in categories.items():
-                    response += f"**🔹 {categorie.title()} :**\n"
-                    for comp in competences:
-                        niveau_emoji = {
-                            "debutant": "🟡",
-                            "intermediaire": "🟠",
-                            "expert": "🔴",
-                        }.get(comp["niveau_maitrise"], "⚪")
-
-                        experience_text = ""
-                        if comp["annees_experience"] and comp["annees_experience"] > 0:
-                            if comp["annees_experience"] == 1:
-                                experience_text = f" ({comp['annees_experience']} an)"
-                            else:
-                                experience_text = f" ({comp['annees_experience']:.0f} ans)"
-
-                        response += f"  {niveau_emoji} **{comp['nom']}** - {comp['niveau_maitrise'].title()}{experience_text}\n"
-                    response += "\n"
-
-                response += f"📊 **Total : {len(skills)} compétence(s)**"
-            else:
-                response = f"❌ Aucune compétence enregistrée pour **{consultant.prenom} {consultant.nom}**."
-        else:
-            response = f"❌ Consultant **{nom}** introuvable."
-
+        response = self._format_consultant_skills_response(consultant, skills)
+        
         return {
             "response": response,
             "data": {
-                "consultant": consultant.nom if consultant else None,
-                "skills_count": len(skills) if consultant else 0,
+                "consultant": consultant.nom,
+                "skills_count": len(skills),
             },
             "intent": "competences",
             "confidence": 0.9,
         }
+
+    def _format_consultant_not_found_response(self, nom: str) -> Dict[str, Any]:
+        """Formate la réponse quand le consultant n'est pas trouvé"""
+        return {
+            "response": f"❌ Consultant **{nom}** introuvable.",
+            "data": {
+                "consultant": None,
+                "skills_count": 0,
+            },
+            "intent": "competences",
+            "confidence": 0.9,
+        }
+
+    def _format_no_skills_response(self, consultant) -> Dict[str, Any]:
+        """Formate la réponse quand aucune compétence n'est trouvée"""
+        return {
+            "response": f"❌ Aucune compétence enregistrée pour **{consultant.prenom} {consultant.nom}**.",
+            "data": {
+                "consultant": consultant.nom,
+                "skills_count": 0,
+            },
+            "intent": "competences",
+            "confidence": 0.9,
+        }
+
+    def _format_consultant_skills_response(self, consultant, skills: List) -> str:
+        """Formate la réponse complète des compétences d'un consultant"""
+        response = f"🎯 **Compétences de {consultant.prenom} {consultant.nom} :**\n\n"
+        
+        categories = self._group_skills_by_category(skills)
+        response += self._format_skills_by_category(categories)
+        response += f"📊 **Total : {len(skills)} compétence(s)**"
+        
+        return response
+
+    def _group_skills_by_category(self, skills: List) -> Dict[str, List[Dict[str, Any]]]:
+        """Groupe les compétences par catégorie"""
+        categories: Dict[str, List[Dict[str, Any]]] = {}
+        for skill in skills:
+            categorie = skill["categorie"] or "Autre"
+            if categorie not in categories:
+                categories[categorie] = []
+            categories[categorie].append(skill)
+        return categories
+
+    def _format_skills_by_category(self, categories: Dict[str, List[Dict[str, Any]]]) -> str:
+        """Formate l'affichage des compétences par catégorie"""
+        response = ""
+        for categorie, competences in categories.items():
+            response += f"**🔹 {categorie.title()} :**\n"
+            response += self._format_category_skills(competences)
+            response += "\n"
+        return response
+
+    def _format_category_skills(self, competences: List[Dict[str, Any]]) -> str:
+        """Formate les compétences d'une catégorie"""
+        formatted = ""
+        for comp in competences:
+            niveau_emoji = self._get_skill_level_emoji(comp["niveau_maitrise"])
+            experience_text = self._format_experience_text(comp["annees_experience"])
+            formatted += f"  {niveau_emoji} **{comp['nom']}** - {comp['niveau_maitrise'].title()}{experience_text}\n"
+        return formatted
+
+    def _get_skill_level_emoji(self, niveau_maitrise: str) -> str:
+        """Retourne l'emoji correspondant au niveau de maîtrise"""
+        return {
+            "debutant": "🟡",
+            "intermediaire": "🟠", 
+            "expert": "🔴",
+        }.get(niveau_maitrise, "⚪")
+
+    def _format_experience_text(self, annees_experience: Optional[float]) -> str:
+        """Formate le texte d'expérience en années"""
+        if not annees_experience or annees_experience <= 0:
+            return ""
+        
+        if annees_experience == 1:
+            return f" ({annees_experience} an)"
+        else:
+            return f" ({annees_experience:.0f} ans)"
 
     def _handle_skills_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les compétences"""
@@ -1447,40 +1543,70 @@ class ChatbotService:
         """Gère la recherche de consultants parlant une langue spécifique"""
         consultants = self._find_consultants_by_language(langue_recherchee)
 
-        if consultants:
-            noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-            response = f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
-            response += "\n".join([f"• {nom}" for nom in noms])
-            response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+        if not consultants:
+            return self._format_no_language_speakers_response(langue_recherchee)
 
-            # Détails des niveaux si moins de 5 consultants
-            if len(consultants) <= 5:
-                response += "\n\n🎯 **Niveaux détaillés :**"
-                for consultant in consultants:
-                    for cl in consultant.langues:
-                        if cl.langue.nom.lower() == langue_recherchee.lower():
-                            response += f"\n  • **{consultant.prenom} {consultant.nom}** : {cl.niveau_label}"
-                            if cl.commentaire:
-                                response += f" - {cl.commentaire}"
-                            break
+        response = self._format_language_speakers_response(consultants, langue_recherchee)
+        
+        return {
+            "response": response,
+            "data": {
+                "consultants": [
+                    {"nom": c.nom, "prenom": c.prenom} for c in consultants
+                ]
+            },
+            "intent": "langues",
+            "confidence": 0.9,
+        }
 
-            return {
-                "response": response,
-                "data": {
-                    "consultants": [
-                        {"nom": c.nom, "prenom": c.prenom} for c in consultants
-                    ]
-                },
-                "intent": "langues",
-                "confidence": 0.9,
-            }
-        else:
-            return {
-                "response": f"❌ Aucun consultant ne parle **{langue_recherchee}** dans notre base.",
-                "data": {"consultants": []},
-                "intent": "langues",
-                "confidence": 0.8,
-            }
+    def _format_no_language_speakers_response(self, langue_recherchee: str) -> Dict[str, Any]:
+        """Formate la réponse quand aucun consultant ne parle la langue"""
+        return {
+            "response": f"❌ Aucun consultant ne parle **{langue_recherchee}** dans notre base.",
+            "data": {"consultants": []},
+            "intent": "langues",
+            "confidence": 0.8,
+        }
+
+    def _format_language_speakers_response(self, consultants: List, langue_recherchee: str) -> str:
+        """Formate la réponse complète des consultants parlant une langue"""
+        response = self._format_language_speakers_list(consultants, langue_recherchee)
+        
+        if len(consultants) <= 5:
+            response += self._format_language_levels_details(consultants, langue_recherchee)
+        
+        return response
+
+    def _format_language_speakers_list(self, consultants: List, langue_recherchee: str) -> str:
+        """Formate la liste de base des consultants parlant une langue"""
+        noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
+        response = f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
+        response += "\n".join([f"• {nom}" for nom in noms])
+        response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+        return response
+
+    def _format_language_levels_details(self, consultants: List, langue_recherchee: str) -> str:
+        """Formate les détails de niveaux pour une langue spécifique"""
+        details = "\n\n🎯 **Niveaux détaillés :**"
+        
+        for consultant in consultants:
+            level_info = self._get_consultant_language_level(consultant, langue_recherchee)
+            if level_info:
+                details += f"\n  • **{consultant.prenom} {consultant.nom}** : {level_info['niveau']}"
+                if level_info['commentaire']:
+                    details += f" - {level_info['commentaire']}"
+        
+        return details
+
+    def _get_consultant_language_level(self, consultant, langue_recherchee: str) -> Optional[Dict[str, str]]:
+        """Récupère le niveau et commentaire d'un consultant pour une langue"""
+        for cl in consultant.langues:
+            if cl.langue.nom.lower() == langue_recherchee.lower():
+                return {
+                    'niveau': cl.niveau_label,
+                    'commentaire': cl.commentaire
+                }
+        return None
 
     def _handle_consultant_languages_inquiry(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les langues d'un consultant spécifique"""
@@ -1554,107 +1680,140 @@ class ChatbotService:
 
     def _handle_missions_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les missions"""
-
-        # Détecter si c'est une question sur le nombre de missions
         question_lower: str = self.last_question.lower()
-        is_count_question = any(
-            word in question_lower for word in ["combien", "nombre"]
-        )
+        is_count_question = self._is_count_question(question_lower)
 
         if entities["entreprises"]:
-            entreprise: str = entities["entreprises"][0]
-            missions = self._get_missions_by_company(entreprise)
-
-            if is_count_question:
-                response = (
-                    "📊 **"
-                    + str(len(missions))
-                    + " mission(s)** trouvée(s) chez **"
-                    + entreprise.title()
-                    + "**"
-                )
-            elif missions:
-                response = f"🏢 **Missions chez {entreprise.title()} :**\n\n"
-                for mission in missions[:5]:  # Limiter à 5 résultats
-                    consultant_nom = (
-                        f"{mission.consultant.prenom} {mission.consultant.nom}"
-                    )
-                    response += f"• **{consultant_nom}** - {mission.nom_mission} ({mission.date_debut.strftime('%Y')})\n"
-
-                if len(missions) > 5:
-                    response += f"\n... et {len(missions) - 5} autres missions"
-
-                response += "\n\n📊 **Total : " + str(len(missions)) + " mission(s)**"
-            else:
-                response = f"❌ Aucune mission trouvée chez **{entreprise}**."
-
-            return {
-                "response": response,
-                "data": {"missions": len(missions), "entreprise": entreprise},
-                "intent": "missions",
-                "confidence": 0.9,
-            }
-
+            return self._handle_company_missions_inquiry(entities["entreprises"][0], is_count_question)
         elif entities["noms"]:
-            nom: str = entities["noms"][0]
-            consultant = self._find_consultant_by_name(nom)
+            return self._handle_consultant_missions_inquiry(entities["noms"][0], is_count_question)
+        else:
+            return self._handle_generic_missions_question()
 
-            if consultant:
-                missions = self._get_missions_by_consultant(consultant.id)
+    def _is_count_question(self, question_lower: str) -> bool:
+        """Détermine si c'est une question de comptage"""
+        return any(word in question_lower for word in ["combien", "nombre"])
 
-                if is_count_question:
-                    # Question spécifique sur le nombre
-                    response = (
-                        "📊 **"
-                        + consultant.prenom
-                        + " "
-                        + consultant.nom
-                        + "** a **"
-                        + str(len(missions))
-                        + " mission(s)** dans la base"
-                    )
-                    if missions:
-                        missions_en_cours = [
-                            m for m in missions if m.statut == "en_cours"
-                        ]
-                        if missions_en_cours:
-                            response += (
-                                " (dont " + str(len(missions_en_cours)) + " en cours)"
-                            )
-                elif missions:
-                    response = (
-                        f"💼 **Missions de {consultant.prenom} {consultant.nom} :**\n\n"
-                    )
-                    for mission in missions:
-                        status_icon = "🟢" if mission.statut == "en_cours" else "✅"
-                        response += f"{status_icon} **{mission.client}** - {mission.nom_mission}\n"
-                        response += f"   📅 {mission.date_debut.strftime('%m/%Y')} → "
-                        if mission.date_fin:
-                            response += f"{mission.date_fin.strftime('%m/%Y')}"
-                        else:
-                            response += "En cours"
-                        if mission.taux_journalier:
-                            response += (
-                                " | 💰 " + str(mission.taux_journalier) + "€/jour"
-                            )
-                        response += "\n\n"
+    def _handle_company_missions_inquiry(self, entreprise: str, is_count_question: bool) -> Dict[str, Any]:
+        """Gère les questions sur les missions d'une entreprise"""
+        missions = self._get_missions_by_company(entreprise)
 
-                    response += "📊 **Total : " + str(len(missions)) + " mission(s)**"
-                else:
-                    response = f"❌ Aucune mission trouvée pour **{consultant.prenom} {consultant.nom}**."
-            else:
-                response = f"❌ Consultant **{nom}** introuvable."
+        if is_count_question:
+            response = self._format_company_missions_count(missions, entreprise)
+        elif missions:
+            response = self._format_company_missions_list(missions, entreprise)
+        else:
+            response = f"❌ Aucune mission trouvée chez **{entreprise}**."
 
-            return {
-                "response": response,
-                "data": {
-                    "consultant": nom,
-                    "missions_count": len(missions) if consultant else 0,
-                },
-                "intent": "missions",
-                "confidence": 0.9,
-            }
+        return {
+            "response": response,
+            "data": {"missions": len(missions), "entreprise": entreprise},
+            "intent": "missions",
+            "confidence": 0.9,
+        }
 
+    def _format_company_missions_count(self, missions: List, entreprise: str) -> str:
+        """Formate le comptage des missions pour une entreprise"""
+        return (
+            "📊 **" + str(len(missions)) + " mission(s)** trouvée(s) chez **" + 
+            entreprise.title() + "**"
+        )
+
+    def _format_company_missions_list(self, missions: List, entreprise: str) -> str:
+        """Formate la liste des missions pour une entreprise"""
+        response = f"🏢 **Missions chez {entreprise.title()} :**\n\n"
+        
+        for mission in missions[:5]:  # Limiter à 5 résultats
+            consultant_nom = f"{mission.consultant.prenom} {mission.consultant.nom}"
+            response += f"• **{consultant_nom}** - {mission.nom_mission} ({mission.date_debut.strftime('%Y')})\n"
+
+        if len(missions) > 5:
+            response += f"\n... et {len(missions) - 5} autres missions"
+
+        response += "\n\n📊 **Total : " + str(len(missions)) + " mission(s)**"
+        return response
+
+    def _handle_consultant_missions_inquiry(self, nom: str, is_count_question: bool) -> Dict[str, Any]:
+        """Gère les questions sur les missions d'un consultant"""
+        consultant = self._find_consultant_by_name(nom)
+
+        if not consultant:
+            return self._format_consultant_not_found_missions_response(nom)
+
+        missions = self._get_missions_by_consultant(consultant.id)
+
+        if is_count_question:
+            response = self._format_consultant_missions_count(consultant, missions)
+        elif missions:
+            response = self._format_consultant_missions_list(consultant, missions)
+        else:
+            response = f"❌ Aucune mission trouvée pour **{consultant.prenom} {consultant.nom}**."
+
+        return {
+            "response": response,
+            "data": {
+                "consultant": nom,
+                "missions_count": len(missions),
+            },
+            "intent": "missions",
+            "confidence": 0.9,
+        }
+
+    def _format_consultant_not_found_missions_response(self, nom: str) -> Dict[str, Any]:
+        """Formate la réponse quand le consultant n'est pas trouvé"""
+        return {
+            "response": f"❌ Consultant **{nom}** introuvable.",
+            "data": {
+                "consultant": nom,
+                "missions_count": 0,
+            },
+            "intent": "missions",
+            "confidence": 0.9,
+        }
+
+    def _format_consultant_missions_count(self, consultant, missions: List) -> str:
+        """Formate le comptage des missions pour un consultant"""
+        response = (
+            "📊 **" + consultant.prenom + " " + consultant.nom + 
+            "** a **" + str(len(missions)) + " mission(s)** dans la base"
+        )
+        
+        if missions:
+            missions_en_cours = [m for m in missions if m.statut == "en_cours"]
+            if missions_en_cours:
+                response += " (dont " + str(len(missions_en_cours)) + " en cours)"
+        
+        return response
+
+    def _format_consultant_missions_list(self, consultant, missions: List) -> str:
+        """Formate la liste détaillée des missions pour un consultant"""
+        response = f"💼 **Missions de {consultant.prenom} {consultant.nom} :**\n\n"
+        
+        for mission in missions:
+            response += self._format_mission_details(mission)
+        
+        response += "📊 **Total : " + str(len(missions)) + " mission(s)**"
+        return response
+
+    def _format_mission_details(self, mission) -> str:
+        """Formate les détails d'une mission"""
+        status_icon = "🟢" if mission.statut == "en_cours" else "✅"
+        details = f"{status_icon} **{mission.client}** - {mission.nom_mission}\n"
+        details += f"   📅 {mission.date_debut.strftime('%m/%Y')} → "
+        
+        if mission.date_fin:
+            details += f"{mission.date_fin.strftime('%m/%Y')}"
+        else:
+            details += "En cours"
+        
+        if mission.taux_journalier:
+            details += " | 💰 " + str(mission.taux_journalier) + "€/jour"
+        
+        details += "\n\n"
+        return details
+
+    def _handle_generic_missions_question(self) -> Dict[str, Any]:
+        """Gère les questions génériques sur les missions"""
         return {
             "response": "🤔 Voulez-vous connaître les missions d'un consultant ou d'une entreprise spécifique ?",
             "data": None,
@@ -2843,11 +3002,11 @@ class ChatbotService:
                 if consultants_dispos:
                     for consultant in consultants_dispos[:5]:  # Limiter à 5
                         response += (
-                            "   • " + consultant.prenom + " " + consultant.nom + "\n"
+                            self.BULLET_POINT_INDENT + consultant.prenom + " " + consultant.nom + "\n"
                         )
                     if len(consultants_dispos) > 5:
                         response += (
-                            "   • ... et "
+                            self.BULLET_POINT_INDENT + "... et "
                             + str(len(consultants_dispos) - 5)
                             + " autre(s)\n"
                         )
@@ -2862,7 +3021,7 @@ class ChatbotService:
                     for consultant in consultants_occupes[:5]:  # Limiter à 5
                         date_dispo = consultant.date_disponibilite
                         response += (
-                            "   • "
+                            self.BULLET_POINT_INDENT
                             + consultant.prenom
                             + " "
                             + consultant.nom
@@ -2872,7 +3031,7 @@ class ChatbotService:
                         )
                     if len(consultants_occupes) > 5:
                         response += (
-                            "   • ... et "
+                            self.BULLET_POINT_INDENT + "... et "
                             + str(len(consultants_occupes) - 5)
                             + " autre(s)\n"
                         )
