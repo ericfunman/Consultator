@@ -569,13 +569,13 @@ def _process_consultant_form_submission(consultant, form_data):
     if not prenom or not nom or not email:
         st.error(MSG_CHAMPS_OBLIGATOIRES)
         return False
-    
+
     # Vérifier l'unicité de l'email
     existing = ConsultantService.get_consultant_by_email(email)
     if existing and existing.id != consultant.id:
         st.error(f"❌ Un consultant avec l'email {email} existe déjà !")
         return False
-    
+
     try:
         update_data = _build_update_data(form_data)
         if ConsultantService.update_consultant(consultant.id, update_data):
@@ -604,8 +604,14 @@ def _build_update_data(form_data):
         # Nouveaux champs V1.2
         "societe": form_data["societe"],
         "date_entree_societe": form_data["date_entree"],
-        "date_sortie_societe": form_data["date_sortie"] if form_data["date_sortie"] else None,
-        "date_premiere_mission": form_data["date_premiere_mission"] if form_data["date_premiere_mission"] else None,
+        "date_sortie_societe": (
+            form_data["date_sortie"] if form_data["date_sortie"] else None
+        ),
+        "date_premiere_mission": (
+            form_data["date_premiere_mission"]
+            if form_data["date_premiere_mission"]
+            else None
+        ),
         # Nouveaux champs V1.2.1
         "grade": form_data["grade"],
         "type_contrat": form_data["type_contrat"],
@@ -625,7 +631,7 @@ def _manage_salary_history(consultant):
             .order_by(ConsultantSalaire.date_debut.desc())
             .all()
         )
-        
+
         # Ajout automatique d'une entrée historique si salaire_actuel existe mais
         # pas d'entrée pour l'année en cours
         if consultant.salaire_actuel and not any(
@@ -646,7 +652,7 @@ def _manage_salary_history(consultant):
                 .order_by(ConsultantSalaire.date_debut.desc())
                 .all()
             )
-    
+
     if salaires:
         _display_salary_history(salaires, consultant)
     else:
@@ -666,7 +672,7 @@ def _display_salary_history(salaires, consultant):
             )
             + (f" — {salaire.commentaire}" if salaire.commentaire else "")
         )
-    
+
     # Met à jour le salaire actuel du consultant si besoin
     salaire_max = max(salaires, key=lambda s: s.date_debut)
     if consultant.salaire_actuel != salaire_max.salaire:
@@ -746,20 +752,20 @@ def _process_consultant_form_data(consultant, form_data):
     prenom = form_data.get("prenom", "")
     nom = form_data.get("nom", "")
     email = form_data.get("email", "")
-    
+
     if not prenom or not nom or not email:
         st.error(MSG_CHAMPS_OBLIGATOIRES)
         return False
-    
+
     # Vérifier l'unicité de l'email
     existing = ConsultantService.get_consultant_by_email(email)
     if existing and existing.id != consultant.id:
         st.error("❌ Un consultant avec l'email " + email + " existe déjà !")
         return False
-    
+
     try:
         update_data = _build_update_data_from_form(form_data)
-        
+
         if ConsultantService.update_consultant(consultant.id, update_data):
             st.success(f"✅ {prenom} {nom} modifié avec succès !")
             st.rerun()
@@ -779,7 +785,9 @@ def _build_update_data_from_form(form_data):
         "prenom": form_data["prenom"].strip(),
         "nom": form_data["nom"].strip(),
         "email": form_data["email"].strip().lower(),
-        "telephone": (form_data["telephone"].strip() if form_data["telephone"] else None),
+        "telephone": (
+            form_data["telephone"].strip() if form_data["telephone"] else None
+        ),
         "salaire_actuel": form_data["salaire"],
         "disponibilite": form_data["disponibilite"],
         "notes": form_data["notes"].strip() if form_data["notes"] else None,
@@ -787,9 +795,13 @@ def _build_update_data_from_form(form_data):
         # Nouveaux champs V1.2
         "societe": form_data["societe"],
         "date_entree_societe": form_data["date_entree"],
-        "date_sortie_societe": form_data["date_sortie"] if form_data["date_sortie"] else None,
+        "date_sortie_societe": (
+            form_data["date_sortie"] if form_data["date_sortie"] else None
+        ),
         "date_premiere_mission": (
-            form_data["date_premiere_mission"] if form_data["date_premiere_mission"] else None
+            form_data["date_premiere_mission"]
+            if form_data["date_premiere_mission"]
+            else None
         ),
         # Nouveaux champs V1.2.1
         "grade": form_data["grade"],
@@ -801,9 +813,9 @@ def _manage_consultant_salary_history(consultant):
     """Gère l'affichage complet de l'historique des salaires"""
     st.markdown("---")
     st.subheader("📈 Historique des salaires")
-    
+
     salaires = _load_and_ensure_salary_history(consultant)
-    
+
     if salaires:
         _display_salary_history_content(consultant, salaires)
     else:
@@ -824,7 +836,7 @@ def _load_and_ensure_salary_history(consultant):
             .order_by(ConsultantSalaire.date_debut.desc())
             .all()
         )
-        
+
         # Ajout automatique d'une entrée historique si nécessaire
         if _should_add_initial_salary_entry(consultant, salaires):
             _add_initial_salary_entry(session, consultant)
@@ -835,13 +847,14 @@ def _load_and_ensure_salary_history(consultant):
                 .order_by(ConsultantSalaire.date_debut.desc())
                 .all()
             )
-    
+
     return salaires
 
 
 def _should_add_initial_salary_entry(consultant, salaires):
     """Vérifie si une entrée de salaire initial doit être ajoutée"""
     from datetime import date
+
     return consultant.salaire_actuel and not any(
         s.date_debut.year == date.today().year for s in salaires
     )
@@ -850,6 +863,7 @@ def _should_add_initial_salary_entry(consultant, salaires):
 def _add_initial_salary_entry(session, consultant):
     """Ajoute une entrée de salaire initial"""
     from datetime import date
+
     salaire_init = ConsultantSalaire(
         consultant_id=consultant.id,
         salaire=consultant.salaire_actuel,
@@ -863,13 +877,13 @@ def _add_initial_salary_entry(session, consultant):
 def _display_salary_history_content(consultant, salaires):
     """Affiche le contenu de l'historique des salaires"""
     salaires_sorted = sorted(salaires, key=lambda s: s.date_debut)
-    
+
     # Affichage textuel
     _display_salary_list(salaires)
-    
+
     # Mise à jour du salaire actuel si nécessaire
     _update_current_salary_if_needed(consultant, salaires)
-    
+
     # Graphique
     _display_salary_evolution_chart(consultant, salaires_sorted)
 
@@ -979,11 +993,13 @@ def show_consultant_info(consultant):
 def show_consultant_skills(consultant):
     """Affiche et gère les compétences techniques et fonctionnelles du consultant"""
     # Onglets pour organiser les types de compétences
-    tab1, tab2, tab3 = st.tabs([
-        "🛠️ Compétences Techniques",
-        "🏦 Compétences Fonctionnelles",
-        "➕ Ajouter Compétences",
-    ])
+    tab1, tab2, tab3 = st.tabs(
+        [
+            "🛠️ Compétences Techniques",
+            "🏦 Compétences Fonctionnelles",
+            "➕ Ajouter Compétences",
+        ]
+    )
 
     with tab1:
         st.subheader("🛠️ Compétences techniques")
@@ -1001,7 +1017,9 @@ def show_consultant_skills(consultant):
 def _show_technical_skills(consultant):
     """Affiche les compétences techniques du consultant"""
     try:
-        competences_tech, technologies_missions = _load_technical_skills_data(consultant)
+        competences_tech, technologies_missions = _load_technical_skills_data(
+            consultant
+        )
         _display_registered_technical_skills(competences_tech)
         _display_mission_technologies(technologies_missions)
     except (SQLAlchemyError, ValueError, TypeError, AttributeError) as exc:
@@ -1024,9 +1042,7 @@ def _load_technical_skills_data(consultant):
 
         # Technologies des missions
         missions = (
-            session.query(Mission)
-            .filter(Mission.consultant_id == consultant.id)
-            .all()
+            session.query(Mission).filter(Mission.consultant_id == consultant.id).all()
         )
 
     # Extraire technologies des missions
@@ -1214,8 +1230,14 @@ def _add_technical_skill_form(consultant):
 
     if submitted:
         _save_consultant_competence(
-            consultant.id, competence_nom, categorie, "technique",
-            niveau, experience, certifications, projets
+            consultant.id,
+            competence_nom,
+            categorie,
+            "technique",
+            niveau,
+            experience,
+            certifications,
+            projets,
         )
 
 
@@ -1240,8 +1262,14 @@ def _add_functional_skill_form(consultant):
 
     if submitted:
         _save_consultant_competence(
-            consultant.id, competence_nom, categorie, "fonctionnelle",
-            niveau, experience, certifications, projets
+            consultant.id,
+            competence_nom,
+            categorie,
+            "fonctionnelle",
+            niveau,
+            experience,
+            certifications,
+            projets,
         )
 
 
@@ -2118,13 +2146,13 @@ def show_add_consultant_form():
     with st.form("add_consultant_form"):
         # Champs de base
         basic_data = _render_basic_consultant_fields_form(practice_options)
-        
+
         # Section historique société
         company_data = _render_company_history_section()
-        
+
         # Section profil professionnel
         professional_data = _render_professional_profile_section()
-        
+
         # Notes optionnelles
         notes = st.text_area(
             "📝 Notes (optionnel)",
@@ -2146,7 +2174,7 @@ def show_add_consultant_form():
 def _load_practice_options():
     """Charge les options de practice disponibles"""
     from database.models import Practice
-    
+
     with get_database_session() as session:
         practices = session.query(Practice).filter(Practice.actif).all()
     return {p.nom: p.id for p in practices}
@@ -2182,7 +2210,7 @@ def _render_basic_consultant_fields_form(practice_options):
         "telephone": telephone,
         "salaire": salaire,
         "disponibilite": disponibilite,
-        "practice_id": selected_practice_id
+        "practice_id": selected_practice_id,
     }
 
 
@@ -2194,9 +2222,7 @@ def _render_company_history_section():
     col3, col4 = st.columns(2)
 
     with col3:
-        societe = st.selectbox(
-            "🏢 Société", options=["Quanteam", "Asigma"], index=0
-        )
+        societe = st.selectbox("🏢 Société", options=["Quanteam", "Asigma"], index=0)
         date_entree = st.date_input(
             "📅 Date d'entrée société", help="Date d'entrée dans la société"
         )
@@ -2217,7 +2243,7 @@ def _render_company_history_section():
         "societe": societe,
         "date_entree": date_entree,
         "date_sortie": date_sortie,
-        "date_premiere_mission": date_premiere_mission
+        "date_premiere_mission": date_premiere_mission,
     }
 
 
@@ -2233,7 +2259,7 @@ def _render_professional_profile_section():
             "🎯 Grade",
             options=[
                 "Junior",
-                "Confirmé", 
+                "Confirmé",
                 "Consultant Manager",
                 "Directeur de Practice",
             ],
