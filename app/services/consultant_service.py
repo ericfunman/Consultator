@@ -247,8 +247,9 @@ class ConsultantService:
 
         today = date.today()
         delta = today - date_premiere_mission
-        return round(delta.days / 365.25, 1) @ staticmethod
+        return round(delta.days / 365.25, 1)
 
+    @staticmethod
     def search_consultants_optimized(
         search_term: str,
         page: int = 1,
@@ -1018,6 +1019,7 @@ class ConsultantService:
             description=mission_data.get("resume", ""),
         )
 
+    @staticmethod
     def _save_competence_from_analysis(
         session: Session, consultant_id: int, competence_name: str, type_competence: str
     ) -> bool:
@@ -1276,11 +1278,12 @@ class ConsultantService:
         missions_count = 0
 
         for mission_data in missions:
-            if ConsultantService._should_save_mission(mission_data):
-                if ConsultantService._save_single_cv_mission(
-                    session, consultant_id, mission_data
-                ):
-                    missions_count += 1
+            if ConsultantService._should_save_mission(
+                mission_data
+            ) and ConsultantService._save_single_cv_mission(
+                session, consultant_id, mission_data
+            ):
+                missions_count += 1
 
         return missions_count
 
@@ -1416,11 +1419,12 @@ class ConsultantService:
         count = 0
 
         for skill_name in skills:
-            if ConsultantService._should_save_skill(skill_name):
-                if ConsultantService._save_single_cv_skill(
-                    session, consultant_id, skill_name.strip(), skill_type
-                ):
-                    count += 1
+            if ConsultantService._should_save_skill(
+                skill_name
+            ) and ConsultantService._save_single_cv_skill(
+                session, consultant_id, skill_name.strip(), skill_type
+            ):
+                count += 1
 
         return count
 
