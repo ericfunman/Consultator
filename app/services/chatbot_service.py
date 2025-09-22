@@ -1183,187 +1183,145 @@ class ChatbotService:
                 "confidence": 0.8,
             }
 
+    def _detect_skill_type(self, question_lower: str) -> Optional[str]:
+        """Détecte le type de compétence demandé dans la question"""
+        if any(word in question_lower for word in [
+            "compétences techniques", "technique", "technologie", "programmation"
+        ]):
+            return "technique"
+        elif any(word in question_lower for word in [
+            "compétences fonctionnelles", "fonctionnelle", "métier", "bancaire", "finance"
+        ]):
+            return "fonctionnelle"
+        return None
+
+    def _extract_skill_from_question(self, question_lower: str) -> Optional[str]:
+        """Extrait le nom de la compétence d'une question 'qui maîtrise'"""
+        patterns = [
+            r"qui\s+maîtrise\s+(.+?)(?:\?|$)",
+            r"qui\s+sait\s+(.+?)(?:\?|$)",
+            r"qui\s+connaît\s+(.+?)(?:\?|$)",
+            r"qui\s+connait\s+(.+?)(?:\?|$)",
+            r"qui\s+a\s+(.+?)(?:\?|$)",
+            r"qui\s+possède\s+(.+?)(?:\?|$)",
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, question_lower)
+            if match:
+                competence_found = match.group(1).strip()
+                # Nettoyer les articles et prépositions
+                competence_found = re.sub(
+                    r"^(le|la|les|du|de|des|en|une?)\s+", "", competence_found
+                )
+                competence_found = re.sub(
+                    r"\s+(compétence|skill)s?$", "", competence_found
+                )
+                return competence_found
+        return None
+
+    def _handle_specific_skill_search(self, competence: str, type_competence: Optional[str]) -> Dict[str, Any]:
+        """Gère la recherche de consultants ayant une compétence spécifique"""
+        consultants = self._find_consultants_by_skill(competence, type_competence)
+
+        if consultants:
+            noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
+            response = f"🎯 Consultants maîtrisant **{competence.title()}** :\n\n"
+            response += "\n".join([f"• {nom}" for nom in noms])
+            response += (
+                self.STATS_PREFIX + str(len(consultants)) + self.CONSULTANT_FOUND_SUFFIX
+            )
+        else:
+            response = f"❌ Aucun consultant ne maîtrise **{competence}** dans notre base."
+
+        return {
+            "response": response,
+            "data": {
+                "consultants": [
+                    {"nom": c.nom, "prenom": c.prenom} for c in consultants
+                ]
+            },
+            "intent": "competences",
+            "confidence": 0.9,
+        }
+
+    def _handle_consultant_skills_inquiry(self, nom: str, type_competence: Optional[str]) -> Dict[str, Any]:
+        """Gère les questions sur les compétences d'un consultant spécifique"""
+        consultant = self._find_consultant_by_name(nom)
+
+        if consultant:
+            skills = self._get_consultant_skills(consultant.id, type_competence)
+
+            if skills:
+                response = f"🎯 **Compétences de {consultant.prenom} {consultant.nom} :**\n\n"
+
+                # Grouper par catégorie
+                categories: Dict[str, List[Dict[str, Any]]] = {}
+                for skill in skills:
+                    categorie = skill["categorie"] or "Autre"
+                    if categorie not in categories:
+                        categories[categorie] = []
+                    categories[categorie].append(skill)
+
+                # Afficher par catégorie
+                for categorie, competences in categories.items():
+                    response += f"**🔹 {categorie.title()} :**\n"
+                    for comp in competences:
+                        niveau_emoji = {
+                            "debutant": "🟡",
+                            "intermediaire": "🟠",
+                            "expert": "🔴",
+                        }.get(comp["niveau_maitrise"], "⚪")
+
+                        experience_text = ""
+                        if comp["annees_experience"] and comp["annees_experience"] > 0:
+                            if comp["annees_experience"] == 1:
+                                experience_text = f" ({comp['annees_experience']} an)"
+                            else:
+                                experience_text = f" ({comp['annees_experience']:.0f} ans)"
+
+                        response += f"  {niveau_emoji} **{comp['nom']}** - {comp['niveau_maitrise'].title()}{experience_text}\n"
+                    response += "\n"
+
+                response += f"📊 **Total : {len(skills)} compétence(s)**"
+            else:
+                response = f"❌ Aucune compétence enregistrée pour **{consultant.prenom} {consultant.nom}**."
+        else:
+            response = f"❌ Consultant **{nom}** introuvable."
+
+        return {
+            "response": response,
+            "data": {
+                "consultant": consultant.nom if consultant else None,
+                "skills_count": len(skills) if consultant else 0,
+            },
+            "intent": "competences",
+            "confidence": 0.9,
+        }
+
     def _handle_skills_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les compétences"""
 
         # Détecter le type de compétences demandé
         question_lower: str = self.last_question.lower()
-        type_competence = None
-
-        if any(
-            word in question_lower
-            for word in [
-                "compétences techniques",
-                "technique",
-                "technologie",
-                "programmation",
-            ]
-        ):
-            type_competence = "technique"
-        elif any(
-            word in question_lower
-            for word in [
-                "compétences fonctionnelles",
-                "fonctionnelle",
-                "métier",
-                "bancaire",
-                "finance",
-            ]
-        ):
-            type_competence = "fonctionnelle"
+        type_competence = self._detect_skill_type(question_lower)
 
         # Si une compétence spécifique est mentionnée
         if entities["competences"]:
-            competence: str = entities["competences"][0]
-            consultants = self._find_consultants_by_skill(competence, type_competence)
-
-            if consultants:
-                noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-                response = f"🎯 Consultants maîtrisant **{competence.title()}** :\n\n"
-                response += "\n".join([f"• {nom}" for nom in noms])
-
-                # Ajouter les détails des compétences
-                response += (
-                    self.STATS_PREFIX
-                    + str(len(consultants))
-                    + self.CONSULTANT_FOUND_SUFFIX
-                )
-            else:
-                response = (
-                    f"❌ Aucun consultant ne maîtrise **{competence}** dans notre base."
-                )
-
-            return {
-                "response": response,
-                "data": {
-                    "consultants": [
-                        {"nom": c.nom, "prenom": c.prenom} for c in consultants
-                    ]
-                },
-                "intent": "competences",
-                "confidence": 0.9,
-            }
+            return self._handle_specific_skill_search(entities["competences"][0], type_competence)
 
         # Recherche dynamique de compétence dans la question
-        elif any(
-            word in question_lower
-            for word in ["qui maîtrise", "qui sait", "qui connaît", "qui connait"]
-        ):
-            # Extraire le nom de la compétence après le verbe
-
-            # Chercher tous les mots après "maîtrise", "sait", "connaît"
-            patterns = [
-                r"qui\s+maîtrise\s+(.+?)(?:\?|$)",
-                r"qui\s+sait\s+(.+?)(?:\?|$)",
-                r"qui\s+connaît\s+(.+?)(?:\?|$)",
-                r"qui\s+connait\s+(.+?)(?:\?|$)",
-                r"qui\s+a\s+(.+?)(?:\?|$)",
-                r"qui\s+possède\s+(.+?)(?:\?|$)",
-            ]
-
-            competence_found = None
-            for pattern in patterns:
-                match = re.search(pattern, question_lower)
-                if match:
-                    competence_found = match.group(1).strip()
-                    # Nettoyer les articles et prépositions
-                    competence_found = re.sub(
-                        r"^(le|la|les|du|de|des|en|une?)\s+", "", competence_found
-                    )
-                    competence_found = re.sub(
-                        r"\s+(compétence|skill)s?$", "", competence_found
-                    )
-                    break
+        elif any(word in question_lower for word in [
+            "qui maîtrise", "qui sait", "qui connaît", "qui connait"
+        ]):
+            competence_found = self._extract_skill_from_question(question_lower)
 
             if competence_found:
-                consultants = self._find_consultants_by_skill(
-                    competence_found, type_competence
-                )
-
-                if consultants:
-                    noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-                    response = f"🎯 Consultants maîtrisant **{competence_found.title()}** :\n\n"
-                    response += "\n".join([f"• {nom}" for nom in noms])
-                    response += (
-                        "\n\n📊 **"
-                        + str(len(consultants))
-                        + " consultant(s) trouvé(s)**"
-                    )
-                else:
-                    response = f"❌ Aucun consultant ne maîtrise **{competence_found}** dans notre base."
-
-                return {
-                    "response": response,
-                    "data": {
-                        "consultants": [
-                            {"nom": c.nom, "prenom": c.prenom} for c in consultants
-                        ]
-                    },
-                    "intent": "competences",
-                    "confidence": 0.8,
-                }
+                return self._handle_specific_skill_search(competence_found, type_competence)
 
         # Question générale sur les compétences d'un consultant
         elif entities["noms"]:
-            nom: str = entities["noms"][0]
-            consultant = self._find_consultant_by_name(nom)
-
-            if consultant:
-                skills = self._get_consultant_skills(consultant.id, type_competence)
-
-                if skills:
-                    response = f"🎯 **Compétences de {consultant.prenom} {consultant.nom} :**\n\n"
-
-                    # Grouper par catégorie
-                    categories: Dict[str, List[Dict[str, Any]]] = {}
-                    for skill in skills:
-                        categorie = skill["categorie"] or "Autre"
-                        if categorie not in categories:
-                            categories[categorie] = []
-                        categories[categorie].append(skill)
-
-                    # Afficher par catégorie
-                    for categorie, competences in categories.items():
-                        response += f"**🔹 {categorie.title()} :**\n"
-                        for comp in competences:
-                            niveau_emoji = {
-                                "debutant": "🟡",
-                                "intermediaire": "🟠",
-                                "expert": "🔴",
-                            }.get(comp["niveau_maitrise"], "⚪")
-
-                            experience_text = ""
-                            if (
-                                comp["annees_experience"]
-                                and comp["annees_experience"] > 0
-                            ):
-                                if comp["annees_experience"] == 1:
-                                    experience_text = (
-                                        f" ({comp['annees_experience']} an)"
-                                    )
-                                else:
-                                    experience_text = (
-                                        f" ({comp['annees_experience']:.0f} ans)"
-                                    )
-
-                            response += f"  {niveau_emoji} **{comp['nom']}** - {comp['niveau_maitrise'].title()}{experience_text}\n"
-                        response += "\n"
-
-                    response += f"📊 **Total : {len(skills)} compétence(s)**"
-                else:
-                    response = f"❌ Aucune compétence enregistrée pour **{consultant.prenom} {consultant.nom}**."
-            else:
-                response = f"❌ Consultant **{nom}** introuvable."
-
-            return {
-                "response": response,
-                "data": {
-                    "consultant": consultant.nom if consultant else None,
-                    "skills_count": len(skills) if consultant else 0,
-                },
-                "intent": "competences",
-                "confidence": 0.9,
-            }
+            return self._handle_consultant_skills_inquiry(entities["noms"][0], type_competence)
 
         return {
             "response": "🤔 Pouvez-vous préciser quelle compétence ou quel consultant vous intéresse ?",
@@ -1372,199 +1330,167 @@ class ChatbotService:
             "confidence": 0.5,
         }
 
+    def _extract_consultant_name_from_language_question(self, question_lower: str) -> Optional[str]:
+        """Extrait le nom du consultant d'une question sur les langues"""
+        patterns = [
+            r"quelles?\s+langues?\s+parle\s+(\w+)",
+            r"langues?\s+parle\s+(\w+)",
+            r"langues?\s+de\s+(\w+)",
+            r"(\w+)\s+parle\s+quelles?\s+langues?",
+            r"quelles?\s+sont\s+les\s+langues?\s+de\s+(\w+)",
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, question_lower)
+            if match:
+                return match.group(1)
+        return None
+
+    def _extract_language_from_question(self, question_lower: str) -> Optional[str]:
+        """Extrait le nom de la langue d'une question 'qui parle'"""
+        patterns = [
+            r"qui\s+parle\s+(.+?)(?:\?|$)",
+            r"parlent\s+(.+?)(?:\?|$)",
+            r"qui.+parle.+(.+?)(?:\?|$)",
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, question_lower)
+            if match:
+                langue_found = match.group(1).strip()
+                # Nettoyer les articles
+                langue_found = re.sub(
+                    r"^(le|la|les|du|de|des|en|une?)\s+", "", langue_found
+                )
+                return langue_found
+        return None
+
+    def _format_consultant_languages_response(self, consultant) -> str:
+        """Formate la réponse pour les langues d'un consultant"""
+        if not consultant.langues:
+            return f"❌ Aucune langue enregistrée pour **{consultant.prenom} {consultant.nom}**."
+
+        response = (
+            "🌍 **Langues parlées par "
+            + consultant.prenom + " " + consultant.nom + " :**\n\n"
+        )
+
+        flag_emoji = {
+            "FR": "🇫🇷", "EN": "🇬🇧", "ES": "🇪🇸", "DE": "🇩🇪", "IT": "🇮🇹",
+            "PT": "🇵🇹", "NL": "🇳🇱", "RU": "🇷🇺", "ZH": "🇨🇳", "JA": "🇯🇵",
+            "AR": "🇸🇦", "HI": "🇮�",
+        }
+
+        for cl in consultant.langues:
+            emoji = flag_emoji.get(cl.langue.code_iso, "🌍")
+            response += f"  {emoji} **{cl.langue.nom}** - {cl.niveau_label}"
+            if cl.commentaire:
+                response += f" - {cl.commentaire}"
+            response += "\n"
+
+        response += f"\n📊 **Total : {len(consultant.langues)} langue(s)**"
+        return response
+
+    def _handle_specific_language_search(self, langue_recherchee: str) -> Dict[str, Any]:
+        """Gère la recherche de consultants parlant une langue spécifique"""
+        consultants = self._find_consultants_by_language(langue_recherchee)
+
+        if consultants:
+            noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
+            response = f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
+            response += "\n".join([f"• {nom}" for nom in noms])
+            response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
+
+            # Détails des niveaux si moins de 5 consultants
+            if len(consultants) <= 5:
+                response += "\n\n🎯 **Niveaux détaillés :**"
+                for consultant in consultants:
+                    for cl in consultant.langues:
+                        if cl.langue.nom.lower() == langue_recherchee.lower():
+                            response += f"\n  • **{consultant.prenom} {consultant.nom}** : {cl.niveau_label}"
+                            if cl.commentaire:
+                                response += f" - {cl.commentaire}"
+                            break
+
+            return {
+                "response": response,
+                "data": {
+                    "consultants": [
+                        {"nom": c.nom, "prenom": c.prenom} for c in consultants
+                    ]
+                },
+                "intent": "langues",
+                "confidence": 0.9,
+            }
+        else:
+            return {
+                "response": f"❌ Aucun consultant ne parle **{langue_recherchee}** dans notre base.",
+                "data": {"consultants": []},
+                "intent": "langues",
+                "confidence": 0.8,
+            }
+
+    def _handle_consultant_languages_inquiry(self, entities: Dict) -> Dict[str, Any]:
+        """Gère les questions sur les langues d'un consultant spécifique"""
+        question_lower = self.last_question.lower()
+        
+        # Si pas de nom détecté dans entities, essayer d'extraire manuellement
+        nom = entities["noms"][0] if entities["noms"] else self._extract_consultant_name_from_language_question(question_lower)
+
+        if nom:
+            consultant = self._find_consultant_by_name(nom)
+
+            if consultant:
+                response = self._format_consultant_languages_response(consultant)
+                return {
+                    "response": response,
+                    "data": {
+                        "consultant": consultant.nom,
+                        "languages_count": len(consultant.langues) if consultant.langues else 0,
+                    },
+                    "intent": "langues",
+                    "confidence": 0.8,
+                }
+            else:
+                return {
+                    "response": f"❌ Consultant **{nom}** introuvable.",
+                    "data": {"consultant": None, "languages_count": 0},
+                    "intent": "langues",
+                    "confidence": 0.8,
+                }
+        else:
+            # Question générale sur les langues sans nom spécifique
+            return {
+                "response": '🌍 Pour connaître les langues d\'un consultant, demandez : "Quelles langues parle [nom] ?"\n\nOu pour trouver qui parle une langue : "Qui parle anglais ?"',
+                "data": {},
+                "intent": "langues",
+                "confidence": 0.6,
+            }
+
     def _handle_languages_question(self, entities: Dict) -> Dict[str, Any]:
         """Gère les questions sur les langues parlées par les consultants"""
 
         # Si une langue spécifique est mentionnée
         if entities["langues"]:
-            langue_recherchee: str = entities["langues"][0]
-            consultants = self._find_consultants_by_language(langue_recherchee)
+            return self._handle_specific_language_search(entities["langues"][0])
 
-            if consultants:
-                noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-                response = (
-                    f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
-                )
-                response += "\n".join([f"• {nom}" for nom in noms])
-
-                # Ajouter les détails des niveaux
-                response += (
-                    "\n\n📊 **" + str(len(consultants)) + " consultant(s) trouvé(s)**"
-                )
-
-                # Détails des niveaux si moins de 5 consultants
-                if len(consultants) <= 5:
-                    response += "\n\n🎯 **Niveaux détaillés :**"
-                    for consultant in consultants:
-                        for cl in consultant.langues:
-                            if cl.langue.nom.lower() == langue_recherchee.lower():
-                                response += f"\n  • **{consultant.prenom} {consultant.nom}** : {cl.niveau_label}"
-                                if cl.commentaire:
-                                    response += f" - {cl.commentaire}"
-                                break
-
-                return {
-                    "response": response,
-                    "data": {
-                        "consultants": [
-                            {"nom": c.nom, "prenom": c.prenom} for c in consultants
-                        ]
-                    },
-                    "intent": "langues",
-                    "confidence": 0.9,
-                }
-            else:
-                response = f"❌ Aucun consultant ne parle **{langue_recherchee}** dans notre base."
-                return {
-                    "response": response,
-                    "data": {"consultants": []},
-                    "intent": "langues",
-                    "confidence": 0.8,
-                }
-
-        # Question générale sur les langues d'un consultant (vérifier en premier)
+        # Question générale sur les langues d'un consultant
         elif entities["noms"] or any(
             word in self.last_question.lower()
             for word in ["quelles langues", "langues de", "langues parlées"]
         ):
-            # Si pas de nom détecté dans entities, essayer d'extraire manuellement
-            nom: Optional[str] = None
-            if entities["noms"]:
-                nom = entities["noms"][0]
-            else:
-                # Extraire le nom après "langues parle" ou "langues de"
-                patterns = [
-                    r"quelles?\s+langues?\s+parle\s+(\w+)",
-                    r"langues?\s+parle\s+(\w+)",
-                    r"langues?\s+de\s+(\w+)",
-                    r"(\w+)\s+parle\s+quelles?\s+langues?",
-                    r"quelles?\s+sont\s+les\s+langues?\s+de\s+(\w+)",
-                ]
-
-                for pattern in patterns:
-                    match = re.search(pattern, self.last_question.lower())
-                    if match:
-                        nom = match.group(1)
-                        break
-
-            if nom:
-                consultant = self._find_consultant_by_name(nom)
-
-                if consultant:
-                    if consultant.langues:
-                        response = (
-                            "🌍 **Langues parlées par "
-                            + consultant.prenom
-                            + " "
-                            + consultant.nom
-                            + " :**\n\n"
-                        )
-
-                        for cl in consultant.langues:
-                            flag_emoji = {
-                                "FR": "🇫🇷",
-                                "EN": "🇬🇧",
-                                "ES": "🇪🇸",
-                                "DE": "🇩🇪",
-                                "IT": "🇮🇹",
-                                "PT": "🇵🇹",
-                                "NL": "🇳🇱",
-                                "RU": "🇷🇺",
-                                "ZH": "🇨🇳",
-                                "JA": "🇯🇵",
-                                "AR": "🇸🇦",
-                                "HI": "🇮🇳",
-                            }
-                            emoji = flag_emoji.get(cl.langue.code_iso, "🌍")
-                            response += (
-                                f"  {emoji} **{cl.langue.nom}** - {cl.niveau_label}"
-                            )
-                            if cl.commentaire:
-                                response += f" - {cl.commentaire}"
-                            response += "\n"
-
-                        response += (
-                            "\n📊 **Total : "
-                            + str(len(consultant.langues))
-                            + " langue(s)**"
-                        )
-                    else:
-                        response = f"❌ Aucune langue enregistrée pour **{consultant.prenom} {consultant.nom}**."
-                else:
-                    response = f"❌ Consultant **{nom}** introuvable."
-
-                return {
-                    "response": response,
-                    "data": {
-                        "consultant": consultant.nom if consultant else None,
-                        "languages_count": len(consultant.langues) if consultant else 0,
-                    },
-                    "intent": "langues",
-                    "confidence": 0.8,
-                }
-            else:
-                # Question générale sur les langues sans nom spécifique
-                return {
-                    "response": '🌍 Pour connaître les langues d\'un consultant, demandez : "Quelles langues parle [nom] ?"\n\nOu pour trouver qui parle une langue : "Qui parle anglais ?"',
-                    "data": {},
-                    "intent": "langues",
-                    "confidence": 0.6,
-                }
+            return self._handle_consultant_languages_inquiry(entities)
 
         # Recherche dynamique de langue dans la question
         elif any(
             word in self.last_question.lower()
             for word in ["qui parle", "parle", "parlent", "bilingue"]
         ):
-            # Extraire le nom de la langue après "parle"
-            question_lower: str = self.last_question.lower()
-
-            patterns = [
-                r"qui\s+parle\s+(.+?)(?:\?|$)",
-                r"parlent\s+(.+?)(?:\?|$)",
-                r"qui.+parle.+(.+?)(?:\?|$)",
-            ]
-
-            langue_found = None
-            for pattern in patterns:
-                match = re.search(pattern, question_lower)
-                if match:
-                    langue_found = match.group(1).strip()
-                    # Nettoyer les articles
-                    langue_found = re.sub(
-                        r"^(le|la|les|du|de|des|en|une?)\s+", "", langue_found
-                    )
-                    break
+            question_lower = self.last_question.lower()
+            langue_found = self._extract_language_from_question(question_lower)
 
             if langue_found:
-                consultants = self._find_consultants_by_language(langue_found)
-
-                if consultants:
-                    noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
-                    response = (
-                        f"🌍 Consultants parlant **{langue_found.title()}** :\n\n"
-                    )
-                    response += "\n".join([f"• {nom}" for nom in noms])
-                    response += (
-                        "\n\n📊 **"
-                        + str(len(consultants))
-                        + " consultant(s) trouvé(s)**"
-                    )
-                else:
-                    response = f"❌ Aucun consultant ne parle **{langue_found}** dans notre base."
-
-                return {
-                    "response": response,
-                    "data": {
-                        "consultants": (
-                            [{"nom": c.nom, "prenom": c.prenom} for c in consultants]
-                            if consultants
-                            else []
-                        )
-                    },
-                    "intent": "langues",
-                    "confidence": 0.8,
-                }
+                return self._handle_specific_language_search(langue_found)
 
         # Question générale sur les langues
         return {
@@ -2919,6 +2845,157 @@ class ChatbotService:
                     "confidence": 0.3,
                 }
 
+    def _get_consultant_missions_with_tjm(self, consultant_db) -> List:
+        """Récupère les missions avec TJM d'un consultant"""
+        if not consultant_db or not consultant_db.missions:
+            return []
+        return [m for m in consultant_db.missions if m.tjm or m.taux_journalier]
+
+    def _format_mission_tjm_details(self, mission) -> str:
+        """Formate les détails d'une mission avec son TJM"""
+        tjm = mission.tjm or mission.taux_journalier
+        tjm_type = "TJM" if mission.tjm else "TJM (ancien)"
+        
+        response = f"🎯 **{mission.nom_mission}**\n"
+        response += f"   • Client: {mission.client}\n"
+        response += f"   • {tjm_type}: {tjm}€\n"
+
+        if mission.date_debut:
+            debut = mission.date_debut.strftime("%d/%m/%Y")
+            if mission.date_fin:
+                fin = mission.date_fin.strftime("%d/%m/%Y")
+                response += f"   • Période: {debut} → {fin}\n"
+            else:
+                response += f"   • Début: {debut} (en cours)\n"
+
+        return response + "\n"
+
+    def _calculate_tjm_average(self, missions_avec_tjm) -> tuple:
+        """Calcule le TJM moyen à partir d'une liste de missions"""
+        if not missions_avec_tjm:
+            return 0, 0
+            
+        total_tjm = sum(mission.tjm or mission.taux_journalier for mission in missions_avec_tjm)
+        count_tjm = len(missions_avec_tjm)
+        return total_tjm / count_tjm if count_tjm > 0 else 0, count_tjm
+
+    def _handle_consultant_tjm_inquiry(self, consultant) -> Dict[str, Any]:
+        """Gère les questions TJM pour un consultant spécifique"""
+        try:
+            with get_database_session() as session:
+                consultant_db = (
+                    session.query(Consultant)
+                    .filter(Consultant.id == consultant.id)
+                    .first()
+                )
+
+            missions_avec_tjm = self._get_consultant_missions_with_tjm(consultant_db)
+
+            if missions_avec_tjm:
+                response = (
+                    f"💰 **TJM des missions de {consultant.prenom} {consultant.nom}** :\n\n"
+                )
+
+                for mission in missions_avec_tjm:
+                    response += self._format_mission_tjm_details(mission)
+
+                tjm_moyen, count_tjm = self._calculate_tjm_average(missions_avec_tjm)
+                if count_tjm > 1:
+                    response += f"📊 **TJM moyen :** {tjm_moyen:.0f}€ (sur {count_tjm} missions)"
+
+            else:
+                response = (
+                    f"💰 **{consultant.prenom} {consultant.nom}** : "
+                    "Aucun TJM renseigné dans les missions"
+                )
+
+        except (SQLAlchemyError, AttributeError, ValueError, TypeError, ZeroDivisionError) as e:
+            response = f"❌ Erreur lors de la récupération des TJM : {str(e)}"
+
+        return {
+            "response": response,
+            "data": {
+                "consultant": {"nom": consultant.nom, "prenom": consultant.prenom}
+            },
+            "intent": "tjm_mission",
+            "confidence": 0.9,
+        }
+
+    def _get_global_tjm_statistics(self) -> Dict[str, Any]:
+        """Calcule les statistiques globales de TJM"""
+        try:
+            with get_database_session() as session:
+                # TJM moyen avec nouveau champ
+                tjm_nouveau_moyen = (
+                    session.query(func.avg(Mission.tjm))
+                    .filter(Mission.tjm.isnot(None))
+                    .scalar() or 0
+                )
+
+                # TJM moyen avec ancien champ
+                tjm_ancien_moyen = (
+                    session.query(func.avg(Mission.taux_journalier))
+                    .filter(Mission.taux_journalier.isnot(None))
+                    .scalar() or 0
+                )
+
+                # Compter les missions avec TJM
+                missions_nouveau_tjm = (
+                    session.query(Mission).filter(Mission.tjm.isnot(None)).count()
+                )
+
+                missions_ancien_tjm = (
+                    session.query(Mission)
+                    .filter(Mission.taux_journalier.isnot(None))
+                    .count()
+                )
+
+            response = "💰 **Statistiques TJM des missions** :\n\n"
+
+            if missions_nouveau_tjm > 0:
+                response += "🆕 **Nouveau format TJM :**\n"
+                response += f"   • Missions avec TJM: {missions_nouveau_tjm}\n"
+                response += f"   • TJM moyen: {tjm_nouveau_moyen:.0f}€\n\n"
+
+            if missions_ancien_tjm > 0:
+                response += "📊 **Ancien format TJM :**\n"
+                response += f"   • Missions avec TJM: {missions_ancien_tjm}\n"
+                response += f"   • TJM moyen: {tjm_ancien_moyen:.0f}€\n\n"
+
+            # Calcul global
+            if missions_nouveau_tjm > 0 or missions_ancien_tjm > 0:
+                total_missions = missions_nouveau_tjm + missions_ancien_tjm
+                tjm_global = (
+                    (tjm_nouveau_moyen * missions_nouveau_tjm) + 
+                    (tjm_ancien_moyen * missions_ancien_tjm)
+                ) / total_missions
+                response += (
+                    f"🎯 **TJM global moyen :** {tjm_global:.0f}€ "
+                    f"(sur {total_missions} missions)"
+                )
+            else:
+                response = "💰 **Aucun TJM renseigné** dans les missions"
+
+            return {
+                "response": response,
+                "data": {
+                    "tjm_nouveau_moyen": tjm_nouveau_moyen,
+                    "tjm_ancien_moyen": tjm_ancien_moyen,
+                    "missions_nouveau": missions_nouveau_tjm,
+                    "missions_ancien": missions_ancien_tjm,
+                },
+                "intent": "tjm_mission",
+                "confidence": 0.8,
+            }
+
+        except (SQLAlchemyError, ZeroDivisionError, TypeError, ValueError) as e:
+            return {
+                "response": f"❌ Erreur lors de la récupération des statistiques TJM : {str(e)}",
+                "data": {},
+                "intent": "tjm_mission",
+                "confidence": 0.3,
+            }
+
     def _handle_mission_tjm_question(self, entities: Dict) -> Dict[str, Any]:
         """
         Gère les questions sur les TJM (Taux Journalier Moyen) des missions (V1.2.2).
@@ -2936,213 +3013,17 @@ class ChatbotService:
             - data: Données structurées sur les TJM
             - intent: Type d'intention détecté ("tjm_mission")
             - confidence: Niveau de confiance de la réponse (0.0 à 1.0)
-
-        Raises:
-            SQLAlchemyError: En cas d'erreur de base de données
-            ZeroDivisionError: En cas de division par zéro lors des calculs
-            AttributeError: Si les données de TJM sont malformées
-
-        Example:
-            >>> entities = {"noms": ["Jean Dupont"]}
-            >>> result = chatbot._handle_mission_tjm_question(entities)
-            >>> print(result["response"])
-            💰 **TJM des missions de Jean Dupont** :
-            🎯 **Mission Data Analyst**
-               • Client: BNP Paribas
-               • TJM: 450€
-               • Période: 01/01/2024 → 31/03/2024
-            📊 **TJM moyen :** 450€ (sur 1 missions)
         """
         # Chercher un consultant spécifique
-
-        # Chercher un consultant spécifique
         consultant = None
-        if entities["noms"]:
+        if entities.get("noms"):
             nom_complet = " ".join(entities["noms"])
             consultant = self._find_consultant_by_name(nom_complet)
 
         if consultant:
-            try:
-                # Récupérer les missions avec TJM
-                with get_database_session() as session:
-
-                    consultant_db = (
-                        session.query(Consultant)
-                        .filter(Consultant.id == consultant.id)
-                        .first()
-                    )
-
-                if consultant_db and consultant_db.missions:
-                    missions_avec_tjm = [
-                        m for m in consultant_db.missions if m.tjm or m.taux_journalier
-                    ]
-
-                    if missions_avec_tjm:
-                        response = (
-                            "💰 **TJM des missions de "
-                            + consultant.prenom
-                            + " "
-                            + consultant.nom
-                            + "** :\n\n"
-                        )
-
-                        total_tjm = 0
-                        count_tjm = 0
-
-                        for mission in missions_avec_tjm:
-                            tjm = mission.tjm or mission.taux_journalier
-                            tjm_type = "TJM" if mission.tjm else "TJM (ancien)"
-
-                            response += "🎯 **" + mission.nom_mission + "**\n"
-                            response += "   • Client: " + mission.client + "\n"
-                            response += "   • " + tjm_type + ": " + str(tjm) + "€\n"
-
-                            if mission.date_debut:
-                                debut = mission.date_debut.strftime("%d/%m/%Y")
-                                if mission.date_fin:
-                                    fin = mission.date_fin.strftime("%d/%m/%Y")
-                                    response += (
-                                        "   • Période: " + debut + " → " + fin + "\n"
-                                    )
-                                else:
-                                    response += "   • Début: " + debut + " (en cours)\n"
-
-                            response += "\n"
-
-                            total_tjm += tjm
-                            count_tjm += 1
-
-                        if count_tjm > 1:
-                            tjm_moyen = total_tjm / count_tjm
-                            response += (
-                                "📊 **TJM moyen :** "
-                                + str(tjm_moyen)
-                                + "€ (sur "
-                                + str(count_tjm)
-                                + " missions)"
-                            )
-
-                    else:
-                        response = (
-                            "💰 **"
-                            + consultant.prenom
-                            + " "
-                            + consultant.nom
-                            + "** : Aucun TJM renseigné dans les missions"
-                        )
-                else:
-                    response = (
-                        "💰 **"
-                        + consultant.prenom
-                        + " "
-                        + consultant.nom
-                        + "** : Aucune mission trouvée"
-                    )
-
-            except (
-                SQLAlchemyError,
-                AttributeError,
-                ValueError,
-                TypeError,
-                ZeroDivisionError,
-            ) as e:
-                response = "❌ Erreur lors de la récupération des TJM : " + str(e)
-
-            return {
-                "response": response,
-                "data": {
-                    "consultant": {"nom": consultant.nom, "prenom": consultant.prenom}
-                },
-                "intent": "tjm_mission",
-                "confidence": 0.9,
-            }
+            return self._handle_consultant_tjm_inquiry(consultant)
         else:
-            # Question générale sur les TJM
-            try:
-                # TJM moyen avec nouveau champ
-                tjm_nouveau_moyen = (
-                    session.query(func.avg(Mission.tjm))
-                    .filter(Mission.tjm.isnot(None))
-                    .scalar()
-                    or 0
-                )
-
-                # TJM moyen avec ancien champ
-                with get_database_session() as session:
-
-                    tjm_ancien_moyen = (
-                        session.query(func.avg(Mission.taux_journalier))
-                        .filter(Mission.taux_journalier.isnot(None))
-                        .scalar()
-                        or 0
-                    )
-
-                # Compter les missions avec TJM
-                with get_database_session() as session:
-                    missions_nouveau_tjm = (
-                        session.query(Mission).filter(Mission.tjm.isnot(None)).count()
-                    )
-
-                with get_database_session() as session:
-                    missions_ancien_tjm = (
-                        session.query(Mission)
-                        .filter(Mission.taux_journalier.isnot(None))
-                        .count()
-                    )
-
-                response = "💰 **Statistiques TJM des missions** :\n\n"
-
-                if missions_nouveau_tjm > 0:
-                    response += "🆕 **Nouveau format TJM :**\n"
-                    response += (
-                        "   • Missions avec TJM: " + str(missions_nouveau_tjm) + "\n"
-                    )
-                    response += "   • TJM moyen: " + str(tjm_nouveau_moyen) + "€\n\n"
-
-                if missions_ancien_tjm > 0:
-                    response += "📊 **Ancien format TJM :**\n"
-                    response += (
-                        "   • Missions avec TJM: " + str(missions_ancien_tjm) + "\n"
-                    )
-                    response += "   • TJM moyen: " + str(tjm_ancien_moyen) + "€\n\n"
-
-                # Calcul global
-                if missions_nouveau_tjm > 0 or missions_ancien_tjm > 0:
-                    total_missions = missions_nouveau_tjm + missions_ancien_tjm
-                    tjm_global = (
-                        (tjm_nouveau_moyen * missions_nouveau_tjm)
-                        + (tjm_ancien_moyen * missions_ancien_tjm)
-                    ) / total_missions
-                    response += (
-                        "🎯 **TJM global moyen :** "
-                        + str(tjm_global)
-                        + "€ (sur "
-                        + str(total_missions)
-                        + " missions)"
-                    )
-                else:
-                    response = "💰 **Aucun TJM renseigné** dans les missions"
-
-                return {
-                    "response": response,
-                    "data": {
-                        "tjm_nouveau_moyen": tjm_nouveau_moyen,
-                        "tjm_ancien_moyen": tjm_ancien_moyen,
-                        "missions_nouveau": missions_nouveau_tjm,
-                        "missions_ancien": missions_ancien_tjm,
-                    },
-                    "intent": "tjm_mission",
-                    "confidence": 0.8,
-                }
-
-            except (SQLAlchemyError, ZeroDivisionError, TypeError, ValueError) as e:
-                return {
-                    "response": "❌ Erreur lors de la récupération des statistiques TJM : "
-                    + str(e),
-                    "data": {},
-                    "intent": "tjm_mission",
-                    "confidence": 0.3,
-                }
+            return self._get_global_tjm_statistics()
 
     def get_response(self, question: str) -> str:
         """
