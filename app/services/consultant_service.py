@@ -28,6 +28,11 @@ from database.models import Practice
 class ConsultantService:
     """Service pour la gestion des consultants optimisÃ© pour de gros volumes"""
 
+    # Constantes pour éviter la duplication de chaînes (SonarQube)
+    STATUS_AVAILABLE = "✅ Disponible"
+    STATUS_BUSY = "🔴 Occupé"
+    STATUS_IN_PROGRESS = "En cours"
+
     @staticmethod
     def get_all_consultants_objects(
         page: int = 1, per_page: int = 50
@@ -220,7 +225,11 @@ class ConsultantService:
                         "cjm": cjm,
                         "salaire_formatted": f"{salaire:,}â¬",
                         "cjm_formatted": f"{cjm:,.0f}â¬",
-                        "statut": "â Disponible" if row.disponibilite else "ð´ OccupÃ©",
+                        "statut": (
+                            ConsultantService.STATUS_AVAILABLE
+                            if row.disponibilite
+                            else ConsultantService.STATUS_BUSY
+                        ),
                         # Nouveaux champs V1.2
                         "societe": row.societe or "Quanteam",
                         "experience_annees": experience_annees,
@@ -354,7 +363,11 @@ class ConsultantService:
                         "cjm": cjm,
                         "salaire_formatted": f"{salaire:,}â¬",
                         "cjm_formatted": f"{cjm:,.0f}â¬",
-                        "statut": "â Disponible" if row.disponibilite else "ð´ OccupÃ©",
+                        "statut": (
+                            ConsultantService.STATUS_AVAILABLE
+                            if row.disponibilite
+                            else ConsultantService.STATUS_BUSY
+                        ),
                         # Nouveaux champs V1.2
                         "societe": row.societe or "Quanteam",
                         "experience_annees": experience_annees,
@@ -835,85 +848,40 @@ class ConsultantService:
             return []
 
     @staticmethod
+    @staticmethod
     def _save_mission_from_analysis(
         session: Session, consultant_id: int, mission_data: Dict
     ) -> bool:
         """
-        Sauvegarde une mission extraite de l'analyse CV (mÃ©thode privÃ©e)
+        Sauvegarde une mission extraite de l'analyse CV (méthode privée)
 
         Args:
-            session: Session de base de donnÃ©es active
-            consultant_id: ID du consultant propriÃ©taire de la mission
-            mission_data: Dictionnaire contenant les donnÃ©es de la mission
+            session: Session de base de données active
+            consultant_id: ID du consultant propriétaire de la mission
+            mission_data: Dictionnaire contenant les données de la mission
 
         Returns:
-            bool: True si la mission a Ã©tÃ© sauvegardÃ©e, False sinon
-
-        Note:
-            Cette mÃ©thode vÃ©rifie les doublons et gÃ¨re les conversions de dates
+            bool: True si la mission a été sauvegardée, False sinon
         """
         try:
             client = mission_data.get("client", "").strip()
             if not client:
                 return False
 
-            # VÃ©rifier si cette mission existe dÃ©jÃ  (mÃªme client + mÃªme annÃ©e)
-            date_debut_str = mission_data.get("date_debut", "")
-            if date_debut_str and date_debut_str != "En cours":
-                try:
-                    if len(date_debut_str) == 4:  # AnnÃ©e seulement
-                        date_debut = date(int(date_debut_str), 1, 1)
-                    else:
-                        date_debut = datetime.strptime(
-                            date_debut_str, "%Y-%m-%d"
-                        ).date()
-                except BaseException:
-                    date_debut = None
-            else:
-                date_debut = None
+            # Vérifier les doublons avec date de début
+            date_debut = ConsultantService._parse_mission_start_date(mission_data)
+            if ConsultantService._mission_already_exists(
+                session, consultant_id, client, date_debut
+            ):
+                return False
 
-            # VÃ©rifier doublons
-            if date_debut:
-                existing = (
-                    session.query(Mission)
-                    .filter(
-                        Mission.consultant_id == consultant_id,
-                        Mission.client == client,
-                        Mission.date_debut == date_debut,
-                    )
-                    .first()
-                )
+            # Traiter la date de fin
+            date_fin = ConsultantService._parse_mission_end_date(mission_data)
 
-                if existing:
-                    print(f"Mission {client} {date_debut} dÃ©jÃ  existante, ignorÃ©e")
-                    return False
-
-            # Date de fin
-            date_fin_str = mission_data.get("date_fin", "")
-            date_fin = None
-            if date_fin_str and date_fin_str != "En cours":
-                try:
-                    if len(date_fin_str) == 4:  # AnnÃ©e seulement
-                        date_fin = date(int(date_fin_str), 12, 31)
-                    else:
-                        date_fin = datetime.strptime(date_fin_str, "%Y-%m-%d").date()
-                except BaseException:
-                    date_fin = None
-
-            # CrÃ©er la mission
-            mission = Mission(
-                consultant_id=consultant_id,
-                nom_mission=mission_data.get("resume", f"Mission chez {client}")[:200],
-                client=client,
-                date_debut=date_debut or date.today(),
-                date_fin=date_fin,
-                statut="terminee" if date_fin else "en_cours",
-                technologies_utilisees=", ".join(
-                    mission_data.get("langages_techniques", [])
-                ),
-                description=mission_data.get("resume", ""),
+            # Créer et sauvegarder la mission
+            mission = ConsultantService._create_mission_object(
+                consultant_id, mission_data, client, date_debut, date_fin
             )
-
             session.add(mission)
             return True
 
@@ -922,6 +890,80 @@ class ConsultantService:
             return False
 
     @staticmethod
+    def _parse_mission_start_date(mission_data: Dict) -> Optional[date]:
+        """Parse la date de début d'une mission depuis les données"""
+        date_debut_str = mission_data.get("date_debut", "")
+        if not date_debut_str or date_debut_str == ConsultantService.STATUS_IN_PROGRESS:
+            return None
+
+        try:
+            if len(date_debut_str) == 4:  # Année seulement
+                return date(int(date_debut_str), 1, 1)
+            else:
+                return datetime.strptime(date_debut_str, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            return None
+
+    @staticmethod
+    def _parse_mission_end_date(mission_data: Dict) -> Optional[date]:
+        """Parse la date de fin d'une mission depuis les données"""
+        date_fin_str = mission_data.get("date_fin", "")
+        if not date_fin_str or date_fin_str == ConsultantService.STATUS_IN_PROGRESS:
+            return None
+
+        try:
+            if len(date_fin_str) == 4:  # Année seulement
+                return date(int(date_fin_str), 12, 31)
+            else:
+                return datetime.strptime(date_fin_str, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            return None
+
+    @staticmethod
+    def _mission_already_exists(
+        session: Session, consultant_id: int, client: str, date_debut: Optional[date]
+    ) -> bool:
+        """Vérifie si une mission similaire existe déjà"""
+        if not date_debut:
+            return False
+
+        existing = (
+            session.query(Mission)
+            .filter(
+                Mission.consultant_id == consultant_id,
+                Mission.client == client,
+                Mission.date_debut == date_debut,
+            )
+            .first()
+        )
+
+        if existing:
+            print(f"Mission {client} {date_debut} déjà existante, ignorée")
+            return True
+        return False
+
+    @staticmethod
+    def _create_mission_object(
+        consultant_id: int,
+        mission_data: Dict,
+        client: str,
+        date_debut: Optional[date],
+        date_fin: Optional[date],
+    ) -> Mission:
+        """Crée un objet Mission à partir des données parsées"""
+        return Mission(
+            consultant_id=consultant_id,
+            nom_mission=mission_data.get("resume", f"Mission chez {client}")[:200],
+            client=client,
+            date_debut=date_debut or date.today(),
+            date_fin=date_fin,
+            statut="terminee" if date_fin else "en_cours",
+            technologies_utilisees=", ".join(
+                mission_data.get("langages_techniques", [])
+            ),
+            description=mission_data.get("resume", ""),
+        )
+
     def _save_competence_from_analysis(
         session: Session, consultant_id: int, competence_name: str, type_competence: str
     ) -> bool:
@@ -996,42 +1038,74 @@ class ConsultantService:
             return False
 
     @staticmethod
+    @staticmethod
     def _determine_skill_category(skill_name: str, type_competence: str) -> str:
         """
-        DÃ©termine automatiquement la catÃ©gorie d'une compÃ©tence (mÃ©thode privÃ©e)
+        Détermine automatiquement la catégorie d'une compétence (méthode privée)
 
         Args:
-            skill_name: Nom de la compÃ©tence Ã  classifier
-            type_competence: Type de compÃ©tence ("technique" ou "fonctionnelle")
+            skill_name: Nom de la compétence à classifier
+            type_competence: Type de compétence ("technique" ou "fonctionnelle")
 
         Returns:
-            str: CatÃ©gorie de la compÃ©tence (ex: "Frontend", "Backend", "Management", etc.)
-
-        Example:
-            >>> category = ConsultantService._determine_skill_category("React", "technique")
-            >>> print(category)  # Output: "Frontend"
+            str: Catégorie de la compétence (ex: "Frontend", "Backend", "Management", etc.)
         """
         skill_lower = skill_name.lower()
 
         if type_competence == "fonctionnelle":
-            if any(
-                word in skill_lower
-                for word in ["management", "leadership", "gestion", "direction"]
-            ):
-                return "Management"
-            elif any(
-                word in skill_lower for word in ["scrum", "agile", "kanban", "projet"]
-            ):
-                return "Methodologie"
-            elif any(
-                word in skill_lower
-                for word in ["formation", "conseil", "accompagnement"]
-            ):
-                return "Conseil"
-            else:
-                return "Fonctionnelle"
+            return ConsultantService._categorize_functional_skill(skill_lower)
+        else:
+            return ConsultantService._categorize_technical_skill(skill_lower)
 
-        # CompÃ©tences techniques
+    @staticmethod
+    def _categorize_functional_skill(skill_lower: str) -> str:
+        """Catégorise une compétence fonctionnelle"""
+        if ConsultantService._is_management_skill(skill_lower):
+            return "Management"
+        elif ConsultantService._is_methodology_skill(skill_lower):
+            return "Methodologie"
+        elif ConsultantService._is_consulting_skill(skill_lower):
+            return "Conseil"
+        else:
+            return "Fonctionnelle"
+
+    @staticmethod
+    def _is_management_skill(skill_lower: str) -> bool:
+        """Vérifie si c'est une compétence de management"""
+        management_keywords = ["management", "leadership", "gestion", "direction"]
+        return any(word in skill_lower for word in management_keywords)
+
+    @staticmethod
+    def _is_methodology_skill(skill_lower: str) -> bool:
+        """Vérifie si c'est une compétence méthodologique"""
+        methodology_keywords = ["scrum", "agile", "kanban", "projet"]
+        return any(word in skill_lower for word in methodology_keywords)
+
+    @staticmethod
+    def _is_consulting_skill(skill_lower: str) -> bool:
+        """Vérifie si c'est une compétence de conseil"""
+        consulting_keywords = ["formation", "conseil", "accompagnement"]
+        return any(word in skill_lower for word in consulting_keywords)
+
+    @staticmethod
+    def _categorize_technical_skill(skill_lower: str) -> str:
+        """Catégorise une compétence technique"""
+        if ConsultantService._is_frontend_skill(skill_lower):
+            return "Frontend"
+        elif ConsultantService._is_backend_skill(skill_lower):
+            return "Backend"
+        elif ConsultantService._is_database_skill(skill_lower):
+            return "Database"
+        elif ConsultantService._is_cloud_skill(skill_lower):
+            return "Cloud"
+        elif ConsultantService._is_devops_skill(skill_lower):
+            return "DevOps"
+        else:
+            return "Technique"
+
+    @staticmethod
+    def _is_frontend_skill(skill_lower: str) -> bool:
+        """Vérifie si c'est une compétence frontend"""
         frontend_keywords = [
             "react",
             "angular",
@@ -1041,6 +1115,11 @@ class ConsultantService:
             "html",
             "css",
         ]
+        return any(keyword in skill_lower for keyword in frontend_keywords)
+
+    @staticmethod
+    def _is_backend_skill(skill_lower: str) -> bool:
+        """Vérifie si c'est une compétence backend"""
         backend_keywords = [
             "java",
             "python",
@@ -1050,8 +1129,23 @@ class ConsultantService:
             "node.js",
             "express",
         ]
+        return any(keyword in skill_lower for keyword in backend_keywords)
+
+    @staticmethod
+    def _is_database_skill(skill_lower: str) -> bool:
+        """Vérifie si c'est une compétence base de données"""
         database_keywords = ["sql", "mysql", "postgresql", "mongodb", "oracle", "redis"]
+        return any(keyword in skill_lower for keyword in database_keywords)
+
+    @staticmethod
+    def _is_cloud_skill(skill_lower: str) -> bool:
+        """Vérifie si c'est une compétence cloud"""
         cloud_keywords = ["aws", "azure", "gcp", "docker", "kubernetes", "cloud"]
+        return any(keyword in skill_lower for keyword in cloud_keywords)
+
+    @staticmethod
+    def _is_devops_skill(skill_lower: str) -> bool:
+        """Vérifie si c'est une compétence DevOps"""
         devops_keywords = [
             "jenkins",
             "gitlab",
@@ -1060,247 +1154,313 @@ class ConsultantService:
             "terraform",
             "ansible",
         ]
-
-        if any(keyword in skill_lower for keyword in frontend_keywords):
-            return "Frontend"
-        elif any(keyword in skill_lower for keyword in backend_keywords):
-            return "Backend"
-        elif any(keyword in skill_lower for keyword in database_keywords):
-            return "Database"
-        elif any(keyword in skill_lower for keyword in cloud_keywords):
-            return "Cloud"
-        elif any(keyword in skill_lower for keyword in devops_keywords):
-            return "DevOps"
-        else:
-            return "Technique"
+        return any(keyword in skill_lower for keyword in devops_keywords)
 
     @staticmethod
     def save_cv_analysis(consultant_id: int, analysis_data: Dict[str, Any]) -> bool:
         """
-        Sauvegarde les rÃ©sultats d'analyse de CV dans le profil du consultant
+        Sauvegarde les résultats d'analyse de CV dans le profil du consultant
 
         Args:
             consultant_id: ID du consultant
-            analysis_data: Dictionnaire contenant les donnÃ©es d'analyse (missions, compÃ©tences, etc.)
+            analysis_data: Dictionnaire contenant les données d'analyse
 
         Returns:
-            bool: True si succÃ¨s, False sinon
+            bool: True si succès, False sinon
         """
         try:
             with get_database_session() as session:
-                # VÃ©rifier que le consultant existe
-                consultant = (
-                    session.query(Consultant)
-                    .filter(Consultant.id == consultant_id)
-                    .first()
+                consultant = ConsultantService._get_consultant_for_cv_analysis(
+                    session, consultant_id
                 )
                 if not consultant:
-                    st.error(f"❌ Consultant avec ID {consultant_id} introuvable")
                     return False
 
                 st.info(
                     f"💾 Sauvegarde de l'analyse CV pour {consultant.prenom} {consultant.nom}"
                 )
 
-                missions_count = 0
-                skills_count = 0
+                # Sauvegarder les différentes parties de l'analyse
+                missions_count = ConsultantService._save_cv_missions(
+                    session, consultant_id, analysis_data
+                )
+                skills_count = ConsultantService._save_cv_skills(
+                    session, consultant_id, analysis_data
+                )
 
-                # 1. Sauvegarder les missions
-                missions = analysis_data.get("missions", [])
-                for mission_data in missions:
-                    if not mission_data.get("client"):
-                        continue
-
-                    # Ignorer les missions sans dates valides
-                    if (
-                        not mission_data.get("date_debut")
-                        or mission_data.get("date_debut") == ""
-                    ):
-                        st.warning(
-                            f"⚠️ Mission {mission_data['client']} ignorée - dates manquantes"
-                        )
-                        continue
-
-                    # VÃ©rifier si la mission existe dÃ©jÃ  (Ã©viter les doublons)
-                    existing_mission = (
-                        session.query(Mission)
-                        .filter(
-                            Mission.consultant_id == consultant_id,
-                            Mission.client == mission_data["client"],
-                            Mission.date_debut == mission_data.get("date_debut", ""),
-                        )
-                        .first()
-                    )
-
-                    if not existing_mission:
-                        # Convertir les dates si nÃ©cessaire
-                        date_debut = mission_data.get("date_debut")
-                        date_fin = mission_data.get("date_fin")
-
-                        # Conversion des dates string vers date objects
-                        try:
-                            if date_debut and date_debut != "En cours":
-                                if len(date_debut) >= 10:  # Format YYYY-MM-DD
-                                    date_debut = datetime.strptime(
-                                        date_debut[:10], "%Y-%m-%d"
-                                    ).date()
-                                else:
-                                    continue  # Ignorer si format de date invalide
-                            else:
-                                continue  # Ignorer si pas de date de dÃ©but
-
-                            if date_fin and date_fin != "En cours":
-                                if len(date_fin) >= 10:  # Format YYYY-MM-DD
-                                    date_fin = datetime.strptime(
-                                        date_fin[:10], "%Y-%m-%d"
-                                    ).date()
-                                else:
-                                    date_fin = None
-                            else:
-                                date_fin = None
-                        except ValueError:
-                            st.warning(
-                                f"⚠️ Mission {mission_data['client']} ignorée - format de date invalide"
-                            )
-                            continue
-
-                        # CrÃ©er la nouvelle mission
-                        new_mission = Mission(
-                            consultant_id=consultant_id,
-                            nom_mission=f"Mission chez {mission_data['client']}",
-                            client=mission_data["client"],
-                            role=mission_data.get("role", ""),  # Nouveau champ role
-                            description=mission_data.get("resume", ""),
-                            date_debut=date_debut,
-                            date_fin=date_fin,
-                            statut="en_cours" if date_fin is None else "terminee",
-                            technologies_utilisees=", ".join(
-                                mission_data.get("langages_techniques", [])
-                            ),
-                            revenus_generes=0,  # Ã complÃ©ter manuellement
-                        )
-
-                        session.add(new_mission)
-                        missions_count += 1
-                        st.success("✅ Mission ajoutée: " + mission_data["client"])
-
-                # 2. Sauvegarder les compÃ©tences techniques
-                technical_skills = analysis_data.get("langages_techniques", [])
-                for skill_name in technical_skills:
-                    if not skill_name or len(skill_name.strip()) < 2:
-                        continue
-
-                    skill_name = skill_name.strip()
-
-                    # VÃ©rifier si la compÃ©tence existe dÃ©jÃ  dans le rÃ©fÃ©rentiel
-                    competence = (
-                        session.query(Competence)
-                        .filter(Competence.nom.ilike(f"%{skill_name}%"))
-                        .first()
-                    )
-
-                    if not competence:
-                        # CrÃ©er la compÃ©tence dans le rÃ©fÃ©rentiel
-                        competence = Competence(
-                            nom=skill_name,
-                            type_competence="technique",
-                            categorie=ConsultantService._determine_skill_category(
-                                skill_name, "technique"
-                            ),
-                            description="CompÃ©tence technique extraite automatiquement du CV",
-                        )
-                        session.add(competence)
-                        session.flush()  # Pour obtenir l'ID
-
-                    # VÃ©rifier si le consultant a dÃ©jÃ  cette compÃ©tence
-                    existing_skill = (
-                        session.query(ConsultantCompetence)
-                        .filter(
-                            ConsultantCompetence.consultant_id == consultant_id,
-                            ConsultantCompetence.competence_id == competence.id,
-                        )
-                        .first()
-                    )
-
-                    if not existing_skill:
-                        # Ajouter la compÃ©tence au consultant
-                        consultant_skill = ConsultantCompetence(
-                            consultant_id=consultant_id,
-                            competence_id=competence.id,
-                            niveau_maitrise="intermediaire",  # Par dÃ©faut
-                            annees_experience=2.0,  # Estimation par dÃ©faut
-                        )
-                        session.add(consultant_skill)
-                        skills_count += 1
-                        st.success("✅ Compétence technique ajoutée: " + skill_name)
-
-                # 3. Sauvegarder les compÃ©tences fonctionnelles
-                functional_skills = analysis_data.get("competences_fonctionnelles", [])
-                for skill_name in functional_skills:
-                    if not skill_name or len(skill_name.strip()) < 2:
-                        continue
-
-                    skill_name = skill_name.strip()
-
-                    # VÃ©rifier si la compÃ©tence existe dÃ©jÃ  dans le rÃ©fÃ©rentiel
-                    competence = (
-                        session.query(Competence)
-                        .filter(Competence.nom.ilike(f"%{skill_name}%"))
-                        .first()
-                    )
-
-                    if not competence:
-                        # CrÃ©er la compÃ©tence dans le rÃ©fÃ©rentiel
-                        competence = Competence(
-                            nom=skill_name,
-                            type_competence="fonctionnelle",
-                            categorie=ConsultantService._determine_skill_category(
-                                skill_name, "fonctionnelle"
-                            ),
-                            description="CompÃ©tence fonctionnelle extraite automatiquement du CV",
-                        )
-                        session.add(competence)
-                        session.flush()  # Pour obtenir l'ID
-
-                    # VÃ©rifier si le consultant a dÃ©jÃ  cette compÃ©tence
-                    existing_skill = (
-                        session.query(ConsultantCompetence)
-                        .filter(
-                            ConsultantCompetence.consultant_id == consultant_id,
-                            ConsultantCompetence.competence_id == competence.id,
-                        )
-                        .first()
-                    )
-
-                    if not existing_skill:
-                        # Ajouter la compÃ©tence au consultant
-                        consultant_skill = ConsultantCompetence(
-                            consultant_id=consultant_id,
-                            competence_id=competence.id,
-                            niveau_maitrise="intermediaire",  # Par dÃ©faut
-                            annees_experience=2.0,  # Estimation par dÃ©faut
-                        )
-                        session.add(consultant_skill)
-                        skills_count += 1
-                        st.success("✅ Compétence fonctionnelle ajoutée: " + skill_name)
-
-                # 4. Mettre Ã  jour la date de derniÃ¨re modification du consultant
-                consultant.derniere_maj = datetime.now()
-
-                # Committer toutes les modifications
-                session.commit()
-
-                st.success("🎉 Analyse CV sauvegardée avec succès !")
-                st.info(
-                    f"📊 **Résumé**: {missions_count} missions ajoutées, {skills_count} compétences ajoutées"
+                # Finaliser la sauvegarde
+                ConsultantService._finalize_cv_analysis_save(
+                    session, consultant, missions_count, skills_count
                 )
 
                 return True
 
         except (SQLAlchemyError, ValueError, TypeError, AttributeError) as e:
             st.error("❌ Erreur lors de la sauvegarde de l'analyse CV: " + str(e))
-            print(f"Erreur dÃ©taillÃ©e: {e}")
+            print(f"Erreur détaillée: {e}")
             import traceback
 
             traceback.print_exc()
             return False
+
+    @staticmethod
+    def _get_consultant_for_cv_analysis(session: Session, consultant_id: int):
+        """Récupère le consultant pour l'analyse CV"""
+        consultant = (
+            session.query(Consultant).filter(Consultant.id == consultant_id).first()
+        )
+        if not consultant:
+            st.error(f"❌ Consultant avec ID {consultant_id} introuvable")
+        return consultant
+
+    @staticmethod
+    def _save_cv_missions(
+        session: Session, consultant_id: int, analysis_data: Dict
+    ) -> int:
+        """Sauvegarde les missions extraites du CV"""
+        missions = analysis_data.get("missions", [])
+        missions_count = 0
+
+        for mission_data in missions:
+            if ConsultantService._should_save_mission(mission_data):
+                if ConsultantService._save_single_cv_mission(
+                    session, consultant_id, mission_data
+                ):
+                    missions_count += 1
+
+        return missions_count
+
+    @staticmethod
+    def _should_save_mission(mission_data: Dict) -> bool:
+        """Vérifie si une mission doit être sauvegardée"""
+        if not mission_data.get("client"):
+            return False
+
+        if not mission_data.get("date_debut") or mission_data.get("date_debut") == "":
+            st.warning(f"⚠️ Mission {mission_data['client']} ignorée - dates manquantes")
+            return False
+
+        return True
+
+    @staticmethod
+    def _save_single_cv_mission(
+        session: Session, consultant_id: int, mission_data: Dict
+    ) -> bool:
+        """Sauvegarde une mission individuelle du CV"""
+        # Vérifier les doublons
+        if ConsultantService._mission_exists_for_cv(
+            session, consultant_id, mission_data
+        ):
+            return False
+
+        # Convertir et valider les dates
+        date_debut, date_fin = ConsultantService._parse_cv_mission_dates(mission_data)
+        if not date_debut:
+            return False
+
+        # Créer et sauvegarder la mission
+        new_mission = ConsultantService._create_cv_mission_object(
+            consultant_id, mission_data, date_debut, date_fin
+        )
+        session.add(new_mission)
+        st.success("✅ Mission ajoutée: " + mission_data["client"])
+        return True
+
+    @staticmethod
+    def _mission_exists_for_cv(
+        session: Session, consultant_id: int, mission_data: Dict
+    ) -> bool:
+        """Vérifie si une mission CV existe déjà"""
+        existing_mission = (
+            session.query(Mission)
+            .filter(
+                Mission.consultant_id == consultant_id,
+                Mission.client == mission_data["client"],
+                Mission.date_debut == mission_data.get("date_debut", ""),
+            )
+            .first()
+        )
+        return existing_mission is not None
+
+    @staticmethod
+    def _parse_cv_mission_dates(mission_data: Dict):
+        """Parse les dates d'une mission CV"""
+        date_debut = mission_data.get("date_debut")
+        date_fin = mission_data.get("date_fin")
+
+        try:
+            if date_debut and date_debut != ConsultantService.STATUS_IN_PROGRESS:
+                if len(date_debut) >= 10:  # Format YYYY-MM-DD
+                    date_debut = datetime.strptime(date_debut[:10], "%Y-%m-%d").date()
+                else:
+                    return None, None  # Format invalide
+            else:
+                return None, None  # Pas de date de début
+
+            if date_fin and date_fin != ConsultantService.STATUS_IN_PROGRESS:
+                if len(date_fin) >= 10:  # Format YYYY-MM-DD
+                    date_fin = datetime.strptime(date_fin[:10], "%Y-%m-%d").date()
+                else:
+                    date_fin = None
+            else:
+                date_fin = None
+
+        except ValueError:
+            st.warning(
+                f"⚠️ Mission {mission_data['client']} ignorée - format de date invalide"
+            )
+            return None, None
+
+        return date_debut, date_fin
+
+    @staticmethod
+    def _create_cv_mission_object(
+        consultant_id: int, mission_data: Dict, date_debut, date_fin
+    ) -> Mission:
+        """Crée un objet Mission depuis les données CV"""
+        return Mission(
+            consultant_id=consultant_id,
+            nom_mission=f"Mission chez {mission_data['client']}",
+            client=mission_data["client"],
+            role=mission_data.get("role", ""),
+            description=mission_data.get("resume", ""),
+            date_debut=date_debut,
+            date_fin=date_fin,
+            statut="en_cours" if date_fin is None else "terminee",
+            technologies_utilisees=", ".join(
+                mission_data.get("langages_techniques", [])
+            ),
+            revenus_generes=0,  # À compléter manuellement
+        )
+
+    @staticmethod
+    def _save_cv_skills(
+        session: Session, consultant_id: int, analysis_data: Dict
+    ) -> int:
+        """Sauvegarde les compétences extraites du CV"""
+        skills_count = 0
+
+        # Compétences techniques
+        technical_skills = analysis_data.get("langages_techniques", [])
+        skills_count += ConsultantService._save_skills_by_type(
+            session, consultant_id, technical_skills, "technique"
+        )
+
+        # Compétences fonctionnelles
+        functional_skills = analysis_data.get("competences_fonctionnelles", [])
+        skills_count += ConsultantService._save_skills_by_type(
+            session, consultant_id, functional_skills, "fonctionnelle"
+        )
+
+        return skills_count
+
+    @staticmethod
+    def _save_skills_by_type(
+        session: Session, consultant_id: int, skills: list, skill_type: str
+    ) -> int:
+        """Sauvegarde un ensemble de compétences d'un type donné"""
+        count = 0
+
+        for skill_name in skills:
+            if ConsultantService._should_save_skill(skill_name):
+                if ConsultantService._save_single_cv_skill(
+                    session, consultant_id, skill_name.strip(), skill_type
+                ):
+                    count += 1
+
+        return count
+
+    @staticmethod
+    def _should_save_skill(skill_name: str) -> bool:
+        """Vérifie si une compétence doit être sauvegardée"""
+        return skill_name and len(skill_name.strip()) >= 2
+
+    @staticmethod
+    def _save_single_cv_skill(
+        session: Session, consultant_id: int, skill_name: str, skill_type: str
+    ) -> bool:
+        """Sauvegarde une compétence individuelle du CV"""
+        # Récupérer ou créer la compétence dans le référentiel
+        competence = ConsultantService._get_or_create_competence(
+            session, skill_name, skill_type
+        )
+
+        # Vérifier si le consultant a déjà cette compétence
+        if ConsultantService._consultant_has_skill(
+            session, consultant_id, competence.id
+        ):
+            return False
+
+        # Ajouter la compétence au consultant
+        ConsultantService._add_skill_to_consultant(
+            session, consultant_id, competence.id
+        )
+        st.success(f"✅ Compétence {skill_type} ajoutée: {skill_name}")
+        return True
+
+    @staticmethod
+    def _get_or_create_competence(session: Session, skill_name: str, skill_type: str):
+        """Récupère ou crée une compétence dans le référentiel"""
+        competence = (
+            session.query(Competence)
+            .filter(Competence.nom.ilike(f"%{skill_name}%"))
+            .first()
+        )
+
+        if not competence:
+            competence = Competence(
+                nom=skill_name,
+                type_competence=skill_type,
+                categorie=ConsultantService._determine_skill_category(
+                    skill_name, skill_type
+                ),
+                description=f"Compétence {skill_type} extraite automatiquement du CV",
+            )
+            session.add(competence)
+            session.flush()  # Pour obtenir l'ID
+
+        return competence
+
+    @staticmethod
+    def _consultant_has_skill(
+        session: Session, consultant_id: int, competence_id: int
+    ) -> bool:
+        """Vérifie si le consultant a déjà cette compétence"""
+        existing_skill = (
+            session.query(ConsultantCompetence)
+            .filter(
+                ConsultantCompetence.consultant_id == consultant_id,
+                ConsultantCompetence.competence_id == competence_id,
+            )
+            .first()
+        )
+        return existing_skill is not None
+
+    @staticmethod
+    def _add_skill_to_consultant(
+        session: Session, consultant_id: int, competence_id: int
+    ):
+        """Ajoute une compétence au consultant"""
+        consultant_skill = ConsultantCompetence(
+            consultant_id=consultant_id,
+            competence_id=competence_id,
+            niveau_maitrise="intermediaire",  # Par défaut
+            annees_experience=2.0,  # Estimation par défaut
+        )
+        session.add(consultant_skill)
+
+    @staticmethod
+    def _finalize_cv_analysis_save(
+        session: Session, consultant, missions_count: int, skills_count: int
+    ):
+        """Finalise la sauvegarde de l'analyse CV"""
+        # Mettre à jour la date de dernière modification
+        consultant.derniere_maj = datetime.now()
+
+        # Committer toutes les modifications
+        session.commit()
+
+        st.success("🎉 Analyse CV sauvegardée avec succès !")
+        st.info(
+            f"📊 **Résumé**: {missions_count} missions ajoutées, {skills_count} compétences ajoutées"
+        )
