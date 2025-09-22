@@ -1894,7 +1894,7 @@ def show_consultants_list_enhanced():
     # Traitement et affichage des données
     consultants_data = _convert_consultants_to_data(consultants)
     filtered_data = filters.apply_filters(consultants_data)
-    
+
     if filtered_data:
         _display_enhanced_metrics(filtered_data)
         _handle_enhanced_table_interactions(enhancer, filtered_data)
@@ -1907,7 +1907,7 @@ def _initialize_ui_components():
     from app.ui.enhanced_ui import AdvancedUIFilters
     from app.ui.enhanced_ui import DataTableEnhancer
     from app.ui.enhanced_ui import RealTimeSearch
-    
+
     filters = AdvancedUIFilters()
     search = RealTimeSearch()
     enhancer = DataTableEnhancer()
@@ -1926,11 +1926,13 @@ def _render_search_input():
 def _load_consultants_data(search, search_term):
     """Charge les données des consultants avec gestion d'erreur"""
     from app.ui.enhanced_ui import LoadingSpinner
-    
+
     with LoadingSpinner.show_loading("Chargement des données..."):
         try:
             if search_term and search.should_search():
-                return ConsultantService.search_consultants_optimized(search_term.strip())
+                return ConsultantService.search_consultants_optimized(
+                    search_term.strip()
+                )
             else:
                 return ConsultantService.get_all_consultants_with_stats()
         except (SQLAlchemyError, AttributeError) as exc:
@@ -1942,24 +1944,26 @@ def _convert_consultants_to_data(consultants):
     """Convertit les données des consultants pour les filtres"""
     consultants_data = []
     for consultant in consultants:
-        consultants_data.append({
-            "id": consultant["id"],
-            "prenom": consultant["prenom"],
-            "nom": consultant["nom"],
-            "email": consultant["email"],
-            "societe": consultant["societe"],
-            "grade": consultant["grade"],
-            "type_contrat": consultant["type_contrat"],
-            "salaire_actuel": consultant.get("salaire_actuel", 0),
-            "disponibilite": consultant.get("disponibilite", False),
-            "practice_name": consultant.get("practice_name", ""),
-            "experience_annees": consultant.get("experience_annees", 0),
-            "nb_missions": consultant.get("nb_missions", 0),
-            "salaire_formatted": consultant.get("salaire_formatted", "0€"),
-            "cjm_formatted": consultant.get("cjm_formatted", "0€"),
-            "experience_formatted": consultant.get("experience_formatted", "0 ans"),
-            "statut": consultant.get("statut", "N/A"),
-        })
+        consultants_data.append(
+            {
+                "id": consultant["id"],
+                "prenom": consultant["prenom"],
+                "nom": consultant["nom"],
+                "email": consultant["email"],
+                "societe": consultant["societe"],
+                "grade": consultant["grade"],
+                "type_contrat": consultant["type_contrat"],
+                "salaire_actuel": consultant.get("salaire_actuel", 0),
+                "disponibilite": consultant.get("disponibilite", False),
+                "practice_name": consultant.get("practice_name", ""),
+                "experience_annees": consultant.get("experience_annees", 0),
+                "nb_missions": consultant.get("nb_missions", 0),
+                "salaire_formatted": consultant.get("salaire_formatted", "0€"),
+                "cjm_formatted": consultant.get("cjm_formatted", "0€"),
+                "experience_formatted": consultant.get("experience_formatted", "0 ans"),
+                "statut": consultant.get("statut", "N/A"),
+            }
+        )
     return consultants_data
 
 
@@ -1989,7 +1993,7 @@ def _display_enhanced_metrics(filtered_data):
 def _handle_enhanced_table_interactions(enhancer, filtered_data):
     """Gère les interactions avec le tableau amélioré"""
     from app.ui.enhanced_ui import NotificationManager
-    
+
     event = enhancer.render_enhanced_table(filtered_data, "consultants_enhanced")
 
     if event and event.selection.rows:
@@ -2001,8 +2005,10 @@ def _handle_enhanced_table_interactions(enhancer, filtered_data):
 def _process_selected_consultant(enhancer, selected_consultant):
     """Traite la sélection d'un consultant dans le tableau"""
     from app.ui.enhanced_ui import NotificationManager
-    
-    action = enhancer.render_action_buttons(selected_consultant, ["view", "edit", "delete"])
+
+    action = enhancer.render_action_buttons(
+        selected_consultant, ["view", "edit", "delete"]
+    )
 
     if action in ["view", "edit"]:
         st.session_state.view_consultant_profile = selected_consultant["id"]
@@ -2031,7 +2037,7 @@ def show_consultants_list_classic():
     try:
         # Chargement des données
         consultants = _load_classic_consultants_data(search_term)
-        
+
         if consultants:
             _display_classic_consultants_table(consultants)
         else:
@@ -2054,7 +2060,9 @@ def _render_classic_search_input():
 def _load_classic_consultants_data(search_term):
     """Charge les données des consultants avec recherche"""
     if search_term and search_term.strip():
-        consultants = ConsultantService.search_consultants_optimized(search_term.strip())
+        consultants = ConsultantService.search_consultants_optimized(
+            search_term.strip()
+        )
         _display_search_results_info(consultants, search_term)
         return consultants
     else:
@@ -2091,20 +2099,22 @@ def _prepare_classic_table_data(consultants):
     """Prépare les données pour le tableau classique"""
     consultants_data = []
     for consultant in consultants:
-        consultants_data.append({
-            "ID": consultant["id"],
-            "Prénom": consultant["prenom"],
-            "Nom": consultant["nom"],
-            "Email": consultant["email"],
-            "Société": consultant["societe"],
-            "Grade": consultant["grade"],
-            "Contrat": consultant["type_contrat"],
-            "Salaire": consultant["salaire_formatted"],
-            "CJM": consultant["cjm_formatted"],
-            "Expérience": consultant["experience_formatted"],
-            "Statut": consultant["statut"],
-            "Missions": consultant["nb_missions"],
-        })
+        consultants_data.append(
+            {
+                "ID": consultant["id"],
+                "Prénom": consultant["prenom"],
+                "Nom": consultant["nom"],
+                "Email": consultant["email"],
+                "Société": consultant["societe"],
+                "Grade": consultant["grade"],
+                "Contrat": consultant["type_contrat"],
+                "Salaire": consultant["salaire_formatted"],
+                "CJM": consultant["cjm_formatted"],
+                "Expérience": consultant["experience_formatted"],
+                "Statut": consultant["statut"],
+                "Missions": consultant["nb_missions"],
+            }
+        )
     return consultants_data
 
 
@@ -2123,7 +2133,7 @@ def _display_selected_consultant_actions(selected_consultant):
     """Affiche les actions pour le consultant sélectionné"""
     selected_id = selected_consultant["ID"]
     selected_name = f"{selected_consultant['Prénom']} {selected_consultant['Nom']}"
-    
+
     st.success(f"✅ Consultant sélectionné : **{selected_name}**")
 
     col1, col2, col3 = st.columns(3)
@@ -2198,7 +2208,9 @@ def _display_classic_metrics(consultants):
 def _display_average_salary_metric(consultants):
     """Affiche la métrique du salaire moyen"""
     if len(consultants) > 0:
-        salaire_moyen = sum(c.get("salaire_actuel", 0) or 0 for c in consultants) / len(consultants)
+        salaire_moyen = sum(c.get("salaire_actuel", 0) or 0 for c in consultants) / len(
+            consultants
+        )
     else:
         salaire_moyen = 0
     st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
@@ -2353,9 +2365,7 @@ def _render_professional_profile_section():
     return {"grade": grade, "type_contrat": type_contrat}
 
 
-def _process_consultant_creation(
-    basic_data, company_data, professional_data, notes
-):
+def _process_consultant_creation(basic_data, company_data, professional_data, notes):
     """Traite la création du consultant"""
     prenom, nom, email = basic_data["prenom"], basic_data["nom"], basic_data["email"]
 
@@ -2385,9 +2395,7 @@ def _process_consultant_creation(
         st.error(f"❌ Erreur lors de la création: {e}")
 
 
-def _build_consultant_data(
-    basic_data, company_data, professional_data, notes
-):
+def _build_consultant_data(basic_data, company_data, professional_data, notes):
     """Construit les données du consultant à créer"""
     return {
         "prenom": basic_data["prenom"].strip(),
@@ -2862,8 +2870,10 @@ def extract_original_filename(full_filename):
 
     if len(parts) >= 4:
         remaining_parts = _get_filename_remaining_parts(parts)
-        original_name = _extract_original_name_from_parts(remaining_parts, full_filename)
-        
+        original_name = _extract_original_name_from_parts(
+            remaining_parts, full_filename
+        )
+
         if original_name:
             return original_name
 
@@ -2879,14 +2889,16 @@ def _get_filename_remaining_parts(parts):
 
 def _extract_original_name_from_parts(remaining_parts, full_filename):
     """Extrait le nom original à partir des parties restantes"""
-    original_parts, timestamp_found = _find_original_parts_before_timestamp(remaining_parts)
-    
+    original_parts, timestamp_found = _find_original_parts_before_timestamp(
+        remaining_parts
+    )
+
     if original_parts:
         original_name = "_".join(original_parts)
         return _add_extension_to_original_name(
             original_name, remaining_parts, timestamp_found, full_filename
         )
-    
+
     return None
 
 
@@ -2922,21 +2934,25 @@ def _handle_no_timestamp_found(remaining_parts):
         return remaining_parts
 
 
-def _add_extension_to_original_name(original_name, remaining_parts, timestamp_found, full_filename):
+def _add_extension_to_original_name(
+    original_name, remaining_parts, timestamp_found, full_filename
+):
     """Ajoute l'extension appropriée au nom original"""
     last_part = remaining_parts[-1] if remaining_parts else ""
-    
+
     if "." in last_part:
         return _handle_extension_in_last_part(
             original_name, last_part, timestamp_found, full_filename
         )
     elif "." not in original_name and "." in full_filename:
         return _add_extension_from_full_filename(original_name, full_filename)
-    
+
     return original_name
 
 
-def _handle_extension_in_last_part(original_name, last_part, timestamp_found, full_filename):
+def _handle_extension_in_last_part(
+    original_name, last_part, timestamp_found, full_filename
+):
     """Gère l'extension quand elle est dans la dernière partie"""
     name_without_ext = last_part.split(".")[0]
     extension = last_part.split(".")[-1]
@@ -2952,7 +2968,7 @@ def _handle_extension_in_last_part(original_name, last_part, timestamp_found, fu
         if not original_name:
             original_name = name_without_ext
         return f"{original_name}.{extension}"
-    
+
     return original_name
 
 
@@ -3248,7 +3264,7 @@ def _display_cv_missions_global_save_button(missions, consultant):
 def _handle_global_missions_save(missions, consultant):
     """Gère la sauvegarde globale de toutes les missions"""
     all_valid = _validate_all_missions(missions)
-    
+
     if all_valid:
         save_all_missions_to_consultant(missions, consultant)
     else:
@@ -3265,7 +3281,7 @@ def _validate_all_missions(missions):
         if not client or not titre:
             all_valid = False
             st.error(f"❌ Mission {i}: Client et titre sont obligatoires")
-    
+
     return all_valid
 
 
@@ -3310,17 +3326,26 @@ def _display_cv_mission_form(mission, mission_index, consultant):
     # Champs client et titre
     client = _display_cv_mission_client_field(mission, mission_index, validation_errors)
     titre = _display_cv_mission_titre_field(mission, mission_index, validation_errors)
-    
+
     # Champs dates
-    date_debut, date_fin = _display_cv_mission_dates_fields(mission_index, validation_errors)
-    
+    date_debut, date_fin = _display_cv_mission_dates_fields(
+        mission_index, validation_errors
+    )
+
     # Champs description et technologies
     description = _display_cv_mission_description_field(mission, mission_index)
     technologies = _display_cv_mission_technologies_field(mission, mission_index)
-    
+
     # Bouton de sauvegarde
     _display_cv_mission_save_button(
-        mission_index, consultant, client, titre, date_debut, date_fin, description, technologies
+        mission_index,
+        consultant,
+        client,
+        titre,
+        date_debut,
+        date_fin,
+        description,
+        technologies,
     )
 
 
@@ -3363,13 +3388,15 @@ def _display_cv_mission_titre_field(mission, mission_index, validation_errors):
 def _display_cv_mission_dates_fields(mission_index, validation_errors):
     """Affiche les champs de dates avec validation"""
     col_date1, col_date2 = st.columns(2)
-    
+
     with col_date1:
-        date_debut = _display_cv_mission_date_debut_field(mission_index, validation_errors)
-    
+        date_debut = _display_cv_mission_date_debut_field(
+            mission_index, validation_errors
+        )
+
     with col_date2:
         date_fin = _display_cv_mission_date_fin_field(mission_index)
-    
+
     return date_debut, date_fin
 
 
@@ -3420,7 +3447,16 @@ def _display_cv_mission_technologies_field(mission, mission_index):
     )
 
 
-def _display_cv_mission_save_button(mission_index, consultant, client, titre, date_debut, date_fin, description, technologies):
+def _display_cv_mission_save_button(
+    mission_index,
+    consultant,
+    client,
+    titre,
+    date_debut,
+    date_fin,
+    description,
+    technologies,
+):
     """Affiche le bouton de sauvegarde d'une mission"""
     if st.button(
         f"💾 Sauvegarder Mission {mission_index}",
@@ -3430,13 +3466,31 @@ def _display_cv_mission_save_button(mission_index, consultant, client, titre, da
         help="Ajouter cette mission au profil du consultant",
     ):
         _handle_single_mission_save(
-            mission_index, consultant, client, titre, date_debut, date_fin, description, technologies
+            mission_index,
+            consultant,
+            client,
+            titre,
+            date_debut,
+            date_fin,
+            description,
+            technologies,
         )
 
 
-def _handle_single_mission_save(mission_index, consultant, client, titre, date_debut, date_fin, description, technologies):
+def _handle_single_mission_save(
+    mission_index,
+    consultant,
+    client,
+    titre,
+    date_debut,
+    date_fin,
+    description,
+    technologies,
+):
     """Gère la sauvegarde d'une mission individuelle"""
-    validation_errors = validate_mission_fields(client, titre, date_debut, mission_index)
+    validation_errors = validate_mission_fields(
+        client, titre, date_debut, mission_index
+    )
     st.session_state[f"validation_errors_{mission_index}"] = validation_errors
 
     if validation_errors:
@@ -3444,20 +3498,45 @@ def _handle_single_mission_save(mission_index, consultant, client, titre, date_d
         st.rerun()
     else:
         _save_validated_mission(
-            consultant, client, titre, date_debut, date_fin, description, technologies, mission_index
+            consultant,
+            client,
+            titre,
+            date_debut,
+            date_fin,
+            description,
+            technologies,
+            mission_index,
         )
 
 
-def _save_validated_mission(consultant, client, titre, date_debut, date_fin, description, technologies, mission_index):
+def _save_validated_mission(
+    consultant,
+    client,
+    titre,
+    date_debut,
+    date_fin,
+    description,
+    technologies,
+    mission_index,
+):
     """Sauvegarde une mission validée"""
     st.session_state[f"validation_errors_{mission_index}"] = []
 
     success = save_mission_to_consultant(
-        consultant, client, titre, date_debut, date_fin, description, technologies, mission_index
+        consultant,
+        client,
+        titre,
+        date_debut,
+        date_fin,
+        description,
+        technologies,
+        mission_index,
     )
 
     if success:
-        st.success("Mission sauvegardée ! Vous pouvez maintenant remplir la mission suivante.")
+        st.success(
+            "Mission sauvegardée ! Vous pouvez maintenant remplir la mission suivante."
+        )
 
 
 def _display_cv_mission_preview(mission_index):
@@ -3491,7 +3570,6 @@ def _display_cv_mission_separator(mission_index, total_missions):
     if mission_index < total_missions:
         st.markdown("---")
         st.markdown("")  # Espace supplémentaire
-
 
 
 def save_all_missions_to_consultant(missions, consultant):
@@ -3758,7 +3836,7 @@ def _display_cv_technologies(analysis):
     """Affiche les technologies détectées dans le CV"""
     st.subheader("🛠️ Technologies & Outils")
     technologies = analysis.get("langages_techniques", [])
-    
+
     if technologies:
         # Affichage en badges/pills
         tech_html = ""
@@ -3776,7 +3854,7 @@ def _display_cv_functional_skills(analysis):
     """Affiche les compétences fonctionnelles détectées dans le CV"""
     st.subheader("💼 Compétences Fonctionnelles")
     competences = analysis.get("competences_fonctionnelles", [])
-    
+
     if competences:
         # Affichage en liste avec icônes
         for comp in competences:
@@ -3825,9 +3903,7 @@ def _display_technologies_action_button(technologies):
 
 def _display_functional_skills_action_button(competences):
     """Affiche le bouton d'action pour les compétences fonctionnelles"""
-    if st.button(
-        "💼 Ajouter les compétences fonctionnelles", use_container_width=True
-    ):
+    if st.button("💼 Ajouter les compétences fonctionnelles", use_container_width=True):
         if competences:
             st.success(
                 f"✅ {len(competences)} compétence(s) prête(s) à être ajoutée(s)"
@@ -3964,7 +4040,9 @@ def _display_missions_addition_result(added_count):
         st.info("💡 Consultez l'onglet 'Missions' du profil pour voir les ajouts")
     else:
         st.warning("⚠️ Aucune mission n'a pu être ajoutée automatiquement")
-        st.info("ℹ Utilisez l'onglet 'Missions' ci-dessus pour les ajouter manuellement")
+        st.info(
+            "ℹ Utilisez l'onglet 'Missions' ci-dessus pour les ajouter manuellement"
+        )
 
 
 def _display_skills_actions(technologies, competences):
@@ -3977,7 +4055,9 @@ def _display_skills_actions(technologies, competences):
 
     st.markdown("")
     if technologies:
-        st.info(f"💡 {len(technologies)} technologie(s) peuvent être ajoutée(s) manuellement")
+        st.info(
+            f"💡 {len(technologies)} technologie(s) peuvent être ajoutée(s) manuellement"
+        )
 
 
 def _handle_add_all_skills(technologies, competences):
@@ -4011,7 +4091,9 @@ def _display_cv_export_tools(consultant, missions, technologies, competences):
         _display_json_export_button(consultant, missions, technologies, competences)
 
     with col_exp2:
-        _display_formatted_summary_button(consultant, missions, technologies, competences)
+        _display_formatted_summary_button(
+            consultant, missions, technologies, competences
+        )
 
     with col_exp3:
         _display_new_analysis_button()
@@ -4037,18 +4119,19 @@ def _display_json_export_button(consultant, missions, technologies, competences)
 def _display_formatted_summary_button(consultant, missions, technologies, competences):
     """Affiche le bouton de résumé formaté"""
     if st.button("📊 Résumé formaté", use_container_width=True):
-        resume_text = _generate_formatted_summary(consultant, missions, technologies, competences)
+        resume_text = _generate_formatted_summary(
+            consultant, missions, technologies, competences
+        )
         st.text_area("Résumé de l'analyse", resume_text, height=300)
         st.success("✅ Résumé généré")
 
 
 def _generate_formatted_summary(consultant, missions, technologies, competences):
     """Génère le texte du résumé formaté"""
-    missions_text = chr(10).join([
-        f"• {m.get('client', 'N/A')} - {m.get('titre', 'N/A')}" 
-        for m in missions[:10]
-    ])
-    
+    missions_text = chr(10).join(
+        [f"• {m.get('client', 'N/A')} - {m.get('titre', 'N/A')}" for m in missions[:10]]
+    )
+
     return f"""
 **Analyse CV - {consultant.prenom} {consultant.nom}**
 
@@ -4066,7 +4149,9 @@ def _generate_formatted_summary(consultant, missions, technologies, competences)
 def _display_new_analysis_button():
     """Affiche le bouton de nouvelle analyse"""
     if st.button("🔄 Nouvelle analyse", use_container_width=True):
-        st.info("📁 Uploadez un nouveau document dans l'onglet 'Documents' pour une nouvelle analyse")
+        st.info(
+            "📁 Uploadez un nouveau document dans l'onglet 'Documents' pour une nouvelle analyse"
+        )
         st.info("🔄 Ou rafraîchissez la page pour réanalyser le même document")
 
 
@@ -4116,6 +4201,7 @@ def _display_mission_technical_info(mission):
             description[:200] + "..." if len(description) > 200 else description
         )
         st.write(display_description)
+
 
 def import_missions_to_profile(missions, consultant):
     """
