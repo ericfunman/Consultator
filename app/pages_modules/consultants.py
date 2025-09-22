@@ -322,32 +322,41 @@ def _load_consultant_for_edit(consultant_id):
     from database.models import Practice
 
     with get_database_session() as session:
-        consultant_db = (
-            session.query(Consultant)
-            .options(joinedload(Consultant.practice))
-            .options(joinedload(Consultant.business_manager_gestions))
-            .filter(Consultant.id == consultant_id)
-            .first()
-        )
+        consultant_db = _load_consultant_with_relations(session, consultant_id)
         practices = session.query(Practice).filter(Practice.actif).all()
-
-        # Charger le BM actuel dans la même session pour éviter les erreurs de session
-        bm_actuel = consultant_db.business_manager_actuel
-        bm_nom_complet = bm_actuel.nom_complet if bm_actuel else None
-        bm_email = bm_actuel.email if bm_actuel else None
-
+        
+        # Charger informations du Business Manager
+        bm_nom_complet, bm_email = _extract_business_manager_info(consultant_db)
+        
+        # Préparer les options
         practice_options = {p.nom: p.id for p in practices}
-        current_practice_id = (
-            consultant_db.practice_id if hasattr(consultant_db, "practice_id") else None
-        )
+        current_practice_id = _get_current_practice_id(consultant_db)
 
-        return (
-            consultant_db,
-            practice_options,
-            current_practice_id,
-            bm_nom_complet,
-            bm_email,
-        )
+        return consultant_db, practice_options, current_practice_id, bm_nom_complet, bm_email
+
+
+def _load_consultant_with_relations(session, consultant_id):
+    """Charge le consultant avec ses relations"""
+    return (
+        session.query(Consultant)
+        .options(joinedload(Consultant.practice))
+        .options(joinedload(Consultant.business_manager_gestions))
+        .filter(Consultant.id == consultant_id)
+        .first()
+    )
+
+
+def _extract_business_manager_info(consultant_db):
+    """Extrait les informations du Business Manager"""
+    bm_actuel = consultant_db.business_manager_actuel
+    bm_nom_complet = bm_actuel.nom_complet if bm_actuel else None
+    bm_email = bm_actuel.email if bm_actuel else None
+    return bm_nom_complet, bm_email
+
+
+def _get_current_practice_id(consultant_db):
+    """Récupère l'ID de la practice actuelle"""
+    return consultant_db.practice_id if hasattr(consultant_db, "practice_id") else None
 
 
 def _render_basic_consultant_fields(
@@ -430,30 +439,50 @@ def _render_company_history_fields(consultant_db):
     col3, col4 = st.columns(2)
 
     with col3:
-        societe = st.selectbox(
-            "🏢 Société",
-            options=["Quanteam", "Asigma"],
-            index=0 if (consultant_db.societe or "Quanteam") == "Quanteam" else 1,
-        )
-        date_entree = st.date_input(
-            "📅 Date d'entrée société",
-            value=consultant_db.date_entree_societe,
-            help="Date d'entrée dans la société",
-        )
+        societe = _render_societe_field(consultant_db)
+        date_entree = _render_date_entree_field(consultant_db)
 
     with col4:
-        date_sortie = st.date_input(
-            "📅 Date de sortie société (optionnel)",
-            value=consultant_db.date_sortie_societe,
-            help="Laissez vide si encore en poste",
-        )
-        date_premiere_mission = st.date_input(
-            "🚀 Date première mission (optionnel)",
-            value=consultant_db.date_premiere_mission,
-            help="Date de début de la première mission",
-        )
+        date_sortie = _render_date_sortie_field(consultant_db)
+        date_premiere_mission = _render_date_premiere_mission_field(consultant_db)
 
     return societe, date_entree, date_sortie, date_premiere_mission
+
+
+def _render_societe_field(consultant_db):
+    """Rendu du champ société"""
+    return st.selectbox(
+        "🏢 Société",
+        options=["Quanteam", "Asigma"],
+        index=0 if (consultant_db.societe or "Quanteam") == "Quanteam" else 1,
+    )
+
+
+def _render_date_entree_field(consultant_db):
+    """Rendu du champ date d'entrée"""
+    return st.date_input(
+        "📅 Date d'entrée société",
+        value=consultant_db.date_entree_societe,
+        help="Date d'entrée dans la société",
+    )
+
+
+def _render_date_sortie_field(consultant_db):
+    """Rendu du champ date de sortie"""
+    return st.date_input(
+        "📅 Date de sortie société (optionnel)",
+        value=consultant_db.date_sortie_societe,
+        help="Laissez vide si encore en poste",
+    )
+
+
+def _render_date_premiere_mission_field(consultant_db):
+    """Rendu du champ date première mission"""
+    return st.date_input(
+        "🚀 Date première mission (optionnel)",
+        value=consultant_db.date_premiere_mission,
+        help="Date de début de la première mission",
+    )
 
 
 def _render_professional_profile_fields(consultant_db):
