@@ -16,6 +16,9 @@ from database.database import get_database_info
 # Supprimer les FutureWarnings de pandas
 warnings.filterwarnings("ignore", category=FutureWarning, message=".*deprecated.*")
 
+# Constantes
+DETAIL_COLUMN = "Détail"
+
 
 # Import des services
 
@@ -82,7 +85,7 @@ def show():
 def show_dashboard_charts():
     """Affiche les graphiques du dashboard"""
 
-    col1, col2 = st.columns(2)
+    _, col2 = st.columns(2)
 
     # Section supprimée : Répartition des compétences
 
@@ -99,7 +102,7 @@ def show_dashboard_charts():
         dates = []
         current = start_date
 
-        for i in range(12):
+        for _ in range(12):
             # Dernier jour du mois
             if current.month == 12:
                 next_month = current.replace(year=current.year + 1, month=1)
@@ -130,22 +133,22 @@ def show_dashboard_charts():
         {
             "Date": "2024-08-06",
             "Action": "Nouveau consultant ajouté",
-            "Détail": "Jean Dupont - Data Analyst",
+            DETAIL_COLUMN: "Jean Dupont - Data Analyst",
         },
         {
             "Date": "2024-08-05",
             "Action": "Mission terminée",
-            "Détail": "Projet Analytics - Client ABC",
+            DETAIL_COLUMN: "Projet Analytics - Client ABC",
         },
         {
             "Date": "2024-08-04",
             "Action": "Compétence ajoutée",
-            "Détail": "Python - Expert pour Marie Martin",
+            DETAIL_COLUMN: "Python - Expert pour Marie Martin",
         },
         {
             "Date": "2024-08-03",
             "Action": "Nouvelle mission",
-            "Détail": "DevOps - Client XYZ",
+            DETAIL_COLUMN: "DevOps - Client XYZ",
         },
     ]
 
