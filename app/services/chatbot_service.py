@@ -3091,244 +3091,311 @@ class ChatbotService:
         """
         Gère les questions sur la disponibilité des consultants (V1.2.2).
 
-        Analyse la disponibilité immédiate (ASAP) ou planifiée des consultants,
-        en tenant compte des missions en cours qui peuvent retarder la disponibilité.
-
         Args:
-            entities: Dictionnaire contenant les entités extraites de la question
-                     (noms, entreprises, compétences, langues, etc.)
+            entities: Dictionnaire contenant les entités extraites
 
         Returns:
-            Dictionnaire contenant :
-            - response: Réponse formatée sur la disponibilité
-            - data: Données structurées sur la disponibilité
-            - intent: Type d'intention détecté ("disponibilite")
-            - confidence: Niveau de confiance de la réponse (0.0 à 1.0)
-
-        Raises:
-            SQLAlchemyError: En cas d'erreur de base de données
-            AttributeError: Si les données de disponibilité sont malformées
-
-        Example:
-            >>> entities = {"noms": ["Jean Dupont"]}
-            >>> result = chatbot._handle_availability_question(entities)
-            >>> print(result["response"])
-            📅 **Disponibilité de Jean Dupont** :
-            ✅ **Disponible immédiatement (ASAP)**
-            📊 **Statut actuel :** ✅ Marqué disponible
+            Dictionnaire avec la réponse formatée
         """
-        # Chercher un consultant spécifique
-
-        # Chercher un consultant spécifique
-        consultant = None
-        if entities["noms"]:
-            nom_complet = " ".join(entities["noms"])
-            consultant = self._find_consultant_by_name(nom_complet)
+        consultant = self._get_consultant_from_entities(entities)
 
         if consultant:
-            try:
-                # Récupérer les données de disponibilité
-                with get_database_session() as session:
+            return self._handle_specific_consultant_availability(consultant)
+        else:
+            return self._handle_general_availability_question()
 
-                    consultant_db = (
-                        session.query(Consultant)
-                        .filter(Consultant.id == consultant.id)
-                        .first()
-                    )
+    def _get_consultant_from_entities(self, entities: Dict):
+        """Extrait le consultant depuis les entités"""
+        if entities["noms"]:
+            nom_complet = " ".join(entities["noms"])
+            return self._find_consultant_by_name(nom_complet)
+        return None
 
-                if consultant_db:
-                    response = (
-                        "📅 **Disponibilité de "
-                        + consultant.prenom
-                        + " "
-                        + consultant.nom
-                        + self.SECTION_HEADER_SUFFIX
-                    )
+    def _handle_specific_consultant_availability(self, consultant) -> Dict[str, Any]:
+        """Gère la disponibilité d'un consultant spécifique"""
+        try:
+            consultant_db = self._get_consultant_db_data(consultant)
 
-                    # Date de disponibilité calculée
-                    date_dispo = consultant_db.date_disponibilite
-                    if date_dispo == "ASAP":
-                        response += "✅ **Disponible immédiatement (ASAP)**\n\n"
+            if consultant_db:
+                response = self._build_availability_response(consultant, consultant_db)
+            else:
+                response = self._format_availability_error(consultant)
 
-                        # Vérifier s'il y a des missions en cours
-                        missions_en_cours = [
-                            m for m in consultant_db.missions if m.statut == "en_cours"
-                        ]
-                        if missions_en_cours:
-                            response += "⚠️ **Attention :** Le consultant a des missions en cours mais est marqué disponible\n"
-                            for mission in missions_en_cours:
-                                response += (
-                                    self.BULLET_POINT_INDENT
-                                    + mission.nom_mission
-                                    + " chez "
-                                    + mission.client
-                                    + "\n"
-                                )
-                    else:
-                        response += (
-                            "📅 **Disponible à partir du :** "
-                            + str(date_dispo)
-                            + "\n\n"
-                        )
+            return self._build_availability_result(consultant, consultant_db, response)
 
-                        # Afficher les missions qui retardent la disponibilité
-                        from datetime import date
+        except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
+            return self._build_availability_error_result(e)
 
-                        missions_futures = [
-                            m
-                            for m in consultant_db.missions
-                            if m.date_fin and m.date_fin > date.today()
-                        ]
-                        if missions_futures:
-                            response += "🎯 **Missions en cours/planifiées :**\n"
-                            for mission in missions_futures:
-                                fin_mission = mission.date_fin.strftime(
-                                    self.DATE_FORMAT
-                                )
-                                response += (
-                                    self.BULLET_POINT_INDENT
-                                    + mission.nom_mission
-                                    + " (fin: "
-                                    + fin_mission
-                                    + ")\n"
-                                )
+    def _get_consultant_db_data(self, consultant):
+        """Récupère les données DB du consultant"""
+        with get_database_session() as session:
+            return (
+                session.query(Consultant).filter(Consultant.id == consultant.id).first()
+            )
 
-                    # Statut général
-                    response += "\n📊 **Statut actuel :** "
-                    if consultant_db.disponibilite:
-                        response += "✅ Marqué disponible"
-                    else:
-                        response += "🔴 Marqué occupé"
+    def _build_availability_response(self, consultant, consultant_db) -> str:
+        """Construit la réponse de disponibilité"""
+        response = self._format_availability_header(consultant)
+        response += self._format_availability_status(consultant_db)
+        response += self._format_consultant_details(consultant_db)
+        return response
 
-                    # Informations complémentaires
-                    if consultant_db.grade:
-                        response += "\n🎯 **Grade :** " + str(consultant_db.grade)
-                    if consultant_db.type_contrat:
-                        response += "\n📝 **Contrat :** " + str(
-                            consultant_db.type_contrat
-                        )
+    def _format_availability_header(self, consultant) -> str:
+        """Formate l'en-tête de disponibilité"""
+        return (
+            "📅 **Disponibilité de "
+            + consultant.prenom
+            + " "
+            + consultant.nom
+            + self.SECTION_HEADER_SUFFIX
+        )
 
-                else:
-                    response = (
-                        "❌ Impossible de récupérer les données de disponibilité pour **"
-                        + consultant.prenom
-                        + " "
-                        + consultant.nom
-                        + "**."
-                    )
+    def _format_availability_status(self, consultant_db) -> str:
+        """Formate le statut de disponibilité"""
+        date_dispo = consultant_db.date_disponibilite
 
-            except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
-                response = (
-                    "❌ Erreur lors de la récupération des données de disponibilité : "
-                    + str(e)
-                )
+        if date_dispo == "ASAP":
+            return self._format_asap_availability(consultant_db)
+        else:
+            return self._format_planned_availability(consultant_db, date_dispo)
+
+    def _format_asap_availability(self, consultant_db) -> str:
+        """Formate la disponibilité ASAP"""
+        response = "✅ **Disponible immédiatement (ASAP)**\n\n"
+        missions_en_cours = self._get_missions_en_cours(consultant_db)
+
+        if missions_en_cours:
+            response += "⚠️ **Attention :** Le consultant a des missions en cours mais est marqué disponible\n"
+            response += self._format_missions_list(missions_en_cours)
+
+        return response
+
+    def _format_planned_availability(self, consultant_db, date_dispo) -> str:
+        """Formate la disponibilité planifiée"""
+        response = "📅 **Disponible à partir du :** " + str(date_dispo) + "\n\n"
+
+        missions_futures = self._get_missions_futures(consultant_db)
+        if missions_futures:
+            response += "🎯 **Missions en cours/planifiées :**\n"
+            response += self._format_missions_futures_list(missions_futures)
+
+        return response
+
+    def _get_missions_en_cours(self, consultant_db):
+        """Récupère les missions en cours"""
+        return [m for m in consultant_db.missions if m.statut == "en_cours"]
+
+    def _get_missions_futures(self, consultant_db):
+        """Récupère les missions futures"""
+        from datetime import date
+
+        return [
+            m
+            for m in consultant_db.missions
+            if m.date_fin and m.date_fin > date.today()
+        ]
+
+    def _format_missions_list(self, missions):
+        """Formate la liste des missions"""
+        result = ""
+        for mission in missions:
+            result += (
+                self.BULLET_POINT_INDENT
+                + mission.nom_mission
+                + " chez "
+                + mission.client
+                + "\n"
+            )
+        return result
+
+    def _format_missions_futures_list(self, missions):
+        """Formate la liste des missions futures"""
+        result = ""
+        for mission in missions:
+            fin_mission = mission.date_fin.strftime(self.DATE_FORMAT)
+            result += (
+                self.BULLET_POINT_INDENT
+                + mission.nom_mission
+                + " (fin: "
+                + fin_mission
+                + ")\n"
+            )
+        return result
+
+    def _format_consultant_details(self, consultant_db) -> str:
+        """Formate les détails du consultant"""
+        response = "\n📊 **Statut actuel :** "
+
+        if consultant_db.disponibilite:
+            response += "✅ Marqué disponible"
+        else:
+            response += "🔴 Marqué occupé"
+
+        if consultant_db.grade:
+            response += "\n🎯 **Grade :** " + str(consultant_db.grade)
+        if consultant_db.type_contrat:
+            response += "\n📝 **Contrat :** " + str(consultant_db.type_contrat)
+
+        return response
+
+    def _format_availability_error(self, consultant) -> str:
+        """Formate l'erreur de disponibilité"""
+        return (
+            "❌ Impossible de récupérer les données de disponibilité pour **"
+            + consultant.prenom
+            + " "
+            + consultant.nom
+            + "**."
+        )
+
+    def _build_availability_result(
+        self, consultant, consultant_db, response
+    ) -> Dict[str, Any]:
+        """Construit le résultat de disponibilité"""
+        return {
+            "response": response,
+            "data": {
+                "consultant": {
+                    "nom": consultant.nom,
+                    "prenom": consultant.prenom,
+                    "date_disponibilite": (
+                        getattr(consultant_db, "date_disponibilite", None)
+                        if consultant_db
+                        else None
+                    ),
+                    "disponibilite_immediate": (
+                        getattr(consultant_db, "disponibilite", None)
+                        if consultant_db
+                        else None
+                    ),
+                }
+            },
+            "intent": "disponibilite",
+            "confidence": 0.9,
+        }
+
+    def _build_availability_error_result(self, error) -> Dict[str, Any]:
+        """Construit le résultat d'erreur"""
+        return {
+            "response": (
+                "❌ Erreur lors de la récupération des données de disponibilité : "
+                + str(error)
+            ),
+            "data": {},
+            "intent": "disponibilite",
+            "confidence": 0.3,
+        }
+
+    def _handle_general_availability_question(self) -> Dict[str, Any]:
+        """Gère les questions générales sur les disponibilités"""
+        try:
+            consultants_dispos, consultants_occupes = self._get_availability_data()
+            response = self._build_general_availability_response(
+                consultants_dispos, consultants_occupes
+            )
 
             return {
                 "response": response,
                 "data": {
-                    "consultant": {
-                        "nom": consultant.nom,
-                        "prenom": consultant.prenom,
-                        "date_disponibilite": (
-                            getattr(consultant_db, "date_disponibilite", None)
-                            if "consultant_db" in locals()
-                            else None
-                        ),
-                        "disponibilite_immediate": (
-                            getattr(consultant_db, "disponibilite", None)
-                            if "consultant_db" in locals()
-                            else None
-                        ),
-                    }
+                    "disponibles": len(consultants_dispos),
+                    "occupes": len(consultants_occupes),
+                    "total": len(consultants_dispos) + len(consultants_occupes),
                 },
                 "intent": "disponibilite",
-                "confidence": 0.9,
+                "confidence": 0.8,
             }
-        else:
-            # Question générale sur les disponibilités
-            try:
-                with get_database_session() as session:
 
-                    consultants_dispos = (
-                        session.query(Consultant).filter(Consultant.disponibilite).all()
-                    )
-                with get_database_session() as session:
+        except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
+            return {
+                "response": "❌ Erreur lors de la récupération des disponibilités : "
+                + str(e),
+                "data": {},
+                "intent": "disponibilite",
+                "confidence": 0.3,
+            }
 
-                    consultants_occupes = (
-                        session.query(Consultant)
-                        .filter(Consultant.disponibilite is False)
-                        .all()
-                    )
+    def _get_availability_data(self):
+        """Récupère les données de disponibilité générale"""
+        with get_database_session() as session:
+            consultants_dispos = (
+                session.query(Consultant).filter(Consultant.disponibilite).all()
+            )
 
-                response = "📅 **État des disponibilités** :\n\n"
+        with get_database_session() as session:
+            consultants_occupes = (
+                session.query(Consultant)
+                .filter(Consultant.disponibilite is False)
+                .all()
+            )
+
+        return consultants_dispos, consultants_occupes
+
+    def _build_general_availability_response(
+        self, consultants_dispos, consultants_occupes
+    ) -> str:
+        """Construit la réponse générale de disponibilité"""
+        response = "📅 **État des disponibilités** :\n\n"
+        response += (
+            "✅ **Disponibles immédiatement :** "
+            + str(len(consultants_dispos))
+            + " consultant(s)\n"
+        )
+
+        response += self._format_available_consultants_list(consultants_dispos)
+        response += self._format_busy_consultants_section(consultants_occupes)
+
+        return response
+
+    def _format_available_consultants_list(self, consultants_dispos) -> str:
+        """Formate la liste des consultants disponibles"""
+        response = ""
+
+        if consultants_dispos:
+            for consultant in consultants_dispos[:5]:  # Limiter à 5
                 response += (
-                    "✅ **Disponibles immédiatement :** "
-                    + str(len(consultants_dispos))
-                    + " consultant(s)\n"
+                    self.BULLET_POINT_INDENT
+                    + consultant.prenom
+                    + " "
+                    + consultant.nom
+                    + "\n"
+                )
+            if len(consultants_dispos) > 5:
+                response += (
+                    self.BULLET_POINT_INDENT
+                    + "... et "
+                    + str(len(consultants_dispos) - 5)
+                    + " autre(s)\n"
                 )
 
-                if consultants_dispos:
-                    for consultant in consultants_dispos[:5]:  # Limiter à 5
-                        response += (
-                            self.BULLET_POINT_INDENT
-                            + consultant.prenom
-                            + " "
-                            + consultant.nom
-                            + "\n"
-                        )
-                    if len(consultants_dispos) > 5:
-                        response += (
-                            self.BULLET_POINT_INDENT
-                            + "... et "
-                            + str(len(consultants_dispos) - 5)
-                            + " autre(s)\n"
-                        )
+        return response
 
+    def _format_busy_consultants_section(self, consultants_occupes) -> str:
+        """Formate la section des consultants occupés"""
+        response = (
+            "\n🔴 **Occupés :** " + str(len(consultants_occupes)) + " consultant(s)\n"
+        )
+
+        if consultants_occupes:
+            for consultant in consultants_occupes[:5]:  # Limiter à 5
+                date_dispo = consultant.date_disponibilite
                 response += (
-                    "\n🔴 **Occupés :** "
-                    + str(len(consultants_occupes))
-                    + " consultant(s)\n"
+                    self.BULLET_POINT_INDENT
+                    + consultant.prenom
+                    + " "
+                    + consultant.nom
+                    + " (dispo: "
+                    + str(date_dispo)
+                    + ")\n"
+                )
+            if len(consultants_occupes) > 5:
+                response += (
+                    self.BULLET_POINT_INDENT
+                    + "... et "
+                    + str(len(consultants_occupes) - 5)
+                    + " autre(s)\n"
                 )
 
-                if consultants_occupes:
-                    for consultant in consultants_occupes[:5]:  # Limiter à 5
-                        date_dispo = consultant.date_disponibilite
-                        response += (
-                            self.BULLET_POINT_INDENT
-                            + consultant.prenom
-                            + " "
-                            + consultant.nom
-                            + " (dispo: "
-                            + str(date_dispo)
-                            + ")\n"
-                        )
-                    if len(consultants_occupes) > 5:
-                        response += (
-                            self.BULLET_POINT_INDENT
-                            + "... et "
-                            + str(len(consultants_occupes) - 5)
-                            + " autre(s)\n"
-                        )
-
-                return {
-                    "response": response,
-                    "data": {
-                        "disponibles": len(consultants_dispos),
-                        "occupes": len(consultants_occupes),
-                        "total": len(consultants_dispos) + len(consultants_occupes),
-                    },
-                    "intent": "disponibilite",
-                    "confidence": 0.8,
-                }
-
-            except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
-                return {
-                    "response": "❌ Erreur lors de la récupération des disponibilités : "
-                    + str(e),
-                    "data": {},
-                    "intent": "disponibilite",
-                    "confidence": 0.3,
-                }
+        return response
 
     def _get_consultant_missions_with_tjm(self, consultant_db) -> List:
         """Récupère les missions avec TJM d'un consultant"""
