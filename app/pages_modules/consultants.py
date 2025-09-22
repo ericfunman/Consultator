@@ -2025,146 +2025,191 @@ def _display_no_consultants_message():
 
 def show_consultants_list_classic():
     """Version classique de la liste des consultants (fallback)"""
+    # Champ de recherche
+    search_term = _render_classic_search_input()
 
-    # Champ de recherche en temps réel
-    search_term = st.text_input(
+    try:
+        # Chargement des données
+        consultants = _load_classic_consultants_data(search_term)
+        
+        if consultants:
+            _display_classic_consultants_table(consultants)
+        else:
+            _display_no_consultants_classic_message()
+
+    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as exc:
+        st.error(f"❌ Erreur lors du chargement de la liste: {exc}")
+
+
+def _render_classic_search_input():
+    """Affiche le champ de recherche classique"""
+    return st.text_input(
         "🔍 Rechercher un consultant",
         placeholder="Tapez un prénom, nom ou email pour filtrer...",
         help="La liste se filtre automatiquement pendant que vous tapez",
         key="consultant_search",
     )
 
-    try:
-        # Utiliser les nouvelles méthodes optimisées
-        if search_term and search_term.strip():
-            consultants = ConsultantService.search_consultants_optimized(
-                search_term.strip()
-            )
-            if consultants:
-                st.info(
-                    "🔍 "
-                    + str(len(consultants))
-                    + " consultant(s) trouvé(s) pour '"
-                    + search_term
-                    + "'"
-                )
-            else:
-                st.warning("❌ Aucun consultant trouvé pour '" + search_term + "'")
+
+def _load_classic_consultants_data(search_term):
+    """Charge les données des consultants avec recherche"""
+    if search_term and search_term.strip():
+        consultants = ConsultantService.search_consultants_optimized(search_term.strip())
+        _display_search_results_info(consultants, search_term)
+        return consultants
+    else:
+        return ConsultantService.get_all_consultants_with_stats()
+
+
+def _display_search_results_info(consultants, search_term):
+    """Affiche les informations sur les résultats de recherche"""
+    if consultants:
+        st.info(f"🔍 {len(consultants)} consultant(s) trouvé(s) pour '{search_term}'")
+    else:
+        st.warning(f"❌ Aucun consultant trouvé pour '{search_term}'")
+
+
+def _display_classic_consultants_table(consultants):
+    """Affiche le tableau classique des consultants"""
+    consultants_data = _prepare_classic_table_data(consultants)
+    df = pd.DataFrame(consultants_data)
+
+    event = st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True,
+        on_select="rerun",
+        selection_mode="single-row",
+    )
+
+    # Gestion des sélections et métriques
+    _handle_classic_table_selection(event, consultants_data)
+    _display_classic_metrics(consultants)
+
+
+def _prepare_classic_table_data(consultants):
+    """Prépare les données pour le tableau classique"""
+    consultants_data = []
+    for consultant in consultants:
+        consultants_data.append({
+            "ID": consultant["id"],
+            "Prénom": consultant["prenom"],
+            "Nom": consultant["nom"],
+            "Email": consultant["email"],
+            "Société": consultant["societe"],
+            "Grade": consultant["grade"],
+            "Contrat": consultant["type_contrat"],
+            "Salaire": consultant["salaire_formatted"],
+            "CJM": consultant["cjm_formatted"],
+            "Expérience": consultant["experience_formatted"],
+            "Statut": consultant["statut"],
+            "Missions": consultant["nb_missions"],
+        })
+    return consultants_data
+
+
+def _handle_classic_table_selection(event, consultants_data):
+    """Gère la sélection dans le tableau classique"""
+    if event.selection.rows:
+        selected_row = event.selection.rows[0]
+        if selected_row < len(consultants_data):
+            selected_consultant = consultants_data[selected_row]
+            _display_selected_consultant_actions(selected_consultant)
         else:
-            # Utiliser la méthode optimisée qui récupère tout en une requête
-            consultants = ConsultantService.get_all_consultants_with_stats()
+            st.error("❌ Erreur: Index de consultant invalide")
 
-        if consultants:
-            # Les données sont déjà préparées par le service optimisé
-            consultants_data = []
-            for consultant in consultants:
-                consultants_data.append(
-                    {
-                        "ID": consultant["id"],
-                        "Prénom": consultant["prenom"],
-                        "Nom": consultant["nom"],
-                        "Email": consultant["email"],
-                        "Société": consultant["societe"],
-                        "Grade": consultant["grade"],
-                        "Contrat": consultant["type_contrat"],
-                        "Salaire": consultant["salaire_formatted"],
-                        "CJM": consultant["cjm_formatted"],
-                        "Expérience": consultant["experience_formatted"],
-                        "Statut": consultant["statut"],
-                        "Missions": consultant["nb_missions"],
-                    }
-                )
 
-            # Afficher le tableau avec sélection
-            df = pd.DataFrame(consultants_data)
+def _display_selected_consultant_actions(selected_consultant):
+    """Affiche les actions pour le consultant sélectionné"""
+    selected_id = selected_consultant["ID"]
+    selected_name = f"{selected_consultant['Prénom']} {selected_consultant['Nom']}"
+    
+    st.success(f"✅ Consultant sélectionné : **{selected_name}**")
 
-            event = st.dataframe(
-                df,
-                use_container_width=True,
-                hide_index=True,
-                on_select="rerun",
-                selection_mode="single-row",
-            )
+    col1, col2, col3 = st.columns(3)
 
-            # Actions sur sélection
-            if event.selection.rows:
-                selected_row = event.selection.rows[0]
-                # Vérifier que l'index est valide
-                if selected_row < len(consultants_data):
-                    selected_id = consultants_data[selected_row]["ID"]
-                    selected_name = f"{consultants_data[selected_row]['Prénom']} {consultants_data[selected_row]['Nom']}"
+    with col1:
+        _render_view_button(selected_id)
 
-                    st.success(f"✅ Consultant sélectionné : **{selected_name}**")
+    with col2:
+        _render_edit_button(selected_id)
 
-                    col1, col2, col3 = st.columns(3)
+    with col3:
+        _render_delete_button(selected_id)
 
-                    with col1:
-                        if st.button(
-                            "👁️ Voir le profil",
-                            type="primary",
-                            use_container_width=True,
-                            key=f"view_{selected_id}",
-                        ):
-                            st.session_state.view_consultant_profile = selected_id
-                            st.rerun()
 
-                    with col2:
-                        if st.button(
-                            "✏️ Modifier",
-                            use_container_width=True,
-                            key=f"edit_{selected_id}",
-                        ):
-                            st.session_state.view_consultant_profile = selected_id
-                            st.rerun()
+def _render_view_button(selected_id):
+    """Affiche le bouton Voir le profil"""
+    if st.button(
+        "👁️ Voir le profil",
+        type="primary",
+        use_container_width=True,
+        key=f"view_{selected_id}",
+    ):
+        st.session_state.view_consultant_profile = selected_id
+        st.rerun()
 
-                    with col3:
-                        if st.button(
-                            "🗑️ Supprimer",
-                            use_container_width=True,
-                            key=f"delete_{selected_id}",
-                        ):
-                            if ConsultantService.delete_consultant(selected_id):
-                                st.success("✅ Consultant supprimé !")
-                                st.rerun()
-                            else:
-                                st.error("❌ Erreur lors de la suppression")
-                else:
-                    st.error("❌ Erreur: Index de consultant invalide")
 
-            # Métriques générales
-            st.markdown("---")
-            col1, col2, col3, col4 = st.columns(4)
+def _render_edit_button(selected_id):
+    """Affiche le bouton Modifier"""
+    if st.button(
+        "✏️ Modifier",
+        use_container_width=True,
+        key=f"edit_{selected_id}",
+    ):
+        st.session_state.view_consultant_profile = selected_id
+        st.rerun()
 
-            with col1:
-                st.metric("👥 Total consultants", len(consultants))
 
-            with col2:
-                disponibles = len(
-                    [c for c in consultants if c.get("disponibilite", False)]
-                )
-                st.metric("✅ Disponibles", disponibles)
-
-            with col3:
-                occupes = len(consultants) - disponibles
-                st.metric("🔴 Occupés", occupes)
-
-            with col4:
-                if len(consultants) > 0:
-                    salaire_moyen = sum(
-                        c.get("salaire_actuel", 0) or 0 for c in consultants
-                    ) / len(consultants)
-                else:
-                    salaire_moyen = 0
-                st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
-
+def _render_delete_button(selected_id):
+    """Affiche le bouton Supprimer"""
+    if st.button(
+        "🗑️ Supprimer",
+        use_container_width=True,
+        key=f"delete_{selected_id}",
+    ):
+        if ConsultantService.delete_consultant(selected_id):
+            st.success("✅ Consultant supprimé !")
+            st.rerun()
         else:
-            st.info("📝 Aucun consultant enregistré")
-            st.markdown(
-                "💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil"
-            )
+            st.error("❌ Erreur lors de la suppression")
 
-    except (SQLAlchemyError, ValueError, TypeError, AttributeError) as exc:
-        st.error(f"❌ Erreur lors du chargement de la liste: {exc}")
+
+def _display_classic_metrics(consultants):
+    """Affiche les métriques générales"""
+    st.markdown("---")
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric("👥 Total consultants", len(consultants))
+
+    with col2:
+        disponibles = len([c for c in consultants if c.get("disponibilite", False)])
+        st.metric("✅ Disponibles", disponibles)
+
+    with col3:
+        occupes = len(consultants) - disponibles
+        st.metric("🔴 Occupés", occupes)
+
+    with col4:
+        _display_average_salary_metric(consultants)
+
+
+def _display_average_salary_metric(consultants):
+    """Affiche la métrique du salaire moyen"""
+    if len(consultants) > 0:
+        salaire_moyen = sum(c.get("salaire_actuel", 0) or 0 for c in consultants) / len(consultants)
+    else:
+        salaire_moyen = 0
+    st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
+
+
+def _display_no_consultants_classic_message():
+    """Affiche le message quand aucun consultant n'est trouvé"""
+    st.info("📝 Aucun consultant enregistré")
+    st.markdown(
+        "💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil"
+    )
 
 
 def show_add_consultant_form():
@@ -2816,64 +2861,107 @@ def extract_original_filename(full_filename):
     parts = full_filename.split("_")
 
     if len(parts) >= 4:
-        # Identifier les parties : ID, Prénom, Nom, puis le reste
-        # Les 3 premières parties (ID, Prénom, Nom) ne sont pas utilisées dans le traitement
-
-        # Le reste après Nom
-        remaining_parts = parts[3:]
-
-        # Chercher le timestamp (format YYYYMMDD) dans les parties restantes
-        original_parts = []
-        timestamp_found = False
-
-        for i, part in enumerate(remaining_parts):
-            # Vérifier si cette partie ressemble à un timestamp YYYYMMDD
-            if len(part) == 8 and part.isdigit() and part.startswith(("20", "19")):
-                # C'est probablement un timestamp, arrêter ici
-                original_parts = remaining_parts[:i]
-                timestamp_found = True
-                break
-
-        if not timestamp_found:
-            # Si pas de timestamp trouvé, prendre tout sauf la dernière partie (qui peut contenir l'extension)
-            if len(remaining_parts) > 1:
-                original_parts = remaining_parts[:-1]
-            else:
-                original_parts = remaining_parts
-
-        if original_parts:
-            original_name = "_".join(original_parts)
-
-            # Gérer l'extension
-            last_part = remaining_parts[-1] if remaining_parts else ""
-            if "." in last_part:
-                # La dernière partie contient l'extension
-                name_without_ext = last_part.split(".")[0]
-                extension = last_part.split(".")[-1]
-
-                # Si on a trouvé un timestamp, la dernière partie devrait être le timestamp.extension
-                # Donc on utilise les original_parts pour construire le nom
-                if timestamp_found:
-                    # Les original_parts contiennent le nom original sans extension
-                    # On ajoute l'extension du fichier complet
-                    if "." in full_filename:
-                        extension = full_filename.split(".")[-1]
-                        original_name = f"{original_name}.{extension}"
-                else:
-                    # Pas de timestamp trouvé, utiliser la logique normale
-                    if not original_name:
-                        original_name = name_without_ext
-                    original_name = f"{original_name}.{extension}"
-            elif "." not in original_name and "." in full_filename:
-                # Chercher l'extension dans le nom complet
-                if "." in full_filename:
-                    extension = full_filename.split(".")[-1]
-                    original_name = f"{original_name}.{extension}"
-
+        remaining_parts = _get_filename_remaining_parts(parts)
+        original_name = _extract_original_name_from_parts(remaining_parts, full_filename)
+        
+        if original_name:
             return original_name
 
     # Si le format n'est pas reconnu, retourner le nom complet
     return full_filename
+
+
+def _get_filename_remaining_parts(parts):
+    """Extrait les parties restantes après ID, Prénom, Nom"""
+    # Les 3 premières parties (ID, Prénom, Nom) ne sont pas utilisées dans le traitement
+    return parts[3:]
+
+
+def _extract_original_name_from_parts(remaining_parts, full_filename):
+    """Extrait le nom original à partir des parties restantes"""
+    original_parts, timestamp_found = _find_original_parts_before_timestamp(remaining_parts)
+    
+    if original_parts:
+        original_name = "_".join(original_parts)
+        return _add_extension_to_original_name(
+            original_name, remaining_parts, timestamp_found, full_filename
+        )
+    
+    return None
+
+
+def _find_original_parts_before_timestamp(remaining_parts):
+    """Trouve les parties originales avant le timestamp"""
+    original_parts = []
+    timestamp_found = False
+
+    for i, part in enumerate(remaining_parts):
+        if _is_timestamp_part(part):
+            # C'est probablement un timestamp, arrêter ici
+            original_parts = remaining_parts[:i]
+            timestamp_found = True
+            break
+
+    if not timestamp_found:
+        original_parts = _handle_no_timestamp_found(remaining_parts)
+
+    return original_parts, timestamp_found
+
+
+def _is_timestamp_part(part):
+    """Vérifie si une partie ressemble à un timestamp YYYYMMDD"""
+    return len(part) == 8 and part.isdigit() and part.startswith(("20", "19"))
+
+
+def _handle_no_timestamp_found(remaining_parts):
+    """Gère le cas où aucun timestamp n'est trouvé"""
+    # Si pas de timestamp trouvé, prendre tout sauf la dernière partie (qui peut contenir l'extension)
+    if len(remaining_parts) > 1:
+        return remaining_parts[:-1]
+    else:
+        return remaining_parts
+
+
+def _add_extension_to_original_name(original_name, remaining_parts, timestamp_found, full_filename):
+    """Ajoute l'extension appropriée au nom original"""
+    last_part = remaining_parts[-1] if remaining_parts else ""
+    
+    if "." in last_part:
+        return _handle_extension_in_last_part(
+            original_name, last_part, timestamp_found, full_filename
+        )
+    elif "." not in original_name and "." in full_filename:
+        return _add_extension_from_full_filename(original_name, full_filename)
+    
+    return original_name
+
+
+def _handle_extension_in_last_part(original_name, last_part, timestamp_found, full_filename):
+    """Gère l'extension quand elle est dans la dernière partie"""
+    name_without_ext = last_part.split(".")[0]
+    extension = last_part.split(".")[-1]
+
+    # Si on a trouvé un timestamp, la dernière partie devrait être le timestamp.extension
+    if timestamp_found:
+        # On ajoute l'extension du fichier complet
+        if "." in full_filename:
+            extension = full_filename.split(".")[-1]
+            return f"{original_name}.{extension}"
+    else:
+        # Pas de timestamp trouvé, utiliser la logique normale
+        if not original_name:
+            original_name = name_without_ext
+        return f"{original_name}.{extension}"
+    
+    return original_name
+
+
+def _add_extension_from_full_filename(original_name, full_filename):
+    """Ajoute l'extension en la cherchant dans le nom complet"""
+    if "." in full_filename:
+        extension = full_filename.split(".")[-1]
+        return f"{original_name}.{extension}"
+    return original_name
 
 
 def download_document_direct(file_path, consultant, display_name):
