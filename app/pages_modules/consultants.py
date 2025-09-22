@@ -324,15 +324,21 @@ def _load_consultant_for_edit(consultant_id):
     with get_database_session() as session:
         consultant_db = _load_consultant_with_relations(session, consultant_id)
         practices = session.query(Practice).filter(Practice.actif).all()
-        
+
         # Charger informations du Business Manager
         bm_nom_complet, bm_email = _extract_business_manager_info(consultant_db)
-        
+
         # Préparer les options
         practice_options = {p.nom: p.id for p in practices}
         current_practice_id = _get_current_practice_id(consultant_db)
 
-        return consultant_db, practice_options, current_practice_id, bm_nom_complet, bm_email
+        return (
+            consultant_db,
+            practice_options,
+            current_practice_id,
+            bm_nom_complet,
+            bm_email,
+        )
 
 
 def _load_consultant_with_relations(session, consultant_id):
@@ -558,7 +564,7 @@ def _display_consultant_status(consultant_db):
 def _process_consultant_form_submission(consultant, form_data):
     """Traite la soumission du formulaire de modification d'un consultant"""
     prenom, nom, email = form_data["prenom"], form_data["nom"], form_data["email"]
-    
+
     if not prenom or not nom or not email:
         st.error("❌ Veuillez remplir tous les champs obligatoires (*)")
         return False
@@ -2143,7 +2149,12 @@ def _render_professional_profile_section():
     with col5:
         grade = st.selectbox(
             "🎯 Grade",
-            options=["Junior", "Confirmé", "Consultant Manager", "Directeur de Practice"],
+            options=[
+                "Junior",
+                "Confirmé", 
+                "Consultant Manager",
+                "Directeur de Practice",
+            ],
             index=0,
             help="Niveau d'expérience du consultant",
         )
@@ -2159,10 +2170,12 @@ def _render_professional_profile_section():
     return {"grade": grade, "type_contrat": type_contrat}
 
 
-def _process_consultant_creation(basic_data, company_data, professional_data, notes, practice_options):
+def _process_consultant_creation(
+    basic_data, company_data, professional_data, notes, practice_options
+):
     """Traite la création du consultant"""
     prenom, nom, email = basic_data["prenom"], basic_data["nom"], basic_data["email"]
-    
+
     if not prenom or not nom or not email:
         st.error("❌ Veuillez remplir tous les champs obligatoires (*)")
         return
@@ -2189,13 +2202,17 @@ def _process_consultant_creation(basic_data, company_data, professional_data, no
         st.error(f"❌ Erreur lors de la création: {e}")
 
 
-def _build_consultant_data(basic_data, company_data, professional_data, notes, practice_options):
+def _build_consultant_data(
+    basic_data, company_data, professional_data, notes, practice_options
+):
     """Construit les données du consultant à créer"""
     return {
         "prenom": basic_data["prenom"].strip(),
         "nom": basic_data["nom"].strip(),
         "email": basic_data["email"].strip().lower(),
-        "telephone": (basic_data["telephone"].strip() if basic_data["telephone"] else None),
+        "telephone": (
+            basic_data["telephone"].strip() if basic_data["telephone"] else None
+        ),
         "salaire": basic_data["salaire"],
         "disponible": basic_data["disponibilite"],
         "notes": notes.strip() if notes else None,
@@ -2203,9 +2220,13 @@ def _build_consultant_data(basic_data, company_data, professional_data, notes, p
         # Nouveaux champs V1.2
         "societe": company_data["societe"],
         "date_entree_societe": company_data["date_entree"],
-        "date_sortie_societe": company_data["date_sortie"] if company_data["date_sortie"] else None,
+        "date_sortie_societe": (
+            company_data["date_sortie"] if company_data["date_sortie"] else None
+        ),
         "date_premiere_mission": (
-            company_data["date_premiere_mission"] if company_data["date_premiere_mission"] else None
+            company_data["date_premiere_mission"]
+            if company_data["date_premiere_mission"]
+            else None
         ),
         # Nouveaux champs V1.2.1
         "grade": professional_data["grade"],
