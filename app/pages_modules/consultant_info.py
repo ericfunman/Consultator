@@ -18,6 +18,7 @@ MSG_ERREUR_HISTORIQUE = "⚠️ Impossible de charger l'historique des salaires"
 MSG_ERREUR_HISTORIQUE_DETAILLE = "❌ Erreur lors du chargement de l'historique détaillé"
 MSG_ERREUR_MODIFICATION = "❌ Erreur lors de la modification"
 MSG_ERREUR_RAPPORT = "❌ Erreur lors de la génération du rapport"
+MSG_ERREUR_MISE_A_JOUR = "❌ Erreur lors de la mise à jour"
 MSG_AUCUN_HISTORIQUE = "ℹ️ Aucun historique salarial trouvé"
 MSG_SUCCESS_MODIFICATION = "✅ Informations mises à jour avec succès !"
 
@@ -361,7 +362,7 @@ def show_edit_info_form(consultant):
                     del st.session_state.edit_consultant_info
                     st.rerun()
                 else:
-                    st.error("❌ Erreur lors de la mise à jour")
+                    st.error(MSG_ERREUR_MISE_A_JOUR)
             else:
                 st.error("❌ Veuillez corriger les erreurs")
 
@@ -449,7 +450,7 @@ def update_consultant_info(consultant_id: int, data: dict) -> bool:
             return True
 
     except Exception as e:
-        st.error(f"❌ Erreur lors de la mise à jour: {e}")
+        st.error(f"{MSG_ERREUR_MISE_A_JOUR}: {e}")
         return False
 
 
@@ -499,4 +500,4 @@ def generate_consultant_report(consultant):
         st.success("✅ Rapport généré avec succès !")
 
     except Exception as e:
-        st.error(f"❌ Erreur lors de la génération du rapport: {e}")
+        st.error(f"{MSG_ERREUR_RAPPORT}: {e}")

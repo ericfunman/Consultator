@@ -9,6 +9,7 @@ import re
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 
 import pdfplumber
 import pypdf as PyPDF2
@@ -1489,7 +1490,7 @@ class DocumentAnalyzer:
         return missions
 
     @staticmethod
-    def _try_extract_mission_from_lines(lines: list, index: int) -> Dict:
+    def _try_extract_mission_from_lines(lines: list, index: int) -> Optional[Dict]:
         """Tente d'extraire une mission à partir de 3 lignes consécutives"""
         line1 = lines[index].strip()
         line2 = lines[index + 1].strip()

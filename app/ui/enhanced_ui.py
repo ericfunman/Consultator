@@ -61,13 +61,18 @@ class AdvancedUIFilters:
         st.sidebar.subheader("📊 Statut")
 
         col1, col2 = st.sidebar.columns(2)
+        
+        def format_availability(availability_value):
+            """Formate la valeur de disponibilité pour l'affichage"""
+            if availability_value is None:
+                return "Tous"
+            return "Disponible" if availability_value else "Occupé"
+        
         with col1:
             self.filters["availability_filter"] = st.sidebar.selectbox(
                 "Disponibilité",
                 options=[None, True, False],
-                format_func=lambda x: (
-                    "Tous" if x is None else ("Disponible" if x else "Occupé")
-                ),
+                format_func=format_availability,
                 help="Filtrer par disponibilité",
             )
 
@@ -580,10 +585,7 @@ def _handle_consultant_selection(event, data, enhancer):
 
 def _execute_consultant_action(action, selected_consultant):
     """Exécute l'action sélectionnée sur le consultant"""
-    if action == "view":
-        st.session_state.view_consultant_profile = selected_consultant["id"]
-        st.rerun()
-    elif action == "edit":
+    if action in ["view", "edit"]:
         st.session_state.view_consultant_profile = selected_consultant["id"]
         st.rerun()
     elif action == "delete":

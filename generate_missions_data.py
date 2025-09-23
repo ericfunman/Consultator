@@ -6,7 +6,7 @@ Crée des missions réalistes avec des clients, dates, et rémunérations
 import os
 import sys
 import random
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 from typing import List, Dict
 
 # Ajouter le chemin de l'application

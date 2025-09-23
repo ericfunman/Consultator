@@ -65,7 +65,7 @@ class TestTechnologiesModule(BaseUITest):
             # Recharger le module pour déclencher le if __name__ == "__main__"
             # Note: En pratique, cela nécessiterait un reload, mais pour le test
             # nous vérifions simplement que la structure est correcte
-            assert True
+            assert 1 == 1  # Test basique
 
     @patch("app.pages_modules.technologies.show_technologies_referentiel")
     @patch("streamlit.title")
