@@ -54,18 +54,22 @@ class TestShowFunction:
         with patch("streamlit.session_state", {}), \
              patch("streamlit.title") as mock_title, \
              patch("streamlit.tabs") as mock_tabs, \
-             patch("app.pages_modules.consultants.show_cv_analysis_fullwidth") as mock_cv, \
-             patch("app.pages_modules.consultants.show_consultant_profile") as mock_profile, \
-             patch("app.pages_modules.consultants.show_consultants_list") as mock_list, \
-             patch("app.pages_modules.consultants.imports_ok", True) as mock_imports_ok:
+             patch("streamlit.columns") as mock_columns, \
+             patch("app.pages_modules.consultants.show_cv_analysis_fullwidth"), \
+             patch("app.pages_modules.consultants.show_consultant_profile"), \
+             patch("app.pages_modules.consultants.show_consultants_list"), \
+             patch("app.pages_modules.consultants.imports_ok", True):
 
             # Configure mock_tabs to return a tuple of 2 mock objects for unpacking
             mock_tab1 = MagicMock()
             mock_tab2 = MagicMock()
             mock_tabs.return_value = (mock_tab1, mock_tab2)
 
-            # Ensure the mock is properly configured before calling
-            assert mock_tabs.return_value == (mock_tab1, mock_tab2)
+            # Configure mock_columns to return a tuple of mock objects for unpacking
+            # This handles various calls to st.columns() with different numbers of columns
+            def mock_columns_func(n):
+                return tuple(MagicMock() for _ in range(n))
+            mock_columns.side_effect = mock_columns_func
 
             consultants.show()
 
@@ -276,7 +280,13 @@ class TestConsultantInfo:
              patch("app.pages_modules.consultants._render_company_history_fields"), \
              patch("app.pages_modules.consultants._render_professional_profile_fields"), \
              patch("app.pages_modules.consultants._display_consultant_status"), \
-             patch("app.pages_modules.consultants._manage_consultant_salary_history") as mock_manage_salary:
+             patch("app.pages_modules.consultants._manage_consultant_salary_history") as mock_manage_salary, \
+             patch("streamlit.columns") as mock_columns:  # Ajouter le mock pour st.columns
+
+            # Mock st.columns to return a tuple
+            mock_col1 = MagicMock()
+            mock_col2 = MagicMock()
+            mock_columns.return_value = (mock_col1, mock_col2)
 
             # Mock the return value of _load_consultant_for_edit to avoid database calls
             mock_load.return_value = (mock_consultant, {}, 1, "Manager Test", "manager@test.com")

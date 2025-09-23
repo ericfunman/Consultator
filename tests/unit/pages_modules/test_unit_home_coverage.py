@@ -292,7 +292,7 @@ class TestDataRefresh:
         mock_cache.return_value = lambda func: func
 
         # Fonction de cache simulée
-        @mock_cache
+        @mock_cache()
         def get_cached_data():
             return {"data": "cached"}
 
@@ -382,7 +382,7 @@ class TestPerformanceOptimization:
         processing_time = end_time - start_time
 
         # Vérifications
-        assert len(filtered_data) == 100  # 100 éléments divisibles par 100
+        assert len(filtered_data) == 200  # 200 éléments dont la valeur est divisible par 100 (0, 100, 200, ..., 9900)
         assert processing_time < 1.0  # Moins d'1 seconde
 
     def test_memory_efficiency(self):

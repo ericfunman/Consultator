@@ -13,10 +13,9 @@ def test_basic_import():
         import json
 
         print("[OK] Import JSON reussi")
-        return True
     except ImportError as e:
         print(f"[ERROR] Erreur import JSON: {e}")
-        return False
+        raise
 
 
 def test_project_structure():
@@ -30,12 +29,10 @@ def test_project_structure():
                 print(f"[OK] Fichier trouve: {file_path}")
             else:
                 print(f"[ERROR] Fichier manquant: {file_path}")
-                return False
-
-        return True
+                raise AssertionError(f"Fichier manquant: {file_path}")
     except Exception as e:
         print(f"[ERROR] Erreur verification structure: {e}")
-        return False
+        raise
 
 
 def test_python_version():
@@ -43,10 +40,9 @@ def test_python_version():
     try:
         version = sys.version_info
         print(f"[OK] Python {version.major}.{version.minor}.{version.micro}")
-        return True
     except Exception as e:
         print(f"[ERROR] Erreur version Python: {e}")
-        return False
+        raise
 
 
 def main():
@@ -92,7 +88,7 @@ def main():
         return 0
     else:
         print("   ECHEC DE CERTAINS TESTS !")
-        return 1
+        raise AssertionError("Certains tests ont échoué")
 
 
 if __name__ == "__main__":

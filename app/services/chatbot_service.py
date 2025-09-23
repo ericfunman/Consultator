@@ -65,8 +65,12 @@ class ChatbotService:
         except Exception as e:
             print(f"Erreur de session dans le chatbot: {e}")
             # Retry avec une nouvelle session
-            with get_database_session() as session:
-                return query_func(session)
+            try:
+                with get_database_session() as session:
+                    return query_func(session)
+            except Exception as e2:
+                print(f"Erreur lors du retry: {e2}")
+                return None
 
     def _route_question_to_handler(self, intent: str, entities: dict) -> Dict[str, Any]:
         """Route la question vers le bon handler selon l'intention"""
