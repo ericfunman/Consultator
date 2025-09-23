@@ -61,13 +61,13 @@ class AdvancedUIFilters:
         st.sidebar.subheader("📊 Statut")
 
         col1, col2 = st.sidebar.columns(2)
-        
+
         def format_availability(availability_value):
             """Formate la valeur de disponibilité pour l'affichage"""
             if availability_value is None:
                 return "Tous"
             return "Disponible" if availability_value else "Occupé"
-        
+
         with col1:
             self.filters["availability_filter"] = st.sidebar.selectbox(
                 "Disponibilité",
