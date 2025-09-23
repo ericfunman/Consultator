@@ -35,10 +35,12 @@ class TestConsultantServiceCoverage:
         """Test récupération objets consultants - succès"""
         # Setup mock DB
         mock_db = self.setup_database_mock(mock_session)
-        
+
         # Mock pour la requête - liste itérable de consultants
         consultants_list = [self.mock_consultant]
-        mock_db.query.return_value.options.return_value.offset.return_value.limit.return_value.all.return_value = consultants_list
+        mock_db.query.return_value.options.return_value.offset.return_value.limit.return_value.all.return_value = (
+            consultants_list
+        )
 
         # Execution
         result = ConsultantService.get_all_consultants_objects()
@@ -47,8 +49,6 @@ class TestConsultantServiceCoverage:
         assert result == [self.mock_consultant]
         # Vérifier que expunge a été appelé
         mock_db.expunge.assert_called()
-
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -73,7 +73,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == [self.mock_consultant]
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -95,7 +94,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert isinstance(result, list)
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -115,7 +113,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == 42
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -137,7 +134,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == self.mock_consultant
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -159,7 +155,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result is None
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -181,7 +176,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == self.mock_consultant
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -218,7 +212,6 @@ class TestConsultantServiceCoverage:
         mock_db.commit.assert_called()
         # Note: Les fonctions utilisent maintenant print() au lieu de streamlit
         # Note: La fonction utilise maintenant print() au lieu de streamlit
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -242,7 +235,7 @@ class TestConsultantServiceCoverage:
         result = ConsultantService.create_consultant(data)
 
         # Vérifications
-        assert result is False    
+        assert result is False
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -271,7 +264,7 @@ class TestConsultantServiceCoverage:
         # Vérifications
         assert result is True
         mock_db.commit.assert_called()
-        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit    
+        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -293,7 +286,7 @@ class TestConsultantServiceCoverage:
         result = ConsultantService.update_consultant(999, data)
 
         # Vérifications
-        assert result is False    
+        assert result is False
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -320,7 +313,7 @@ class TestConsultantServiceCoverage:
         assert result is True
         mock_db.delete.assert_called_with(self.mock_consultant)
         mock_db.commit.assert_called()
-        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit    
+        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -339,7 +332,7 @@ class TestConsultantServiceCoverage:
         result = ConsultantService.delete_consultant(999)
 
         # Vérifications
-        assert result is False    
+        assert result is False
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -361,7 +354,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == [self.mock_consultant]
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -383,7 +375,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result == [self.mock_consultant]
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -406,7 +397,6 @@ class TestConsultantServiceCoverage:
         assert isinstance(result, dict)
         assert "total_consultants" in result
         assert "available_consultants" in result
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -430,7 +420,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert isinstance(result, list)
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -454,7 +443,6 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert isinstance(result, list)
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -476,6 +464,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert isinstance(result, list)
+
     def test_determine_skill_category_technique(self):
         """Test détermination catégorie compétence - technique"""
         result = ConsultantService._determine_skill_category("Python", "Technique")
@@ -490,8 +479,6 @@ class TestConsultantServiceCoverage:
         """Test détermination catégorie compétence - défaut"""
         result = ConsultantService._determine_skill_category("Unknown", "Unknown")
         assert result == "Technique"  # Corrigé selon l'implémentation réelle
-
-    
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -533,7 +520,7 @@ class TestConsultantServiceCoverage:
         # Vérifications
         assert result is True
         mock_db.commit.assert_called()
-        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit    
+        # Note: Les fonctions utilisent maintenant print() au lieu de streamlit
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
@@ -556,7 +543,7 @@ class TestConsultantServiceCoverage:
 
         # Vérifications
         assert result is False
-        
+
     def test_consultant_service_static_methods_exist(self):
         """Test que les méthodes statiques existent et sont appelables"""
         # Test d'existence des méthodes principales

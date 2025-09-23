@@ -7,6 +7,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from app.services.practice_service import PracticeService
 
+
 class TestPracticeServiceOptimized:
     """Tests optimisés pour PracticeService avec mocking corrigé"""
 
@@ -114,7 +115,9 @@ class TestPracticeServiceOptimized:
         mock_session.return_value = mock_db
         mock_db.close = Mock()
         # Mock pour create_practice
-        mock_db.query.return_value.filter.return_value.first.return_value = None  # Pas d\'existing
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            None  # Pas d\'existing
+        )
         mock_db.add = Mock()
         mock_db.commit = Mock()
         # Mock de la nouvelle practice créée
@@ -231,9 +234,15 @@ class TestPracticeServiceOptimized:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.join.return_value.all.return_value = [self.mock_consultant]
-        mock_db.query.return_value.filter.return_value.all.return_value = [self.mock_consultant]
-        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = [self.mock_consultant]
+        mock_db.query.return_value.filter.return_value.join.return_value.all.return_value = [
+            self.mock_consultant
+        ]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            self.mock_consultant
+        ]
+        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = [
+            self.mock_consultant
+        ]
 
         result = PracticeService.get_consultants_by_practice(1)
 
@@ -247,9 +256,13 @@ class TestPracticeServiceOptimized:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.join.return_value.all.return_value = []
+        mock_db.query.return_value.filter.return_value.join.return_value.all.return_value = (
+            []
+        )
         mock_db.query.return_value.filter.return_value.all.return_value = []
-        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = []
+        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = (
+            []
+        )
 
         result = PracticeService.get_consultants_by_practice(1)
 
@@ -280,10 +293,19 @@ class TestPracticeServiceOptimized:
         mock_session.return_value = mock_db
         mock_db.close = Mock()
         # Mock simple pour get_practice_statistics
-        mock_db.query.return_value.filter.return_value.all.return_value = [self.mock_practice]
-        mock_db.query.return_value.join.return_value.all.return_value = [self.mock_consultant]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            self.mock_practice
+        ]
+        mock_db.query.return_value.join.return_value.all.return_value = [
+            self.mock_consultant
+        ]
         # Différents count() selon le contexte: practice.count=3, consultants_actifs=2, sans_practice=0
-        mock_db.query.return_value.filter.return_value.count.side_effect = [3, 2, 0, 0]  # cycle des appels
+        mock_db.query.return_value.filter.return_value.count.side_effect = [
+            3,
+            2,
+            0,
+            0,
+        ]  # cycle des appels
         # Mock avg salary
         mock_db.query.return_value.filter.return_value.scalar.return_value = 55000
 
@@ -302,7 +324,9 @@ class TestPracticeServiceOptimized:
         mock_session.return_value = mock_db
         mock_db.close = Mock()
         # Mock zero consultants mais practices existe
-        mock_db.query.return_value.filter.return_value.all.return_value = [self.mock_practice]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            self.mock_practice
+        ]
         mock_db.query.return_value.filter.return_value.count.return_value = 0
         mock_db.query.return_value.filter.return_value.scalar.return_value = None
 
@@ -365,7 +389,7 @@ class TestPracticeServiceOptimized:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        # Mock practices existantes 
+        # Mock practices existantes
         mock_db.query.return_value.all.return_value = [self.mock_practice]
 
         result = PracticeService.init_default_practices()
@@ -405,9 +429,13 @@ class TestPracticeServiceOptimized:
         # Pour get_practice_by_id avec None
         mock_db.query.return_value.filter.return_value.first.return_value = None
         # Pour get_consultants_by_practice avec None (toutes les practices) - configuration complète
-        mock_db.query.return_value.filter.return_value.all.return_value = []  # Pas de practices actives
-        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = []  # Consultants
-        
+        mock_db.query.return_value.filter.return_value.all.return_value = (
+            []
+        )  # Pas de practices actives
+        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = (
+            []
+        )  # Consultants
+
         # Test get_practice_by_id avec ID None
         result = PracticeService.get_practice_by_id(None)
         assert result is None  # Mock configuré pour retourner None
@@ -444,7 +472,9 @@ class TestPracticeServiceOptimized:
         mock_session.return_value = mock_db
         mock_db.close = Mock()
         # Mock complex scenarios
-        mock_db.query.return_value.filter.return_value.join.return_value.all.return_value = []
+        mock_db.query.return_value.filter.return_value.join.return_value.all.return_value = (
+            []
+        )
         mock_db.query.return_value.count.return_value = 0
         # Test avec multiples practices
         mock_practices = [Mock() for _ in range(10)]
@@ -465,8 +495,12 @@ class TestPracticeServiceOptimized:
             mock_consultants
         )
         # Configuration pour get_consultants_by_practice avec practice_id spécifique
-        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = mock_consultants
-        mock_db.query.return_value.filter.return_value.first.return_value = Mock(nom="Test Practice")
+        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = (
+            mock_consultants
+        )
+        mock_db.query.return_value.filter.return_value.first.return_value = Mock(
+            nom="Test Practice"
+        )
 
         result = PracticeService.get_consultants_by_practice(1)
         assert len(result) == 1  # 1 practice dans le dict

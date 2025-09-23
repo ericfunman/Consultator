@@ -19,22 +19,30 @@ class TestChatbotServiceCoverage(TestCase):
         mock_session = Mock()
         mock_session.__enter__ = Mock(return_value=mock_session)
         mock_session.__exit__ = Mock(return_value=None)
-        
+
         # Configuration des mocks de base
         mock_session.query.return_value.all.return_value = []
         mock_session.query.return_value.first.return_value = None
         mock_session.query.return_value.count.return_value = 0
-        mock_session.query.return_value.filter.return_value = mock_session.query.return_value
-        mock_session.query.return_value.order_by.return_value = mock_session.query.return_value
-        mock_session.query.return_value.limit.return_value = mock_session.query.return_value
-        mock_session.query.return_value.offset.return_value = mock_session.query.return_value
+        mock_session.query.return_value.filter.return_value = (
+            mock_session.query.return_value
+        )
+        mock_session.query.return_value.order_by.return_value = (
+            mock_session.query.return_value
+        )
+        mock_session.query.return_value.limit.return_value = (
+            mock_session.query.return_value
+        )
+        mock_session.query.return_value.offset.return_value = (
+            mock_session.query.return_value
+        )
         mock_session.add = Mock()
         mock_session.commit = Mock()
         mock_session.rollback = Mock()
         mock_session.close = Mock()
-        
+
         mock_session_func.return_value = mock_session
-        
+
         try:
             yield mock_session
         finally:

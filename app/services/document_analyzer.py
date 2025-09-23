@@ -902,9 +902,7 @@ class DocumentAnalyzer:
         client_words = known_client.lower().split()
         if len(client_words) > 1:
             pattern = (
-                r"\b"
-                + r"\s+".join(re.escape(word) for word in client_words)
-                + r"\b"
+                r"\b" + r"\s+".join(re.escape(word) for word in client_words) + r"\b"
             )
             return bool(re.search(pattern, block, re.IGNORECASE))
         return False
@@ -913,7 +911,7 @@ class DocumentAnalyzer:
     def _find_new_client_in_block(block: str) -> str:
         """Cherche de nouveaux clients avec patterns dans le bloc"""
         client_patterns = DocumentAnalyzer._get_client_patterns()
-        
+
         for pattern in client_patterns:
             matches = re.finditer(pattern, block, re.IGNORECASE | re.MULTILINE)
             for match in matches:
@@ -956,12 +954,22 @@ class DocumentAnalyzer:
         """Vérifie si le nom de client est valide"""
         if not (3 < len(client) < 60):
             return False
-        
+
         # Filtre pour éviter les faux positifs
         excluded_words = [
-            "particulier", "spécifique", "général", "simple", "basique",
-            "standard", "classique", "ordinaire", "commun", "habituel",
-            "typique", "normal", "banal",
+            "particulier",
+            "spécifique",
+            "général",
+            "simple",
+            "basique",
+            "standard",
+            "classique",
+            "ordinaire",
+            "commun",
+            "habituel",
+            "typique",
+            "normal",
+            "banal",
         ]
         client_lower = client.lower()
         return not any(word in client_lower for word in excluded_words)
@@ -991,7 +999,9 @@ class DocumentAnalyzer:
         for sentence in sentences:
             sentence = sentence.strip()
             if 20 < len(sentence) < 500:
-                score = DocumentAnalyzer._score_sentence(sentence, mission_keywords, action_verbs)
+                score = DocumentAnalyzer._score_sentence(
+                    sentence, mission_keywords, action_verbs
+                )
                 if score > 0:
                     relevant_sentences.append((sentence, score))
 
@@ -1001,22 +1011,47 @@ class DocumentAnalyzer:
     def _get_mission_keywords() -> list:
         """Retourne les mots-clés de mission"""
         return [
-            "mission", "projet", "développement", "conception", "réalisation",
-            "mise en place", "création", "analyse", "étude", "design",
-            "architecture", "implémentation", "déploiement", "maintenance",
-            "support", "optimisation", "migration", "formation", "conseil",
-            "audit", "expertise", "accompagnement", "pilotage",
+            "mission",
+            "projet",
+            "développement",
+            "conception",
+            "réalisation",
+            "mise en place",
+            "création",
+            "analyse",
+            "étude",
+            "design",
+            "architecture",
+            "implémentation",
+            "déploiement",
+            "maintenance",
+            "support",
+            "optimisation",
+            "migration",
+            "formation",
+            "conseil",
+            "audit",
+            "expertise",
+            "accompagnement",
+            "pilotage",
         ]
 
     @staticmethod
     def _get_action_verbs() -> list:
         """Retourne les verbes d'action"""
         return [
-            "développé", "créé", "conçu", "réalisé", "mis en place", "déployé",
+            "développé",
+            "créé",
+            "conçu",
+            "réalisé",
+            "mis en place",
+            "déployé",
         ]
 
     @staticmethod
-    def _score_sentence(sentence: str, mission_keywords: list, action_verbs: list) -> int:
+    def _score_sentence(
+        sentence: str, mission_keywords: list, action_verbs: list
+    ) -> int:
         """Calcule le score d'une phrase pour la pertinence de mission"""
         sentence_lower = sentence.lower()
         score = 0
@@ -1330,11 +1365,21 @@ class DocumentAnalyzer:
         )
 
         # Ajouter chaque section
-        DocumentAnalyzer._add_missions_section(preview, analysis_data.get("missions", []))
-        DocumentAnalyzer._add_technical_skills_section(preview, analysis_data.get("langages_techniques", []))
-        DocumentAnalyzer._add_functional_skills_section(preview, analysis_data.get("competences_fonctionnelles", []))
-        DocumentAnalyzer._add_general_info_section(preview, analysis_data.get("informations_generales", {}))
-        DocumentAnalyzer._add_text_preview_section(preview, analysis_data.get("texte_brut", ""))
+        DocumentAnalyzer._add_missions_section(
+            preview, analysis_data.get("missions", [])
+        )
+        DocumentAnalyzer._add_technical_skills_section(
+            preview, analysis_data.get("langages_techniques", [])
+        )
+        DocumentAnalyzer._add_functional_skills_section(
+            preview, analysis_data.get("competences_fonctionnelles", [])
+        )
+        DocumentAnalyzer._add_general_info_section(
+            preview, analysis_data.get("informations_generales", {})
+        )
+        DocumentAnalyzer._add_text_preview_section(
+            preview, analysis_data.get("texte_brut", "")
+        )
 
         return "\n".join(preview)
 
@@ -1456,11 +1501,15 @@ class DocumentAnalyzer:
 
         # Traitement spécial pour Quanteam
         if line1.lower() == "quanteam":
-            return DocumentAnalyzer._extract_quanteam_mission(lines, index, line2, line3)
+            return DocumentAnalyzer._extract_quanteam_mission(
+                lines, index, line2, line3
+            )
 
         # Autres entreprises
         if DocumentAnalyzer._is_known_company(line1):
-            return DocumentAnalyzer._extract_standard_mission(lines, index, line1, line2, line3)
+            return DocumentAnalyzer._extract_standard_mission(
+                lines, index, line1, line2, line3
+            )
 
         return None
 
@@ -1470,11 +1519,11 @@ class DocumentAnalyzer:
         # Ligne entreprise non vide
         if not line1:
             return False
-        
+
         # Ligne date avec année
         if not re.match(r"\w+\s+\d{4}\s*[–-]", line2):
             return False
-        
+
         # Ligne poste avec mots-clés
         role_keywords = ["directeur", "chef", "manager", "lead", "responsable"]
         return any(keyword in line3.lower() for keyword in role_keywords)
@@ -1488,18 +1537,20 @@ class DocumentAnalyzer:
             for known_client in DocumentAnalyzer.CLIENTS_CONNUS
         ):
             return True
-        
+
         # Nom court probable (3 mots ou moins)
         return len(company_name.split()) <= 3
 
     @staticmethod
-    def _extract_quanteam_mission(lines: list, index: int, date_line: str, role_line: str) -> Dict:
+    def _extract_quanteam_mission(
+        lines: list, index: int, date_line: str, role_line: str
+    ) -> Dict:
         """Traite spécifiquement les missions Quanteam"""
         st.success(f"🎯 Quanteam détecté! Date: '{date_line}', Poste: '{role_line}'")
 
         # Parser la date Quanteam
         date_debut, date_fin = DocumentAnalyzer._parse_quanteam_date(date_line)
-        
+
         # Récupérer la description
         description = DocumentAnalyzer._get_mission_description(lines, index + 3, 7)
 
@@ -1523,32 +1574,43 @@ class DocumentAnalyzer:
             return "", ""
 
         month, year, end_info = date_match.groups()
-        
+
         # Convertir le mois
         month_num = DocumentAnalyzer._get_month_number(month)
         date_debut = f"{year}-{month_num}-01"
         date_fin = "" if "aujourd" in end_info.lower() else f"{year}-12-31"
-        
+
         return date_debut, date_fin
 
     @staticmethod
     def _get_month_number(month_name: str) -> str:
         """Convertit un nom de mois en numéro"""
         months = {
-            "janvier": "01", "février": "02", "mars": "03", "avril": "04",
-            "mai": "05", "juin": "06", "juillet": "07", "août": "08",
-            "septembre": "09", "octobre": "10", "novembre": "11", "décembre": "12",
+            "janvier": "01",
+            "février": "02",
+            "mars": "03",
+            "avril": "04",
+            "mai": "05",
+            "juin": "06",
+            "juillet": "07",
+            "août": "08",
+            "septembre": "09",
+            "octobre": "10",
+            "novembre": "11",
+            "décembre": "12",
         }
         return months.get(month_name.lower(), "01")
 
     @staticmethod
-    def _extract_standard_mission(lines: list, index: int, company: str, date_line: str, role_line: str) -> Dict:
+    def _extract_standard_mission(
+        lines: list, index: int, company: str, date_line: str, role_line: str
+    ) -> Dict:
         """Traite les missions d'entreprises standard"""
         st.info(f"🔍 Entreprise détectée: '{company}' | '{date_line}' | '{role_line}'")
 
         # Parser la date simple
         date_debut, date_fin = DocumentAnalyzer._parse_standard_date(date_line)
-        
+
         # Récupérer la description
         description = DocumentAnalyzer._get_mission_description(lines, index + 3, 5)
 
@@ -1562,8 +1624,10 @@ class DocumentAnalyzer:
         }
 
         # Extraire les technologies de la description
-        mission["langages_techniques"] = DocumentAnalyzer._extract_technical_skills(description)
-        
+        mission["langages_techniques"] = DocumentAnalyzer._extract_technical_skills(
+            description
+        )
+
         return mission
 
     @staticmethod
@@ -1576,7 +1640,7 @@ class DocumentAnalyzer:
         year = year_match.group(1)
         date_debut = f"{year}-01-01"
         date_fin = f"{year}-12-31" if "aujourd" not in date_line.lower() else ""
-        
+
         return date_debut, date_fin
 
     @staticmethod
@@ -1584,7 +1648,7 @@ class DocumentAnalyzer:
         """Récupère la description de mission depuis les lignes suivantes"""
         description_lines = []
         end_index = min(start_index + max_lines, len(lines))
-        
+
         for j in range(start_index, end_index):
             if j < len(lines) and lines[j].strip():
                 # Arrêter si on trouve une nouvelle mission

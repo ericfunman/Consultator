@@ -91,8 +91,8 @@ class SimpleDocumentAnalyzer:
     def extract_text_from_file(file_path: str) -> str:
         """Extraction simple de texte depuis un fichier"""
         try:
-            file_extension = file_path.lower().split('.')[-1]
-            
+            file_extension = file_path.lower().split(".")[-1]
+
             if file_extension == "txt":
                 return SimpleDocumentAnalyzer._extract_from_txt(file_path)
             elif file_extension == "pdf":

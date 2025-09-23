@@ -82,7 +82,7 @@ class TestHelpersMaxCoverage:
         mock_date = Mock()
         mock_date.strftime.side_effect = ValueError("Invalid date")
         # Faire en sorte que isinstance(mock_date, datetime) soit True
-        with patch('app.utils.helpers.isinstance') as mock_isinstance:
+        with patch("app.utils.helpers.isinstance") as mock_isinstance:
             mock_isinstance.return_value = True
             result = format_date(mock_date)
             assert result == ""
@@ -204,4 +204,6 @@ class TestHelpersMaxCoverage:
         """Test arrondi types invalides"""
         # La fonction devrait capturer InvalidOperation et retourner value or 0.0
         result = round_to_nearest("invalid", 5)
-        assert result == "invalid" or result == 0.0  # Selon implémentation except clause
+        assert (
+            result == "invalid" or result == 0.0
+        )  # Selon implémentation except clause

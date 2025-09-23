@@ -369,7 +369,7 @@ class TestBusinessManagersCoverage:
                 mock_session.add.called or mock_st.error.called
             )  # Accepter soit succès soit erreur
 
-    @patch('app.pages_modules.business_managers.get_database_session')
+    @patch("app.pages_modules.business_managers.get_database_session")
     @patch("app.pages_modules.business_managers.st")
     def test_show_bm_assignments_history_with_data(
         self,

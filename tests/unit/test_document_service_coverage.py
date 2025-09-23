@@ -220,9 +220,13 @@ class TestDocumentServiceCoverage:
 
     def test_extract_text_from_pdf_success(self):
         """Test extraction texte PDF avec succès"""
-        with patch.object(DocumentService, '_extract_text_from_pdf', return_value="Page 1 content\nPage 2 content\n") as mock_extract:
+        with patch.object(
+            DocumentService,
+            "_extract_text_from_pdf",
+            return_value="Page 1 content\nPage 2 content\n",
+        ) as mock_extract:
             result = DocumentService._extract_text_from_pdf("test.pdf")
-            
+
             assert result == "Page 1 content\nPage 2 content\n"
             mock_extract.assert_called_once_with("test.pdf")
 

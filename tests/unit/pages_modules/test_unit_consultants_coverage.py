@@ -57,7 +57,14 @@ class TestShowFunction:
     @patch("app.pages_modules.consultants.show_consultants_list")
     @patch("app.pages_modules.consultants.imports_ok", True)
     def test_show_basic_structure(
-        self, mock_imports_ok, mock_list, mock_profile, mock_cv, mock_tabs, mock_title, mock_session_state
+        self,
+        mock_imports_ok,
+        mock_list,
+        mock_profile,
+        mock_cv,
+        mock_tabs,
+        mock_title,
+        mock_session_state,
     ):
         """Test de la structure de base de la fonction show"""
         mock_tabs.return_value = [MagicMock(), MagicMock(), MagicMock()]

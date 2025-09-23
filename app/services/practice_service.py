@@ -125,7 +125,9 @@ class PracticeService:
         session = get_session()
         try:
             if practice_id:
-                return PracticeService._get_consultants_for_specific_practice(session, practice_id)
+                return PracticeService._get_consultants_for_specific_practice(
+                    session, practice_id
+                )
             else:
                 return PracticeService._get_all_consultants_by_practice(session)
         except SQLAlchemyError as e:
@@ -137,7 +139,9 @@ class PracticeService:
             session.close()
 
     @staticmethod
-    def _get_consultants_for_specific_practice(session, practice_id: int) -> Dict[str, List[Consultant]]:
+    def _get_consultants_for_specific_practice(
+        session, practice_id: int
+    ) -> Dict[str, List[Consultant]]:
         """Récupère les consultants d'une practice spécifique"""
         from sqlalchemy.orm import joinedload
 
@@ -169,11 +173,15 @@ class PracticeService:
 
         # Consultants par practice
         for practice in practices:
-            consultants = PracticeService._get_practice_consultants(session, practice.id)
+            consultants = PracticeService._get_practice_consultants(
+                session, practice.id
+            )
             result[practice.nom] = consultants
 
         # Consultants sans practice
-        consultants_sans_practice = PracticeService._get_consultants_without_practice(session)
+        consultants_sans_practice = PracticeService._get_consultants_without_practice(
+            session
+        )
         if consultants_sans_practice:
             result["Sans Practice"] = consultants_sans_practice
 
