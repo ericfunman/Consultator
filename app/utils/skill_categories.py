@@ -363,50 +363,58 @@ def get_all_categories():
 
 def search_competences(query, category_type=None):
     """Recherche des compétences par nom"""
-    results = []
-    competences_dict = (
-        COMPETENCES_TECHNIQUES
-        if category_type == "techniques"
-        else COMPETENCES_FONCTIONNELLES
-    )
-
-    if category_type is None:
-        competences_dict = {**COMPETENCES_TECHNIQUES, **COMPETENCES_FONCTIONNELLES}
-
+    competences_dict = _get_competences_dict(category_type)
     query_lower = query.lower()
+    results = []
 
     for category, competences in competences_dict.items():
-        # Chercher aussi dans le nom de la catégorie
+        # Chercher dans le nom de la catégorie
         if query_lower in category.lower():
-            # Ajouter toutes les compétences de cette catégorie
-            for competence in competences:
-                results.append(
-                    {
-                        "nom": competence,
-                        "categorie": category,
-                        "type": category_type
-                        or (
-                            "techniques"
-                            if category in COMPETENCES_TECHNIQUES
-                            else "fonctionnelles"
-                        ),
-                    }
-                )
+            results.extend(_add_all_category_competences(category, competences, category_type))
         else:
             # Chercher dans les compétences individuelles
-            for competence in competences:
-                if query_lower in competence.lower():
-                    results.append(
-                        {
-                            "nom": competence,
-                            "categorie": category,
-                            "type": category_type
-                            or (
-                                "techniques"
-                                if category in COMPETENCES_TECHNIQUES
-                                else "fonctionnelles"
-                            ),
-                        }
-                    )
+            results.extend(_search_individual_competences(query_lower, category, competences, category_type))
 
     return results
+
+
+def _get_competences_dict(category_type):
+    """Retourne le dictionnaire de compétences selon le type"""
+    if category_type == "techniques":
+        return COMPETENCES_TECHNIQUES
+    elif category_type == "fonctionnelles":
+        return COMPETENCES_FONCTIONNELLES
+    else:
+        return {**COMPETENCES_TECHNIQUES, **COMPETENCES_FONCTIONNELLES}
+
+
+def _add_all_category_competences(category, competences, category_type):
+    """Ajoute toutes les compétences d'une catégorie"""
+    results = []
+    for competence in competences:
+        results.append({
+            "nom": competence,
+            "categorie": category,
+            "type": _determine_competence_type(category, category_type),
+        })
+    return results
+
+
+def _search_individual_competences(query_lower, category, competences, category_type):
+    """Cherche dans les compétences individuelles"""
+    results = []
+    for competence in competences:
+        if query_lower in competence.lower():
+            results.append({
+                "nom": competence,
+                "categorie": category,
+                "type": _determine_competence_type(category, category_type),
+            })
+    return results
+
+
+def _determine_competence_type(category, category_type):
+    """Détermine le type de compétence"""
+    if category_type:
+        return category_type
+    return "techniques" if category in COMPETENCES_TECHNIQUES else "fonctionnelles"

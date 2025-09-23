@@ -91,49 +91,71 @@ class SimpleDocumentAnalyzer:
     def extract_text_from_file(file_path: str) -> str:
         """Extraction simple de texte depuis un fichier"""
         try:
-            if file_path.lower().endswith(".txt"):
-                with open(file_path, "r", encoding="utf-8") as f:
-                    return f.read()
-            elif file_path.lower().endswith(".pdf"):
-                try:
-                    import pypdf as PyPDF2
-
-                    with open(file_path, "rb") as f:
-                        reader = PyPDF2.PdfReader(f)
-                        text = ""
-                        for page in reader.pages:
-                            text += page.extract_text()
-                        return text
-                except BaseException:
-                    return "Erreur lors de l'extraction PDF"
-            elif file_path.lower().endswith(".docx"):
-                try:
-                    from docx import Document
-
-                    doc = Document(file_path)
-                    text = []
-                    for paragraph in doc.paragraphs:
-                        text.append(paragraph.text)
-                    return "\n".join(text)
-                except BaseException:
-                    return "Erreur lors de l'extraction DOCX"
-            elif file_path.lower().endswith((".pptx", ".ppt")):
-                try:
-                    from pptx import Presentation
-
-                    prs = Presentation(file_path)
-                    text = []
-                    for slide in prs.slides:
-                        for shape in slide.shapes:
-                            if hasattr(shape, "text"):
-                                text.append(shape.text)
-                    return "\n".join(text)
-                except (OSError, ValueError, TypeError, AttributeError) as e:
-                    return f"Erreur lors de l'extraction PowerPoint: {str(e)}"
+            file_extension = file_path.lower().split('.')[-1]
+            
+            if file_extension == "txt":
+                return SimpleDocumentAnalyzer._extract_from_txt(file_path)
+            elif file_extension == "pdf":
+                return SimpleDocumentAnalyzer._extract_from_pdf(file_path)
+            elif file_extension == "docx":
+                return SimpleDocumentAnalyzer._extract_from_docx(file_path)
+            elif file_extension in ["pptx", "ppt"]:
+                return SimpleDocumentAnalyzer._extract_from_powerpoint(file_path)
             else:
                 return "Format de fichier non supporté"
         except (OSError, ValueError, TypeError, AttributeError) as e:
             return f"Erreur d'extraction: {str(e)}"
+
+    @staticmethod
+    def _extract_from_txt(file_path: str) -> str:
+        """Extraction depuis fichier TXT"""
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read()
+
+    @staticmethod
+    def _extract_from_pdf(file_path: str) -> str:
+        """Extraction depuis fichier PDF"""
+        try:
+            import pypdf as PyPDF2
+
+            with open(file_path, "rb") as f:
+                reader = PyPDF2.PdfReader(f)
+                text = ""
+                for page in reader.pages:
+                    text += page.extract_text()
+                return text
+        except (OSError, ValueError, TypeError, AttributeError, ImportError) as e:
+            return f"Erreur lors de l'extraction PDF: {str(e)}"
+
+    @staticmethod
+    def _extract_from_docx(file_path: str) -> str:
+        """Extraction depuis fichier DOCX"""
+        try:
+            from docx import Document
+
+            doc = Document(file_path)
+            text = []
+            for paragraph in doc.paragraphs:
+                text.append(paragraph.text)
+            return "\n".join(text)
+        except (OSError, ValueError, TypeError, AttributeError, ImportError) as e:
+            return f"Erreur lors de l'extraction DOCX: {str(e)}"
+
+    @staticmethod
+    def _extract_from_powerpoint(file_path: str) -> str:
+        """Extraction depuis fichier PowerPoint"""
+        try:
+            from pptx import Presentation
+
+            prs = Presentation(file_path)
+            text = []
+            for slide in prs.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        text.append(shape.text)
+            return "\n".join(text)
+        except (OSError, ValueError, TypeError, AttributeError, ImportError) as e:
+            return f"Erreur lors de l'extraction PowerPoint: {str(e)}"
 
     @staticmethod
     def analyze_cv_content(text: str, consultant_name: str = "") -> Dict[str, Any]:

@@ -18,6 +18,12 @@ from app.services.cache_service import get_cached_consultants_list
 from app.services.cache_service import get_cached_search_results
 from app.services.consultant_service import ConsultantService
 
+# Constantes pour les labels d'interface
+LABEL_SOCIETE = "Société"
+LABEL_PRENOM = "Prénom"
+LABEL_SALAIRE_ACTUEL = "Salaire Actuel"
+LABEL_ANNEES_EXP = "Années Exp."
+
 
 class AdvancedUIFilters:
     """Classe pour gérer les filtres avancés de l'interface utilisateur"""
@@ -91,7 +97,7 @@ class AdvancedUIFilters:
             )
 
         self.filters["societe_filter"] = st.sidebar.selectbox(
-            "Société",
+            LABEL_SOCIETE,
             options=[None] + self._get_unique_values("societe"),
             help="Filtrer par société",
         )
@@ -328,16 +334,16 @@ class DataTableEnhancer:
         # Renommer les colonnes pour un meilleur affichage
         column_mapping = {
             "id": "ID",
-            "prenom": "Prénom",
+            "prenom": LABEL_PRENOM,
             "nom": "Nom",
             "email": "Email",
             "telephone": "Téléphone",
-            "salaire_actuel": "Salaire Actuel",
+            "salaire_actuel": LABEL_SALAIRE_ACTUEL,
             "disponibilite": "Disponible",
             "practice_name": "Practice",
             "grade": "Grade",
             "type_contrat": "Contrat",
-            "societe": "Société",
+            "societe": LABEL_SOCIETE,
             "experience_annees": "Années Exp.",
             "nb_missions": "Missions",
             "cjm_formatted": "CJM",
@@ -352,15 +358,15 @@ class DataTableEnhancer:
         # Sélectionner les colonnes à afficher
         display_columns = [
             "ID",
-            "Prénom",
+            LABEL_PRENOM,
             "Nom",
             "Email",
-            "Société",
+            LABEL_SOCIETE,
             "Grade",
             "Contrat",
-            "Salaire Actuel",
+            LABEL_SALAIRE_ACTUEL,
             "CJM",
-            "Années Exp.",
+            LABEL_ANNEES_EXP,
             "Statut",
             "Missions",
         ]

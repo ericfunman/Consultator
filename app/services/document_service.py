@@ -176,12 +176,15 @@ class DocumentService:
                         page_text = page.extract_text()
                         if page_text:
                             text += page_text + "\n"
-            except BaseException:
+            except (OSError, IOError, ValueError, Exception) as pdf_error:
                 # Méthode 2: PyPDF2 (fallback)
-                with open(file_path, "rb") as file:
-                    pdf_reader = PyPDF2.PdfReader(file)
-                    for page in pdf_reader.pages:
-                        text += page.extract_text() + "\n"
+                try:
+                    with open(file_path, "rb") as file:
+                        pdf_reader = PyPDF2.PdfReader(file)
+                        for page in pdf_reader.pages:
+                            text += page.extract_text() + "\n"
+                except (OSError, IOError, ValueError) as fallback_error:
+                    return f"Erreur lors de l'extraction PDF: {str(fallback_error)}"
 
             return text.strip()
 

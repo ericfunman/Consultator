@@ -12,6 +12,13 @@ from datetime import date
 from datetime import datetime
 
 
+import pandas as pd
+import streamlit as st
+
+# Constantes pour les formats de date
+DATE_FORMAT_FR = "%d/%m/%Y"
+
+
 def format_currency(amount: float) -> str:
     """
     Formate un montant en euros avec séparateur de milliers
@@ -48,9 +55,9 @@ def format_date(date_obj) -> str:
 
     try:
         if isinstance(date_obj, datetime):
-            return date_obj.strftime("%d/%m/%Y")
+            return date_obj.strftime(DATE_FORMAT_FR)
         elif isinstance(date_obj, date):
-            return date_obj.strftime("%d/%m/%Y")
+            return date_obj.strftime(DATE_FORMAT_FR)
         else:
             return str(date_obj)
     except (ValueError, AttributeError):
@@ -278,7 +285,7 @@ def validate_date(date_str: str) -> bool:
 
     try:
         # Essayer différents formats
-        for fmt in ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"]:
+        for fmt in ["%Y-%m-%d", DATE_FORMAT_FR, "%d-%m-%Y"]:
             try:
                 datetime.strptime(date_str, fmt)
                 return True

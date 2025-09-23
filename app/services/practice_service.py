@@ -122,77 +122,12 @@ class PracticeService:
         practice_id: Optional[int] = None,
     ) -> Dict[str, List[Consultant]]:
         """Récupère les consultants groupés par practice"""
-        from sqlalchemy.orm import joinedload
-
         session = get_session()
         try:
             if practice_id:
-                # Consultants d'une practice spécifique
-                consultants = (
-                    session.query(Consultant)
-                    .options(
-                        joinedload(Consultant.missions),
-                        joinedload(Consultant.competences),
-                    )
-                    .filter(Consultant.practice_id == practice_id)
-                    .order_by(Consultant.nom, Consultant.prenom)
-                    .all()
-                )
-
-                practice = (
-                    session.query(Practice).filter(Practice.id == practice_id).first()
-                )
-                practice_name = practice.nom if practice else "Practice inconnue"
-
-                # Détacher les objets de la session pour éviter les erreurs
-                # DetachedInstance
-                for consultant in consultants:
-                    session.expunge(consultant)
-
-                return {practice_name: consultants}
+                return PracticeService._get_consultants_for_specific_practice(session, practice_id)
             else:
-                # Tous les consultants groupés par practice
-                practices = session.query(Practice).filter(Practice.actif).all()
-                result = {}
-
-                for practice in practices:
-                    consultants = (
-                        session.query(Consultant)
-                        .options(
-                            joinedload(Consultant.missions),
-                            joinedload(Consultant.competences),
-                        )
-                        .filter(Consultant.practice_id == practice.id)
-                        .order_by(Consultant.nom, Consultant.prenom)
-                        .all()
-                    )
-
-                    # Détacher les objets de la session
-                    for consultant in consultants:
-                        session.expunge(consultant)
-
-                    result[practice.nom] = consultants
-
-                # Consultants sans practice
-                consultants_sans_practice = (
-                    session.query(Consultant)
-                    .options(
-                        joinedload(Consultant.missions),
-                        joinedload(Consultant.competences),
-                    )
-                    .filter(Consultant.practice_id.is_(None))
-                    .order_by(Consultant.nom, Consultant.prenom)
-                    .all()
-                )
-
-                # Détacher les objets de la session
-                for consultant in consultants_sans_practice:
-                    session.expunge(consultant)
-
-                if consultants_sans_practice:
-                    result["Sans Practice"] = consultants_sans_practice
-
-                return result
+                return PracticeService._get_all_consultants_by_practice(session)
         except SQLAlchemyError as e:
             st.error(
                 f"Erreur lors de la récupération des consultants par practice: {e}"
@@ -200,6 +135,93 @@ class PracticeService:
             return {}
         finally:
             session.close()
+
+    @staticmethod
+    def _get_consultants_for_specific_practice(session, practice_id: int) -> Dict[str, List[Consultant]]:
+        """Récupère les consultants d'une practice spécifique"""
+        from sqlalchemy.orm import joinedload
+
+        consultants = (
+            session.query(Consultant)
+            .options(
+                joinedload(Consultant.missions),
+                joinedload(Consultant.competences),
+            )
+            .filter(Consultant.practice_id == practice_id)
+            .order_by(Consultant.nom, Consultant.prenom)
+            .all()
+        )
+
+        practice = session.query(Practice).filter(Practice.id == practice_id).first()
+        practice_name = practice.nom if practice else "Practice inconnue"
+
+        # Détacher les objets de la session pour éviter les erreurs DetachedInstance
+        for consultant in consultants:
+            session.expunge(consultant)
+
+        return {practice_name: consultants}
+
+    @staticmethod
+    def _get_all_consultants_by_practice(session) -> Dict[str, List[Consultant]]:
+        """Récupère tous les consultants groupés par practice"""
+        practices = session.query(Practice).filter(Practice.actif).all()
+        result = {}
+
+        # Consultants par practice
+        for practice in practices:
+            consultants = PracticeService._get_practice_consultants(session, practice.id)
+            result[practice.nom] = consultants
+
+        # Consultants sans practice
+        consultants_sans_practice = PracticeService._get_consultants_without_practice(session)
+        if consultants_sans_practice:
+            result["Sans Practice"] = consultants_sans_practice
+
+        return result
+
+    @staticmethod
+    def _get_practice_consultants(session, practice_id: int) -> List[Consultant]:
+        """Récupère les consultants d'une practice donnée"""
+        from sqlalchemy.orm import joinedload
+
+        consultants = (
+            session.query(Consultant)
+            .options(
+                joinedload(Consultant.missions),
+                joinedload(Consultant.competences),
+            )
+            .filter(Consultant.practice_id == practice_id)
+            .order_by(Consultant.nom, Consultant.prenom)
+            .all()
+        )
+
+        # Détacher les objets de la session
+        for consultant in consultants:
+            session.expunge(consultant)
+
+        return consultants
+
+    @staticmethod
+    def _get_consultants_without_practice(session) -> List[Consultant]:
+        """Récupère les consultants sans practice"""
+        from sqlalchemy.orm import joinedload
+
+        consultants = (
+            session.query(Consultant)
+            .options(
+                joinedload(Consultant.missions),
+                joinedload(Consultant.competences),
+            )
+            .filter(Consultant.practice_id.is_(None))
+            .order_by(Consultant.nom, Consultant.prenom)
+            .all()
+        )
+
+        # Détacher les objets de la session
+        for consultant in consultants:
+            session.expunge(consultant)
+
+        return consultants
 
     @staticmethod
     def assign_consultant_to_practice(
