@@ -1570,7 +1570,13 @@ class DocumentAnalyzer:
     @staticmethod
     def _parse_quanteam_date(date_line: str) -> tuple:
         """Parse la date spécifique de Quanteam"""
-        date_match = re.search(r"(\w+)\s{1,3}(\d{4})\s{0,3}[-–]\s{0,3}(\w+)", date_line)
+        # Pattern sécurisé contre ReDoS : quantificateurs spécifiques au lieu de plages
+        month_pattern = r"(?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)"
+        date_match = re.search(
+            rf"({month_pattern})\s+(\d{{4}})\s*[-–]\s*({month_pattern}|aujourd'hui)",
+            date_line,
+            re.IGNORECASE
+        )
         if not date_match:
             return "", ""
 
