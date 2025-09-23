@@ -126,49 +126,45 @@ class TestConsultantCV(BaseIntegrationTest):
         mock_session_instance.add.return_value = None
         mock_session_instance.flush.return_value = None
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             add_skill_from_cv("Python", 1)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     @patch("app.pages_modules.consultant_cv.imports_ok", False)
     def test_add_skill_from_cv_no_imports(self):
         """Test ajout compétence sans imports"""
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             add_skill_from_cv("Python", 1)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_skills_statistics_empty(self):
         """Test statistiques compétences vides"""
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_skills_statistics([])
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_skills_statistics_with_data(self):
         """Test statistiques compétences avec données"""
         skills = ["Python", "Java", "Agile", "Scrum", "Management"]
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_skills_statistics(skills)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_calculate_cv_quality_score_empty(self):
@@ -239,13 +235,12 @@ class TestConsultantCV(BaseIntegrationTest):
         """Test recommandations CV vide"""
         analysis = {}
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_recommendations(analysis)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_recommendations_complete(self):
@@ -270,13 +265,12 @@ class TestConsultantCV(BaseIntegrationTest):
             },
         }
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_recommendations(analysis)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_save_mission_from_cv_success(self):
@@ -329,26 +323,24 @@ class TestConsultantCV(BaseIntegrationTest):
             "description": "Développement d'une application web",
         }
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             analyze_mission_details(mission_data)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_analyze_mission_details_empty(self):
         """Test analyse détails mission vide"""
         mission_data = {}
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             analyze_mission_details(mission_data)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_copy_mission_to_clipboard(self):
@@ -361,13 +353,12 @@ class TestConsultantCV(BaseIntegrationTest):
             "description": "Test description",
         }
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             copy_mission_to_clipboard(mission_data)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_save_cv_analysis_to_profile(self):
@@ -377,13 +368,12 @@ class TestConsultantCV(BaseIntegrationTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             save_cv_analysis_to_profile(analysis, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_generate_cv_analysis_report(self):
@@ -398,13 +388,12 @@ class TestConsultantCV(BaseIntegrationTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             generate_cv_analysis_report(analysis, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     @patch("app.pages_modules.consultant_cv.imports_ok", True)
@@ -428,13 +417,12 @@ class TestConsultantCV(BaseIntegrationTest):
         mock_consultant = Mock()
         mock_consultant.id = 1
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             compare_cv_with_profile(analysis, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_career_suggestions(self):
@@ -445,13 +433,12 @@ class TestConsultantCV(BaseIntegrationTest):
         }
         mock_consultant = Mock()
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_career_suggestions(analysis, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_missions_empty(self):
@@ -459,13 +446,12 @@ class TestConsultantCV(BaseIntegrationTest):
         mock_consultant = Mock()
         mock_consultant.id = 1
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_missions([], mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_missions_with_data(self):
@@ -489,50 +475,46 @@ class TestConsultantCV(BaseIntegrationTest):
         mock_consultant = Mock()
         mock_consultant.id = 1
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_missions(missions, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_skills_empty(self):
         """Test affichage compétences CV vides"""
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_skills({})
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_skills_with_data(self):
         """Test affichage compétences CV avec données"""
         analysis = {"competences": ["Python", "Java", "Agile", "Scrum", "Management"]}
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_skills(analysis)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_summary_empty(self):
         """Test affichage résumé CV vide"""
         mock_consultant = Mock()
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_summary({}, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_summary_with_data(self):
@@ -545,13 +527,12 @@ class TestConsultantCV(BaseIntegrationTest):
         }
         mock_consultant = Mock()
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_summary(analysis, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_show_cv_actions(self):
@@ -560,13 +541,12 @@ class TestConsultantCV(BaseIntegrationTest):
         mock_consultant = Mock()
         mock_consultant.id = 1
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             show_cv_actions(analysis, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_create_mission_from_cv(self):
@@ -581,13 +561,12 @@ class TestConsultantCV(BaseIntegrationTest):
         mock_consultant = Mock()
         mock_consultant.id = 1
 
+        # Test que la fonction s'exécute sans erreur fatale
         try:
             create_mission_from_cv(mission_data, mock_consultant)
-            assert True
         except Exception as e:
-            if "ScriptRunContext" in str(e) or "Session state" in str(e):
-                assert True
-            else:
+            # Les erreurs de contexte Streamlit sont attendues en test
+            if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
     def test_module_structure(self):

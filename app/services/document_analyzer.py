@@ -20,6 +20,10 @@ from pptx import Presentation
 class DocumentAnalyzer:
     """Service d'analyse et d'extraction d'informations des CV"""
 
+    # Constantes pour éviter la duplication de chaînes (SonarQube)
+    CLIENT_SOCIETE_GENERALE = "Société Générale"
+    STATUS_EN_COURS = "En cours"
+
     # Clients connus pour améliorer la détection
     CLIENTS_CONNUS = [
         # ESN et Conseil
@@ -43,7 +47,7 @@ class DocumentAnalyzer:
         # Banques & Finance
         "BNP Paribas",
         "BNPP",
-        "Société Générale",
+        CLIENT_SOCIETE_GENERALE,
         "SG",
         "SGCIB",
         "Crédit Agricole",
@@ -265,60 +269,18 @@ class DocumentAnalyzer:
 
         try:
             # Méthode 1 : pdfplumber (plus fiable pour les tableaux)
-            st.info("📄 Extraction PDF avec pdfplumber...")
-            with pdfplumber.open(file_path) as pdf:
-                st.info(f"📄 PDF contient {len(pdf.pages)} page(s)")
+            text_parts = DocumentAnalyzer._extract_pdf_with_pdfplumber(file_path)
 
-                for page_num, page in enumerate(pdf.pages, 1):
-                    st.info(f"📖 Lecture page {page_num}...")
-                    try:
-                        page_text = page.extract_text()
-                        if page_text:
-                            text_parts.append(f"--- PAGE {page_num} ---\n{page_text}")
-
-                        # Extraire aussi les tableaux
-                        tables = page.extract_tables()
-                        for table in tables:
-                            table_text = "\n".join(
-                                [
-                                    "\t".join([cell or "" for cell in row])
-                                    for row in table
-                                ]
-                            )
-                            if table_text.strip():
-                                text_parts.append(
-                                    f"--- TABLEAU PAGE {page_num} ---\n{table_text}"
-                                )
-
-                    except (ValueError, TypeError, AttributeError, KeyError) as e:
-                        st.warning(f"⚠️ Erreur page {page_num}: {e}")
-                        continue
-
-                if text_parts:
-                    st.success(
-                        f"✅ {len(text_parts)} sections extraites avec pdfplumber"
-                    )
-                    return "\n\n".join(text_parts)
+            if text_parts:
+                st.success(f"✅ {len(text_parts)} sections extraites avec pdfplumber")
+                return "\n\n".join(text_parts)
 
             # Méthode 2 : PyPDF2 (fallback)
-            st.info("📄 Fallback avec PyPDF2...")
-            with open(file_path, "rb") as file:
-                pdf_reader = PyPDF2.PdfReader(file)
-                st.info(f"📄 PDF contient {len(pdf_reader.pages)} page(s)")
+            text_parts = DocumentAnalyzer._extract_pdf_with_pypdf2(file_path)
 
-                for page_num, page in enumerate(pdf_reader.pages, 1):
-                    st.info(f"📖 Lecture page {page_num}...")
-                    try:
-                        page_text = page.extract_text()
-                        if page_text:
-                            text_parts.append(f"--- PAGE {page_num} ---\n{page_text}")
-                    except (ValueError, TypeError, AttributeError, KeyError) as e:
-                        st.warning(f"⚠️ Erreur page {page_num}: {e}")
-                        continue
-
-                if text_parts:
-                    st.success(f"✅ {len(text_parts)} sections extraites avec PyPDF2")
-                    return "\n\n".join(text_parts)
+            if text_parts:
+                st.success(f"✅ {len(text_parts)} sections extraites avec PyPDF2")
+                return "\n\n".join(text_parts)
 
             st.error("❌ Aucun texte extrait du PDF")
             return ""
@@ -328,37 +290,71 @@ class DocumentAnalyzer:
             return ""
 
     @staticmethod
-    def _extract_text_from_docx(file_path: str) -> str:
-        """Extrait le texte d'un document Word avec tous les éléments"""
+    def _extract_pdf_with_pdfplumber(file_path: str) -> List[str]:
+        """Extrait le texte d'un PDF avec pdfplumber"""
         text_parts = []
 
+        st.info("📄 Extraction PDF avec pdfplumber...")
+        with pdfplumber.open(file_path) as pdf:
+            st.info(f"📄 PDF contient {len(pdf.pages)} page(s)")
+
+            for page_num, page in enumerate(pdf.pages, 1):
+                st.info(f"📖 Lecture page {page_num}...")
+                try:
+                    page_text = page.extract_text()
+                    if page_text:
+                        text_parts.append(f"--- PAGE {page_num} ---\n{page_text}")
+
+                    # Extraire aussi les tableaux
+                    tables = page.extract_tables()
+                    for table in tables:
+                        table_text = "\n".join(
+                            ["\t".join([cell or "" for cell in row]) for row in table]
+                        )
+                        if table_text.strip():
+                            text_parts.append(
+                                f"--- TABLEAU PAGE {page_num} ---\n{table_text}"
+                            )
+
+                except (ValueError, TypeError, AttributeError, KeyError) as e:
+                    st.warning(f"⚠️ Erreur page {page_num}: {e}")
+                    continue
+
+        return text_parts
+
+    @staticmethod
+    def _extract_pdf_with_pypdf2(file_path: str) -> List[str]:
+        """Extrait le texte d'un PDF avec PyPDF2 (fallback)"""
+        text_parts = []
+
+        st.info("📄 Fallback avec PyPDF2...")
+        with open(file_path, "rb") as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            st.info(f"📄 PDF contient {len(pdf_reader.pages)} page(s)")
+
+            for page_num, page in enumerate(pdf_reader.pages, 1):
+                st.info(f"📖 Lecture page {page_num}...")
+                try:
+                    page_text = page.extract_text()
+                    if page_text:
+                        text_parts.append(f"--- PAGE {page_num} ---\n{page_text}")
+                except (ValueError, TypeError, AttributeError, KeyError) as e:
+                    st.warning(f"⚠️ Erreur page {page_num}: {e}")
+                    continue
+
+        return text_parts
+
+    @staticmethod
+    def _extract_text_from_docx(file_path: str) -> str:
+        """Extrait le texte d'un document Word avec tous les éléments"""
         try:
             st.info("📄 Extraction Word avec python-docx...")
             doc = Document(file_path)
 
-            # Extraire les paragraphes
-            st.info(f"📄 Document contient {len(doc.paragraphs)} paragraphe(s)")
-            for i, paragraph in enumerate(doc.paragraphs, 1):
-                if paragraph.text.strip():
-                    text_parts.append(paragraph.text)
-                    if i % 50 == 0:  # Feedback tous les 50 paragraphes
-                        st.info(f"📖 Traitement paragraphe {i}...")
-
-            # Extraire les tableaux
-            st.info(f"📄 Document contient {len(doc.tables)} tableau(x)")
-            for table_num, table in enumerate(doc.tables, 1):
-                st.info(f"📊 Extraction tableau {table_num}...")
-                table_text = []
-                for row in table.rows:
-                    row_text = []
-                    for cell in row.cells:
-                        row_text.append(cell.text.strip())
-                    table_text.append("\t".join(row_text))
-
-                if table_text:
-                    text_parts.append(
-                        f"--- TABLEAU {table_num} ---\n" + "\n".join(table_text)
-                    )
+            # Extraire les paragraphes et tableaux
+            text_parts = []
+            text_parts.extend(DocumentAnalyzer._extract_docx_paragraphs(doc))
+            text_parts.extend(DocumentAnalyzer._extract_docx_tables(doc))
 
             result = "\n\n".join(text_parts)
             st.success(
@@ -371,42 +367,53 @@ class DocumentAnalyzer:
             return ""
 
     @staticmethod
+    def _extract_docx_paragraphs(doc) -> List[str]:
+        """Extrait les paragraphes d'un document Word"""
+        text_parts = []
+        st.info(f"📄 Document contient {len(doc.paragraphs)} paragraphe(s)")
+
+        for i, paragraph in enumerate(doc.paragraphs, 1):
+            if paragraph.text.strip():
+                text_parts.append(paragraph.text)
+                if i % 50 == 0:  # Feedback tous les 50 paragraphes
+                    st.info(f"📖 Traitement paragraphe {i}...")
+
+        return text_parts
+
+    @staticmethod
+    def _extract_docx_tables(doc) -> List[str]:
+        """Extrait les tableaux d'un document Word"""
+        text_parts = []
+        st.info(f"📄 Document contient {len(doc.tables)} tableau(x)")
+
+        for table_num, table in enumerate(doc.tables, 1):
+            st.info(f"📊 Extraction tableau {table_num}...")
+            table_text = []
+            for row in table.rows:
+                row_text = []
+                for cell in row.cells:
+                    row_text.append(cell.text.strip())
+                table_text.append("\t".join(row_text))
+
+            if table_text:
+                text_parts.append(
+                    f"--- TABLEAU {table_num} ---\n" + "\n".join(table_text)
+                )
+
+        return text_parts
+
+    @staticmethod
     def _extract_text_from_pptx(file_path: str) -> str:
         """Extrait le texte d'une présentation PowerPoint"""
-        text_parts = []
-
         try:
             st.info("📄 Extraction PowerPoint avec python-pptx...")
             prs = Presentation(file_path)
-
             st.info(f"📄 Présentation contient {len(prs.slides)} slide(s)")
 
+            text_parts = []
             for slide_num, slide in enumerate(prs.slides, 1):
                 st.info(f"📖 Lecture slide {slide_num}...")
-                slide_text = []
-
-                for shape in slide.shapes:
-                    try:
-                        if hasattr(shape, "text") and shape.text.strip():
-                            slide_text.append(shape.text)
-
-                        # Extraire aussi le texte des tableaux
-                        if hasattr(shape, "table"):
-                            table_text = []
-                            for row in shape.table.rows:
-                                row_text = []
-                                for cell in row.cells:
-                                    row_text.append(cell.text.strip())
-                                table_text.append("\t".join(row_text))
-                            if table_text:
-                                slide_text.append(
-                                    "--- TABLEAU ---\n" + "\n".join(table_text)
-                                )
-                    except (ValueError, TypeError, AttributeError, KeyError) as e:
-                        st.warning(
-                            f"⚠️ Erreur lors du traitement d'une forme PowerPoint: {e}"
-                        )
-                        continue
+                slide_text = DocumentAnalyzer._extract_slide_content(slide)
 
                 if slide_text:
                     text_parts.append(
@@ -422,6 +429,39 @@ class DocumentAnalyzer:
         except (OSError, ValueError, TypeError, AttributeError) as e:
             st.error(f"❌ Erreur extraction PowerPoint: {e}")
             return ""
+
+    @staticmethod
+    def _extract_slide_content(slide) -> List[str]:
+        """Extrait le contenu d'une slide PowerPoint"""
+        slide_text = []
+
+        for shape in slide.shapes:
+            try:
+                if hasattr(shape, "text") and shape.text.strip():
+                    slide_text.append(shape.text)
+
+                # Extraire aussi le texte des tableaux
+                if hasattr(shape, "table"):
+                    table_text = DocumentAnalyzer._extract_pptx_table(shape.table)
+                    if table_text:
+                        slide_text.append("--- TABLEAU ---\n" + "\n".join(table_text))
+
+            except (ValueError, TypeError, AttributeError, KeyError) as e:
+                st.warning(f"⚠️ Erreur lors du traitement d'une forme PowerPoint: {e}")
+                continue
+
+        return slide_text
+
+    @staticmethod
+    def _extract_pptx_table(table) -> List[str]:
+        """Extrait le contenu d'un tableau PowerPoint"""
+        table_text = []
+        for row in table.rows:
+            row_text = []
+            for cell in row.cells:
+                row_text.append(cell.text.strip())
+            table_text.append("\t".join(row_text))
+        return table_text
 
     @staticmethod
     def analyze_cv_content(text: str, consultant_name: str = "") -> Dict[str, Any]:
@@ -478,20 +518,33 @@ class DocumentAnalyzer:
     @staticmethod
     def _extract_missions(text: str) -> List[Dict]:
         """Extrait les missions du CV avec une approche multi-méthodes"""
-        missions = []
-
         st.info(f"🔍 Analyse de {len(text)} caractères de texte...")
 
-        # Nettoyer et préparer le texte
-        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        # Préparation du texte
+        prepared_text = DocumentAnalyzer._prepare_text_for_analysis(text)
+        experience_text = DocumentAnalyzer._extract_experience_section(prepared_text)
 
-        # Séparer par pages pour mieux analyser
+        # Extraction multi-méthodes
+        missions = DocumentAnalyzer._apply_multiple_extraction_methods(
+            experience_text, prepared_text
+        )
+
+        # Nettoyage et tri final
+        final_missions = DocumentAnalyzer._process_final_missions(missions)
+
+        return final_missions
+
+    @staticmethod
+    def _prepare_text_for_analysis(text: str) -> str:
+        """Prépare le texte pour l'analyse"""
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
         pages = text.split("--- PAGE")
         st.info(f"📄 Analyse de {len(pages)} section(s) de document")
+        return " ".join(pages)
 
-        all_text = " ".join(pages)  # Recombiner pour l'analyse globale
-
-        # Trouver la section expérience
+    @staticmethod
+    def _extract_experience_section(text: str) -> str:
+        """Extrait la section expérience du CV"""
         experience_keywords = [
             "expérience professionnelle",
             "parcours professionnel",
@@ -510,7 +563,7 @@ class DocumentAnalyzer:
             "conseil",
         ]
 
-        text_lower = all_text.lower()
+        text_lower = text.lower()
         experience_start = 0
 
         for keyword in experience_keywords:
@@ -522,11 +575,16 @@ class DocumentAnalyzer:
                 )
                 break
 
-        # Prendre le texte d'expérience
-        experience_text = (
-            all_text[experience_start:] if experience_start > 0 else all_text
-        )
+        experience_text = text[experience_start:] if experience_start > 0 else text
         st.info(f"📝 Analyse de {len(experience_text)} caractères d'expérience")
+        return experience_text
+
+    @staticmethod
+    def _apply_multiple_extraction_methods(
+        experience_text: str, all_text: str
+    ) -> List[Dict]:
+        """Applique toutes les méthodes d'extraction de missions"""
+        missions = []
 
         # Méthode 1: Analyse par blocs logiques
         missions.extend(DocumentAnalyzer._extract_missions_by_blocks(experience_text))
@@ -544,27 +602,32 @@ class DocumentAnalyzer:
             DocumentAnalyzer._extract_missions_company_date_role_format(all_text)
         )
 
-        # Méthode 5: NOUVELLE - Extraction optimisée PowerPoint (corrige les
-        # problèmes de dates)
+        # Méthode 5: Extraction optimisée PowerPoint
         missions_powerpoint = DocumentAnalyzer._extract_missions_powerpoint_optimized(
             all_text
         )
         missions.extend(missions_powerpoint)
 
-        # Méthode 6: NOUVELLE - Détection spécialisée Quanteam améliorée
+        # Méthode 6: Détection spécialisée Quanteam améliorée
         missions_quanteam = DocumentAnalyzer._quanteam_specific_detection_improved(
             all_text
         )
         missions.extend(missions_quanteam)
 
         st.info(
-            f"🚀 {len(missions)} missions brutes trouvées avant nettoyage (dont {len(missions_powerpoint)} PowerPoint optimisées et {len(missions_quanteam)} Quanteam corrigées)"
+            f"🚀 {len(missions)} missions brutes trouvées avant nettoyage "
+            f"(dont {len(missions_powerpoint)} PowerPoint optimisées et {len(missions_quanteam)} Quanteam corrigées)"
         )
 
+        return missions
+
+    @staticmethod
+    def _process_final_missions(missions: List[Dict]) -> List[Dict]:
+        """Nettoie et trie les missions finales"""
         # Nettoyer et dédupliquer
         unique_missions = DocumentAnalyzer._clean_and_deduplicate_missions(missions)
 
-        # Séparer les missions PowerPoint optimisées (priorité absolue) des autres
+        # Séparer les missions PowerPoint optimisées des autres
         powerpoint_missions = [
             m
             for m in unique_missions
@@ -576,28 +639,26 @@ class DocumentAnalyzer:
             if "powerpoint_optimized" not in m.get("detection_source", "")
         ]
 
-        # Trier les missions PowerPoint par date de début (plus ancien en premier
-        # pour respecter l'ordre chronologique du CV)
+        # Trier les missions PowerPoint par date (chronologique)
         sorted_powerpoint_missions = sorted(
             powerpoint_missions,
             key=lambda x: DocumentAnalyzer._date_sort_key(x.get("date_debut", "")),
             reverse=False,
         )
 
-        # Trier les autres missions par date de début (plus récent en premier)
+        # Trier les autres missions par date (plus récent en premier)
         sorted_other_missions = sorted(
             other_missions,
             key=lambda x: DocumentAnalyzer._date_sort_key(x.get("date_debut", "")),
             reverse=True,
         )
 
-        # Combiner : PowerPoint optimisées triées chronologiquement, puis les autres
-        final_missions = (
-            sorted_powerpoint_missions + sorted_other_missions[:10]
-        )  # PowerPoint triées + 10 autres max
+        # Combiner résultats
+        final_missions = sorted_powerpoint_missions + sorted_other_missions[:10]
 
         st.success(
-            f"✅ {len(final_missions)} missions finales ({len(powerpoint_missions)} PowerPoint optimisées + {len(sorted_other_missions[:10])} autres)"
+            f"✅ {len(final_missions)} missions finales "
+            f"({len(powerpoint_missions)} PowerPoint optimisées + {len(sorted_other_missions[:10])} autres)"
         )
 
         return final_missions
@@ -646,7 +707,7 @@ class DocumentAnalyzer:
             mission["date_fin"] = dates[1]
         elif len(dates) == 1:
             mission["date_debut"] = dates[0]
-            mission["date_fin"] = "En cours"
+            mission["date_fin"] = DocumentAnalyzer.STATUS_EN_COURS
 
         # Recherche de client
         client = DocumentAnalyzer._find_client_in_block_improved(block)
@@ -668,22 +729,36 @@ class DocumentAnalyzer:
         """Trouve toutes les dates dans un texte - Version améliorée"""
         dates = []
 
-        # Patterns de dates très complets
-        date_patterns = [
+        # Obtenir les patterns de dates
+        date_patterns = DocumentAnalyzer._get_date_patterns()
+
+        # Appliquer chaque pattern
+        for pattern, pattern_type in date_patterns:
+            matches = re.finditer(pattern, text, re.IGNORECASE)
+            for match in matches:
+                date_results = DocumentAnalyzer._process_date_match(match, pattern_type)
+                dates.extend(date_results)
+
+        # Nettoyer et trier
+        return DocumentAnalyzer._clean_and_sort_dates(dates)
+
+    @staticmethod
+    def _get_date_patterns() -> List[tuple]:
+        """Retourne la liste des patterns de dates supportés"""
+        return [
             # Formats avec séparateurs
-            (r"\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})\b", "dmy"),  # DD/MM/YYYY
-            (r"\b(\d{1,2})[\/\-\.](\d{4})\b", "my"),  # MM/YYYY
-            (r"\b(\d{4})[\/\-\.](\d{1,2})\b", "ym"),  # YYYY/MM
+            (r"\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})\b", "dmy"),
+            (r"\b(\d{1,2})[\/\-\.](\d{4})\b", "my"),
+            (r"\b(\d{4})[\/\-\.](\d{1,2})\b", "ym"),
             # Années dans un contexte temporel
-            (r"\b(\d{4})\s*[-–—]\s*(\d{4})\b", "range"),  # 2020-2023
-            # 2020-en cours
+            (r"\b(\d{4})\s*[-–—]\s*(\d{4})\b", "range"),
             (
                 r"\b(\d{4})\s*[-–—]\s*(en\s+cours|actuel|présent|aujourd\'hui)\b",
                 "ongoing",
             ),
-            (r"\bdepuis\s+(\d{4})\b", "since"),  # depuis 2020
-            (r"\ben\s+(\d{4})\b", "year"),  # en 2020
-            # Mois en français - AMÉLIORATION CLÉE POUR QUANTEAM
+            (r"\bdepuis\s+(\d{4})\b", "since"),
+            (r"\ben\s+(\d{4})\b", "year"),
+            # Mois en français
             (
                 r"\b(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+(\d{4})\s*[-–—]\s*(en\s+cours|actuel|présent|aujourd\'hui)",
                 "month_current",
@@ -708,82 +783,64 @@ class DocumentAnalyzer:
             ),
         ]
 
-        for pattern, pattern_type in date_patterns:
-            matches = re.finditer(pattern, text, re.IGNORECASE)
+    @staticmethod
+    def _process_date_match(match, pattern_type: str) -> List[str]:
+        """Traite un match de pattern de date et retourne les dates extraites"""
+        try:
+            if pattern_type == "dmy":
+                day, month, year = match.groups()
+                return [f"{year}-{month.zfill(2)}-{day.zfill(2)}"]
+            elif pattern_type == "my":
+                month, year = match.groups()
+                return [f"{year}-{month.zfill(2)}-01"]
+            elif pattern_type == "ym":
+                year, month = match.groups()
+                return [f"{year}-{month.zfill(2)}-01"]
+            elif pattern_type == "range":
+                start_year, end_year = match.groups()
+                return [f"{start_year}-01-01", f"{end_year}-12-31"]
+            elif pattern_type == "ongoing":
+                start_year = match.group(1)
+                return [f"{start_year}-01-01", DocumentAnalyzer.STATUS_EN_COURS]
+            elif pattern_type in ["since", "year"]:
+                year = match.group(1)
+                return [f"{year}-01-01"]
+            elif pattern_type in ["month_current", "since_month", "month_ongoing"]:
+                month_name, year = match.groups()
+                month_num = DocumentAnalyzer._month_name_to_number(month_name.lower())
+                return [f"{year}-{month_num}-01", DocumentAnalyzer.STATUS_EN_COURS]
+            elif pattern_type in ["month_fr", "month_abbr"]:
+                month_name, year = match.groups()
+                month_num = DocumentAnalyzer._month_name_to_number(month_name.lower())
+                return [f"{year}-{month_num}-01"]
+            elif pattern_type == "to_date":
+                year = match.group(1)
+                return [f"{year}-01-01", DocumentAnalyzer.STATUS_EN_COURS]
+            else:
+                return []
 
-            for match in matches:
-                try:
-                    if pattern_type == "dmy":
-                        day, month, year = match.groups()
-                        date_str = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
-                    elif pattern_type == "my":
-                        month, year = match.groups()
-                        date_str = f"{year}-{month.zfill(2)}-01"
-                    elif pattern_type == "ym":
-                        year, month = match.groups()
-                        date_str = f"{year}-{month.zfill(2)}-01"
-                    elif pattern_type == "range":
-                        start_year, end_year = match.groups()
-                        dates.extend([f"{start_year}-01-01", f"{end_year}-12-31"])
-                        continue
-                    elif pattern_type == "ongoing":
-                        start_year = match.group(1)
-                        dates.extend([f"{start_year}-01-01", "En cours"])
-                        continue
-                    elif pattern_type in ["since", "year"]:
-                        year = match.group(1)
-                        date_str = f"{year}-01-01"
-                    elif pattern_type == "month_current":
-                        month_name, year = match.groups()
-                        month_num = DocumentAnalyzer._month_name_to_number(
-                            month_name.lower()
-                        )
-                        dates.extend([f"{year}-{month_num}-01", "En cours"])
-                        continue
-                    elif pattern_type in ["month_fr", "month_abbr"]:
-                        month_name, year = match.groups()
-                        month_num = DocumentAnalyzer._month_name_to_number(
-                            month_name.lower()
-                        )
-                        date_str = f"{year}-{month_num}-01"
-                    elif pattern_type == "to_date":
-                        year = match.group(1)
-                        dates.extend([f"{year}-01-01", "En cours"])
-                        continue
-                    elif pattern_type == "since_month":
-                        month_name, year = match.groups()
-                        month_num = DocumentAnalyzer._month_name_to_number(
-                            month_name.lower()
-                        )
-                        dates.extend([f"{year}-{month_num}-01", "En cours"])
-                        continue
-                    elif pattern_type == "month_ongoing":
-                        month_name, year = match.groups()
-                        month_num = DocumentAnalyzer._month_name_to_number(
-                            month_name.lower()
-                        )
-                        dates.extend([f"{year}-{month_num}-01", "En cours"])
-                        continue
-                    else:
-                        continue
+        except ValueError as e:
+            print(f"Erreur d'unpacking pour pattern {pattern_type}: {e}")
+            return []
 
-                    if date_str and date_str not in dates:
-                        dates.append(date_str)
+    @staticmethod
+    def _clean_and_sort_dates(dates: List[str]) -> List[str]:
+        """Nettoie et trie la liste des dates"""
+        # Dédupliquer
+        unique_dates = []
+        for date in dates:
+            if date and date not in unique_dates:
+                unique_dates.append(date)
 
-                except ValueError as e:
-                    # Gestion des erreurs d'unpacking (nombre de groupes incorrect)
-                    print(f"Erreur d'unpacking pour pattern {pattern_type}: {e}")
-                    continue
-
-        # Trier les dates et retourner
-        valid_dates = [d for d in dates if d and d != "En cours"]
+        # Séparer les dates valides de STATUS_EN_COURS
+        valid_dates = [d for d in unique_dates if d != DocumentAnalyzer.STATUS_EN_COURS]
         valid_dates.sort(key=lambda x: DocumentAnalyzer._date_sort_key(x))
 
-        # Ajouter "En cours" à la fin si présent
-        if "En cours" in dates:
-            valid_dates.append("En cours")
+        # Ajouter STATUS_EN_COURS à la fin si présent
+        if DocumentAnalyzer.STATUS_EN_COURS in unique_dates:
+            valid_dates.append(DocumentAnalyzer.STATUS_EN_COURS)
 
-        return valid_dates[:6]  # Limiter à 6 dates max par bloc
+        return valid_dates[:6]  # Limiter à 6 dates max
 
     @staticmethod
     def _month_name_to_number(month_name: str) -> str:
@@ -805,7 +862,6 @@ class DocumentAnalyzer:
             "fév": "02",
             "mar": "03",
             "avr": "04",
-            "mai": "05",
             "jun": "06",
             "jul": "07",
             "aoû": "08",
@@ -974,7 +1030,7 @@ class DocumentAnalyzer:
 
         # Fallback
         clean_text = re.sub(r"^\s*[-–—•]\s*", "", text.strip())
-        clean_text = re.sub(r"^\d{4}.*?:", "", clean_text)
+        clean_text = re.sub(r"^\d{4}[^:]*:", "", clean_text)
 
         if len(clean_text) > 20:
             summary = clean_text[:1000]
@@ -1002,7 +1058,7 @@ class DocumentAnalyzer:
             mission = {
                 "date_debut": f"{start_year}-01-01",
                 "date_fin": (
-                    "En cours"
+                    DocumentAnalyzer.STATUS_EN_COURS
                     if end_year.lower() in ["en cours", "actuel", "présent"]
                     else f"{end_year}-12-31"
                 ),
@@ -1033,7 +1089,11 @@ class DocumentAnalyzer:
                 if dates:
                     mission = {
                         "date_debut": dates[0] if dates else "",
-                        "date_fin": dates[1] if len(dates) > 1 else "En cours",
+                        "date_fin": (
+                            dates[1]
+                            if len(dates) > 1
+                            else DocumentAnalyzer.STATUS_EN_COURS
+                        ),
                         "client": client,
                         "resume": DocumentAnalyzer._extract_long_mission_summary(
                             context
@@ -1105,7 +1165,7 @@ class DocumentAnalyzer:
     @staticmethod
     def _date_sort_key(date_str: str) -> str:
         """Crée une clé de tri pour les dates"""
-        if not date_str or date_str == "En cours":
+        if not date_str or date_str == DocumentAnalyzer.STATUS_EN_COURS:
             return "9999-12-31"
 
         if len(date_str) == 4:
@@ -1302,7 +1362,7 @@ class DocumentAnalyzer:
             Technologies utilisées : Python, React, PostgreSQL, Docker, Kubernetes
             Responsable de l'architecture microservices et de l'équipe de 5 développeurs.
 
-            03/2021 - 12/2022 : Lead Developer pour Société Générale
+            03/2021 - 12/2022 : Lead Developer pour {DocumentAnalyzer.CLIENT_SOCIETE_GENERALE}
             Refonte complète du système de gestion des comptes clients.
             Stack technique : Java Spring Boot, Angular, Oracle, Jenkins, AWS
             Gestion de projet Agile, formation des équipes junior.
@@ -1474,7 +1534,7 @@ class DocumentAnalyzer:
             {
                 "client": "Quanteam",
                 "date_debut": "2023-01-01",
-                "date_fin": "En cours",
+                "date_fin": DocumentAnalyzer.STATUS_EN_COURS,
                 "role": "Directeur de practice Data",
                 "resume": """Management de la practice SI/Data
 • Réponses aux appels d'offres
@@ -1488,7 +1548,7 @@ class DocumentAnalyzer:
             {
                 "client": "Generali",
                 "date_debut": "2023-08-01",
-                "date_fin": "En cours",
+                "date_fin": DocumentAnalyzer.STATUS_EN_COURS,
                 "role": "Manager de transition des équipes fiscalité et conformité",
                 "resume": """Pilotage du projet (Planning, Budget, gestion équipe, recrutement)
 • Proposition de transformation des process actuels
@@ -1531,9 +1591,9 @@ class DocumentAnalyzer:
 • Interface avec les équipes de développement""",
                 "detection_source": "powerpoint_optimized_corrected",
             },
-            # Les 5 missions Société Générale avec dates corrigées
+            # Les 5 missions avec CLIENT_SOCIETE_GENERALE avec dates corrigées
             {
-                "client": "Société Générale",
+                "client": DocumentAnalyzer.CLIENT_SOCIETE_GENERALE,
                 "date_debut": "2021-04-01",
                 "date_fin": "2023-02-01",
                 "role": "Directeur de projet Capstone",
@@ -1545,7 +1605,7 @@ class DocumentAnalyzer:
                 "detection_source": "powerpoint_optimized_sg_1",
             },
             {
-                "client": "Société Générale",
+                "client": DocumentAnalyzer.CLIENT_SOCIETE_GENERALE,
                 "date_debut": "2023-04-01",
                 "date_fin": "2024-09-01",
                 "role": "Responsable technique du projet TPS",
@@ -1557,7 +1617,7 @@ class DocumentAnalyzer:
                 "detection_source": "powerpoint_optimized_sg_2",
             },
             {
-                "client": "Société Générale",
+                "client": DocumentAnalyzer.CLIENT_SOCIETE_GENERALE,
                 "date_debut": "2011-07-01",
                 "date_fin": "2013-03-01",
                 "role": "Chef de projet CBR (Central Bank Reporting) et DPRS (Deal PRocessing Storage)",
@@ -1569,7 +1629,7 @@ class DocumentAnalyzer:
                 "detection_source": "powerpoint_optimized_sg_3",
             },
             {
-                "client": "Société Générale",
+                "client": DocumentAnalyzer.CLIENT_SOCIETE_GENERALE,
                 "date_debut": "2008-06-01",
                 "date_fin": "2011-06-01",
                 "role": "Responsable cellule décisionnelle",
@@ -1581,7 +1641,7 @@ class DocumentAnalyzer:
                 "detection_source": "powerpoint_optimized_sg_4",
             },
             {
-                "client": "Société Générale",
+                "client": DocumentAnalyzer.CLIENT_SOCIETE_GENERALE,
                 "date_debut": "2006-09-01",
                 "date_fin": "2008-05-01",
                 "role": "Ingénieur décisionnel",
@@ -1623,13 +1683,13 @@ class DocumentAnalyzer:
 
         for pattern in quanteam_patterns:
             matches = re.finditer(pattern, text, re.IGNORECASE | re.DOTALL)
-            for match in matches:
+            for _ in matches:
 
                 # CORRECTION FORCÉE : Toujours utiliser les bonnes dates pour Quanteam
                 mission = {
                     "client": "Quanteam",
                     "date_debut": "2023-01-01",  # FORCÉ: Janvier 2023
-                    "date_fin": "En cours",  # FORCÉ: Aujourd'hui
+                    "date_fin": DocumentAnalyzer.STATUS_EN_COURS,  # FORCÉ: Aujourd'hui
                     "resume": "Directeur de practice Data - Management de la practice SI/Data, Réponses aux appels d'offres, Suivi des consultants",
                     "langages_techniques": ["Data Management", "Practice Management"],
                     "competences_fonctionnelles": [
