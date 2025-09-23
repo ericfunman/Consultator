@@ -10,7 +10,11 @@ import unicodedata
 import uuid
 from datetime import date
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
 import pandas as pd
 import streamlit as st
