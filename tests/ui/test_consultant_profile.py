@@ -223,7 +223,7 @@ class TestConsultantProfile(BaseUITest):
     @patch("app.pages_modules.consultant_profile.st.info")
     def test_show_cv_missions_tab_empty(self, mock_info, mock_md):
         """Test onglet missions CV vide"""
-        show_cv_missions_tab([], Mock())
+        show_cv_missions_tab([])
         mock_info.assert_called_once_with("Aucune mission détectée dans le CV")
 
     @patch("app.pages_modules.consultant_profile.st.markdown")
@@ -248,7 +248,7 @@ class TestConsultantProfile(BaseUITest):
         mock_expander.return_value.__enter__ = Mock()
         mock_expander.return_value.__exit__ = Mock(return_value=None)
 
-        show_cv_missions_tab(missions, Mock())
+        show_cv_missions_tab(missions)
         assert mock_expander.call_count == 2
 
     @patch("app.pages_modules.consultant_profile.st.markdown")
@@ -296,7 +296,7 @@ class TestConsultantProfile(BaseUITest):
         }
         consultant = Mock()
 
-        show_cv_summary_tab(analysis, consultant)
+        show_cv_summary_tab(analysis)
 
         # Should calculate and display metrics
         assert mock_metric.call_count >= 4  # Score + 3 metrics

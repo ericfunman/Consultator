@@ -6,7 +6,7 @@ Tests des fonctionnalités de gestion des documents et d'extraction de texte
 import os
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, mock_open, MagicMock
+from unittest.mock import Mock, patch, mock_open, MagicMock, PropertyMock
 import pytest
 import streamlit as st
 
@@ -26,6 +26,13 @@ with patch.dict(
     },
 ):
     from app.services.document_service import DocumentService
+
+
+class MockDocumentForTests:
+    """Mock personnalisé pour simuler un document DOCX"""
+
+    def __init__(self, paragraphs):
+        self.paragraphs = paragraphs
 
 
 class TestDocumentServiceCoverage:
@@ -266,15 +273,19 @@ class TestDocumentServiceCoverage:
     @patch("app.services.document_service.DocxDocument")
     def test_extract_text_from_docx_success(self, mock_docx_document):
         """Test extraction texte DOCX avec succès"""
-        # Setup mock
+        # Setup mock paragraphs
         mock_paragraph1 = Mock()
         mock_paragraph1.text = "Premier paragraphe"
         mock_paragraph2 = Mock()
         mock_paragraph2.text = "Deuxième paragraphe"
 
-        mock_doc = Mock()
-        mock_doc.paragraphs = [mock_paragraph1, mock_paragraph2]
-        mock_docx_document.return_value = mock_doc
+        # Create a custom mock that behaves like a document
+        mock_document = MockDocumentForTests([mock_paragraph1, mock_paragraph2])
+        mock_docx_document.return_value = mock_document
+
+        # Debug: verify what we created
+        print(f"Mock document paragraphs: {mock_document.paragraphs}")
+        print(f"Type of paragraphs: {type(mock_document.paragraphs)}")
 
         result = DocumentService._extract_text_from_docx("test.docx")
 

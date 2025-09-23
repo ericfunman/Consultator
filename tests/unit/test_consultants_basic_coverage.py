@@ -68,7 +68,9 @@ class TestConsultantsBasicFunctions:
             except Exception as e:
                 # On accepte certaines erreurs car on mock des composants externes
                 if "imports_ok" not in str(e):
-                    assert 1 == 1  # Test basique Exécution partielle = amélioration de couverture
+                    assert (
+                        1 == 1
+                    )  # Test basique Exécution partielle = amélioration de couverture
 
     @patch("app.pages_modules.consultants.st")
     def test_show_cv_analysis_basic(self, mock_st):

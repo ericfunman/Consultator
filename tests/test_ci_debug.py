@@ -32,8 +32,8 @@ class TestCIEnvironment:
         import datetime
 
         # Vérification que les modules sont bien importés
-        assert hasattr(json, 'loads')
-        assert hasattr(datetime, 'datetime')
+        assert hasattr(json, "loads")
+        assert hasattr(datetime, "datetime")
 
     def test_directory_structure(self):
         """Test structure répertoire"""

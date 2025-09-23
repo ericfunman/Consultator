@@ -405,7 +405,10 @@ class ChatbotService:
 
         # Si c'est une question de type "qui travaille chez", c'est du profil
         # professionnel
-        if re.search(r"qui\s+(?:[\w'-]+\s+)*(?:travaille|est)\s+(?:[\w'-]+\s+)*(?:chez|dans)\s+(?:[\w'-]+\s+)*(?:quanteam|asigma)", question):
+        if re.search(
+            r"qui\s+(?:[\w'-]+\s+)*(?:travaille|est)\s+(?:[\w'-]+\s+)*(?:chez|dans)\s+(?:[\w'-]+\s+)*(?:quanteam|asigma)",
+            question,
+        ):
             return "profil_professionnel"
 
         # Si c'est une question de type "combien de missions", c'est des missions
@@ -418,7 +421,10 @@ class ChatbotService:
             return "salaire"
 
         # Si c'est une question de type "combien de consultants", c'est des statistiques
-        if re.search(r"combien\s+(?:[\w-]+\s+)*(?:consultants?|dans\s+(?:[\w-]+\s+)*base)", question):
+        if re.search(
+            r"combien\s+(?:[\w-]+\s+)*(?:consultants?|dans\s+(?:[\w-]+\s+)*base)",
+            question,
+        ):
             return "statistiques"
 
         return None

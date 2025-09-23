@@ -435,7 +435,7 @@ class TestConsultantCV(BaseIntegrationTest):
 
         # Test que la fonction s'exécute sans erreur fatale
         try:
-            show_career_suggestions(analysis, mock_consultant)
+            show_career_suggestions(analysis)
         except Exception as e:
             # Les erreurs de contexte Streamlit sont attendues en test
             if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
@@ -511,7 +511,7 @@ class TestConsultantCV(BaseIntegrationTest):
 
         # Test que la fonction s'exécute sans erreur fatale
         try:
-            show_cv_summary({}, mock_consultant)
+            show_cv_summary({})
         except Exception as e:
             # Les erreurs de contexte Streamlit sont attendues en test
             if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
@@ -529,7 +529,7 @@ class TestConsultantCV(BaseIntegrationTest):
 
         # Test que la fonction s'exécute sans erreur fatale
         try:
-            show_cv_summary(analysis, mock_consultant)
+            show_cv_summary(analysis)
         except Exception as e:
             # Les erreurs de contexte Streamlit sont attendues en test
             if not ("ScriptRunContext" in str(e) or "Session state" in str(e)):
