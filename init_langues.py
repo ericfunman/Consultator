@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script pour initialiser les langues de base dans la base de données
+Script pour initialiser les langues de base dans la base de donnÃ©es
 """
 
 import os
@@ -21,13 +21,17 @@ def init_langues():
 
     # Langues principales avec codes ISO
     langues_base = [
-        {"nom": "Français", "code_iso": "FR", "description": "Langue française"},
+        {"nom": "FranÃ§ais", "code_iso": "FR", "description": "Langue franÃ§aise"},
         {"nom": "Anglais", "code_iso": "EN", "description": "Langue anglaise"},
         {"nom": "Espagnol", "code_iso": "ES", "description": "Langue espagnole"},
         {"nom": "Allemand", "code_iso": "DE", "description": "Langue allemande"},
         {"nom": "Italien", "code_iso": "IT", "description": "Langue italienne"},
         {"nom": "Portugais", "code_iso": "PT", "description": "Langue portugaise"},
-        {"nom": "Néerlandais", "code_iso": "NL", "description": "Langue néerlandaise"},
+        {
+            "nom": "NÃ©erlandais",
+            "code_iso": "NL",
+            "description": "Langue nÃ©erlandaise",
+        },
         {"nom": "Russe", "code_iso": "RU", "description": "Langue russe"},
         {
             "nom": "Chinois Mandarin",
@@ -39,10 +43,10 @@ def init_langues():
         {"nom": "Hindi", "code_iso": "HI", "description": "Langue hindi"},
     ]
 
-    print("🌍 Initialisation des langues...")
+    print("ð Initialisation des langues...")
 
     for langue_data in langues_base:
-        # Vérifier si la langue existe déj�
+        # VÃ©rifier si la langue existe dÃ©jÃ
         existing = (
             session.query(Langue).filter(Langue.nom == langue_data["nom"]).first()
         )
@@ -54,21 +58,21 @@ def init_langues():
                 description=langue_data["description"],
             )
             session.add(langue)
-            print(f"  ✅ {langue_data['nom']} ({langue_data['code_iso']}) ajoutée")
+            print(f"  â {langue_data['nom']} ({langue_data['code_iso']}) ajoutÃ©e")
         else:
-            print(f"  ⚠️  {langue_data['nom']} existe déjà")
+            print(f"  â ï¸  {langue_data['nom']} existe dÃ©jÃ ")
 
     try:
         session.commit()
-        print(f"\n✅ {len(langues_base)} langues initialisées avec succès!")
+        print(f"\nâ {len(langues_base)} langues initialisÃ©es avec succÃ¨s!")
 
-        # Afficher le résumé
+        # Afficher le rÃ©sumÃ©
         total_langues = session.query(Langue).count()
-        print(f"📊 Total des langues en base : {total_langues}")
+        print(f"ð Total des langues en base : {total_langues}")
 
     except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()
-        print(f"❌ Erreur lors de l'initialisation : {e}")
+        print(f"â Erreur lors de l'initialisation : {e}")
     finally:
         session.close()
 
@@ -81,20 +85,20 @@ def add_sample_consultant_languages():
         from database.models import Consultant
         from database.models import ConsultantLangue
 
-        # Récupérer quelques consultants et langues
+        # RÃ©cupÃ©rer quelques consultants et langues
         consultants = session.query(Consultant).limit(5).all()
-        francais = session.query(Langue).filter(Langue.nom == "Français").first()
+        francais = session.query(Langue).filter(Langue.nom == "FranÃ§ais").first()
         anglais = session.query(Langue).filter(Langue.nom == "Anglais").first()
         espagnol = session.query(Langue).filter(Langue.nom == "Espagnol").first()
 
         if not (francais and anglais):
-            print("❌ Langues de base non trouvées")
+            print("â Langues de base non trouvÃ©es")
             return
 
-        print("\n🗣️  Ajout de langues d'exemple aux consultants...")
+        print("\nð£ï¸  Ajout de langues d'exemple aux consultants...")
 
         for i, consultant in enumerate(consultants):
-            # Tous les consultants parlent français (niveau natif)
+            # Tous les consultants parlent franÃ§ais (niveau natif)
             existing_fr = (
                 session.query(ConsultantLangue)
                 .filter(
@@ -127,7 +131,7 @@ def add_sample_consultant_languages():
                 niveau_anglais = 3 + (i % 3)  # Niveaux 3, 4, 5
                 commentaires = {
                     3: "TOEIC 750 - Bon niveau professionnel",
-                    4: "TOEIC 900 - Très bon niveau",
+                    4: "TOEIC 900 - TrÃ¨s bon niveau",
                     5: "Bilingue - Travail en environnement anglophone",
                 }
 
@@ -154,19 +158,19 @@ def add_sample_consultant_languages():
                     langue_es = ConsultantLangue(
                         consultant_id=consultant.id,
                         langue_id=espagnol.id,
-                        niveau=2,  # Élémentaire
+                        niveau=2,  # ÃlÃ©mentaire
                         commentaire="Notions scolaires",
                     )
                     session.add(langue_es)
 
-            print(f"  ✅ Langues ajoutées pour {consultant.prenom} {consultant.nom}")
+            print(f"  â Langues ajoutÃ©es pour {consultant.prenom} {consultant.nom}")
 
         session.commit()
-        print("\n✅ Langues d'exemple ajoutées avec succès!")
+        print("\nâ Langues d'exemple ajoutÃ©es avec succÃ¨s!")
 
     except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()
-        print(f"❌ Erreur lors de l'ajout des langues d'exemple : {e}")
+        print(f"â Erreur lors de l'ajout des langues d'exemple : {e}")
     finally:
         session.close()
 

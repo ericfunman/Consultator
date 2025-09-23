@@ -29,7 +29,7 @@ def init_business_managers():
             "prenom": "Laurent",
             "email": "laurent.leroy@consultator.com",
             "telephone": "01.45.67.89.12",
-            "notes": "BM senior, spécialisé secteur bancaire",
+            "notes": "BM senior, spÃ©cialisÃ© secteur bancaire",
         },
         {
             "nom": "Moreau",
@@ -54,10 +54,10 @@ def init_business_managers():
         },
     ]
 
-    print("👥 Initialisation des Business Managers...")
+    print("ð¥ Initialisation des Business Managers...")
 
     for bm_data in bms_base:
-        # Vérifier si le BM existe déj�
+        # VÃ©rifier si le BM existe dÃ©jÃ
         existing = (
             session.query(BusinessManager)
             .filter(BusinessManager.email == bm_data["email"])
@@ -73,21 +73,21 @@ def init_business_managers():
                 notes=bm_data["notes"],
             )
             session.add(bm)
-            print(f"  ✅ {bm_data['prenom']} {bm_data['nom']} ajouté(e)")
+            print(f"  â {bm_data['prenom']} {bm_data['nom']} ajoutÃ©(e)")
         else:
-            print(f"  ⚠️  {bm_data['prenom']} {bm_data['nom']} existe déjà")
+            print(f"  â ï¸  {bm_data['prenom']} {bm_data['nom']} existe dÃ©jÃ ")
 
     try:
         session.commit()
-        print(f"\n✅ {len(bms_base)} Business Managers initialisés avec succès!")
+        print(f"\nâ {len(bms_base)} Business Managers initialisÃ©s avec succÃ¨s!")
 
-        # Afficher le résumé
+        # Afficher le rÃ©sumÃ©
         total_bms = session.query(BusinessManager).count()
-        print(f"📊 Total des BMs en base : {total_bms}")
+        print(f"ð Total des BMs en base : {total_bms}")
 
     except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()
-        print(f"❌ Erreur lors de l'initialisation : {e}")
+        print(f"â Erreur lors de l'initialisation : {e}")
     finally:
         session.close()
 
@@ -97,36 +97,36 @@ def assign_consultants_to_bms():
     session = get_database_session()
 
     try:
-        # Récupérer les BMs et consultants
+        # RÃ©cupÃ©rer les BMs et consultants
         bms = session.query(BusinessManager).all()
         consultants = session.query(Consultant).all()
 
         if not bms:
-            print("❌ Aucun Business Manager trouvé")
+            print("â Aucun Business Manager trouvÃ©")
             return
 
         if not consultants:
-            print("❌ Aucun consultant trouvé")
+            print("â Aucun consultant trouvÃ©")
             return
 
         print(
-            f"\n👨‍💼 Affectation de {len(consultants)} consultants à {len(bms)} BMs..."
+            f"\nð¨âð¼ Affectation de {len(consultants)} consultants Ã  {len(bms)} BMs..."
         )
 
-        # Répartir les consultants entre les BMs
+        # RÃ©partir les consultants entre les BMs
         for i, consultant in enumerate(consultants):
-            # Vérifier si le consultant n'a pas déjà un BM actuel
+            # VÃ©rifier si le consultant n'a pas dÃ©jÃ  un BM actuel
             bm_actuel = consultant.business_manager_actuel
             if bm_actuel:
                 print(
-                    f"  ⚠️  {consultant.nom_complet} déjà géré par {bm_actuel.nom_complet}"
+                    f"  â ï¸  {consultant.nom_complet} dÃ©jÃ  gÃ©rÃ© par {bm_actuel.nom_complet}"
                 )
                 continue
 
-            # Affecter de manière cyclique
+            # Affecter de maniÃ¨re cyclique
             bm = bms[i % len(bms)]
 
-            # Créer l'affectation
+            # CrÃ©er l'affectation
             affectation = ConsultantBusinessManager(
                 consultant_id=consultant.id,
                 business_manager_id=bm.id,
@@ -134,20 +134,20 @@ def assign_consultants_to_bms():
                 commentaire="Affectation initiale",
             )
             session.add(affectation)
-            print(f"  ✅ {consultant.nom_complet} → {bm.nom_complet}")
+            print(f"  â {consultant.nom_complet} â {bm.nom_complet}")
 
         session.commit()
-        print("\n✅ Affectations créées avec succès!")
+        print("\nâ Affectations crÃ©Ã©es avec succÃ¨s!")
 
         # Statistiques finales
-        print("\n📊 Répartition des consultants :")
+        print("\nð RÃ©partition des consultants :")
         for bm in session.query(BusinessManager).all():
             nb_consultants = bm.nombre_consultants_actuels
-            print(f"  • {bm.nom_complet}: {nb_consultants} consultant(s)")
+            print(f"  â¢ {bm.nom_complet}: {nb_consultants} consultant(s)")
 
     except (SQLAlchemyError, ValueError, AttributeError) as e:
         session.rollback()
-        print(f"❌ Erreur lors des affectations : {e}")
+        print(f"â Erreur lors des affectations : {e}")
     finally:
         session.close()
 

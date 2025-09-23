@@ -1,6 +1,6 @@
 """
-Script pour initialiser les compétences fonctionnelles bancaire/assurance
-Lance ce script pour peupler la base avec le référentiel compétences fonctionnelles
+Script pour initialiser les compÃ©tences fonctionnelles bancaire/assurance
+Lance ce script pour peupler la base avec le rÃ©fÃ©rentiel compÃ©tences fonctionnelles
 """
 
 import os
@@ -14,31 +14,31 @@ from app.utils.skill_categories import COMPETENCES_FONCTIONNELLES
 
 
 def init_competences_fonctionnelles():
-    """Initialise les compétences fonctionnelles dans la base de données"""
+    """Initialise les compÃ©tences fonctionnelles dans la base de donnÃ©es"""
 
     session = SessionLocal()
 
     try:
-        print("🏦 Initialisation des compétences fonctionnelles bancaire/assurance...")
+        print("ð¦ Initialisation des compÃ©tences fonctionnelles bancaire/assurance...")
 
-        # Compter les compétences fonctionnelles existantes
+        # Compter les compÃ©tences fonctionnelles existantes
         existing_func = (
             session.query(Competence)
             .filter(Competence.type_competence == "fonctionnelle")
             .count()
         )
 
-        print(f"📊 Compétences fonctionnelles existantes: {existing_func}")
+        print(f"ð CompÃ©tences fonctionnelles existantes: {existing_func}")
 
         competences_ajoutees = 0
         competences_existantes = 0
 
-        # Parcourir toutes les catégories fonctionnelles
+        # Parcourir toutes les catÃ©gories fonctionnelles
         for categorie, competences_list in COMPETENCES_FONCTIONNELLES.items():
-            print(f"\n📂 Catégorie: {categorie}")
+            print(f"\nð CatÃ©gorie: {categorie}")
 
             for competence_nom in competences_list:
-                # Vérifier si la compétence existe déj�
+                # VÃ©rifier si la compÃ©tence existe dÃ©jÃ
                 existing = (
                     session.query(Competence)
                     .filter(
@@ -49,41 +49,41 @@ def init_competences_fonctionnelles():
                 )
 
                 if not existing:
-                    # Créer la nouvelle compétence fonctionnelle
+                    # CrÃ©er la nouvelle compÃ©tence fonctionnelle
                     nouvelle_competence = Competence(
                         nom=competence_nom,
                         categorie=categorie,
                         type_competence="fonctionnelle",
-                        description=f"Compétence fonctionnelle en {competence_nom.lower()}",
+                        description=f"CompÃ©tence fonctionnelle en {competence_nom.lower()}",
                         niveau_requis="junior",
                     )
 
                     session.add(nouvelle_competence)
                     competences_ajoutees += 1
-                    print(f"   ✅ Ajouté: {competence_nom}")
+                    print(f"   â AjoutÃ©: {competence_nom}")
                 else:
                     competences_existantes += 1
-                    print(f"   ⚠️ Existe déjà: {competence_nom}")
+                    print(f"   â ï¸ Existe dÃ©jÃ : {competence_nom}")
 
         # Sauvegarder les changements
         session.commit()
 
-        print("\n🎯 Résumé de l'initialisation:")
-        print(f"   ✅ Compétences ajoutées: {competences_ajoutees}")
-        print(f"   ⚠️ Compétences existantes: {competences_existantes}")
-        print(f"   📊 Total traité: {competences_ajoutees + competences_existantes}")
+        print("\nð¯ RÃ©sumÃ© de l'initialisation:")
+        print(f"   â CompÃ©tences ajoutÃ©es: {competences_ajoutees}")
+        print(f"   â ï¸ CompÃ©tences existantes: {competences_existantes}")
+        print(f"   ð Total traitÃ©: {competences_ajoutees + competences_existantes}")
 
-        # Vérification finale
+        # VÃ©rification finale
         total_fonctionnelles = (
             session.query(Competence)
             .filter(Competence.type_competence == "fonctionnelle")
             .count()
         )
 
-        print(f"\n📈 Total compétences fonctionnelles en base: {total_fonctionnelles}")
+        print(f"\nð Total compÃ©tences fonctionnelles en base: {total_fonctionnelles}")
 
-        # Afficher quelques exemples par catégorie
-        print("\n📋 Aperçu des catégories créées:")
+        # Afficher quelques exemples par catÃ©gorie
+        print("\nð AperÃ§u des catÃ©gories crÃ©Ã©es:")
         for categorie in COMPETENCES_FONCTIONNELLES.keys():
             count = (
                 session.query(Competence)
@@ -93,12 +93,12 @@ def init_competences_fonctionnelles():
                 )
                 .count()
             )
-            print(f"   • {categorie}: {count} compétences")
+            print(f"   â¢ {categorie}: {count} compÃ©tences")
 
-        print("\n🎉 Initialisation terminée avec succès!")
+        print("\nð Initialisation terminÃ©e avec succÃ¨s!")
 
     except Exception as e:
-        print(f"❌ Erreur lors de l'initialisation: {e}")
+        print(f"â Erreur lors de l'initialisation: {e}")
         session.rollback()
         raise
     finally:
@@ -106,35 +106,35 @@ def init_competences_fonctionnelles():
 
 
 def show_competences_summary():
-    """Affiche un résumé des compétences en base"""
+    """Affiche un rÃ©sumÃ© des compÃ©tences en base"""
     session = SessionLocal()
 
     try:
-        print("\n📊 RÉSUMÉ DES COMPÉTENCES EN BASE:")
+        print("\nð RÃSUMÃ DES COMPÃTENCES EN BASE:")
         print("=" * 50)
 
-        # Compétences techniques
+        # CompÃ©tences techniques
         tech_count = (
             session.query(Competence)
             .filter(Competence.type_competence == "technique")
             .count()
         )
-        print(f"🔧 Compétences techniques: {tech_count}")
+        print(f"ð§ CompÃ©tences techniques: {tech_count}")
 
-        # Compétences fonctionnelles
+        # CompÃ©tences fonctionnelles
         func_count = (
             session.query(Competence)
             .filter(Competence.type_competence == "fonctionnelle")
             .count()
         )
-        print(f"🏦 Compétences fonctionnelles: {func_count}")
+        print(f"ð¦ CompÃ©tences fonctionnelles: {func_count}")
 
         # Total
         total = session.query(Competence).count()
-        print(f"📈 Total compétences: {total}")
+        print(f"ð Total compÃ©tences: {total}")
 
-        # Détail des catégories fonctionnelles
-        print("\n🏦 DÉTAIL COMPÉTENCES FONCTIONNELLES:")
+        # DÃ©tail des catÃ©gories fonctionnelles
+        print("\nð¦ DÃTAIL COMPÃTENCES FONCTIONNELLES:")
         print("-" * 40)
 
         categories_func = (
@@ -153,7 +153,7 @@ def show_competences_summary():
                 )
                 .count()
             )
-            print(f"   • {categorie}: {count}")
+            print(f"   â¢ {categorie}: {count}")
 
             # Afficher quelques exemples
             exemples = (
@@ -178,13 +178,13 @@ def show_competences_summary():
 
 
 if __name__ == "__main__":
-    print("🚀 INITIALISATION COMPÉTENCES FONCTIONNELLES")
+    print("ð INITIALISATION COMPÃTENCES FONCTIONNELLES")
     print("=" * 60)
 
-    # Initialiser les compétences
+    # Initialiser les compÃ©tences
     init_competences_fonctionnelles()
 
-    # Afficher le résumé
+    # Afficher le rÃ©sumÃ©
     show_competences_summary()
 
-    print("\n✨ Script terminé!")
+    print("\nâ¨ Script terminÃ©!")

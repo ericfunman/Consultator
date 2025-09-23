@@ -14,30 +14,30 @@ from database.models import Practice
 
 
 def migrate_add_practices():
-    """Ajoute les practices par défaut à la base de données"""
+    """Ajoute les practices par dÃ©faut Ã  la base de donnÃ©es"""
 
-    print("🔄 Migration : Ajout des practices...")
+    print("ð Migration : Ajout des practices...")
 
-    # Initialiser la base de données (créera la nouvelle table Practice)
+    # Initialiser la base de donnÃ©es (crÃ©era la nouvelle table Practice)
     init_database()
 
     try:
         with get_database_session() as session:
-            # Vérifier si les practices existent déj�
+            # VÃ©rifier si les practices existent dÃ©jÃ
             existing_practices = session.query(Practice).all()
 
             if not existing_practices:
-                # Créer les practices par défaut
+                # CrÃ©er les practices par dÃ©faut
                 practices_default = [
                     Practice(
                         nom="Data",
-                        description="Practice spécialisée dans les données, analytics, BI et data science",
+                        description="Practice spÃ©cialisÃ©e dans les donnÃ©es, analytics, BI et data science",
                         responsable="",
                         actif=True,
                     ),
                     Practice(
                         nom="Quant",
-                        description="Practice spécialisée dans l'analyse quantitative et le risk management",
+                        description="Practice spÃ©cialisÃ©e dans l'analyse quantitative et le risk management",
                         responsable="",
                         actif=True,
                     ),
@@ -47,17 +47,17 @@ def migrate_add_practices():
                     session.add(practice)
 
                 session.commit()
-                print("✅ Practices par défaut créées : Data et Quant")
+                print("â Practices par dÃ©faut crÃ©Ã©es : Data et Quant")
             else:
-                print(f"ℹ️ {len(existing_practices)} practice(s) déjà existante(s)")
+                print(f"â¹ï¸ {len(existing_practices)} practice(s) dÃ©jÃ  existante(s)")
                 for p in existing_practices:
                     print(f"   - {p.nom}")
 
     except Exception as e:
-        print(f"❌ Erreur lors de la migration : {e}")
+        print(f"â Erreur lors de la migration : {e}")
         return False
 
-    print("✅ Migration terminée avec succès")
+    print("â Migration terminÃ©e avec succÃ¨s")
     return True
 
 
