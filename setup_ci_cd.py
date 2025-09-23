@@ -15,9 +15,14 @@ def run_command(command, description):
     """Exécute une commande et affiche le résultat"""
     print(f"🔧 {description}...")
     try:
+        # Utiliser shell=False pour éviter les injection de commandes
+        if isinstance(command, str):
+            # Convertir la commande string en liste pour éviter shell=True
+            command = command.split()
+
         result = subprocess.run(
             command,
-            shell=True,
+            shell=False,  # Security: éviter shell=True
             check=True,
             capture_output=True,
             text=True,

@@ -229,11 +229,25 @@ def create_missions():
         existing_missions = session.query(Mission).count()
         if existing_missions > 0:
             print(f"ℹ️ {existing_missions} missions déjà présentes")
-            overwrite = input(
-                "Voulez-vous supprimer les missions existantes et en créer de nouvelles ? (y/N): "
-            )
-            if overwrite.lower() != "y":
-                print("❌ Opération annulée")
+            try:
+                # Security: Validation stricte de l'input utilisateur
+                user_input = (
+                    input(
+                        "Voulez-vous supprimer les missions existantes et en créer de nouvelles ? (y/N): "
+                    )
+                    .strip()
+                    .lower()
+                )
+                # Limiter aux réponses autorisées
+                if user_input not in ["y", "yes", "n", "no", ""]:
+                    print("❌ Réponse invalide. Opération annulée")
+                    return
+
+                if user_input not in ["y", "yes"]:
+                    print("❌ Opération annulée")
+                    return
+            except (EOFError, KeyboardInterrupt):
+                print("\n❌ Opération annulée")
                 return
 
             # Supprimer les missions existantes

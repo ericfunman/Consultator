@@ -344,7 +344,7 @@ class DataTableEnhancer:
             "grade": "Grade",
             "type_contrat": "Contrat",
             "societe": LABEL_SOCIETE,
-            "experience_annees": "Années Exp.",
+            "experience_annees": LABEL_ANNEES_EXP,
             "nb_missions": "Missions",
             "cjm_formatted": "CJM",
             "salaire_formatted": "Salaire Formaté",
@@ -384,15 +384,15 @@ class DataTableEnhancer:
             selection_mode="single-row",
             column_config={
                 "ID": st.column_config.NumberColumn("ID", width="small"),
-                "Prénom": st.column_config.TextColumn("Prénom", width="medium"),
+                LABEL_PRENOM: st.column_config.TextColumn(LABEL_PRENOM, width="medium"),
                 "Nom": st.column_config.TextColumn("Nom", width="medium"),
                 "Email": st.column_config.TextColumn("Email", width="large"),
-                "Salaire Actuel": st.column_config.TextColumn(
-                    "Salaire Actuel", width="medium"
+                LABEL_SALAIRE_ACTUEL: st.column_config.TextColumn(
+                    LABEL_SALAIRE_ACTUEL, width="medium"
                 ),
                 "CJM": st.column_config.TextColumn("CJM", width="medium"),
-                "Années Exp.": st.column_config.TextColumn(
-                    "Années Exp.", width="small"
+                LABEL_ANNEES_EXP: st.column_config.TextColumn(
+                    LABEL_ANNEES_EXP, width="small"
                 ),
                 "Missions": st.column_config.NumberColumn("Missions", width="small"),
             },
@@ -489,9 +489,7 @@ class NotificationManager:
 def create_enhanced_consultants_view():
     """Crée une vue améliorée de la liste des consultants"""
     # Initialiser les composants
-    filters = AdvancedUIFilters()
-    search = RealTimeSearch()
-    enhancer = DataTableEnhancer()
+    filters, search, enhancer = _initialize_ui_components()
 
     # Afficher les filtres dans la sidebar
     applied_filters = filters.render_filters_sidebar()
@@ -499,6 +497,31 @@ def create_enhanced_consultants_view():
     # Titre principal
     st.title("👥 Gestion des consultants - Version Améliorée")
 
+    # Recherche et chargement des données
+    data = _load_consultant_data(search)
+
+    # Appliquer les filtres
+    if applied_filters:
+        data = filters.apply_filters(data)
+
+    # Afficher les métriques et le tableau
+    _display_metrics(data)
+    event = enhancer.render_enhanced_table(data, "consultants")
+
+    # Gérer les actions sur la sélection
+    _handle_consultant_selection(event, data, enhancer)
+
+
+def _initialize_ui_components():
+    """Initialise les composants de l'interface utilisateur"""
+    filters = AdvancedUIFilters()
+    search = RealTimeSearch()
+    enhancer = DataTableEnhancer()
+    return filters, search, enhancer
+
+
+def _load_consultant_data(search):
+    """Charge les données des consultants avec recherche"""
     # Recherche en temps réel
     search_term = st.text_input(
         "🔍 Recherche en temps réel",
@@ -509,59 +532,66 @@ def create_enhanced_consultants_view():
     # Chargement des données avec cache
     with st.spinner("Chargement des données..."):
         if search_term and search.should_search():
-            data = search.search_with_cache(search_term)
+            return search.search_with_cache(search_term)
         else:
-            data = get_cached_consultants_list()
+            return get_cached_consultants_list()
 
-    # Appliquer les filtres
-    if applied_filters:
-        data = filters.apply_filters(data)
 
-    # Afficher les métriques
-    if data:
-        col1, col2, col3, col4 = st.columns(4)
+def _display_metrics(data):
+    """Affiche les métriques des consultants"""
+    if not data:
+        return
 
-        with col1:
-            st.metric("👥 Total", len(data))
+    col1, col2, col3, col4 = st.columns(4)
 
-        with col2:
-            disponibles = len([c for c in data if c.get("disponibilite", False)])
-            st.metric("✅ Disponibles", disponibles)
+    with col1:
+        st.metric("👥 Total", len(data))
 
-        with col3:
-            st.metric("🔴 Occupés", len(data) - disponibles)
+    with col2:
+        disponibles = len([c for c in data if c.get("disponibilite", False)])
+        st.metric("✅ Disponibles", disponibles)
 
-        with col4:
-            salaire_moyen = (
-                sum(c.get("salaire_actuel", 0) for c in data) / len(data) if data else 0
-            )
-            st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
+    with col3:
+        st.metric("🔴 Occupés", len(data) - disponibles)
 
-    # Afficher le tableau amélioré
-    event = enhancer.render_enhanced_table(data, "consultants")
+    with col4:
+        salaire_moyen = (
+            sum(c.get("salaire_actuel", 0) for c in data) / len(data) if data else 0
+        )
+        st.metric("💰 Salaire moyen", f"{salaire_moyen:,.0f}€")
 
-    # Gérer les actions sur la sélection
-    if event and event.selection.rows:
-        selected_idx = event.selection.rows[0]
-        if selected_idx < len(data):
-            selected_consultant = data[selected_idx]
 
-            action = enhancer.render_action_buttons(
-                selected_consultant, ["view", "edit", "delete"]
-            )
+def _handle_consultant_selection(event, data, enhancer):
+    """Gère les actions sur la sélection de consultant"""
+    if not event or not event.selection.rows:
+        return
 
-            if action == "view":
-                st.session_state.view_consultant_profile = selected_consultant["id"]
-                st.rerun()
-            elif action == "edit":
-                st.session_state.view_consultant_profile = selected_consultant["id"]
-                st.rerun()
-            elif action == "delete":
-                if ConsultantService.delete_consultant(selected_consultant["id"]):
-                    NotificationManager.show_success("Consultant supprimé avec succès!")
-                    st.rerun()
-                else:
-                    NotificationManager.show_error("Erreur lors de la suppression")
+    selected_idx = event.selection.rows[0]
+    if selected_idx >= len(data):
+        return
+
+    selected_consultant = data[selected_idx]
+    action = enhancer.render_action_buttons(
+        selected_consultant, ["view", "edit", "delete"]
+    )
+
+    _execute_consultant_action(action, selected_consultant)
+
+
+def _execute_consultant_action(action, selected_consultant):
+    """Exécute l'action sélectionnée sur le consultant"""
+    if action == "view":
+        st.session_state.view_consultant_profile = selected_consultant["id"]
+        st.rerun()
+    elif action == "edit":
+        st.session_state.view_consultant_profile = selected_consultant["id"]
+        st.rerun()
+    elif action == "delete":
+        if ConsultantService.delete_consultant(selected_consultant["id"]):
+            NotificationManager.show_success("Consultant supprimé avec succès!")
+            st.rerun()
+        else:
+            NotificationManager.show_error("Erreur lors de la suppression")
 
 
 # Export des classes pour utilisation externe
