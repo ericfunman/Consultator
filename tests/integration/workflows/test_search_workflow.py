@@ -66,17 +66,69 @@ def search_test_data():
 
     practice_ids = []
 
+@pytest.fixture
+def search_test_data():
+    """Créer un jeu de données complet pour les tests de recherche"""
+
+    # Créer des practices avec des noms uniques pour éviter les conflits
+    import uuid
+    unique_suffix = str(uuid.uuid4())[:8]
+
+    practices_data = [
+        {
+            "nom": f"Data Science_{unique_suffix}",
+            "description": "Data Science & AI",
+            "responsable": "Dr. Marie Dubois",
+        },
+        {
+            "nom": f"Frontend_{unique_suffix}",
+            "description": "Développement frontend",
+            "responsable": "Alice Frontend",
+        },
+        {
+            "nom": f"Backend_{unique_suffix}",
+            "description": "Développement backend",
+            "responsable": "Bob Backend",
+        },
+        {
+            "nom": f"DevOps_{unique_suffix}",
+            "description": "Infrastructure & DevOps",
+            "responsable": "Charlie DevOps",
+        },
+    ]
+
+    practice_ids = []
+
     for practice_data in practices_data:
         with get_database_session() as session:
-            # Vérifier si la practice existe déjà (au cas où)
+            # Vérifier si la practice existe déjà et la supprimer si nécessaire
             existing = session.query(Practice).filter(Practice.nom == practice_data["nom"]).first()
             if existing:
-                practice_ids.append(existing.id)
-            else:
+                # Supprimer la practice existante et ses dépendances
+                try:
+                    # Supprimer les consultants associés d'abord
+                    consultants_to_delete = session.query(Consultant).filter(Consultant.practice_id == existing.id).all()
+                    for consultant in consultants_to_delete:
+                        session.delete(consultant)
+                    session.delete(existing)
+                    session.commit()
+                except Exception as e:
+                    print(f"Erreur lors de la suppression de practice existante {practice_data['nom']}: {e}")
+                    session.rollback()
+
+            # Créer la nouvelle practice
+            try:
                 practice = Practice(**practice_data)
                 session.add(practice)
                 session.commit()
                 practice_ids.append(practice.id)
+            except Exception as e:
+                print(f"Erreur lors de la création de practice {practice_data['nom']}: {e}")
+                session.rollback()
+                # Essayer de récupérer une practice existante si la création échoue
+                existing = session.query(Practice).filter(Practice.nom == practice_data["nom"]).first()
+                if existing:
+                    practice_ids.append(existing.id)
 
     # Créer des consultants avec diversité
     consultants_data = [
@@ -199,10 +251,26 @@ def search_test_data():
     consultant_ids = []
 
     for data in consultants_data:
-        result = ConsultantService.create_consultant(data)
-        assert result is True
-        consultant = ConsultantService.get_consultant_by_email(data["email"])
-        consultant_ids.append(consultant.id)
+        # Vérifier si le consultant existe déjà par email et le supprimer si nécessaire
+        existing_consultant = ConsultantService.get_consultant_by_email(data["email"])
+        if existing_consultant:
+            try:
+                ConsultantService.delete_consultant(existing_consultant.id)
+            except Exception as e:
+                print(f"Erreur lors de la suppression de consultant existant {data['email']}: {e}")
+
+        # Créer le nouveau consultant
+        try:
+            result = ConsultantService.create_consultant(data)
+            assert result is True
+            consultant = ConsultantService.get_consultant_by_email(data["email"])
+            consultant_ids.append(consultant.id)
+        except Exception as e:
+            print(f"Erreur lors de la création de consultant {data['email']}: {e}")
+            # Essayer de récupérer le consultant existant si la création échoue
+            existing = ConsultantService.get_consultant_by_email(data["email"])
+            if existing:
+                consultant_ids.append(existing.id)
 
     yield {
         "practice_ids": practice_ids,

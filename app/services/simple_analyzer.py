@@ -163,6 +163,10 @@ class SimpleDocumentAnalyzer:
 
         st.info(f"🔍 Analyse en cours pour {consultant_name}...")
 
+        # Gérer le cas où text est None
+        if text is None:
+            text = ""
+
         # Initialiser le résultat
         result = {
             "consultant": consultant_name,

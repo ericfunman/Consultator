@@ -5,6 +5,7 @@ Tests réalistes basés sur le code existant
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
+from sqlalchemy.exc import SQLAlchemyError
 from app.services.practice_service import PracticeService
 
 
@@ -48,7 +49,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.side_effect = Exception("DB Error")
+        mock_db.query.side_effect = SQLAlchemyError("DB Error")
         mock_db.close = Mock()
 
         # Execution
@@ -86,7 +87,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.side_effect = Exception("DB Error")
+        mock_db.query.side_effect = SQLAlchemyError("DB Error")
 
         # Execution
         result = PracticeService.get_practice_by_id(1)
@@ -130,11 +131,8 @@ class TestPracticeServiceCoverage:
             None  # Pas d'existant
         )
 
-        # Mock new practice
-        new_practice = Mock()
-
         # Execution
-        result = PracticeService.create_practice(
+        PracticeService.create_practice(
             nom="Test Practice",
             description="Description test",
             responsable="Test Manager",
@@ -177,7 +175,7 @@ class TestPracticeServiceCoverage:
         mock_session.return_value = mock_db
         mock_db.close = Mock()
         mock_db.query.return_value.filter.return_value.first.return_value = None
-        mock_db.add.side_effect = Exception("Test error")
+        mock_db.add.side_effect = SQLAlchemyError("Test error")
 
         # Execution
         result = PracticeService.create_practice(
@@ -242,7 +240,7 @@ class TestPracticeServiceCoverage:
         mock_db.query.return_value.filter.return_value.first.return_value = (
             self.mock_practice
         )
-        mock_db.commit.side_effect = Exception("DB Error")
+        mock_db.commit.side_effect = SQLAlchemyError("DB Error")
 
         # Execution
         result = PracticeService.update_practice(1, nom="New Name")
@@ -314,7 +312,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.side_effect = Exception("DB Error")
+        mock_db.query.side_effect = SQLAlchemyError("DB Error")
 
         # Execution
         result = PracticeService.get_consultants_by_practice(1)
@@ -436,7 +434,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.side_effect = Exception("DB Error")
+        mock_db.query.side_effect = SQLAlchemyError("DB Error")
 
         # Execution
         result = PracticeService.get_practice_statistics()
@@ -496,7 +494,7 @@ class TestPracticeServiceCoverage:
         mock_session.return_value = mock_db
         mock_db.close = Mock()
         mock_db.query.return_value.all.return_value = []
-        mock_db.add.side_effect = Exception("DB Error")
+        mock_db.add.side_effect = SQLAlchemyError("DB Error")
 
         # Execution
         PracticeService.init_default_practices()

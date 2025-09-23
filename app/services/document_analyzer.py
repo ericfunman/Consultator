@@ -1570,7 +1570,7 @@ class DocumentAnalyzer:
     @staticmethod
     def _parse_quanteam_date(date_line: str) -> tuple:
         """Parse la date spécifique de Quanteam"""
-        date_match = re.search(r"(\w+)\s+(\d{4})\s*[–\-]\s*(\w+)", date_line)
+        date_match = re.search(r"(\w+)\s{1,3}(\d{4})\s{0,3}[-–]\s{0,3}(\w+)", date_line)
         if not date_match:
             return "", ""
 
