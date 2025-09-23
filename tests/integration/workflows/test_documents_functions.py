@@ -215,7 +215,7 @@ class TestShowExistingDocuments(BaseIntegrationTest):
 
         # Verify
         mock_st.info.assert_called_once_with(
-            " Aucun document trouve pour ce consultant"
+            "📄 Aucun document trouve pour ce consultant"
         )
 
     @patch("app.pages_modules.documents_functions.DocumentService")

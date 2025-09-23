@@ -13,9 +13,19 @@ from app.database.database import get_database_session
 from app.database.models import Practice, Consultant, Mission
 
 
+@pytest.fixture(scope="function")
+def real_db_session(test_db):
+    """Fixture pour patcher get_database_session avec la vraie session de test"""
+    test_session = test_db()
+
+    with patch('app.database.database.get_database_session', return_value=test_session):
+        with patch('app.services.consultant_service.get_database_session', return_value=test_session):
+            yield test_session
+
+
 # Fixtures pour les tests de statistiques
-@pytest.fixture
-def statistics_test_data(test_db):
+@pytest.fixture(scope="function")
+def statistics_test_data(test_db, real_db_session):
     """Créer un jeu de données complet pour les tests de statistiques"""
 
     # Créer des practices
@@ -41,10 +51,15 @@ def statistics_test_data(test_db):
 
     for practice_data in practices_data:
         with test_db() as session:
-            practice = Practice(**practice_data)
-            session.add(practice)
-            session.commit()
-            practice_ids.append(practice.id)
+            # Vérifier si la practice existe déjà
+            existing_practice = session.query(Practice).filter(Practice.nom == practice_data["nom"]).first()
+            if existing_practice:
+                practice_ids.append(existing_practice.id)
+            else:
+                practice = Practice(**practice_data)
+                session.add(practice)
+                session.commit()
+                practice_ids.append(practice.id)
 
     # Créer des consultants avec diversité de salaires et grades
     consultants_data = [
@@ -176,53 +191,47 @@ def statistics_test_data(test_db):
     consultant_ids = []
 
     for data in consultants_data:
-        result = ConsultantService.create_consultant(data)
-        assert result is True
-        consultant = ConsultantService.get_consultant_by_email(data["email"])
-        consultant_ids.append(consultant.id)
+        # Vérifier si le consultant existe déjà par email
+        existing_consultant = ConsultantService.get_consultant_by_email(data["email"])
+        if existing_consultant:
+            consultant_ids.append(existing_consultant.id)
+        else:
+            result = ConsultantService.create_consultant(data)
+            assert result is True
+            consultant = ConsultantService.get_consultant_by_email(data["email"])
+            consultant_ids.append(consultant.id)
 
-    yield {
+    # Retourner les données sans nettoyage automatique
+    return {
         "practice_ids": practice_ids,
         "consultant_ids": consultant_ids,
         "practices_data": practices_data,
         "consultants_data": consultants_data,
     }
 
-    # Nettoyage
-    for consultant_id in consultant_ids:
-        try:
-            ConsultantService.delete_consultant(consultant_id)
-        except:
-            pass
-
-    for practice_id in practice_ids:
-        try:
-            with test_db() as session:
-                practice = (
-                    session.query(Practice).filter(Practice.id == practice_id).first()
-                )
-                if practice:
-                    session.delete(practice)
-                    session.commit()
-        except:
-            pass
-
 
 class TestStatisticsWorkflowIntegration:
     """Tests d'intégration pour le workflow de statistiques et tableaux de bord"""
 
-    def test_basic_statistics_workflow(self, statistics_test_data):
+    def test_basic_statistics_workflow(self, statistics_test_data, real_db_session):
         """Test du workflow de statistiques de base"""
 
         print("=== TEST STATISTIQUES DE BASE ===")
 
         # Récupérer tous les consultants avec stats
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        assert len(all_consultants) == len(statistics_test_data["consultant_ids"])
+        
+        # Filtrer seulement les consultants créés dans ce test
+        test_consultants = [
+            c for c in all_consultants 
+            if c["id"] in statistics_test_data["consultant_ids"]
+        ]
+        
+        assert len(test_consultants) == len(statistics_test_data["consultant_ids"])
 
         # Calculer les métriques de base
-        total_consultants = len(all_consultants)
-        available_consultants = sum(1 for c in all_consultants if c["disponibilite"])
+        total_consultants = len(test_consultants)
+        available_consultants = sum(1 for c in test_consultants if c["disponibilite"])
         unavailable_consultants = total_consultants - available_consultants
         availability_rate = (
             (available_consultants / total_consultants) * 100
@@ -230,7 +239,7 @@ class TestStatisticsWorkflowIntegration:
             else 0
         )
 
-        total_salary = sum(c["salaire_actuel"] for c in all_consultants)
+        total_salary = sum(c["salaire_actuel"] for c in test_consultants)
         avg_salary = total_salary / total_consultants if total_consultants > 0 else 0
 
         print(f"📊 Métriques globales:")
@@ -249,18 +258,24 @@ class TestStatisticsWorkflowIntegration:
 
         print("✅ Statistiques de base calculées correctement")
 
-    def test_practice_statistics_workflow(self, statistics_test_data):
+    def test_practice_statistics_workflow(self, statistics_test_data, real_db_session):
         """Test du workflow de statistiques par practice"""
 
         print("=== TEST STATISTIQUES PAR PRACTICE ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
+        
+        # Filtrer seulement les consultants créés dans ce test
+        test_consultants = [
+            c for c in all_consultants 
+            if c["id"] in statistics_test_data["consultant_ids"]
+        ]
 
         # Statistiques par practice
         practice_stats = {}
         for practice_name in ["Data Science", "Frontend", "Backend"]:
             practice_consultants = [
-                c for c in all_consultants if c.get("practice_name") == practice_name
+                c for c in test_consultants if c.get("practice_name") == practice_name
             ]
             if practice_consultants:
                 total = len(practice_consultants)
@@ -302,17 +317,23 @@ class TestStatisticsWorkflowIntegration:
 
         print("✅ Statistiques par practice calculées correctement")
 
-    def test_grade_statistics_workflow(self, statistics_test_data):
+    def test_grade_statistics_workflow(self, statistics_test_data, real_db_session):
         """Test du workflow de statistiques par grade"""
 
         print("=== TEST STATISTIQUES PAR GRADE ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
+        
+        # Filtrer seulement les consultants créés dans ce test
+        test_consultants = [
+            c for c in all_consultants 
+            if c["id"] in statistics_test_data["consultant_ids"]
+        ]
 
         # Statistiques par grade
         grade_stats = {}
         for grade in ["Expert", "Senior", "Junior"]:
-            grade_consultants = [c for c in all_consultants if c.get("grade") == grade]
+            grade_consultants = [c for c in test_consultants if c.get("grade") == grade]
             if grade_consultants:
                 total = len(grade_consultants)
                 available = sum(1 for c in grade_consultants if c["disponibilite"])
@@ -355,13 +376,20 @@ class TestStatisticsWorkflowIntegration:
 
         print("✅ Statistiques par grade calculées correctement")
 
-    def test_salary_distribution_workflow(self, statistics_test_data):
+    def test_salary_distribution_workflow(self, statistics_test_data, real_db_session):
         """Test du workflow de distribution des salaires"""
 
         print("=== TEST DISTRIBUTION SALARIALE ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        salaries = [c["salaire_actuel"] for c in all_consultants]
+        
+        # Filtrer seulement les consultants créés dans ce test
+        test_consultants = [
+            c for c in all_consultants 
+            if c["id"] in statistics_test_data["consultant_ids"]
+        ]
+        
+        salaries = [c["salaire_actuel"] for c in test_consultants]
 
         # Calculer les quartiles
         salaries_sorted = sorted(salaries)
@@ -406,32 +434,38 @@ class TestStatisticsWorkflowIntegration:
 
         print("✅ Distribution salariale analysée correctement")
 
-    def test_dashboard_metrics_workflow(self, statistics_test_data):
+    def test_dashboard_metrics_workflow(self, statistics_test_data, real_db_session):
         """Test du workflow des métriques pour tableau de bord"""
 
         print("=== TEST MÉTRIQUES TABLEAU DE BORD ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
+        
+        # Filtrer seulement les consultants créés dans ce test
+        test_consultants = [
+            c for c in all_consultants 
+            if c["id"] in statistics_test_data["consultant_ids"]
+        ]
 
         # Métriques clés pour le dashboard
         dashboard_metrics = {
-            "total_consultants": len(all_consultants),
+            "total_consultants": len(test_consultants),
             "available_consultants": sum(
-                1 for c in all_consultants if c["disponibilite"]
+                1 for c in test_consultants if c["disponibilite"]
             ),
             "total_practices": len(
                 set(
                     c.get("practice_name")
-                    for c in all_consultants
+                    for c in test_consultants
                     if c.get("practice_name")
                 )
             ),
-            "total_salary_cost": sum(c["salaire_actuel"] for c in all_consultants),
-            "avg_salary": sum(c["salaire_actuel"] for c in all_consultants)
-            / len(all_consultants),
+            "total_salary_cost": sum(c["salaire_actuel"] for c in test_consultants),
+            "avg_salary": sum(c["salaire_actuel"] for c in test_consultants)
+            / len(test_consultants),
             "availability_rate": (
-                sum(1 for c in all_consultants if c["disponibilite"])
-                / len(all_consultants)
+                sum(1 for c in test_consultants if c["disponibilite"])
+                / len(test_consultants)
             )
             * 100,
         }
@@ -440,7 +474,7 @@ class TestStatisticsWorkflowIntegration:
         practice_dashboard = {}
         for practice_name in ["Data Science", "Frontend", "Backend"]:
             practice_consultants = [
-                c for c in all_consultants if c.get("practice_name") == practice_name
+                c for c in test_consultants if c.get("practice_name") == practice_name
             ]
             if practice_consultants:
                 practice_dashboard[practice_name] = {
@@ -487,18 +521,24 @@ class TestStatisticsWorkflowIntegration:
 
         print("✅ Métriques du tableau de bord calculées correctement")
 
-    def test_statistics_export_workflow(self, statistics_test_data):
+    def test_statistics_export_workflow(self, statistics_test_data, real_db_session):
         """Test du workflow d'export des statistiques"""
 
         print("=== TEST EXPORT STATISTIQUES ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
+        
+        # Filtrer seulement les consultants créés dans ce test
+        test_consultants = [
+            c for c in all_consultants 
+            if c["id"] in statistics_test_data["consultant_ids"]
+        ]
 
         # Créer un DataFrame pandas pour l'export
-        df = pd.DataFrame(all_consultants)
+        df = pd.DataFrame(test_consultants)
 
         # Vérifications du DataFrame
-        assert len(df) == len(all_consultants)
+        assert len(df) == len(test_consultants)
         assert "prenom" in df.columns
         assert "nom" in df.columns
         assert "salaire_actuel" in df.columns

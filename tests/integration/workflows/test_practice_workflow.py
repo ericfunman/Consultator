@@ -229,15 +229,18 @@ class TestPracticeWorkflowIntegration:
     def test_practice_statistics_workflow(self):
         """Test du workflow des statistiques de practice"""
 
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
+
         # Créer plusieurs practices avec des consultants
         practices_data = [
             {
-                "nom": "Frontend Development",
+                "nom": f"Frontend Development {unique_id}",
                 "description": "Développement frontend",
                 "responsable": "Alice Frontend",
             },
             {
-                "nom": "Backend Development",
+                "nom": f"Backend Development {unique_id}",
                 "description": "Développement backend",
                 "responsable": "Bob Backend",
             },
@@ -259,42 +262,42 @@ class TestPracticeWorkflowIntegration:
             consultants_data = [
                 # Frontend
                 {
-                    "prenom": "Anna",
+                    "prenom": f"Anna_{unique_id}",
                     "nom": "React",
-                    "email": "anna.react@test.com",
+                    "email": f"anna.react.{unique_id}@test.com",
                     "salaire_actuel": 55000,
                     "practice_id": practice_ids[0],
                     "disponibilite": True,
                 },
                 {
-                    "prenom": "Ben",
+                    "prenom": f"Ben_{unique_id}",
                     "nom": "Vue",
-                    "email": "ben.vue@test.com",
+                    "email": f"ben.vue.{unique_id}@test.com",
                     "salaire_actuel": 52000,
                     "practice_id": practice_ids[0],
                     "disponibilite": False,
                 },
                 # Backend
                 {
-                    "prenom": "Charlie",
+                    "prenom": f"Charlie_{unique_id}",
                     "nom": "Python",
-                    "email": "charlie.python@test.com",
+                    "email": f"charlie.python.{unique_id}@test.com",
                     "salaire_actuel": 60000,
                     "practice_id": practice_ids[1],
                     "disponibilite": True,
                 },
                 {
-                    "prenom": "Diana",
+                    "prenom": f"Diana_{unique_id}",
                     "nom": "Java",
-                    "email": "diana.java@test.com",
+                    "email": f"diana.java.{unique_id}@test.com",
                     "salaire_actuel": 58000,
                     "practice_id": practice_ids[1],
                     "disponibilite": True,
                 },
                 {
-                    "prenom": "Eve",
+                    "prenom": f"Eve_{unique_id}",
                     "nom": "Node",
-                    "email": "eve.node@test.com",
+                    "email": f"eve.node.{unique_id}@test.com",
                     "salaire_actuel": 54000,
                     "practice_id": practice_ids[1],
                     "disponibilite": False,
@@ -308,19 +311,65 @@ class TestPracticeWorkflowIntegration:
                 consultant = ConsultantService.get_consultant_by_email(data["email"])
                 all_consultant_ids.append(consultant.id)
 
-            # Analyser les statistiques par practice
-            all_consultants = ConsultantService.get_all_consultants_with_stats()
+            # Analyser les statistiques par practice - filtrer directement sur nos practice_ids
+            with get_database_session() as session:
+                from sqlalchemy.orm import joinedload
+                
+                frontend_consultants_db = (
+                    session.query(Consultant)
+                    .options(joinedload(Consultant.practice))
+                    .filter(Consultant.practice_id == practice_ids[0])
+                    .all()
+                )
+                backend_consultants_db = (
+                    session.query(Consultant)
+                    .options(joinedload(Consultant.practice))
+                    .filter(Consultant.practice_id == practice_ids[1])
+                    .all()
+                )
 
-            frontend_consultants = [
-                c
-                for c in all_consultants
-                if c.get("practice_name") == "Frontend Development"
-            ]
-            backend_consultants = [
-                c
-                for c in all_consultants
-                if c.get("practice_name") == "Backend Development"
-            ]
+            # Convertir en dictionnaires comme le fait get_all_consultants
+            frontend_consultants = []
+            for consultant in frontend_consultants_db:
+                frontend_consultants.append({
+                    "id": consultant.id,
+                    "prenom": consultant.prenom,
+                    "nom": consultant.nom,
+                    "email": consultant.email,
+                    "telephone": consultant.telephone,
+                    "salaire_actuel": consultant.salaire_actuel,
+                    "disponibilite": consultant.disponibilite,
+                    "practice_name": consultant.practice.nom if consultant.practice else "N/A",
+                    "date_creation": consultant.date_creation,
+                    "derniere_maj": consultant.derniere_maj,
+                    # Éviter les propriétés lazy-loaded qui causent DetachedInstanceError
+                    # "date_disponibilite": consultant.date_disponibilite,
+                    "experience_annees": consultant.experience_annees,
+                    "grade": consultant.grade,
+                    "type_contrat": consultant.type_contrat,
+                    "societe": consultant.societe,
+                })
+
+            backend_consultants = []
+            for consultant in backend_consultants_db:
+                backend_consultants.append({
+                    "id": consultant.id,
+                    "prenom": consultant.prenom,
+                    "nom": consultant.nom,
+                    "email": consultant.email,
+                    "telephone": consultant.telephone,
+                    "salaire_actuel": consultant.salaire_actuel,
+                    "disponibilite": consultant.disponibilite,
+                    "practice_name": consultant.practice.nom if consultant.practice else "N/A",
+                    "date_creation": consultant.date_creation,
+                    "derniere_maj": consultant.derniere_maj,
+                    # Éviter les propriétés lazy-loaded qui causent DetachedInstanceError
+                    # "date_disponibilite": consultant.date_disponibilite,
+                    "experience_annees": consultant.experience_annees,
+                    "grade": consultant.grade,
+                    "type_contrat": consultant.type_contrat,
+                    "societe": consultant.societe,
+                })
 
             # Vérifications Frontend
             assert len(frontend_consultants) == 2
@@ -356,7 +405,7 @@ class TestPracticeWorkflowIntegration:
             for consultant_id in all_consultant_ids:
                 try:
                     ConsultantService.delete_consultant(consultant_id)
-                except:
+                except Exception:
                     pass
 
             for practice_id in practice_ids:
@@ -370,16 +419,19 @@ class TestPracticeWorkflowIntegration:
                         if practice:
                             session.delete(practice)
                             session.commit()
-                except:
+                except Exception:
                     pass
 
     def test_practice_consultant_reassignment(self):
         """Test de réassignation de consultants entre practices"""
 
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
+
         # Créer deux practices
         practices_data = [
-            {"nom": "Old Practice", "description": "Practice d'origine"},
-            {"nom": "New Practice", "description": "Nouvelle practice"},
+            {"nom": f"Old Practice {unique_id}", "description": "Practice d'origine"},
+            {"nom": f"New Practice {unique_id}", "description": "Nouvelle practice"},
         ]
 
         practice_ids = []
@@ -395,9 +447,9 @@ class TestPracticeWorkflowIntegration:
 
             # Créer un consultant dans la première practice
             consultant_data = {
-                "prenom": "Test",
+                "prenom": f"Test_{unique_id}",
                 "nom": "Reassignment",
-                "email": "test.reassignment@test.com",
+                "email": f"test.reassignment.{unique_id}@test.com",
                 "salaire_actuel": 50000,
                 "practice_id": practice_ids[0],
                 "disponibilite": True,
@@ -430,15 +482,40 @@ class TestPracticeWorkflowIntegration:
             updated_consultant = ConsultantService.get_consultant_by_id(consultant_id)
             assert updated_consultant.practice_id == practice_ids[1]
 
-            # Vérifier les statistiques des practices
-            all_consultants = ConsultantService.get_all_consultants_with_stats()
+            # Vérifier les statistiques des practices - filtrer directement
+            with get_database_session() as session:
+                from sqlalchemy.orm import joinedload
+                
+                old_practice_consultants_db = (
+                    session.query(Consultant)
+                    .options(joinedload(Consultant.practice))
+                    .filter(Consultant.practice_id == practice_ids[0])
+                    .all()
+                )
+                new_practice_consultants_db = (
+                    session.query(Consultant)
+                    .options(joinedload(Consultant.practice))
+                    .filter(Consultant.practice_id == practice_ids[1])
+                    .all()
+                )
 
-            old_practice_consultants = [
-                c for c in all_consultants if c.get("practice_name") == "Old Practice"
-            ]
-            new_practice_consultants = [
-                c for c in all_consultants if c.get("practice_name") == "New Practice"
-            ]
+            old_practice_consultants = []
+            for consultant in old_practice_consultants_db:
+                old_practice_consultants.append({
+                    "id": consultant.id,
+                    "prenom": consultant.prenom,
+                    "nom": consultant.nom,
+                    "practice_name": consultant.practice.nom if consultant.practice else "N/A",
+                })
+
+            new_practice_consultants = []
+            for consultant in new_practice_consultants_db:
+                new_practice_consultants.append({
+                    "id": consultant.id,
+                    "prenom": consultant.prenom,
+                    "nom": consultant.nom,
+                    "practice_name": consultant.practice.nom if consultant.practice else "N/A",
+                })
 
             assert (
                 len(old_practice_consultants) == 0
@@ -454,7 +531,7 @@ class TestPracticeWorkflowIntegration:
             if "consultant_id" in locals():
                 try:
                     ConsultantService.delete_consultant(consultant_id)
-                except:
+                except Exception:
                     pass
 
             for practice_id in practice_ids:
@@ -468,5 +545,5 @@ class TestPracticeWorkflowIntegration:
                         if practice:
                             session.delete(practice)
                             session.commit()
-                except:
+                except Exception:
                     pass

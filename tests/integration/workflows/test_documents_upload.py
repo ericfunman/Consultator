@@ -89,7 +89,7 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_subheader.assert_called_once_with(" Upload de documents")
         mock_uploader.assert_called_once()
         mock_columns.assert_called_once_with(3)
-        mock_metric.assert_any_call(" Nom du fichier", "test_document.pdf")
+        mock_metric.assert_any_call("📄 Nom du fichier", "test_document.pdf")
         mock_metric.assert_any_call(" Taille", "500.0 KB")
         mock_button.assert_called_once_with(
             " Sauvegarder document", type="primary", key="save_document"
@@ -242,5 +242,5 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
 
         show_document_upload_section()
 
-        mock_metric.assert_any_call(" Nom du fichier", "large_document.pdf")
+        mock_metric.assert_any_call("📄 Nom du fichier", "large_document.pdf")
         mock_metric.assert_any_call(" Taille", "5.0 MB")
