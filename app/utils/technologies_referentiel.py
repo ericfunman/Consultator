@@ -413,7 +413,7 @@ def get_all_technologies() -> List[str]:
     all_techs = []
     for category, techs in TECHNOLOGIES_REFERENTIEL.items():
         all_techs.extend(techs)
-    return sorted(list(set(all_techs)))
+    return sorted(set(all_techs))
 
 
 def get_technologies_by_category() -> Dict[str, List[str]]:

@@ -193,9 +193,7 @@ class SimpleDocumentAnalyzer:
                         "client": client,
                         "titre": f"Mission chez {client}",
                         "description": f"Intervention chez {client}",
-                        "langages_techniques": [
-                            tech for tech in technologies_found[:5]
-                        ],
+                        "langages_techniques": list(technologies_found[:5]),
                         "duree": "Non spécifiée",
                     }
                     missions.append(mission)

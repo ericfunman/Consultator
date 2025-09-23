@@ -31,7 +31,7 @@ class TechnologyService:
                 custom_tech_names = [tech.nom for tech in custom_techs]
 
             # Fusion et tri
-            all_technologies = list(set(ref_technologies + custom_tech_names))
+            all_technologies = set(ref_technologies + custom_tech_names)
             return sorted(all_technologies)
 
         except SQLAlchemyError as e:

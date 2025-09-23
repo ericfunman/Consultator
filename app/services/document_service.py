@@ -176,7 +176,7 @@ class DocumentService:
                         page_text = page.extract_text()
                         if page_text:
                             text += page_text + "\n"
-            except (OSError, IOError, ValueError, Exception) as pdf_error:
+            except (OSError, IOError, ValueError):
                 # Méthode 2: PyPDF2 (fallback)
                 try:
                     with open(file_path, "rb") as file:
