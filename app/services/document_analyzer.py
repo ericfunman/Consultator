@@ -1575,7 +1575,7 @@ class DocumentAnalyzer:
         date_match = re.search(
             rf"({month_pattern})\s+(\d{{4}})\s*[-–]\s*({month_pattern}|aujourd'hui)",
             date_line,
-            re.IGNORECASE
+            re.IGNORECASE,
         )
         if not date_match:
             return "", ""
