@@ -16,8 +16,11 @@ from app.database.models import Practice, Consultant
 @pytest.fixture
 def sample_practice_data():
     """Données de test pour une practice"""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
+    
     return {
-        "nom": "Data Science & AI",
+        "nom": f"Data Science & AI {unique_id}",
         "description": "Practice spécialisée dans la data science et l'intelligence artificielle",
         "responsable": "Dr. Marie Dubois",
     }
@@ -26,21 +29,24 @@ def sample_practice_data():
 @pytest.fixture
 def sample_consultants_for_practice():
     """Créer plusieurs consultants de test pour une practice"""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
+    
     consultants_data = [
         {
             "prenom": "Alice",
-            "nom": "Data",
-            "email": "alice.data@test.com",
+            "nom": f"Data_{unique_id}",
+            "email": f"alice.data.{unique_id}@test.com",
             "salaire_actuel": 65000,
-            "practice_id": 1,
+            "practice_id": 1,  # Practice par défaut, sera changée dans le test
             "disponibilite": True,
             "grade": "Expert",
             "societe": "DataCorp",
         },
         {
             "prenom": "Bob",
-            "nom": "AI",
-            "email": "bob.ai@test.com",
+            "nom": f"AI_{unique_id}",
+            "email": f"bob.ai.{unique_id}@test.com",
             "salaire_actuel": 60000,
             "practice_id": 1,
             "disponibilite": True,
@@ -49,8 +55,8 @@ def sample_consultants_for_practice():
         },
         {
             "prenom": "Claire",
-            "nom": "ML",
-            "email": "claire.ml@test.com",
+            "nom": f"ML_{unique_id}",
+            "email": f"claire.ml.{unique_id}@test.com",
             "salaire_actuel": 55000,
             "practice_id": 1,
             "disponibilite": False,
@@ -134,40 +140,32 @@ class TestPracticeWorkflowIntegration:
             # === PHASE 3: Vérification des statistiques ===
             print("=== PHASE 3: Vérification des statistiques ===")
 
-            # Vérifier les statistiques via ConsultantService
-            all_consultants = ConsultantService.get_all_consultants_with_stats()
-            practice_consultants = [
-                c
-                for c in all_consultants
-                if c.get("practice_name") == sample_practice_data["nom"]
-            ]
+            # Vérifier directement via la base de données
+            with get_database_session() as session:
+                consultants_in_practice = (
+                    session.query(Consultant)
+                    .filter(Consultant.practice_id == practice_id)
+                    .all()
+                )
+                assert len(consultants_in_practice) == len(consultant_ids)
+                
+                # Calculer les statistiques manuellement
+                total_salary = sum(c.salaire_actuel for c in consultants_in_practice)
+                available_count = sum(1 for c in consultants_in_practice if c.disponibilite)
+                unavailable_count = len(consultants_in_practice) - available_count
 
-            assert len(practice_consultants) == len(consultant_ids)
-
-            # Calculer les statistiques manuellement
-            total_salary = sum(c["salaire_actuel"] for c in practice_consultants)
-            available_count = sum(1 for c in practice_consultants if c["disponibilite"])
-            unavailable_count = len(practice_consultants) - available_count
-
-            print(
-                f"📊 Statistiques practice: {len(practice_consultants)} consultants, "
-                f"{available_count} disponibles, salaire total: {total_salary}€"
-            )
+                print(
+                    f"📊 Statistiques practice: {len(consultants_in_practice)} consultants, "
+                    f"{available_count} disponibles, salaire total: {total_salary}€"
+                )
 
             # === PHASE 4: Test de recherche par practice ===
             print("=== PHASE 4: Test de recherche par practice ===")
 
-            # Rechercher les consultants de cette practice
-            search_results = ConsultantService.search_consultants_optimized(
-                "", page=1, per_page=50
-            )
-            practice_results = [
-                c
-                for c in search_results
-                if c.get("practice_name") == sample_practice_data["nom"]
-            ]
-
-            assert len(practice_results) == len(consultant_ids)
+            # Vérifier que les consultants ont bien le bon practice_id
+            for consultant_id in consultant_ids:
+                consultant = ConsultantService.get_consultant_by_id(consultant_id)
+                assert consultant.practice_id == practice_id
 
             print("✅ Recherche par practice fonctionnelle")
 

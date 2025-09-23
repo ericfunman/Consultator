@@ -31,10 +31,13 @@ def sample_mission_data():
 @pytest.fixture
 def sample_consultant_for_mission():
     """Créer un consultant de test pour les missions"""
+    import uuid
+    unique_id = str(uuid.uuid4())[:8]
+    
     data = {
         "prenom": "Marie",
-        "nom": "Leroy",
-        "email": "marie.leroy@test.com",
+        "nom": f"Leroy_{unique_id}",
+        "email": f"marie.leroy.{unique_id}@test.com",
         "telephone": "0123456789",
         "salaire_actuel": 55000,
         "practice_id": 1,
