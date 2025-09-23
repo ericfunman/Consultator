@@ -172,85 +172,106 @@ class TestConsultants(BaseUITest):
     @patch("app.pages_modules.consultants.st.columns")
     @patch("app.pages_modules.consultants.st.markdown")
     @patch("app.pages_modules.consultants.st.dataframe")
-    @patch("app.pages_modules.consultants.get_database_session")
+    @patch("app.pages_modules.consultants.ConsultantService.get_all_consultants_with_stats")
     def test_show_consultants_list_basic(
-        self, mock_session, mock_dataframe, mock_md, mock_columns
+        self, mock_get_consultants, mock_dataframe, mock_md, mock_columns
     ):
         """Test show_consultants_list() basique"""
-        # Mock database session
-        mock_session_instance = Mock()
-        mock_session.return_value.__enter__.return_value = mock_session_instance
+        # Forcer la version classique en mockant l'import
+        with patch.dict('sys.modules', {'app.ui.enhanced_ui': None}):
+            # Mock consultants data
+            mock_consultants = [
+                {
+                    "id": 1,
+                    "prenom": "Jean",
+                    "nom": "Dupont",
+                    "email": "jean@email.com",
+                    "societe": "Quanteam",
+                    "grade": "Consultant",
+                    "type_contrat": "CDI",
+                    "salaire_actuel": 45000,
+                    "disponibilite": True,
+                    "practice_name": "Data Science",
+                    "experience_annees": 5,
+                    "nb_missions": 3,
+                    "salaire_formatted": "45 000€",
+                    "cjm_formatted": "15 000€",
+                    "experience_formatted": "5 ans",
+                    "statut": "Disponible",
+                },
+                {
+                    "id": 2,
+                    "prenom": "Marie",
+                    "nom": "Martin",
+                    "email": "marie@email.com",
+                    "societe": "Quanteam",
+                    "grade": "Senior",
+                    "type_contrat": "CDI",
+                    "salaire_actuel": 55000,
+                    "disponibilite": False,
+                    "practice_name": "Data Science",
+                    "experience_annees": 8,
+                    "nb_missions": 5,
+                    "salaire_formatted": "55 000€",
+                    "cjm_formatted": "18 000€",
+                    "experience_formatted": "8 ans",
+                    "statut": "Occupé",
+                },
+            ]
+            mock_get_consultants.return_value = mock_consultants
 
-        # Mock consultants
-        mock_consultant1 = Mock()
-        mock_consultant1.id = 1
-        mock_consultant1.prenom = "Jean"
-        mock_consultant1.nom = "Dupont"
-        mock_consultant1.email = "jean@email.com"
-        mock_consultant1.disponibilite = "Immédiate"
+            # Mock columns as context managers
+            mock_col1, mock_col2, mock_col3, mock_col4 = Mock(), Mock(), Mock(), Mock()
+            for col in [mock_col1, mock_col2, mock_col3, mock_col4]:
+                col.__enter__ = Mock(return_value=col)
+                col.__exit__ = Mock(return_value=None)
+            mock_columns.return_value = (mock_col1, mock_col2, mock_col3, mock_col4)
 
-        mock_consultant2 = Mock()
-        mock_consultant2.id = 2
-        mock_consultant2.prenom = "Marie"
-        mock_consultant2.nom = "Martin"
-        mock_consultant2.email = "marie@email.com"
-        mock_consultant2.disponibilite = "Dans 1 mois"
+            # Mock dataframe event
+            mock_event = Mock()
+            mock_event.selection.rows = []  # Aucune sélection
+            mock_dataframe.return_value = mock_event
 
-        # Mock query chain
-        mock_session_instance.query.return_value.filter.return_value.all.return_value = [
-            mock_consultant1,
-            mock_consultant2,
-        ]
+            with patch(
+                "app.pages_modules.consultants.st.selectbox"
+            ) as mock_selectbox, patch(
+                "app.pages_modules.consultants.st.button"
+            ) as mock_button, patch(
+                "app.pages_modules.consultants.st.text_input"
+            ) as mock_text_input:
 
-        # Mock columns as context managers
-        mock_col1, mock_col2, mock_col3, mock_col4 = Mock(), Mock(), Mock(), Mock()
-        for col in [mock_col1, mock_col2, mock_col3, mock_col4]:
-            col.__enter__ = Mock(return_value=col)
-            col.__exit__ = Mock(return_value=None)
-        mock_columns.return_value = (mock_col1, mock_col2, mock_col3, mock_col4)
+                mock_selectbox.side_effect = [
+                    25,
+                    "Tous",
+                    "",
+                ]  # items_per_page, filter, search
+                mock_button.return_value = False
+                mock_text_input.return_value = ""
 
-        with patch(
-            "app.pages_modules.consultants.st.selectbox"
-        ) as mock_selectbox, patch(
-            "app.pages_modules.consultants.st.button"
-        ) as mock_button, patch(
-            "app.pages_modules.consultants.st.text_input"
-        ) as mock_text_input:
+                show_consultants_list()
 
-            mock_selectbox.side_effect = [
-                25,
-                "Tous",
-                "",
-            ]  # items_per_page, filter, search
-            mock_button.return_value = False
-            mock_text_input.return_value = ""
+                # Vérifier que markdown est appelé (pour les métriques)
+                mock_md.assert_called()
+                # Vérifier que dataframe est appelé
+                mock_dataframe.assert_called_once()
 
-            show_consultants_list()
-
-            # Vérifier que le titre est affiché (pas forcément "### 👥 Liste des consultants" si il y a des données)
-            mock_md.assert_called()
-            # mock_dataframe.assert_called_once()  # Peut ne pas être appelé selon la logique
-
-    def test_show_consultants_list_empty(self):
+    @patch("app.pages_modules.consultants.ConsultantService.get_all_consultants_with_stats")
+    def test_show_consultants_list_empty(self, mock_get_consultants):
         """Test show_consultants_list() avec liste vide"""
-        with patch(
-            "app.pages_modules.consultants.get_database_session"
-        ) as mock_session, patch(
-            "app.pages_modules.consultants.st.markdown"
-        ) as mock_md:
+        with patch.dict('sys.modules', {'app.ui.enhanced_ui': None}):
+            # Mock empty consultants list
+            mock_get_consultants.return_value = []
 
-            mock_session_instance = Mock()
-            mock_session.return_value.__enter__.return_value = mock_session_instance
-            mock_session_instance.query.return_value.filter.return_value.all.return_value = (
-                []
-            )
+            with patch(
+                "app.pages_modules.consultants.st.markdown"
+            ) as mock_md:
 
-            show_consultants_list()
+                show_consultants_list()
 
-            # Should show empty message
-            mock_md.assert_any_call(
-                "💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil"
-            )
+                # Should show empty message
+                mock_md.assert_any_call(
+                    "💡 Utilisez l'onglet **Ajouter un consultant** pour créer votre premier profil"
+                )
 
     @patch("app.pages_modules.consultants.st.markdown")
     @patch("app.pages_modules.consultants.st.columns")

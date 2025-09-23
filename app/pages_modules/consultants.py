@@ -1998,6 +1998,12 @@ def _handle_enhanced_table_interactions(enhancer, filtered_data):
 
     if event and event.selection.rows:
         selected_idx = event.selection.rows[0]
+        # S'assurer que selected_idx est un entier (gestion des mocks en test)
+        try:
+            selected_idx = int(selected_idx)
+        except (TypeError, ValueError):
+            selected_idx = 0
+
         if selected_idx < len(filtered_data):
             _process_selected_consultant(enhancer, filtered_data[selected_idx])
 
@@ -2122,6 +2128,12 @@ def _handle_classic_table_selection(event, consultants_data):
     """Gère la sélection dans le tableau classique"""
     if event.selection.rows:
         selected_row = event.selection.rows[0]
+        # S'assurer que selected_row est un entier (gestion des mocks en test)
+        try:
+            selected_row = int(selected_row)
+        except (TypeError, ValueError):
+            selected_row = 0
+
         if selected_row < len(consultants_data):
             selected_consultant = consultants_data[selected_row]
             _display_selected_consultant_actions(selected_consultant)

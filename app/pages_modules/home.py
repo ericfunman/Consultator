@@ -207,7 +207,7 @@ def show_getting_started():
     # Actions rapides
     st.subheader("⚡ Actions rapides")
 
-    (col1,) = st.columns(1)
+    col1 = st.columns(1)[0]
 
     with col1:
         if st.button("➕ Ajouter un consultant", type="primary"):
