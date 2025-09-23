@@ -220,8 +220,8 @@ class ChatbotService:
                 r"python",
                 r"sql",
                 r"java",
-                r"quelles.+compétences",
-                r"quelles.+competences",
+                r"quelles\s+(?:\w+\s+)*compétences",
+                r"quelles\s+(?:\w+\s+)*competences",
                 r"skills",
                 r"techno",
                 r"connaît",
@@ -238,10 +238,10 @@ class ChatbotService:
                 r"allemand",
                 r"italien",
                 r"bilingue",
-                r"niveau.+langue",
-                r"parle.+anglais",
-                r"qui.+parle",
-                r"quelles.+langues",
+                r"niveau\s+(?:\w+\s+)*langue",
+                r"parle\s+(?:\w+\s+)*anglais",
+                r"qui\s+(?:\w+\s+)*parle",
+                r"quelles\s+(?:\w+\s+)*langues",
                 r"polyglotte",
                 r"linguistique",
             ],
@@ -256,8 +256,8 @@ class ChatbotService:
                 r"bnp",
                 r"paribas",
                 r"société générale",
-                r"combien.+missions?",
-                r"nombre.+missions?",
+                r"combien\s+(?:\w+\s+)*missions?",
+                r"nombre\s+(?:\w+\s+)*missions?",
                 r"projets",
             ],
             "contact": [
@@ -300,14 +300,14 @@ class ChatbotService:
                 r"téléchargé",
             ],
             "statistiques": [
-                r"combien.+consultants",
-                r"nombre.+consultants",
-                r"combien.+dans.+base",
+                r"combien\s+(?:[\w-]+\s+)*consultants",
+                r"nombre\s+(?:[\w-]+\s+)*consultants",
+                r"combien\s+(?:[\w-]+\s+)*dans\s+(?:[\w-]+\s+)*base",
                 r"nombre",
                 r"moyenne",
                 r"total",
                 r"statistiques",
-                r"combien.+missions",
+                r"combien\s+(?:[\w-]+\s+)*missions",
                 r"actifs",
                 r"inactifs",
                 r"tjm moyen",
@@ -318,10 +318,10 @@ class ChatbotService:
                 r"disponible",
                 r"disponibilité",
                 r"libre",
-                r"quand.+libre",
-                r"quand.+disponible",
-                r"date.+disponibilité",
-                r"fin.+mission",
+                r"quand\s+(?:\w+\s+)*libre",
+                r"quand\s+(?:\w+\s+)*disponible",
+                r"date\s+(?:\w+\s+)*disponibilité",
+                r"fin\s+(?:\w+\s+)*mission",
                 r"libéré",
                 r"fini",
                 r"termine",
@@ -331,15 +331,15 @@ class ChatbotService:
                 r"prochaine disponibilité",
             ],
             "tjm_mission": [  # Nouvelle intention V1.2.2
-                r"tjm.+mission",
-                r"taux.+mission",
-                r"prix.+mission",
-                r"coût.+mission",
-                r"tarif.+mission",
-                r"facturation.+mission",
-                r"journalier.+mission",
-                r"combien.+coûte.+mission",
-                r"prix.+journée.+mission",
+                r"tjm\s+(?:\w+\s+)*mission",
+                r"taux\s+(?:\w+\s+)*mission",
+                r"prix\s+(?:\w+\s+)*mission",
+                r"coût\s+(?:\w+\s+)*mission",
+                r"tarif\s+(?:\w+\s+)*mission",
+                r"facturation\s+(?:\w+\s+)*mission",
+                r"journalier\s+(?:\w+\s+)*mission",
+                r"combien\s+(?:\w+\s+)*coûte\s+(?:\w+\s+)*mission",
+                r"prix\s+(?:\w+\s+)*journée\s+(?:\w+\s+)*mission",
                 r"tjm mission",
                 r"prix mission",
                 r"coût mission",
@@ -398,18 +398,18 @@ class ChatbotService:
         # Si c'est une question de type "combien de consultants en CDI/CDD", c'est
         # du profil professionnel
         if re.search(
-            r"combien.+(consultants?).+(cdi|cdd|stagiaire|alternant|indépendant)",
+            r"combien\s+(?:[\w-]+\s+)*consultants?\s+(?:[\w-]+\s+)*(?:cdi|cdd|stagiaire|alternant|indépendant)",
             question,
         ):
             return "profil_professionnel"
 
         # Si c'est une question de type "qui travaille chez", c'est du profil
         # professionnel
-        if re.search(r"qui.+(travaille|est).+(chez|dans).+(quanteam|asigma)", question):
+        if re.search(r"qui\s+(?:[\w'-]+\s+)*(?:travaille|est)\s+(?:[\w'-]+\s+)*(?:chez|dans)\s+(?:[\w'-]+\s+)*(?:quanteam|asigma)", question):
             return "profil_professionnel"
 
         # Si c'est une question de type "combien de missions", c'est des missions
-        if re.search(r"combien.+missions?", question):
+        if re.search(r"combien\s+(?:\w+\s+)*missions?", question):
             return "missions"
 
         # Si le mot "combien" est utilisé avec un nom de consultant, c'est probablement un salaire
@@ -418,7 +418,7 @@ class ChatbotService:
             return "salaire"
 
         # Si c'est une question de type "combien de consultants", c'est des statistiques
-        if re.search(r"combien.+(consultants?|dans.+base)", question):
+        if re.search(r"combien\s+(?:[\w-]+\s+)*(?:consultants?|dans\s+(?:[\w-]+\s+)*base)", question):
             return "statistiques"
 
         return None
@@ -1596,7 +1596,7 @@ class ChatbotService:
         patterns = [
             r"qui\s+parle\s+(.+?)(?:\?|$)",
             r"parlent\s+(.+?)(?:\?|$)",
-            r"qui.+parle.+(.+?)(?:\?|$)",
+            r"qui\s+(?:\w+\s+)*parle\s+(?:\w+\s+)*(.+?)(?:\?|$)",
         ]
 
         for pattern in patterns:
