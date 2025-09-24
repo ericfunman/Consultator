@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Service d'analyse IA avec Grok (xAI)
-Utilise l'API Grok pour analyser les CV et extraire les informations pertinentes
+Service d'analyse IA avec OpenAI GPT-4
+Utilise l'API OpenAI pour analyser les CV et extraire les informations pertinentes
 """
 
 import json
@@ -16,30 +16,29 @@ import streamlit as st
 logger = logging.getLogger(__name__)
 
 
-class GrokAIService:
-    """Service d'analyse IA utilisant Grok (xAI)"""
+class OpenAIChatGPTService:
+    """Service d'analyse IA utilisant OpenAI GPT-4"""
 
     def __init__(self, api_key: Optional[str] = None):
         """
-        Initialise le service Grok
+        Initialise le service OpenAI
 
         Args:
-            api_key: Clé API Grok. Si None, utilise la variable d'environnement
+            api_key: Clé API OpenAI. Si None, utilise la variable d'environnement
         """
-        self.api_key = api_key or os.getenv("GROK_API_KEY")
-        self.base_url = "https://api.x.ai/v1"
-        self.model = "grok-beta"  # Modèle Grok actuel
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.base_url = "https://api.openai.com/v1"
+        self.model = "gpt-4"  # Modèle GPT-4
 
         if not self.api_key:
-            raise ValueError("❌ Clé API Grok manquante. Configurez GROK_API_KEY")
+            raise ValueError("❌ Clé API OpenAI manquante. Configurez OPENAI_API_KEY")
 
     def analyze_cv(self, document_text: str) -> Dict[str, Any]:
         """
-        Analyse un CV avec Grok et retourne les informations structurées
+        Analyse un CV avec GPT-4 et retourne les informations structurées
 
         Args:
             document_text: Texte brut du CV
-            consultant_name: Nom du consultant (optionnel)
 
         Returns:
             Dictionnaire avec les informations extraites
@@ -48,8 +47,8 @@ class GrokAIService:
             # Construire le prompt d'analyse
             prompt = self._build_analysis_prompt(document_text)
 
-            # Appeler l'API Grok
-            response = self._call_grok_api(prompt)
+            # Appeler l'API OpenAI
+            response = self._call_openai_api(prompt)
 
             # Parser et valider la réponse
             return self._parse_and_validate_response(response, document_text)
@@ -59,10 +58,10 @@ class GrokAIService:
             raise RuntimeError(f"❌ Échec de l'analyse IA: {str(e)}") from e
 
     def _build_analysis_prompt(self, document_text: str) -> str:
-        """Construit le prompt d'analyse pour Grok"""
+        """Construit le prompt d'analyse pour GPT-4"""
 
         # Limiter la longueur du texte pour éviter les dépassements de tokens
-        max_length = 8000  # Environ 2000 tokens
+        max_length = 12000  # GPT-4 peut gérer plus de tokens
         if len(document_text) > max_length:
             document_text = document_text[:max_length] + "...[texte tronqué]"
 
@@ -129,8 +128,8 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
 
         return prompt
 
-    def _call_grok_api(self, prompt: str) -> Dict[str, Any]:
-        """Appelle l'API Grok"""
+    def _call_openai_api(self, prompt: str) -> Dict[str, Any]:
+        """Appelle l'API OpenAI"""
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -150,21 +149,36 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         }
 
         try:
+            # D'abord essayer avec les certificats standard
             response = requests.post(
                 f"{self.base_url}/chat/completions",
                 headers=headers,
                 json=payload,
                 timeout=60
             )
-
             response.raise_for_status()
             return response.json()
 
+        except requests.exceptions.SSLError:
+            # Si erreur SSL, essayer avec certificats désactivés (environnement entreprise)
+            logger.warning("Erreur SSL détectée, tentative sans vérification SSL...")
+            try:
+                response = requests.post(
+                    f"{self.base_url}/chat/completions",
+                    headers=headers,
+                    json=payload,
+                    timeout=60,
+                    verify=False
+                )
+                response.raise_for_status()
+                return response.json()
+            except Exception as e:
+                raise ConnectionError(f"Erreur API OpenAI: {str(e)}") from e
         except requests.exceptions.RequestException as e:
-            raise ConnectionError(f"Erreur API Grok: {str(e)}") from e
+            raise ConnectionError(f"Erreur API OpenAI: {str(e)}") from e
 
     def _parse_and_validate_response(self, api_response: Dict[str, Any], original_text: str) -> Dict[str, Any]:
-        """Parse et valide la réponse de Grok"""
+        """Parse et valide la réponse de GPT-4"""
 
         try:
             # Extraire le contenu de la réponse
@@ -187,7 +201,7 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
 
             # Ajouter des métadonnées
             parsed_data["_metadata"] = {
-                "analyzed_by": "grok_ai",
+                "analyzed_by": "openai_gpt4",
                 "analysis_date": datetime.now().isoformat(),
                 "text_length": len(original_text),
                 "model_used": self.model
@@ -198,11 +212,11 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         except json.JSONDecodeError as e:
             logger.error(f"Erreur de parsing JSON: {e}")
             logger.error(f"Contenu reçu: {content[:500]}...")
-            raise ValueError("❌ La réponse de Grok n'est pas un JSON valide") from e
+            raise ValueError("❌ La réponse de GPT-4 n'est pas un JSON valide") from e
 
         except KeyError as e:
             logger.error(f"Structure de réponse inattendue: {e}")
-            raise ValueError("❌ Structure de réponse Grok inattendue") from e
+            raise ValueError("❌ Structure de réponse OpenAI inattendue") from e
 
     def get_cost_estimate(self, text_length: int) -> float:
         """
@@ -214,23 +228,26 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         Returns:
             Coût estimé en dollars
         """
-        # Estimation basée sur les prix Grok (approximatif)
-        # ~$0.001 par 1K tokens, 1 token ≈ 4 caractères
-        estimated_tokens = text_length / 4
-        cost_per_1k_tokens = 0.001
-        return (estimated_tokens / 1000) * cost_per_1k_tokens
+        # Estimation basée sur les prix GPT-4 (approximatif)
+        # GPT-4: ~$0.03 par 1K tokens input, ~$0.06 par 1K tokens output
+        # 1 token ≈ 4 caractères, estimation conservatrice
+        estimated_input_tokens = text_length / 4
+        estimated_output_tokens = 1000  # Estimation pour la réponse JSON
+        input_cost = (estimated_input_tokens / 1000) * 0.03
+        output_cost = (estimated_output_tokens / 1000) * 0.06
+        return input_cost + output_cost
 
 
-def get_grok_service() -> Optional[GrokAIService]:
-    """Factory pour obtenir une instance du service Grok"""
+def get_grok_service() -> Optional[OpenAIChatGPTService]:
+    """Factory pour obtenir une instance du service OpenAI (rétrocompatibilité)"""
     try:
-        return GrokAIService()
+        return OpenAIChatGPTService()
     except ValueError:
         return None
 
 
 def is_grok_available() -> bool:
-    """Vérifie si le service Grok est disponible"""
+    """Vérifie si le service OpenAI est disponible (rétrocompatibilité)"""
     try:
         service = get_grok_service()
         return service is not None
@@ -240,55 +257,55 @@ def is_grok_available() -> bool:
 
 # Interface Streamlit pour la configuration
 def show_grok_config_interface():
-    """Interface Streamlit pour configurer Grok"""
+    """Interface Streamlit pour configurer OpenAI (rétrocompatibilité)"""
 
-    st.markdown("### 🤖 Configuration Grok AI")
+    st.markdown("### 🤖 Configuration OpenAI GPT-4")
 
     # Vérifier si la clé API est configurée
-    api_key = os.getenv("GROK_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
 
     if api_key:
         # Clé configurée
         masked_key = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
-        st.success(f"✅ Clé API configurée: `{masked_key}`")
+        st.success(f"✅ Clé API OpenAI configurée: `{masked_key}`")
 
         # Tester la connexion
-        if st.button("🔍 Tester la connexion", key="test_grok_connection"):
+        if st.button("🔍 Tester la connexion", key="test_openai_connection"):
             with st.spinner("Test de connexion en cours..."):
                 try:
-                    service = GrokAIService(api_key)
+                    service = OpenAIChatGPTService(api_key)
                     # Faire un petit test
-                    test_response = service._call_grok_api("Bonjour, réponds simplement 'OK'")
-                    st.success("✅ Connexion Grok réussie !")
+                    service._call_openai_api("Bonjour, réponds simplement 'OK'")
+                    st.success("✅ Connexion OpenAI réussie !")
                 except Exception as e:
                     st.error(f"❌ Erreur de connexion: {e}")
 
     else:
         # Clé non configurée
-        st.warning("⚠️ Clé API Grok non configurée")
+        st.warning("⚠️ Clé API OpenAI non configurée")
 
         st.markdown("""
-        **Pour utiliser Grok AI, vous devez :**
+        **Pour utiliser GPT-4, vous devez :**
 
-        1. **Obtenir une clé API** sur [x.ai](https://x.ai)
+        1. **Obtenir une clé API** sur [platform.openai.com](https://platform.openai.com)
         2. **Ajouter la variable d'environnement** :
            ```bash
-           export GROK_API_KEY="votre_clé_api_ici"
+           export OPENAI_API_KEY="votre_clé_api_ici"
            ```
         3. **Redémarrer l'application**
         """)
 
         # Saisie temporaire de la clé API
         temp_api_key = st.text_input(
-            "Clé API Grok (temporaire)",
+            "Clé API OpenAI (temporaire)",
             type="password",
             help="Saisissez votre clé API pour tester immédiatement"
         )
 
         if temp_api_key and st.button("🔍 Tester avec cette clé"):
             try:
-                service = GrokAIService(temp_api_key)
-                test_response = service._call_grok_api("Bonjour, réponds simplement 'OK'")
+                service = OpenAIChatGPTService(temp_api_key)
+                service._call_openai_api("Bonjour, réponds simplement 'OK'")
                 st.success("✅ Clé API valide ! Configurez-la dans vos variables d'environnement.")
             except Exception as e:
                 st.error(f"❌ Clé API invalide: {e}")
@@ -296,10 +313,10 @@ def show_grok_config_interface():
 
 if __name__ == "__main__":
     # Test du service
-    print("Test du service Grok AI...")
+    print("Test du service OpenAI GPT-4...")
 
     if not is_grok_available():
-        print("❌ Service Grok non disponible (clé API manquante)")
+        print("❌ Service OpenAI non disponible (clé API manquante)")
         exit(1)
 
     # Test avec un CV exemple
@@ -316,7 +333,7 @@ if __name__ == "__main__":
 
     try:
         service = get_grok_service()
-        result = service.analyze_cv(test_cv, "Jean DUPONT")
+        result = service.analyze_cv(test_cv)
         print("✅ Analyse réussie !")
         print(json.dumps(result, indent=2, ensure_ascii=False))
     except Exception as e:

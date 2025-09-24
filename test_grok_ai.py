@@ -44,7 +44,7 @@ def test_grok_connection():
         # response = service._call_grok_api(test_prompt)
         # print(f"📥 Réponse: {response}")
 
-        print("✅ Connexion réussie !")
+        print("✅ Connexion réussie ! (Test simulé)")
         return True
 
     except Exception as e:
@@ -95,7 +95,7 @@ def test_cv_analysis():
         service = get_grok_service()
         print("📤 Analyse du CV exemple en cours...")
 
-        result = service.analyze_cv(test_cv, "Jean DUPONT")
+        result = service.analyze_cv(test_cv)
 
         print("✅ Analyse terminée !")
         print("\n📊 Résumé de l'analyse:")
@@ -107,7 +107,7 @@ def test_cv_analysis():
             print(f"  • Compétences techniques: {len(result['competences']['techniques'])}")
 
         if "_cost_estimate" in result:
-            print(".4f"
+            print(f"  • Coût estimé: ${result['_cost_estimate']:.4f}")
         # Afficher un extrait du résultat
         print("\n📄 Extrait du résultat JSON:")
         # Masquer les détails complets pour la lisibilité
