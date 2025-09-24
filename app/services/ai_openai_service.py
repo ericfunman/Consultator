@@ -13,6 +13,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
+import certifi
 import requests
 import streamlit as st
 
@@ -132,7 +133,7 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         return prompt
 
     def _call_openai_api(self, prompt: str) -> Dict[str, Any]:
-        """Appelle l'API OpenAI"""
+        """Appelle l'API OpenAI avec gestion sécurisée des certificats SSL"""
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -147,31 +148,28 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         }
 
         try:
-            # D'abord essayer avec les certificats standard
+            # Essayer d'abord avec validation SSL complète et certificats certifi
             response = requests.post(
                 f"{self.base_url}/chat/completions",
                 headers=headers,
                 json=payload,
                 timeout=60,
+                verify=certifi.where(),  # Validation SSL avec certificats certifi
             )
             response.raise_for_status()
             return response.json()
 
-        except requests.exceptions.SSLError:
-            # Si erreur SSL, essayer avec certificats désactivés (environnement entreprise)
-            logger.warning("Erreur SSL détectée, tentative sans vérification SSL...")
-            try:
-                response = requests.post(
-                    f"{self.base_url}/chat/completions",
-                    headers=headers,
-                    json=payload,
-                    timeout=60,
-                    verify=False,
-                )
-                response.raise_for_status()
-                return response.json()
-            except Exception as e:
-                raise ConnectionError(f"Erreur API OpenAI: {str(e)}") from e
+        except requests.exceptions.SSLError as ssl_error:
+            # En cas d'erreur SSL, logger l'erreur mais ne pas désactiver la validation
+            logger.warning(f"Erreur SSL lors de l'appel OpenAI: {ssl_error}")
+            logger.warning("Cela peut être dû à un proxy d'entreprise ou des certificats système manquants")
+
+            # Lever une erreur explicite plutôt que de désactiver SSL
+            raise ConnectionError(
+                "Erreur de certificat SSL. Vérifiez votre configuration réseau ou contactez l'administrateur système. "
+                "Détails: " + str(ssl_error)
+            ) from ssl_error
+
         except requests.exceptions.RequestException as e:
             raise ConnectionError(f"Erreur API OpenAI: {str(e)}") from e
 
