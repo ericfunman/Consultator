@@ -303,19 +303,331 @@ class TestAdditionalConsultantMissionsCoverage:
         assert isinstance(total_revenue, (int, float))
 
     @patch("app.pages_modules.consultant_missions.st")
-    def test_display_revenue_statistics(self, mock_st, mock_mission_active):
-        """Test de l'affichage des statistiques de revenus"""
-        # Mock st.columns
-        mock_columns = [Mock() for _ in range(3)]
-        for col in mock_columns:
-            col.__enter__ = Mock(return_value=col)
-            col.__exit__ = Mock(return_value=None)
-        mock_st.columns.return_value = mock_columns
+    def test_show_consultant_missions_imports_error(self, mock_st):
+        """Test de show_consultant_missions avec erreur d'imports"""
+        # Simuler l'erreur d'imports
+        with patch("app.pages_modules.consultant_missions.imports_ok", False):
+            from app.pages_modules.consultant_missions import show_consultant_missions
+            
+            mock_consultant = Mock()
+            show_consultant_missions(mock_consultant)
+            
+            mock_st.error.assert_called_with("❌ Les services de base ne sont pas disponibles")
 
-        from app.pages_modules.consultant_missions import _display_revenue_statistics
+    @patch("app.pages_modules.consultant_missions.st")
+    def test_show_consultant_missions_no_consultant(self, mock_st):
+        """Test de show_consultant_missions sans consultant"""
+        from app.pages_modules.consultant_missions import show_consultant_missions
+        
+        show_consultant_missions(None)
+        
+        mock_st.error.assert_called_with("❌ Consultant non fourni")
 
-        missions = [mock_mission_active]
-        _display_revenue_statistics(missions, 100000)
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_show_consultant_missions_exception(self, mock_get_session, mock_st, mock_consultant):
+        """Test de show_consultant_missions avec exception"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Faire lever une exception lors de la requête
+        mock_session.query.side_effect = Exception("Database error")
+        
+        from app.pages_modules.consultant_missions import show_consultant_missions
+        show_consultant_missions(mock_consultant)
+        
+        mock_st.error.assert_called_with("❌ Erreur lors de l'affichage des missions: Database error")
 
-        # Vérifier que st.metric a été appelé
-        assert mock_st.metric.call_count > 0
+    @patch("app.pages_modules.consultant_missions.st")
+    def test_validate_mission_form_invalid_client(self, mock_st):
+        """Test de validation avec client invalide"""
+        from app.pages_modules.consultant_missions import validate_mission_form
+
+        result = validate_mission_form(
+            titre="Test Mission",
+            client_id=None,
+            date_debut=date(2024, 1, 1),
+            en_cours=True,
+            date_fin=None
+        )
+
+        assert result is False
+        mock_st.error.assert_called_with("❌ Le client est obligatoire")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    def test_validate_mission_form_invalid_date(self, mock_st):
+        """Test de validation avec date invalide"""
+        from app.pages_modules.consultant_missions import validate_mission_form
+
+        result = validate_mission_form(
+            titre="Test Mission",
+            client_id=1,
+            date_debut=None,
+            en_cours=True,
+            date_fin=None
+        )
+
+        assert result is False
+        mock_st.error.assert_called_with("❌ La date de début est obligatoire")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    def test_validate_mission_form_invalid_date_order(self, mock_st):
+        """Test de validation avec dates dans le mauvais ordre"""
+        from app.pages_modules.consultant_missions import validate_mission_form
+
+        result = validate_mission_form(
+            titre="Test Mission",
+            client_id=1,
+            date_debut=date(2024, 6, 30),
+            en_cours=False,
+            date_fin=date(2024, 1, 1)
+        )
+
+        assert result is False
+        mock_st.error.assert_called_with("❌ La date de fin doit être postérieure à la date de début")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_create_mission_exception(self, mock_get_session, mock_st):
+        """Test de create_mission avec exception"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Faire lever une exception lors de l'ajout
+        mock_session.add.side_effect = Exception("Database error")
+        
+        from app.pages_modules.consultant_missions import create_mission
+
+        data = {
+            "titre": "Test Mission",
+            "client_id": 1,
+            "date_debut": date(2024, 1, 1),
+            "date_fin": None,
+            "en_cours": True,
+            "taux_journalier": 450,
+            "tjm": 450,
+            "salaire_mensuel": 0,
+            "description": "Description test",
+            "competences_requises": "Python, SQL"
+        }
+
+        result = create_mission(1, data)
+
+        assert result is False
+        mock_st.error.assert_called_with("❌ Erreur lors de la création de la mission: Database error")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_update_mission_not_found(self, mock_get_session, mock_st):
+        """Test de update_mission avec mission introuvable"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Mock de la requête qui ne trouve pas la mission
+        mock_query = Mock()
+        mock_session.query.return_value = mock_query
+        mock_query.filter.return_value = mock_query
+        mock_query.first.return_value = None
+
+        from app.pages_modules.consultant_missions import update_mission
+
+        data = {"titre": "Titre modifié"}
+        
+        result = update_mission(999, data)
+
+        assert result is False
+        mock_st.error.assert_called_with("❌ Mission introuvable")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_update_mission_exception(self, mock_get_session, mock_st, mock_mission_active):
+        """Test de update_mission avec exception"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Mock de la requête qui trouve la mission
+        mock_query = Mock()
+        mock_session.query.return_value = mock_query
+        mock_query.filter.return_value = mock_query
+        mock_query.first.return_value = mock_mission_active
+        
+        # Faire lever une exception lors du commit
+        mock_session.commit.side_effect = Exception("Database error")
+
+        from app.pages_modules.consultant_missions import update_mission
+
+        data = {"titre": "Titre modifié"}
+        
+        result = update_mission(1, data)
+
+        assert result is False
+        mock_st.error.assert_called_with("❌ Erreur lors de la mise à jour de la mission: Database error")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_delete_mission_not_found(self, mock_get_session, mock_st):
+        """Test de delete_mission avec mission introuvable"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Mock de la requête qui ne trouve pas la mission
+        mock_query = Mock()
+        mock_session.query.return_value = mock_query
+        mock_query.filter.return_value = mock_query
+        mock_query.first.return_value = None
+
+        from app.pages_modules.consultant_missions import delete_mission
+
+        result = delete_mission(999)
+
+        assert result is False
+        mock_st.error.assert_called_with("❌ Mission introuvable")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_delete_mission_exception(self, mock_get_session, mock_st, mock_mission_active):
+        """Test de delete_mission avec exception"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Mock de la requête qui trouve la mission
+        mock_query = Mock()
+        mock_session.query.return_value = mock_query
+        mock_query.filter.return_value = mock_query
+        mock_query.first.return_value = mock_mission_active
+        
+        # Faire lever une exception lors du delete
+        mock_session.delete.side_effect = Exception("Database error")
+
+        from app.pages_modules.consultant_missions import delete_mission
+
+        result = delete_mission(1)
+
+        assert result is False
+        mock_st.error.assert_called_with("❌ Erreur lors de la suppression de la mission: Database error")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    def test_show_missions_statistics_empty(self, mock_st):
+        """Test de show_missions_statistics avec liste vide"""
+        from app.pages_modules.consultant_missions import show_missions_statistics
+
+        show_missions_statistics([])
+        
+        # Ne devrait rien afficher pour une liste vide
+        assert mock_st.markdown.call_count == 0
+
+    @patch("app.pages_modules.consultant_missions.st")
+    def test_show_missions_analysis_empty(self, mock_st):
+        """Test de show_missions_analysis avec liste vide"""
+        from app.pages_modules.consultant_missions import show_missions_analysis
+
+        show_missions_analysis([])
+        
+        mock_st.info.assert_called_with("ℹ️ Aucune mission à analyser")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    def test_show_missions_revenues_empty(self, mock_st):
+        """Test de show_missions_revenues avec liste vide"""
+        from app.pages_modules.consultant_missions import show_missions_revenues
+
+        show_missions_revenues([])
+        
+        mock_st.info.assert_called_with("ℹ️ Aucune mission pour analyser les revenus")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    def test_show_missions_revenues_no_revenue_data(self, mock_st):
+        """Test de show_missions_revenues sans données de revenus"""
+        # Mission sans taux journalier
+        mission = Mock()
+        mission.taux_journalier = None
+        mission.tjm = None
+        mission.en_cours = True
+        mission.date_debut = date(2024, 1, 1)
+        mission.date_fin = None
+        mission.client = Mock()
+        mission.client.nom = "Test Client"
+
+        from app.pages_modules.consultant_missions import show_missions_revenues
+
+        show_missions_revenues([mission])
+        
+        mock_st.info.assert_called_with("ℹ️ Aucune donnée de revenus disponible")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_show_add_mission_form_no_clients(self, mock_get_session, mock_st):
+        """Test du formulaire d'ajout quand aucun client n'existe"""
+        # Mock st.form
+        mock_form = Mock()
+        mock_form.__enter__ = Mock(return_value=mock_form)
+        mock_form.__exit__ = Mock(return_value=None)
+        mock_st.form.return_value = mock_form
+
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Aucun client disponible
+        mock_query = Mock()
+        mock_session.query.return_value = mock_query
+        mock_query.all.return_value = []
+
+        from app.pages_modules.consultant_missions import show_add_mission_form
+
+        show_add_mission_form(1)
+        
+        mock_st.warning.assert_called_with("⚠️ Aucun client trouvé. Veuillez créer des clients d'abord.")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_show_add_mission_form_exception(self, mock_get_session, mock_st):
+        """Test du formulaire d'ajout avec exception"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Faire lever une exception lors du chargement des clients
+        mock_query = Mock()
+        mock_session.query.return_value = mock_query
+        mock_query.all.side_effect = Exception("Database error")
+
+        from app.pages_modules.consultant_missions import show_add_mission_form
+
+        show_add_mission_form(1)
+        
+        mock_st.error.assert_called_with("❌ Erreur lors du chargement du formulaire: Database error")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_show_edit_mission_form_not_found(self, mock_get_session, mock_st):
+        """Test du formulaire d'édition avec mission introuvable"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Mission introuvable
+        mock_query = Mock()
+        mock_filtered = Mock()
+        mock_session.query.return_value = mock_query
+        mock_query.options.return_value = mock_filtered
+        mock_filtered.filter.return_value = mock_filtered
+        mock_filtered.first.return_value = None
+
+        from app.pages_modules.consultant_missions import show_edit_mission_form
+
+        show_edit_mission_form(999)
+        
+        mock_st.error.assert_called_with("❌ Mission introuvable")
+
+    @patch("app.pages_modules.consultant_missions.st")
+    @patch("app.pages_modules.consultant_missions.get_database_session")
+    def test_show_edit_mission_form_exception(self, mock_get_session, mock_st):
+        """Test du formulaire d'édition avec exception"""
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Faire lever une exception lors du chargement
+        mock_session.query.side_effect = Exception("Database error")
+
+        from app.pages_modules.consultant_missions import show_edit_mission_form
+
+        show_edit_mission_form(1)
+        
+        mock_st.error.assert_called_with("❌ Erreur lors du chargement du formulaire de modification: Database error")
