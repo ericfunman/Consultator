@@ -387,3 +387,191 @@ class TestConsultantListCoverage:
 
         mock_st.error.assert_called_once()
         mock_st.code.assert_called_once()
+
+
+class TestConsultantListEdgeCases:
+    """Tests pour les cas particuliers et edge cases"""
+
+    @patch("app.pages_modules.consultant_list.st")
+    def test_convert_consultants_to_dataframe_no_practice(self, mock_st):
+        """Test de conversion avec consultant sans practice"""
+        # Mock consultant sans practice
+        mock_consultant = Mock()
+        mock_consultant.id = 1
+        mock_consultant.prenom = "Marie"
+        mock_consultant.nom = "Martin"
+        mock_consultant.email = "marie.martin@email.com"
+        mock_consultant.telephone = "0123456789"
+        mock_consultant.salaire_actuel = 50000
+        mock_consultant.disponibilite = True
+        mock_consultant.date_disponibilite = "2025-01-15"
+        mock_consultant.grade = "Senior"
+        mock_consultant.type_contrat = "CDI"
+        mock_consultant.date_creation = datetime(2024, 1, 1)
+        mock_consultant.practice = None  # Pas de practice
+
+        from app.pages_modules.consultant_list import _convert_consultants_to_dataframe
+
+        df = _convert_consultants_to_dataframe([mock_consultant])
+
+        assert len(df) == 1
+        assert df.iloc[0]["Practice"] == "Non affecté"
+
+    @patch("app.pages_modules.consultant_list.st")
+    def test_convert_consultants_to_dataframe_no_date_creation(self, mock_st):
+        """Test de conversion avec consultant sans date de création"""
+        # Mock consultant sans date_creation
+        mock_consultant = Mock()
+        mock_consultant.id = 1
+        mock_consultant.prenom = "Marie"
+        mock_consultant.nom = "Martin"
+        mock_consultant.email = "marie.martin@email.com"
+        mock_consultant.telephone = "0123456789"
+        mock_consultant.salaire_actuel = 50000
+        mock_consultant.disponibilite = True
+        mock_consultant.date_disponibilite = "2025-01-15"
+        mock_consultant.grade = "Senior"
+        mock_consultant.type_contrat = "CDI"
+        mock_consultant.date_creation = None  # Pas de date
+        mock_consultant.practice = Mock()
+        mock_consultant.practice.nom = "Data Science"
+
+        from app.pages_modules.consultant_list import _convert_consultants_to_dataframe
+
+        df = _convert_consultants_to_dataframe([mock_consultant])
+
+        assert len(df) == 1
+        assert df.iloc[0]["Date création"] == "N/A"
+
+    @patch("app.pages_modules.consultant_list.st")
+    @patch("app.pages_modules.consultant_list.get_database_session")
+    def test_show_consultants_list_filtered_empty(self, mock_get_session, mock_st):
+        """Test avec résultats filtrés vides"""
+        # Mock st.columns pour les filtres
+        mock_columns_filters = [Mock() for _ in range(3)]
+        for col in mock_columns_filters:
+            col.__enter__ = Mock(return_value=col)
+            col.__exit__ = Mock(return_value=None)
+
+        # Mock st.columns pour les statistiques
+        mock_columns_stats = [Mock() for _ in range(4)]
+        for col in mock_columns_stats:
+            col.__enter__ = Mock(return_value=col)
+            col.__exit__ = Mock(return_value=None)
+
+        mock_st.columns.side_effect = [mock_columns_filters, mock_columns_stats]
+
+        mock_session = Mock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+
+        # Mock consultant
+        mock_consultant = Mock()
+        mock_consultant.id = 1
+        mock_consultant.prenom = "Marie"
+        mock_consultant.nom = "Martin"
+        mock_consultant.email = "marie.martin@email.com"
+        mock_consultant.telephone = "0123456789"
+        mock_consultant.salaire_actuel = 50000
+        mock_consultant.disponibilite = True
+        mock_consultant.date_disponibilite = "2025-01-15"
+        mock_consultant.grade = "Senior"
+        mock_consultant.type_contrat = "CDI"
+        mock_consultant.date_creation = datetime(2024, 1, 1)
+        mock_consultant.practice = Mock()
+        mock_consultant.practice.nom = "Data Science"
+
+        mock_session.query().options().all.return_value = [mock_consultant]
+
+        # Mock session state
+        mock_st.session_state = {}
+
+        # Mock inputs qui filtrent tout
+        mock_st.text_input.return_value = "XYZ_NON_EXISTANT"  # Recherche qui ne trouve rien
+        mock_st.selectbox.side_effect = ["Tous", "Tous"]
+
+        from app.pages_modules.consultant_list import show_consultants_list
+
+        show_consultants_list()
+
+        # Vérifier que le message "aucun résultat" est affiché
+        mock_st.info.assert_any_call("ℹ️ Aucun consultant ne correspond aux critères de recherche")
+
+    @patch("app.pages_modules.consultant_list.st")
+    def test_export_to_excel_success(self, mock_st):
+        """Test de l'export Excel avec succès"""
+        # Mock DataFrame
+        df = pd.DataFrame({
+            "ID": [1, 2],
+            "Prénom": ["Marie", "Pierre"],
+            "Nom": ["Martin", "Dubois"],
+            "Email": ["marie.martin@email.com", "pierre.dubois@email.com"],
+            "Téléphone": ["0123456789", "0987654321"],
+            "Salaire annuel": [50000, 60000],
+            "Disponibilité": ["✅ Disponible", "🔴 En mission"],
+            "Date disponibilité": ["2025-01-15", "2025-03-01"],
+            "Grade": ["Senior", "Lead"],
+            "Type contrat": ["CDI", "CDD"],
+            "Practice": ["Data Science", "Cloud"],
+            "Date création": ["01/01/2024", "15/06/2023"]
+        })
+
+        from app.pages_modules.consultant_list import export_to_excel
+
+        export_to_excel(df)
+
+        # Vérifier que le bouton de téléchargement est créé
+        mock_st.download_button.assert_called_once()
+        mock_st.success.assert_called_with("✅ Fichier Excel généré avec succès !")
+
+    @patch("app.pages_modules.consultant_list.st")
+    def test_generate_consultants_report_single_practice(self, mock_st):
+        """Test du rapport avec une seule practice"""
+        df = pd.DataFrame({
+            "Prénom": ["Marie"],
+            "Nom": ["Martin"],
+            "Salaire annuel": [50000],
+            "Disponibilité": ["✅ Disponible"],
+            "Practice": ["Data Science"]
+        })
+
+        # Mock st.columns pour les statistiques
+        mock_columns_stats = [Mock() for _ in range(3)]
+        for col in mock_columns_stats:
+            col.__enter__ = Mock(return_value=col)
+            col.__exit__ = Mock(return_value=None)
+        mock_st.columns.return_value = mock_columns_stats
+
+        from app.pages_modules.consultant_list import generate_consultants_report
+
+        generate_consultants_report(df)
+
+        # Avec une seule practice, le graphique ne devrait pas être affiché
+        # Vérifier que bar_chart n'est pas appelé pour les practices
+        bar_chart_calls = [call for call in mock_st.bar_chart.call_args_list if len(call[0]) == 1]
+        assert len(bar_chart_calls) <= 1  # Seulement le graphique des salaires
+
+    @patch("app.pages_modules.consultant_list.st")
+    def test_generate_consultants_report_single_consultant(self, mock_st):
+        """Test du rapport avec un seul consultant"""
+        df = pd.DataFrame({
+            "Prénom": ["Marie"],
+            "Nom": ["Martin"],
+            "Salaire annuel": [50000],
+            "Disponibilité": ["✅ Disponible"],
+            "Practice": ["Data Science"]
+        })
+
+        # Mock st.columns pour les statistiques
+        mock_columns_stats = [Mock() for _ in range(3)]
+        for col in mock_columns_stats:
+            col.__enter__ = Mock(return_value=col)
+            col.__exit__ = Mock(return_value=None)
+        mock_st.columns.return_value = mock_columns_stats
+
+        from app.pages_modules.consultant_list import generate_consultants_report
+
+        generate_consultants_report(df)
+
+        # Avec un seul consultant, certains graphiques ne devraient pas être affichés
+        # Vérifier que bar_chart n'est pas appelé du tout
+        assert mock_st.bar_chart.call_count == 0

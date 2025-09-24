@@ -3,17 +3,7 @@ Tests de couverture pour business_managers.py
 Visant à améliorer la couverture de 69.3% vers 80%+
 """
 
-from unittest.mock import MagicMock, patch, mock          show_business_managers_list()
-
-        # Vérifier que le message d'information est affiché
-        mock_st.info.assert_called_once()
-        # Le message contient le terme de recherche (qui est un mock)
-        call_args = mock_st.info.call_args[0][0]
-        assert "0 Business Manager(s) trouvé(s) pour" in call_args  # Vérifier que le message d'information est affiché
-        mock_st.info.assert_called_once()
-        # Le message contient le terme de recherche (qui est un mock)
-        call_args = mock_st.info.call_args[0][0]
-        assert "0 Business Manager(s) trouvé(s) pour" in call_argspen
+from unittest.mock import MagicMock, patch
 import pytest
 import json
 from datetime import datetime, date
