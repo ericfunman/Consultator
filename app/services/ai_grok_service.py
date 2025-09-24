@@ -134,19 +134,14 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
         payload = {
             "model": self.model,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
+            "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 4000,
-            "temperature": 0.1  # Faible température pour plus de précision
+            "temperature": 0.1,  # Faible température pour plus de précision
         }
 
         try:
@@ -154,7 +149,7 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
                 f"{self.base_url}/chat/completions",
                 headers=headers,
                 json=payload,
-                timeout=60
+                timeout=60,
             )
 
             response.raise_for_status()
@@ -163,7 +158,9 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         except requests.exceptions.RequestException as e:
             raise ConnectionError(f"Erreur API Grok: {str(e)}") from e
 
-    def _parse_and_validate_response(self, api_response: Dict[str, Any], original_text: str) -> Dict[str, Any]:
+    def _parse_and_validate_response(
+        self, api_response: Dict[str, Any], original_text: str
+    ) -> Dict[str, Any]:
         """Parse et valide la réponse de Grok"""
 
         try:
@@ -190,7 +187,7 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
                 "analyzed_by": "grok_ai",
                 "analysis_date": datetime.now().isoformat(),
                 "text_length": len(original_text),
-                "model_used": self.model
+                "model_used": self.model,
             }
 
             return parsed_data
@@ -249,7 +246,9 @@ def show_grok_config_interface():
 
     if api_key:
         # Clé configurée
-        masked_key = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
+        masked_key = (
+            api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
+        )
         st.success(f"✅ Clé API configurée: `{masked_key}`")
 
         # Tester la connexion
@@ -267,7 +266,8 @@ def show_grok_config_interface():
         # Clé non configurée
         st.warning("⚠️ Clé API Grok non configurée")
 
-        st.markdown("""
+        st.markdown(
+            """
         **Pour utiliser Grok AI, vous devez :**
 
         1. **Obtenir une clé API** sur [x.ai](https://x.ai)
@@ -276,20 +276,23 @@ def show_grok_config_interface():
            export GROK_API_KEY="votre_clé_api_ici"
            ```
         3. **Redémarrer l'application**
-        """)
+        """
+        )
 
         # Saisie temporaire de la clé API
         temp_api_key = st.text_input(
             "Clé API Grok (temporaire)",
             type="password",
-            help="Saisissez votre clé API pour tester immédiatement"
+            help="Saisissez votre clé API pour tester immédiatement",
         )
 
         if temp_api_key and st.button("🔍 Tester avec cette clé"):
             try:
                 service = GrokAIService(temp_api_key)
                 service._call_grok_api("Bonjour, réponds simplement 'OK'")
-                st.success("✅ Clé API valide ! Configurez-la dans vos variables d'environnement.")
+                st.success(
+                    "✅ Clé API valide ! Configurez-la dans vos variables d'environnement."
+                )
             except Exception as e:
                 st.error(f"❌ Clé API invalide: {e}")
 
