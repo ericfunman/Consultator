@@ -258,7 +258,7 @@ def show_grok_config_interface():
                 try:
                     service = GrokAIService(api_key)
                     # Faire un petit test
-                    test_response = service._call_grok_api("Bonjour, réponds simplement 'OK'")
+                    service._call_grok_api("Bonjour, réponds simplement 'OK'")
                     st.success("✅ Connexion Grok réussie !")
                 except Exception as e:
                     st.error(f"❌ Erreur de connexion: {e}")
@@ -288,7 +288,7 @@ def show_grok_config_interface():
         if temp_api_key and st.button("🔍 Tester avec cette clé"):
             try:
                 service = GrokAIService(temp_api_key)
-                test_response = service._call_grok_api("Bonjour, réponds simplement 'OK'")
+                service._call_grok_api("Bonjour, réponds simplement 'OK'")
                 st.success("✅ Clé API valide ! Configurez-la dans vos variables d'environnement.")
             except Exception as e:
                 st.error(f"❌ Clé API invalide: {e}")

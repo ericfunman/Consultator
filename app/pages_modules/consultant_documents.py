@@ -35,7 +35,11 @@ try:
     from database.models import Document
     from services.consultant_service import ConsultantService
     from services.document_analyzer import DocumentAnalyzer
-    from services.ai_openai_service import OpenAIChatGPTService, get_grok_service, is_grok_available
+    from services.ai_openai_service import (
+        OpenAIChatGPTService,
+        get_grok_service,
+        is_grok_available,
+    )
 
     imports_ok = True
 except ImportError:
@@ -250,7 +254,9 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
             st.error("❌ Fichier CV introuvable")
             return False
 
-        extracted_text = DocumentAnalyzer.extract_text_from_file(cv_document.chemin_fichier)
+        extracted_text = DocumentAnalyzer.extract_text_from_file(
+            cv_document.chemin_fichier
+        )
         if not extracted_text:
             st.error("❌ Impossible d'extraire le texte du CV")
             return False
@@ -263,18 +269,18 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
                 st.error("❌ Service OpenAI non disponible")
                 return False
 
-            analysis_result = grok_service.analyze_cv(
-                extracted_text)
+            analysis_result = grok_service.analyze_cv(extracted_text)
 
             # Ajouter des métadonnées
             analysis_result["_analysis_method"] = "openai_gpt4"
-            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(len(extracted_text))
+            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(
+                len(extracted_text)
+            )
 
         else:
             # Analyse classique
             analysis_result = DocumentAnalyzer.analyze_cv_content(
-                extracted_text,
-                f"{consultant.prenom} {consultant.nom}"
+                extracted_text, f"{consultant.prenom} {consultant.nom}"
             )
             analysis_result["_analysis_method"] = "classic"
 
@@ -329,7 +335,7 @@ def analyze_consultant_cv(consultant):
                 "Choisissez la méthode d'analyse :",
                 options=analysis_methods,
                 index=default_index,
-                help="OpenAI GPT-4 offre une analyse plus précise et détaillée"
+                help="OpenAI GPT-4 offre une analyse plus précise et détaillée",
             )
 
             # Afficher le statut de l'analyse actuelle
@@ -340,19 +346,28 @@ def analyze_consultant_cv(consultant):
                 if st.button("👁️ Voir analyse actuelle", key="view_current_analysis"):
                     try:
                         import json
+
                         analysis = json.loads(cv_document.analyse_cv)
-                        show_full_cv_analysis(analysis, cv_document.nom_fichier, consultant)
+                        show_full_cv_analysis(
+                            analysis, cv_document.nom_fichier, consultant
+                        )
                     except Exception as e:
                         st.error(f"❌ Erreur lors de l'affichage: {e}")
             else:
                 st.info("ℹ️ Aucune analyse disponible. Lancez une nouvelle analyse.")
 
             # Bouton d'analyse
-            button_text = "🚀 Analyser avec GPT-4" if "Grok" in selected_method else "🔍 Analyser classiquement"
+            button_text = (
+                "🚀 Analyser avec GPT-4"
+                if "Grok" in selected_method
+                else "🔍 Analyser classiquement"
+            )
 
             if st.button(button_text, type="primary", key="start_analysis"):
                 with st.spinner("Analyse en cours..."):
-                    success = perform_cv_analysis(cv_document, consultant, selected_method)
+                    success = perform_cv_analysis(
+                        cv_document, consultant, selected_method
+                    )
 
                 if success:
                     st.success("✅ Analyse terminée avec succès !")
@@ -364,11 +379,13 @@ def analyze_consultant_cv(consultant):
             if grok_available:
                 with st.expander("⚙️ Configuration IA"):
                     from services.ai_grok_service import show_grok_config_interface
+
                     show_grok_config_interface()
             else:
                 with st.expander("⚙️ Configuration IA"):
                     st.warning("⚠️ OpenAI GPT-4 non configuré")
-                    st.markdown("""
+                    st.markdown(
+                        """
                     Pour activer l'analyse IA :
 
                     1. **Obtenez une clé API** sur [platform.openai.com](https://platform.openai.com)
@@ -377,7 +394,8 @@ def analyze_consultant_cv(consultant):
                        export OPENAI_API_KEY="votre_clé_api_ici"
                        ```
                     3. **Redémarrez l'application**
-                    """)
+                    """
+                    )
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'analyse du CV: {e}")
@@ -664,7 +682,9 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
             st.error("❌ Fichier CV introuvable")
             return False
 
-        extracted_text = DocumentAnalyzer.extract_text_from_file(cv_document.chemin_fichier)
+        extracted_text = DocumentAnalyzer.extract_text_from_file(
+            cv_document.chemin_fichier
+        )
         if not extracted_text:
             st.error("❌ Impossible d'extraire le texte du CV")
             return False
@@ -677,18 +697,18 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
                 st.error("❌ Service OpenAI non disponible")
                 return False
 
-            analysis_result = grok_service.analyze_cv(
-                extracted_text)
+            analysis_result = grok_service.analyze_cv(extracted_text)
 
             # Ajouter des métadonnées
             analysis_result["_analysis_method"] = "openai_gpt4"
-            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(len(extracted_text))
+            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(
+                len(extracted_text)
+            )
 
         else:
             # Analyse classique
             analysis_result = DocumentAnalyzer.analyze_cv_content(
-                extracted_text,
-                f"{consultant.prenom} {consultant.nom}"
+                extracted_text, f"{consultant.prenom} {consultant.nom}"
             )
             analysis_result["_analysis_method"] = "classic"
 
