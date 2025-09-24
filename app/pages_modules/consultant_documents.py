@@ -5,6 +5,7 @@ Fonctions pour afficher, uploader et analyser les documents
 
 import os
 import sys
+import json
 from datetime import datetime
 from typing import Any
 from typing import Dict
@@ -34,7 +35,7 @@ try:
     from database.models import Document
     from services.consultant_service import ConsultantService
     from services.document_analyzer import DocumentAnalyzer
-    from services.document_service import DocumentService
+    from services.ai_grok_service import GrokAIService, get_grok_service, is_grok_available
 
     imports_ok = True
 except ImportError:
@@ -238,6 +239,150 @@ def show_upload_document_form(consultant_id: int):
             if "upload_document" in st.session_state:
                 del st.session_state.upload_document
             st.rerun()
+
+
+def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
+    """Effectue l'analyse du CV selon la méthode choisie"""
+
+    try:
+        # Extraire le texte du document
+        if not os.path.exists(cv_document.chemin_fichier):
+            st.error("❌ Fichier CV introuvable")
+            return False
+
+        extracted_text = DocumentAnalyzer.extract_text_from_file(cv_document.chemin_fichier)
+        if not extracted_text:
+            st.error("❌ Impossible d'extraire le texte du CV")
+            return False
+
+        # Choisir la méthode d'analyse
+        if "Grok" in method:
+            # Analyse avec Grok IA
+            grok_service = get_grok_service()
+            if not grok_service:
+                st.error("❌ Service Grok non disponible")
+                return False
+
+            analysis_result = grok_service.analyze_cv(
+                extracted_text,
+                f"{consultant.prenom} {consultant.nom}"
+            )
+
+            # Ajouter des métadonnées
+            analysis_result["_analysis_method"] = "grok_ai"
+            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(len(extracted_text))
+
+        else:
+            # Analyse classique
+            analysis_result = DocumentAnalyzer.analyze_cv_content(
+                extracted_text,
+                f"{consultant.prenom} {consultant.nom}"
+            )
+            analysis_result["_analysis_method"] = "classic"
+
+        # Sauvegarder l'analyse en base
+        with get_database_session() as session:
+            cv_document.analyse_cv = json.dumps(analysis_result, ensure_ascii=False)
+            session.commit()
+
+        return True
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'analyse: {e}")
+        return False
+
+
+def analyze_consultant_cv(consultant):
+    """Analyse le CV du consultant avec choix de méthode"""
+
+    st.markdown("### 🔍 Analyse du CV")
+
+    try:
+        with get_database_session() as session:
+            # Chercher le CV le plus récent
+            cv_document = (
+                session.query(Document)
+                .filter(
+                    Document.consultant_id == consultant.id,
+                    Document.type_document == "CV",
+                )
+                .order_by(Document.date_upload.desc())
+                .first()
+            )
+
+            if not cv_document:
+                st.warning("⚠️ Aucun CV trouvé pour ce consultant")
+                return
+
+            # Vérifier si Grok est disponible
+            grok_available = is_grok_available()
+
+            # Choix de la méthode d'analyse
+            st.markdown("#### 🎯 Méthode d'analyse")
+
+            analysis_methods = ["🤖 IA avec Grok (recommandé)"]
+            if grok_available:
+                default_method = "🤖 IA avec Grok (recommandé)"
+            else:
+                analysis_methods.insert(0, "🔍 Analyse classique")
+                default_method = "🔍 Analyse classique"
+
+            selected_method = st.selectbox(
+                "Choisissez la méthode d'analyse :",
+                options=analysis_methods,
+                index=0 if grok_available else 0,
+                help="L'IA Grok offre une analyse plus précise et détaillée"
+            )
+
+            # Afficher le statut de l'analyse actuelle
+            if cv_document.analyse_cv:
+                st.info("ℹ️ Une analyse existe déjà. Vous pouvez la régénérer.")
+
+                # Bouton pour voir l'analyse actuelle
+                if st.button("👁️ Voir analyse actuelle", key="view_current_analysis"):
+                    try:
+                        import json
+                        analysis = json.loads(cv_document.analyse_cv)
+                        show_full_cv_analysis(analysis, cv_document.nom_fichier, consultant)
+                    except Exception as e:
+                        st.error(f"❌ Erreur lors de l'affichage: {e}")
+            else:
+                st.info("ℹ️ Aucune analyse disponible. Lancez une nouvelle analyse.")
+
+            # Bouton d'analyse
+            button_text = "🚀 Analyser avec Grok" if "Grok" in selected_method else "🔍 Analyser classiquement"
+
+            if st.button(button_text, type="primary", key="start_analysis"):
+                with st.spinner("Analyse en cours..."):
+                    success = perform_cv_analysis(cv_document, consultant, selected_method)
+
+                if success:
+                    st.success("✅ Analyse terminée avec succès !")
+                    st.rerun()
+                else:
+                    st.error("❌ Échec de l'analyse")
+
+            # Configuration Grok (si disponible)
+            if grok_available:
+                with st.expander("⚙️ Configuration IA"):
+                    from services.ai_grok_service import show_grok_config_interface
+                    show_grok_config_interface()
+            else:
+                with st.expander("⚙️ Configuration IA"):
+                    st.warning("⚠️ IA Grok non configurée")
+                    st.markdown("""
+                    Pour activer l'analyse IA :
+
+                    1. **Obtenez une clé API** sur [x.ai](https://x.ai)
+                    2. **Ajoutez la variable d'environnement** :
+                       ```bash
+                       export GROK_API_KEY="votre_clé_api_ici"
+                       ```
+                    3. **Redémarrez l'application**
+                    """)
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'analyse du CV: {e}")
 
 
 def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
@@ -512,8 +657,56 @@ def delete_document(document_id: int) -> bool:
         return False
 
 
-def analyze_consultant_cv(consultant):
-    """Analyse le CV du consultant"""
+def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
+    """Effectue l'analyse du CV selon la méthode choisie"""
+
+    try:
+        # Extraire le texte du document
+        if not os.path.exists(cv_document.chemin_fichier):
+            st.error("❌ Fichier CV introuvable")
+            return False
+
+        extracted_text = DocumentAnalyzer.extract_text_from_file(cv_document.chemin_fichier)
+        if not extracted_text:
+            st.error("❌ Impossible d'extraire le texte du CV")
+            return False
+
+        # Choisir la méthode d'analyse
+        if "Grok" in method:
+            # Analyse avec Grok IA
+            grok_service = get_grok_service()
+            if not grok_service:
+                st.error("❌ Service Grok non disponible")
+                return False
+
+            analysis_result = grok_service.analyze_cv(
+                extracted_text,
+                f"{consultant.prenom} {consultant.nom}"
+            )
+
+            # Ajouter des métadonnées
+            analysis_result["_analysis_method"] = "grok_ai"
+            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(len(extracted_text))
+
+        else:
+            # Analyse classique
+            analysis_result = DocumentAnalyzer.analyze_cv_content(
+                extracted_text,
+                f"{consultant.prenom} {consultant.nom}"
+            )
+            analysis_result["_analysis_method"] = "classic"
+
+        # Sauvegarder l'analyse en base
+        with get_database_session() as session:
+            cv_document.analyse_cv = json.dumps(analysis_result, ensure_ascii=False)
+            session.commit()
+
+        return True
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'analyse: {e}")
+        return False
+    """Analyse le CV du consultant avec choix de méthode"""
 
     st.markdown("### 🔍 Analyse du CV")
 
@@ -534,27 +727,72 @@ def analyze_consultant_cv(consultant):
                 st.warning("⚠️ Aucun CV trouvé pour ce consultant")
                 return
 
-            if not cv_document.analyse_cv:
-                st.info("ℹ️ Analyse CV non disponible. Lancement de l'analyse...")
+            # Vérifier si Grok est disponible
+            grok_available = is_grok_available()
 
-                if reanalyze_document(cv_document.id, consultant):
-                    # Recharger le document
-                    cv_document = (
-                        session.query(Document)
-                        .filter(Document.id == cv_document.id)
-                        .first()
-                    )
+            # Choix de la méthode d'analyse
+            st.markdown("#### 🎯 Méthode d'analyse")
 
-            if cv_document.analyse_cv:
-                try:
-                    import json
-
-                    analysis = json.loads(cv_document.analyse_cv)
-                    show_full_cv_analysis(analysis, cv_document.nom_fichier, consultant)
-                except Exception as e:
-                    st.error(f"❌ Erreur lors de l'affichage de l'analyse: {e}")
+            analysis_methods = ["🤖 IA avec Grok (recommandé)"]
+            if grok_available:
+                default_method = "🤖 IA avec Grok (recommandé)"
             else:
-                st.error("❌ Analyse CV toujours indisponible")
+                analysis_methods.insert(0, "🔍 Analyse classique")
+                default_method = "🔍 Analyse classique"
+
+            selected_method = st.selectbox(
+                "Choisissez la méthode d'analyse :",
+                options=analysis_methods,
+                index=0 if grok_available else 0,
+                help="L'IA Grok offre une analyse plus précise et détaillée"
+            )
+
+            # Afficher le statut de l'analyse actuelle
+            if cv_document.analyse_cv:
+                st.info("ℹ️ Une analyse existe déjà. Vous pouvez la régénérer.")
+
+                # Bouton pour voir l'analyse actuelle
+                if st.button("👁️ Voir analyse actuelle", key="view_current_analysis"):
+                    try:
+                        import json
+                        analysis = json.loads(cv_document.analyse_cv)
+                        show_full_cv_analysis(analysis, cv_document.nom_fichier, consultant)
+                    except Exception as e:
+                        st.error(f"❌ Erreur lors de l'affichage: {e}")
+            else:
+                st.info("ℹ️ Aucune analyse disponible. Lancez une nouvelle analyse.")
+
+            # Bouton d'analyse
+            button_text = "🚀 Analyser avec Grok" if "Grok" in selected_method else "🔍 Analyser classiquement"
+
+            if st.button(button_text, type="primary", key="start_analysis"):
+                with st.spinner("Analyse en cours..."):
+                    success = perform_cv_analysis(cv_document, consultant, selected_method)
+
+                if success:
+                    st.success("✅ Analyse terminée avec succès !")
+                    st.rerun()
+                else:
+                    st.error("❌ Échec de l'analyse")
+
+            # Configuration Grok (si disponible)
+            if grok_available:
+                with st.expander("⚙️ Configuration IA"):
+                    from services.ai_grok_service import show_grok_config_interface
+                    show_grok_config_interface()
+            else:
+                with st.expander("⚙️ Configuration IA"):
+                    st.warning("⚠️ IA Grok non configurée")
+                    st.markdown("""
+                    Pour activer l'analyse IA :
+
+                    1. **Obtenez une clé API** sur [x.ai](https://x.ai)
+                    2. **Ajoutez la variable d'environnement** :
+                       ```bash
+                       export GROK_API_KEY="votre_clé_api_ici"
+                       ```
+                    3. **Redémarrez l'application**
+                    """)
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'analyse du CV: {e}")

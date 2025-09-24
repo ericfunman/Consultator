@@ -24,10 +24,11 @@ Une application Streamlit moderne pour gérer efficacement vos équipes de consu
 - **Rapports automatiques** : Export Excel/PDF
 - **Métriques business** : KPIs et indicateurs de performance
 
-### Phase 3 - IA (À venir)
+### Phase 3 - IA (En cours) 🤖
 - **Chatbot intégré** : Recherche intelligente par compétences
 - **Analyses prédictives** : Recommandations de staffing
 - **Matching automatique** : Consultant → Mission optimal
+- **Analyse CV IA** : Parsing intelligent avec Grok (xAI)
 
 ## 🚀 Installation et démarrage
 
@@ -45,6 +46,9 @@ cd Consultator
 # Installer les dépendances
 pip install -r requirements.txt
 
+# Configuration IA Grok (optionnel - pour analyse CV avancée)
+# Suivez les instructions dans GROK_SETUP.md
+
 # Configuration du pipeline CI/CD (recommandé)
 python setup_ci_cd.py
 
@@ -57,9 +61,8 @@ python run.py
 # Installation des outils de développement
 python setup_ci_cd.py
 
-# Ou installation manuelle
-pip install pre-commit pytest-cov pylint black flake8 isort bandit radon
-pre-commit install
+# Test du service IA Grok
+python test_grok_ai.py
 ```
 
 ### Accès

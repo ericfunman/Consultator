@@ -29,8 +29,8 @@ altair>=5.0.0
 # File handling
 # pathlib and os are built-in with Python
 
-# Utilities
-python-dotenv>=1.0.0
+# HTTP requests for AI services
+requests>=2.31.0
 
 # Development and testing (optional - install separately if needed)
 # pytest>=7.0.0
