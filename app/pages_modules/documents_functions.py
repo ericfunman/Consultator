@@ -130,7 +130,7 @@ def save_consultant_document(uploaded_file, consultant, document_type, _):
 def _get_file_size_display(file_size_bytes):
     """Formate la taille du fichier pour l'affichage"""
     file_size_kb = file_size_bytes / 1024
-    if file_size_kb > 1024:
+    if file_size_kb >= 1024:
         return f"{file_size_kb / 1024:.1f} MB"
     else:
         return f"{file_size_kb:.1f} KB"
