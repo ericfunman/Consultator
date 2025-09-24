@@ -3,15 +3,16 @@ Module de gestion des documents du consultant
 Fonctions pour afficher, uploader et analyser les documents
 """
 
+import json
 import os
 import sys
-import json
 from datetime import datetime
 from typing import Any
 from typing import Dict
 from typing import List
 from typing import Optional
 
+import pandas as pd
 import streamlit as st
 
 # Constantes pour éviter la duplication
@@ -33,13 +34,11 @@ try:
     from database.database import get_database_session
     from database.models import Consultant
     from database.models import Document
+    from services.ai_openai_service import OpenAIChatGPTService
+    from services.ai_openai_service import get_grok_service
+    from services.ai_openai_service import is_grok_available
     from services.consultant_service import ConsultantService
     from services.document_analyzer import DocumentAnalyzer
-    from services.ai_openai_service import (
-        OpenAIChatGPTService,
-        get_grok_service,
-        is_grok_available,
-    )
 
     imports_ok = True
 except ImportError:
@@ -378,7 +377,9 @@ def analyze_consultant_cv(consultant):
             # Configuration OpenAI (si disponible)
             if grok_available:
                 with st.expander("⚙️ Configuration IA"):
-                    from services.ai_grok_service import show_grok_config_interface
+                    from services.ai_grok_service import (
+                        show_grok_config_interface,
+                    )
 
                     show_grok_config_interface()
             else:
@@ -902,8 +903,6 @@ def show_documents_report(documents):
             }
         )
 
-    import pandas as pd
-
     df = pd.DataFrame(doc_data)
     st.dataframe(df, use_container_width=True, hide_index=True)
 
@@ -944,8 +943,6 @@ def _display_cv_analysis_summary(document, consultant):
 
     st.markdown("**🔍 Analyse CV**")
     try:
-        import json
-
         analysis = json.loads(document.analyse_cv)
 
         # Afficher un résumé de l'analyse

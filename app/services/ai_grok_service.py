@@ -7,8 +7,11 @@ Utilise l'API Grok pour analyser les CV et extraire les informations pertinentes
 import json
 import logging
 import os
-from typing import Dict, List, Optional, Any
 from datetime import datetime
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
 
 import requests
 import streamlit as st
