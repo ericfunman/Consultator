@@ -162,7 +162,9 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         except requests.exceptions.SSLError as ssl_error:
             # En cas d'erreur SSL, logger l'erreur mais ne pas désactiver la validation
             logger.warning(f"Erreur SSL lors de l'appel OpenAI: {ssl_error}")
-            logger.warning("Cela peut être dû à un proxy d'entreprise ou des certificats système manquants")
+            logger.warning(
+                "Cela peut être dû à un proxy d'entreprise ou des certificats système manquants"
+            )
 
             # Lever une erreur explicite plutôt que de désactiver SSL
             raise ConnectionError(
