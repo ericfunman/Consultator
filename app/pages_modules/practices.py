@@ -193,7 +193,7 @@ def _display_consultants_dataframe(consultant_data):
         df = pd.DataFrame(consultant_data)
         st.dataframe(
             df,
-            use_container_width=True,
+            width='stretch',
             hide_index=True,
             column_config=_get_column_config(),
         )

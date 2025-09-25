@@ -560,6 +560,13 @@ def _handle_assignment_selection(current_assignments, data, session):
     # Actions sur sélection
     if event.selection.rows:
         selected_row = event.selection.rows[0]
+        # Convertir en entier au cas où c'est une chaîne (bug Streamlit)
+        try:
+            selected_row = int(selected_row)
+        except (ValueError, TypeError):
+            st.error("❌ Erreur : Index de ligne invalide")
+            return
+
         selected_consultant_name = data[selected_row]["Consultant"]
         assignment_to_end = current_assignments[selected_row][0]
 

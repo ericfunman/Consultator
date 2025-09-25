@@ -53,7 +53,7 @@ with col1:
         help="Recherche dans les prénoms, noms et emails des consultants"
     )
 with col2:
-    search_button = st.button("🔍 Rechercher", use_container_width=True)
+    search_button = st.button("🔍 Rechercher", width='stretch')
 ```
 
 ### 📊 Affichage des Résultats

@@ -562,7 +562,7 @@ class TestEnhancedUICoverage:
         call_args = mock_st.dataframe.call_args
         
         # Vérifier les paramètres passés à dataframe
-        assert call_args[1]["use_container_width"] is True
+        assert call_args[1]["width"] == 'stretch'
         assert call_args[1]["hide_index"] is True
         assert call_args[1]["on_select"] == "rerun"
         assert call_args[1]["selection_mode"] == "single-row"

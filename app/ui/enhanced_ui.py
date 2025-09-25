@@ -168,13 +168,13 @@ class AdvancedUIFilters:
 
         col1, col2 = st.sidebar.columns(2)
         with col1:
-            if st.sidebar.button("🔄 Réinitialiser", use_container_width=True):
+            if st.sidebar.button("🔄 Réinitialiser", width='stretch'):
                 self.reset_filters()
                 st.rerun()
 
         with col2:
             if st.sidebar.button(
-                "📊 Appliquer", type="primary", use_container_width=True
+                "📊 Appliquer", type="primary", width='stretch'
             ):
                 st.rerun()
 
@@ -383,7 +383,7 @@ class DataTableEnhancer:
         # Configuration du tableau
         event = st.dataframe(
             df_display,
-            use_container_width=True,
+            width='stretch',
             hide_index=True,
             on_select="rerun",
             selection_mode="single-row",
@@ -421,17 +421,17 @@ class DataTableEnhancer:
 
         with col1:
             if "view" in actions and st.button(
-                "👁️ Voir profil", type="primary", use_container_width=True
+                "👁️ Voir profil", type="primary", width='stretch'
             ):
                 action_performed = "view"
 
         with col2:
-            if "edit" in actions and st.button("✏️ Modifier", use_container_width=True):
+            if "edit" in actions and st.button("✏️ Modifier", width='stretch'):
                 action_performed = "edit"
 
         with col3:
             if "delete" in actions and st.button(
-                "🗑️ Supprimer", use_container_width=True
+                "🗑️ Supprimer", width='stretch'
             ):
                 action_performed = "delete"
 
