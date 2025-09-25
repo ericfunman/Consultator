@@ -18,11 +18,11 @@ get_session = get_database_session
 
 
 class PracticeService:
-    """Service pour gérer les practices"""
+    """Service pour gÃ©rer les practices"""
 
     @staticmethod
     def get_all_practices() -> List[Practice]:
-        """Récupère toutes les practices actives"""
+        """RÃ©cupÃ¨re toutes les practices actives"""
         session = get_session()
         try:
             return (
@@ -32,31 +32,31 @@ class PracticeService:
                 .all()
             )
         except SQLAlchemyError as e:
-            st.error(f"Erreur lors de la récupération des practices: {e}")
+            st.error(f"Erreur lors de la rÃ©cupÃ©ration des practices: {e}")
             return []
         finally:
             session.close()
 
     @staticmethod
     def get_practice_by_id(practice_id: int) -> Optional[Practice]:
-        """Récupère une practice par son ID"""
+        """RÃ©cupÃ¨re une practice par son ID"""
         session = get_session()
         try:
             return session.query(Practice).filter(Practice.id == practice_id).first()
         except SQLAlchemyError as e:
-            st.error(f"Erreur lors de la récupération de la practice: {e}")
+            st.error(f"Erreur lors de la rÃ©cupÃ©ration de la practice: {e}")
             return None
         finally:
             session.close()
 
     @staticmethod
     def get_practice_by_name(nom: str) -> Optional[Practice]:
-        """Récupère une practice par son nom"""
+        """RÃ©cupÃ¨re une practice par son nom"""
         session = get_session()
         try:
             return session.query(Practice).filter(Practice.nom == nom).first()
         except SQLAlchemyError as e:
-            st.error(f"Erreur lors de la récupération de la practice: {e}")
+            st.error(f"Erreur lors de la rÃ©cupÃ©ration de la practice: {e}")
             return None
         finally:
             session.close()
@@ -65,13 +65,13 @@ class PracticeService:
     def create_practice(
         nom: str, description: str = "", responsable: str = ""
     ) -> Optional[Practice]:
-        """Crée une nouvelle practice"""
+        """CrÃ©e une nouvelle practice"""
         session = get_session()
         try:
-            # Vérifier si la practice existe déj?
+            # VÃ©rifier si la practice existe dÃ©j?
             existing = session.query(Practice).filter(Practice.nom == nom).first()
             if existing:
-                st.error(f"La practice '{nom}' existe déjà")
+                st.error(f"La practice '{nom}' existe dÃ©jÃ ")
                 return None
 
             practice = Practice(
@@ -82,25 +82,25 @@ class PracticeService:
             session.commit()
             session.refresh(practice)
 
-            st.success(f"Practice '{nom}' créée avec succès")
+            st.success(f"Practice '{nom}' crÃ©Ã©e avec succÃ¨s")
             return practice
 
         except SQLAlchemyError as e:
-            st.error(f"Erreur lors de la création de la practice: {e}")
+            st.error(f"Erreur lors de la crÃ©ation de la practice: {e}")
             return None
         finally:
             session.close()
 
     @staticmethod
     def update_practice(practice_id: int, **kwargs) -> bool:
-        """Met à jour une practice"""
+        """Met Ã  jour une practice"""
         session = get_session()
         try:
             practice = (
                 session.query(Practice).filter(Practice.id == practice_id).first()
             )
             if not practice:
-                st.error("Practice non trouvée")
+                st.error("Practice non trouvÃ©e")
                 return False
 
             for key, value in kwargs.items():
@@ -108,11 +108,11 @@ class PracticeService:
                     setattr(practice, key, value)
 
             session.commit()
-            st.success("Practice mise à jour avec succès")
+            st.success("Practice mise Ã  jour avec succÃ¨s")
             return True
 
         except SQLAlchemyError as e:
-            st.error(f"Erreur lors de la mise à jour de la practice: {e}")
+            st.error(f"Erreur lors de la mise Ã  jour de la practice: {e}")
             return False
         finally:
             session.close()
@@ -121,7 +121,7 @@ class PracticeService:
     def get_consultants_by_practice(
         practice_id: Optional[int] = None,
     ) -> Dict[str, List[Consultant]]:
-        """Récupère les consultants groupés par practice"""
+        """RÃ©cupÃ¨re les consultants groupÃ©s par practice"""
         session = get_session()
         try:
             if practice_id:
@@ -132,7 +132,7 @@ class PracticeService:
                 return PracticeService._get_all_consultants_by_practice(session)
         except SQLAlchemyError as e:
             st.error(
-                f"Erreur lors de la récupération des consultants par practice: {e}"
+                f"Erreur lors de la rÃ©cupÃ©ration des consultants par practice: {e}"
             )
             return {}
         finally:
@@ -142,7 +142,7 @@ class PracticeService:
     def _get_consultants_for_specific_practice(
         session, practice_id: int
     ) -> Dict[str, List[Consultant]]:
-        """Récupère les consultants d'une practice spécifique"""
+        """RÃ©cupÃ¨re les consultants d'une practice spÃ©cifique"""
         from sqlalchemy.orm import joinedload
 
         consultants = (
@@ -159,7 +159,7 @@ class PracticeService:
         practice = session.query(Practice).filter(Practice.id == practice_id).first()
         practice_name = practice.nom if practice else "Practice inconnue"
 
-        # Détacher les objets de la session pour éviter les erreurs DetachedInstance
+        # DÃ©tacher les objets de la session pour Ã©viter les erreurs DetachedInstance
         for consultant in consultants:
             session.expunge(consultant)
 
@@ -167,7 +167,7 @@ class PracticeService:
 
     @staticmethod
     def _get_all_consultants_by_practice(session) -> Dict[str, List[Consultant]]:
-        """Récupère tous les consultants groupés par practice"""
+        """RÃ©cupÃ¨re tous les consultants groupÃ©s par practice"""
         practices = session.query(Practice).filter(Practice.actif).all()
         result = {}
 
@@ -189,7 +189,7 @@ class PracticeService:
 
     @staticmethod
     def _get_practice_consultants(session, practice_id: int) -> List[Consultant]:
-        """Récupère les consultants d'une practice donnée"""
+        """RÃ©cupÃ¨re les consultants d'une practice donnÃ©e"""
         from sqlalchemy.orm import joinedload
 
         consultants = (
@@ -203,7 +203,7 @@ class PracticeService:
             .all()
         )
 
-        # Détacher les objets de la session
+        # DÃ©tacher les objets de la session
         for consultant in consultants:
             session.expunge(consultant)
 
@@ -211,7 +211,7 @@ class PracticeService:
 
     @staticmethod
     def _get_consultants_without_practice(session) -> List[Consultant]:
-        """Récupère les consultants sans practice"""
+        """RÃ©cupÃ¨re les consultants sans practice"""
         from sqlalchemy.orm import joinedload
 
         consultants = (
@@ -225,7 +225,7 @@ class PracticeService:
             .all()
         )
 
-        # Détacher les objets de la session
+        # DÃ©tacher les objets de la session
         for consultant in consultants:
             session.expunge(consultant)
 
@@ -235,14 +235,14 @@ class PracticeService:
     def assign_consultant_to_practice(
         consultant_id: int, practice_id: Optional[int]
     ) -> bool:
-        """Assigne un consultant à une practice"""
+        """Assigne un consultant Ã  une practice"""
         session = get_session()
         try:
             consultant = (
                 session.query(Consultant).filter(Consultant.id == consultant_id).first()
             )
             if not consultant:
-                st.error("Consultant non trouvé")
+                st.error("Consultant non trouvÃ©")
                 return False
 
             if practice_id:
@@ -250,16 +250,16 @@ class PracticeService:
                     session.query(Practice).filter(Practice.id == practice_id).first()
                 )
                 if not practice:
-                    st.error("Practice non trouvée")
+                    st.error("Practice non trouvÃ©e")
                     return False
 
             consultant.practice_id = practice_id
             session.commit()
 
             if practice_id:
-                st.success(f"Consultant assigné à la practice {practice.nom}")
+                st.success(f"Consultant assignÃ© Ã  la practice {practice.nom}")
             else:
-                st.success("Consultant retiré de sa practice")
+                st.success("Consultant retirÃ© de sa practice")
 
             return True
         except SQLAlchemyError as e:
@@ -270,7 +270,7 @@ class PracticeService:
 
     @staticmethod
     def get_practice_statistics() -> Dict:
-        """Récupère les statistiques des practices"""
+        """RÃ©cupÃ¨re les statistiques des practices"""
         session = get_session()
         try:
             practices = session.query(Practice).filter(Practice.actif).all()
@@ -301,7 +301,7 @@ class PracticeService:
                         "nom": practice.nom,
                         "total_consultants": consultants_count,
                         "consultants_actifs": consultants_actifs,
-                        "responsable": practice.responsable or "Non défini",
+                        "responsable": practice.responsable or "Non dÃ©fini",
                     }
                 )
 
@@ -332,7 +332,7 @@ class PracticeService:
 
             return stats
         except SQLAlchemyError as e:
-            st.error(f"Erreur lors de la récupération des statistiques: {e}")
+            st.error(f"Erreur lors de la rÃ©cupÃ©ration des statistiques: {e}")
             return {
                 "total_practices": 0,
                 "total_consultants": 0,
@@ -343,23 +343,23 @@ class PracticeService:
 
     @staticmethod
     def init_default_practices():
-        """Initialise les practices par défaut (Data et Quant)"""
+        """Initialise les practices par dÃ©faut (Data et Quant)"""
         session = get_session()
         try:
-            # Vérifier si les practices existent déj?
+            # VÃ©rifier si les practices existent dÃ©j?
             existing_practices = session.query(Practice).all()
 
             if not existing_practices:
-                # Créer les practices par défaut
+                # CrÃ©er les practices par dÃ©faut
                 practices_default = [
                     {
                         "nom": "Data",
-                        "description": "Practice spécialisée dans les données, analytics, BI et data science",
+                        "description": "Practice spÃ©cialisÃ©e dans les donnÃ©es, analytics, BI et data science",
                         "responsable": "",
                     },
                     {
                         "nom": "Quant",
-                        "description": "Practice spécialisée dans l'analyse quantitative et le risk management",
+                        "description": "Practice spÃ©cialisÃ©e dans l'analyse quantitative et le risk management",
                         "responsable": "",
                     },
                 ]
@@ -369,7 +369,7 @@ class PracticeService:
                     session.add(practice)
 
                 session.commit()
-                st.success("Practices par défaut initialisées : Data et Quant")
+                st.success("Practices par dÃ©faut initialisÃ©es : Data et Quant")
         except SQLAlchemyError as e:
             st.error(f"Erreur lors de l'initialisation des practices: {e}")
         finally:

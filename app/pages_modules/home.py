@@ -123,7 +123,7 @@ def show_dashboard_charts():
             y="Revenus",
             title="Évolution mensuelle des revenus",
         )
-        st.plotly_chart(fig, width='stretch')
+        st.plotly_chart(fig, width="stretch")
 
     # Tableau des dernières activités
     st.subheader("📋 Activités récentes")
@@ -153,7 +153,7 @@ def show_dashboard_charts():
     ]
 
     df_activites = pd.DataFrame(activites)
-    st.dataframe(df_activites, width='stretch', hide_index=True)
+    st.dataframe(df_activites, width="stretch", hide_index=True)
 
 
 def show_getting_started():

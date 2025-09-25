@@ -228,7 +228,7 @@ def show_salary_history(consultant_id: int):
             import pandas as pd
 
             df = pd.DataFrame(salary_data)
-            st.dataframe(df, width='stretch', hide_index=True)
+            st.dataframe(df, width="stretch", hide_index=True)
 
     except Exception as e:
         st.warning(f"{MSG_ERREUR_HISTORIQUE}: {e}")
@@ -293,7 +293,7 @@ def show_detailed_salary_history(consultant_id: int):
         # Formater les colonnes
         df["Salaire"] = df["Salaire"].apply(lambda x: f"{x:,}€")
 
-        st.dataframe(df, width='stretch', hide_index=True)
+        st.dataframe(df, width="stretch", hide_index=True)
 
         # Bouton pour fermer
         if st.button("❌ Fermer l'historique", key="close_salary_history"):

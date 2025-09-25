@@ -904,7 +904,7 @@ def show_documents_report(documents):
         )
 
     df = pd.DataFrame(doc_data)
-    st.dataframe(df, width='stretch', hide_index=True)
+    st.dataframe(df, width="stretch", hide_index=True)
 
 
 # Helper methods pour show_document_details()

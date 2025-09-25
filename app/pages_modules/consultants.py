@@ -743,7 +743,7 @@ def _display_salary_evolution_chart(consultant, salaires_sorted):
             yaxis_title="Salaire (€)",
             template="plotly_white",
         )
-        st.plotly_chart(fig, width='stretch')
+        st.plotly_chart(fig, width="stretch")
 
 
 def _process_consultant_form_data(consultant, form_data):
@@ -964,7 +964,7 @@ def show_consultant_info(consultant):
         _, col2, _ = st.columns([2, 1, 2])
         with col2:
             submitted = st.form_submit_button(
-                "💾 Sauvegarder", type="primary", width='stretch'
+                "💾 Sauvegarder", type="primary", width="stretch"
             )
 
         if submitted:
@@ -2090,7 +2090,7 @@ def _display_classic_consultants_table(consultants):
 
     event = st.dataframe(
         df,
-        width='stretch',
+        width="stretch",
         hide_index=True,
         on_select="rerun",
         selection_mode="single-row",
@@ -2165,7 +2165,7 @@ def _render_view_button(selected_id):
     if st.button(
         "👁️ Voir le profil",
         type="primary",
-        width='stretch',
+        width="stretch",
         key=f"view_{selected_id}",
     ):
         st.session_state.view_consultant_profile = selected_id
@@ -2176,7 +2176,7 @@ def _render_edit_button(selected_id):
     """Affiche le bouton Modifier"""
     if st.button(
         "✏️ Modifier",
-        width='stretch',
+        width="stretch",
         key=f"edit_{selected_id}",
     ):
         st.session_state.view_consultant_profile = selected_id
@@ -2187,7 +2187,7 @@ def _render_delete_button(selected_id):
     """Affiche le bouton Supprimer"""
     if st.button(
         "🗑️ Supprimer",
-        width='stretch',
+        width="stretch",
         key=f"delete_{selected_id}",
     ):
         if ConsultantService.delete_consultant(selected_id):
@@ -2261,7 +2261,7 @@ def show_add_consultant_form():
 
         # Bouton de création
         submitted = st.form_submit_button(
-            "➕ Créer le consultant", type="primary", width='stretch'
+            "➕ Créer le consultant", type="primary", width="stretch"
         )
 
         if submitted:
@@ -3267,9 +3267,7 @@ def _display_cv_missions_header(missions):
 
 def _display_cv_missions_global_save_button(missions, consultant):
     """Affiche le bouton de sauvegarde globale"""
-    if st.button(
-        "💾 Sauvegarder TOUTES les missions", type="primary", width='stretch'
-    ):
+    if st.button("💾 Sauvegarder TOUTES les missions", type="primary", width="stretch"):
         _handle_global_missions_save(missions, consultant)
 
 
@@ -3474,7 +3472,7 @@ def _display_cv_mission_save_button(
         f"💾 Sauvegarder Mission {mission_index}",
         key=f"save_mission_{mission_index}",
         type="primary",
-        width='stretch',
+        width="stretch",
         help="Ajouter cette mission au profil du consultant",
     ):
         _handle_single_mission_save(
@@ -3899,7 +3897,7 @@ def _display_technologies_action_button(technologies):
     if st.button(
         "🛠️ Ajouter toutes les technologies au profil",
         type="primary",
-        width='stretch',
+        width="stretch",
     ):
         if technologies:
             st.success(
@@ -3915,7 +3913,7 @@ def _display_technologies_action_button(technologies):
 
 def _display_functional_skills_action_button(competences):
     """Affiche le bouton d'action pour les compétences fonctionnelles"""
-    if st.button("💼 Ajouter les compétences fonctionnelles", width='stretch'):
+    if st.button("💼 Ajouter les compétences fonctionnelles", width="stretch"):
         if competences:
             st.success(
                 f"✅ {len(competences)} compétence(s) prête(s) à être ajoutée(s)"
@@ -4009,7 +4007,7 @@ def _display_missions_actions(missions):
     if st.button(
         "📋 Ajouter toutes les missions au profil",
         type="primary",
-        width='stretch',
+        width="stretch",
     ):
         _handle_add_all_missions(missions)
 
@@ -4060,9 +4058,7 @@ def _display_missions_addition_result(added_count):
 def _display_skills_actions(technologies, competences):
     """Affiche les actions pour les compétences"""
     st.write("**🛠️ Gestion des compétences**")
-    if st.button(
-        "🛠️ Ajouter toutes les compétences au profil", width='stretch'
-    ):
+    if st.button("🛠️ Ajouter toutes les compétences au profil", width="stretch"):
         _handle_add_all_skills(technologies, competences)
 
     st.markdown("")
@@ -4113,7 +4109,7 @@ def _display_cv_export_tools(consultant, missions, technologies, competences):
 
 def _display_json_export_button(consultant, missions, technologies, competences):
     """Affiche le bouton d'export JSON"""
-    if st.button("📄 Export JSON", width='stretch'):
+    if st.button("📄 Export JSON", width="stretch"):
         import json
         from datetime import datetime
 
@@ -4130,7 +4126,7 @@ def _display_json_export_button(consultant, missions, technologies, competences)
 
 def _display_formatted_summary_button(consultant, missions, technologies, competences):
     """Affiche le bouton de résumé formaté"""
-    if st.button("📊 Résumé formaté", width='stretch'):
+    if st.button("📊 Résumé formaté", width="stretch"):
         resume_text = _generate_formatted_summary(
             consultant, missions, technologies, competences
         )
@@ -4160,7 +4156,7 @@ def _generate_formatted_summary(consultant, missions, technologies, competences)
 
 def _display_new_analysis_button():
     """Affiche le bouton de nouvelle analyse"""
-    if st.button("🔄 Nouvelle analyse", width='stretch'):
+    if st.button("🔄 Nouvelle analyse", width="stretch"):
         st.info(
             "📁 Uploadez un nouveau document dans l'onglet 'Documents' pour une nouvelle analyse"
         )

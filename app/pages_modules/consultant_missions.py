@@ -1336,7 +1336,7 @@ def show_missions_revenues(missions):
         df["Revenus"] = df["Revenus"].apply(lambda x: f"{x:,.0f}€")
         df["TJM"] = df["TJM"].apply(lambda x: f"{x:,}€" if x > 0 else "N/A")
 
-        st.dataframe(df, width='stretch', hide_index=True)
+        st.dataframe(df, width="stretch", hide_index=True)
 
         _display_revenue_statistics(missions, total_revenue)
 

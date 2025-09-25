@@ -249,7 +249,7 @@ def _handle_consultant_selection(event, filtered_df: pd.DataFrame) -> None:
             if st.button(
                 "👁️ Voir le profil",
                 type="primary",
-                width='stretch',
+                width="stretch",
                 key=f"view_profile_{selected_id}",
             ):
                 st.session_state.view_consultant_profile = selected_id
@@ -258,7 +258,7 @@ def _handle_consultant_selection(event, filtered_df: pd.DataFrame) -> None:
         with col2:
             if st.button(
                 "✏️ Modifier",
-                width='stretch',
+                width="stretch",
                 key=f"edit_profile_{selected_id}",
             ):
                 st.session_state.view_consultant_profile = selected_id
@@ -268,7 +268,7 @@ def _handle_consultant_selection(event, filtered_df: pd.DataFrame) -> None:
         with col3:
             if st.button(
                 "🗑️ Supprimer",
-                width='stretch',
+                width="stretch",
                 key=f"delete_profile_{selected_id}",
             ):
                 st.session_state.view_consultant_profile = selected_id
@@ -369,7 +369,7 @@ def show_consultants_list():
             # Afficher le DataFrame avec sélection interactive
             event = st.dataframe(
                 filtered_df[display_columns],
-                width='stretch',
+                width="stretch",
                 hide_index=True,
                 on_select="rerun",
                 selection_mode="single-row",
@@ -501,7 +501,7 @@ def generate_consultants_report(df: pd.DataFrame):
 
             st.bar_chart(
                 salary_data.set_index("Nom complet")[SALAIRE_COL],
-                width='stretch',
+                width="stretch",
             )
 
         st.success(MSG_SUCCESS_RAPPORT)

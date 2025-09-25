@@ -96,7 +96,7 @@ def _display_language_table(df):
                 LANGUE_MATERNELLE_LABEL,
             ]
         ],
-        width='stretch',
+        width="stretch",
         hide_index=True,
     )
 
@@ -877,7 +877,7 @@ def show_languages_comparison(consultant_id: int):
                 import pandas as pd
 
                 df = pd.DataFrame(comparison_data)
-                st.dataframe(df, width='stretch', hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
 
                 # Résumé
                 above_avg = sum(
