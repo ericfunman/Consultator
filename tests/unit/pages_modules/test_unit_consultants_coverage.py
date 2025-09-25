@@ -879,7 +879,7 @@ class TestMissionFunctions:
     def test_placeholder(self):
         """Test placeholder pour la classe"""
         # Test basique pour éviter les avertissements de couverture
-        self.assertTrue(True)
+        assert True
 
 
 class TestDocumentFunctions:
