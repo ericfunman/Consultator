@@ -86,6 +86,7 @@ class Consultant(Base):
     )  # Date d'entrée dans la société
     date_sortie_societe: Mapped[Optional[datetime.date]] = Column(Date)
     societe: Mapped[str] = Column(String(50), default="Quanteam")  # Quanteam ou Asigma
+    entite: Mapped[Optional[str]] = Column(String(100))  # Entité (ASIGMA, QUANTEAM, etc.)
     date_premiere_mission: Mapped[Optional[datetime.date]] = Column(
         Date
     )  # Date de la première mission
@@ -580,6 +581,63 @@ class BusinessManager(Base):
             >>> print(f"BM gère {bm.nombre_consultants_actuels} consultants")
         """
         return len(self.consultants_actuels)
+
+
+class VSA_Mission(Base):
+    """Modèle pour les missions VSA importées depuis Excel"""
+
+    __tablename__ = "vsa_missions"
+
+    id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = Column(Integer, nullable=False)  # Lien avec consultant (non FK pour éviter dépendance)
+    code: Mapped[str] = Column(String(100), nullable=False)  # Clé unique de la mission
+    orderid: Mapped[str] = Column(String(100), nullable=False)  # Numéro de commande
+    client_name: Mapped[str] = Column(String(200), nullable=False)  # Nom du client
+    date_debut: Mapped[Optional[datetime.date]] = Column(Date)
+    date_fin: Mapped[Optional[datetime.date]] = Column(Date)
+    tjm: Mapped[Optional[float]] = Column(Float)  # Taux Journalier Moyen
+    cjm: Mapped[Optional[float]] = Column(Float)  # Coût Journalier Moyen
+    description: Mapped[Optional[str]] = Column(Text)
+    statut: Mapped[str] = Column(String(50), default="active")  # active, completed, cancelled
+    date_import: Mapped[datetime] = Column(DateTime, default=datetime.now)
+
+    # Index pour les recherches fréquentes
+    __table_args__ = (
+        Index("idx_vsa_mission_user_id", "user_id"),
+        Index("idx_vsa_mission_code", "code"),
+        Index("idx_vsa_mission_orderid", "orderid"),
+        Index("idx_vsa_mission_client", "client_name"),
+        Index("idx_vsa_mission_dates", "date_debut", "date_fin"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<VSA_Mission(id={self.id}, code='{self.code}', client='{self.client_name}', user_id={self.user_id})>"
+
+    @property
+    def duree_jours(self) -> Optional[int]:
+        """Calcule la durée de la mission en jours"""
+        if self.date_fin and self.date_debut:
+            return (self.date_fin - self.date_debut).days
+        return None
+
+    @property
+    def consultant(self) -> Optional["Consultant"]:
+        """Retourne le consultant associé (lazy loading)"""
+        from database.database import get_database_session
+        with get_database_session() as session:
+            return session.query(Consultant).filter(Consultant.id == self.user_id).first()
+
+    @property
+    def est_active(self) -> bool:
+        """Vérifie si la mission est actuellement active"""
+        if self.statut != "active":
+            return False
+        today = date.today()
+        if self.date_debut and self.date_debut > today:
+            return False  # N'a pas encore commencé
+        if self.date_fin and self.date_fin < today:
+            return False  # Déjà terminée
+        return True
 
 
 class ConsultantBusinessManager(Base):

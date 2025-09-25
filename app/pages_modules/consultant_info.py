@@ -75,6 +75,7 @@ def _display_affectation_info(consultant) -> None:
     st.markdown("#### 🏢 Affectation")
     practice_name = consultant.practice.nom if consultant.practice else DEFAULT_PRACTICE
     st.write(f"**Practice :** {practice_name}")
+    st.write(f"**Entité :** {consultant.entite or 'N/A'}")
 
     status = STATUS_DISPONIBLE if consultant.disponibilite else STATUS_EN_MISSION
     st.write(f"**Statut :** {status}")
@@ -115,6 +116,112 @@ def _display_notes_section(consultant) -> None:
             disabled=True,
             key=f"notes_{consultant.id}",
         )
+
+
+# Constantes pour l'affichage des missions VSA
+DATE_FORMAT = "%d/%m/%Y"
+COL_CODE = "Code"
+COL_ORDERID = "N° Commande"
+COL_CLIENT = "Client"
+COL_DATE_DEBUT = "Date début"
+COL_DATE_FIN = "Date fin"
+COL_TJM = "TJM"
+COL_CJM = "CJM"
+COL_STATUT = "Statut"
+COL_DUREE = "Durée"
+NA_VALUE = "N/A"
+
+
+def _display_vsa_missions(consultant) -> None:
+    """Affiche les missions VSA du consultant"""
+    st.markdown("#### 🎯 Missions VSA")
+
+    try:
+        with get_database_session() as session:
+            # Importer VSA_Mission ici pour éviter les dépendances circulaires
+            from database.models import VSA_Mission
+
+            missions_vsa = (
+                session.query(VSA_Mission)
+                .filter(VSA_Mission.user_id == consultant.id)
+                .order_by(VSA_Mission.date_debut.desc())
+                .all()
+            )
+
+        if not missions_vsa:
+            st.info("ℹ️ Aucune mission VSA trouvée pour ce consultant")
+            return
+
+        # Statistiques des missions VSA
+        _display_vsa_missions_stats(missions_vsa)
+
+        # Tableau des missions VSA
+        _display_vsa_missions_table(missions_vsa, consultant)
+
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement des missions VSA: {e}")
+        st.code(str(e))
+
+
+def _display_vsa_missions_stats(missions_vsa) -> None:
+    """Affiche les statistiques des missions VSA"""
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("🎯 Total missions VSA", len(missions_vsa))
+
+    with col2:
+        active_missions = sum(1 for m in missions_vsa if m.est_active)
+        st.metric("✅ Missions actives", active_missions)
+
+    with col3:
+        missions_with_tjm = [m for m in missions_vsa if m.tjm]
+        avg_tjm = sum(m.tjm for m in missions_with_tjm) / len(missions_with_tjm) if missions_with_tjm else 0
+        st.metric("💰 TJM moyen", f"{avg_tjm:,.0f}€")
+
+
+def _display_vsa_missions_table(missions_vsa, consultant) -> None:
+    """Affiche le tableau des missions VSA"""
+    missions_data = []
+    for mission in missions_vsa:
+        missions_data.append({
+            COL_CODE: mission.code,
+            COL_ORDERID: mission.orderid,
+            COL_CLIENT: mission.client_name,
+            COL_DATE_DEBUT: mission.date_debut.strftime(DATE_FORMAT) if mission.date_debut else NA_VALUE,
+            COL_DATE_FIN: mission.date_fin.strftime(DATE_FORMAT) if mission.date_fin else NA_VALUE,
+            COL_TJM: f"{mission.tjm:,.0f}€" if mission.tjm else NA_VALUE,
+            COL_CJM: f"{mission.cjm:,.0f}€" if mission.cjm else NA_VALUE,
+            COL_STATUT: "✅ Active" if mission.est_active else "❌ Terminée",
+            COL_DUREE: f"{mission.duree_jours} jours" if mission.duree_jours else NA_VALUE
+        })
+
+    import pandas as pd
+    df = pd.DataFrame(missions_data)
+
+    # Configuration des colonnes
+    column_config = {
+        COL_CODE: st.column_config.TextColumn(COL_CODE, width="small"),
+        COL_ORDERID: st.column_config.TextColumn(COL_ORDERID, width="medium"),
+        COL_CLIENT: st.column_config.TextColumn(COL_CLIENT, width="large"),
+        COL_DATE_DEBUT: st.column_config.TextColumn(COL_DATE_DEBUT, width="small"),
+        COL_DATE_FIN: st.column_config.TextColumn(COL_DATE_FIN, width="small"),
+        COL_TJM: st.column_config.TextColumn(COL_TJM, width="small"),
+        COL_CJM: st.column_config.TextColumn(COL_CJM, width="small"),
+        COL_STATUT: st.column_config.TextColumn(COL_STATUT, width="small"),
+        COL_DUREE: st.column_config.TextColumn(COL_DUREE, width="small"),
+    }
+
+    st.dataframe(
+        df,
+        width="stretch",
+        hide_index=True,
+        column_config=column_config,
+    )
+
+    # Bouton pour rafraîchir
+    if st.button("🔄 Actualiser les missions VSA", key=f"refresh_vsa_{consultant.id}"):
+        st.rerun()
 
 
 def _display_action_buttons(consultant) -> None:
@@ -169,26 +276,36 @@ def show_consultant_info(consultant):
     st.markdown("### 📋 Informations personnelles")
 
     try:
-        # Informations de base
-        col1, col2 = st.columns(2)
+        # Créer les onglets
+        tab_info, tab_missions_vsa, tab_actions = st.tabs([
+            "📋 Informations", "🎯 Missions VSA", "⚙️ Actions"
+        ])
 
-        with col1:
-            _display_identity_info(consultant)
+        with tab_info:
+            # Informations de base
+            col1, col2 = st.columns(2)
 
-        with col2:
-            _display_affectation_info(consultant)
+            with col1:
+                _display_identity_info(consultant)
 
-        # Informations financières
-        _display_financial_info(consultant)
+            with col2:
+                _display_affectation_info(consultant)
 
-        # Historique des salaires
-        show_salary_history(consultant.id)
+            # Informations financières
+            _display_financial_info(consultant)
 
-        # Notes
-        _display_notes_section(consultant)
+            # Historique des salaires
+            show_salary_history(consultant.id)
 
-        # Actions
-        _display_action_buttons(consultant)
+            # Notes
+            _display_notes_section(consultant)
+
+        with tab_missions_vsa:
+            _display_vsa_missions(consultant)
+
+        with tab_actions:
+            # Actions
+            _display_action_buttons(consultant)
 
         # Gestion des affichages conditionnels
         _handle_conditional_displays(consultant)

@@ -24,6 +24,7 @@ DATE_DISPONIBILITE_COL = "Date disponibilité"
 GRADE_COL = "Grade"
 TYPE_CONTRAT_COL = "Type contrat"
 PRACTICE_COL = "Practice"
+ENTITE_COL = "Entité"
 DATE_CREATION_COL = "Date création"
 ID_COL = "ID"
 
@@ -107,6 +108,7 @@ def _convert_consultants_to_dataframe(consultants: List) -> pd.DataFrame:
                 GRADE_COL: consultant.grade,
                 TYPE_CONTRAT_COL: consultant.type_contrat,
                 PRACTICE_COL: practice_name,
+                ENTITE_COL: consultant.entite or "N/A",
                 DATE_CREATION_COL: (
                     consultant.date_creation.strftime("%d/%m/%Y")
                     if consultant.date_creation
@@ -120,7 +122,7 @@ def _convert_consultants_to_dataframe(consultants: List) -> pd.DataFrame:
 
 def _create_search_filters(df: pd.DataFrame) -> tuple:
     """Crée les widgets de recherche et de filtres"""
-    col1, col2, col3 = st.columns([2, 2, 1])
+    col1, col2, col3, col4 = st.columns([2, 2, 1, 1])
 
     with col1:
         search_term = st.text_input(
@@ -137,17 +139,24 @@ def _create_search_filters(df: pd.DataFrame) -> tuple:
         )
 
     with col3:
+        entite_filter = st.selectbox(
+            "🏛️ Filtrer par entité",
+            options=[FILTRE_TOUS] + sorted(set(df[ENTITE_COL].tolist())),
+            help="Filtrer les consultants par entité",
+        )
+
+    with col4:
         availability_filter = st.selectbox(
             "📊 Statut",
             options=[FILTRE_TOUS, FILTRE_DISPONIBLE, FILTRE_EN_MISSION],
             help="Filtrer par disponibilité",
         )
 
-    return search_term, practice_filter, availability_filter
+    return search_term, practice_filter, entite_filter, availability_filter
 
 
 def _apply_filters(
-    df: pd.DataFrame, search_term: str, practice_filter: str, availability_filter: str
+    df: pd.DataFrame, search_term: str, practice_filter: str, entite_filter: str, availability_filter: str
 ) -> pd.DataFrame:
     """Applique les filtres au DataFrame"""
     filtered_df = df.copy()
@@ -161,6 +170,9 @@ def _apply_filters(
 
     if practice_filter != FILTRE_TOUS:
         filtered_df = filtered_df[filtered_df[PRACTICE_COL] == practice_filter]
+
+    if entite_filter != FILTRE_TOUS:
+        filtered_df = filtered_df[filtered_df[ENTITE_COL] == entite_filter]
 
     if availability_filter != FILTRE_TOUS:
         status_map = {
@@ -210,6 +222,7 @@ def _get_display_columns() -> List[str]:
         GRADE_COL,
         TYPE_CONTRAT_COL,
         PRACTICE_COL,
+        ENTITE_COL,
     ]
 
 
@@ -228,6 +241,7 @@ def _create_column_config() -> dict:
         GRADE_COL: st.column_config.TextColumn(GRADE_COL, width="small"),
         TYPE_CONTRAT_COL: st.column_config.TextColumn(TYPE_CONTRAT_COL, width="small"),
         PRACTICE_COL: st.column_config.TextColumn(PRACTICE_COL, width="medium"),
+        ENTITE_COL: st.column_config.TextColumn(ENTITE_COL, width="medium"),
     }
 
 
@@ -347,11 +361,11 @@ def show_consultants_list():
         df = _convert_consultants_to_dataframe(consultants)
 
         # Filtres et recherche
-        search_term, practice_filter, availability_filter = _create_search_filters(df)
+        search_term, practice_filter, entite_filter, availability_filter = _create_search_filters(df)
 
         # Appliquer les filtres
         filtered_df = _apply_filters(
-            df, search_term, practice_filter, availability_filter
+            df, search_term, practice_filter, entite_filter, availability_filter
         )
 
         # Statistiques

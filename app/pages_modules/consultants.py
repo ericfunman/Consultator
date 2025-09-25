@@ -282,12 +282,13 @@ def show_consultant_profile():
             )
 
             # Onglets de détail
-            tab1, tab2, tab3, tab4, tab5 = st.tabs(
+            tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
                 [
                     "📋 Informations",
                     LABEL_COMPETENCES,
                     "🌍 Langues",
                     "🚀 Missions",
+                    "🎯 Missions VSA",
                     "📁 Documents",
                 ]
             )
@@ -305,6 +306,11 @@ def show_consultant_profile():
                 show_consultant_missions(consultant_obj)
 
             with tab5:
+                # Afficher les missions VSA
+                from .consultant_info import _display_vsa_missions
+                _display_vsa_missions(consultant_obj)
+
+            with tab6:
                 show_consultant_documents(consultant_obj)
 
     except (AttributeError, TypeError, ValueError, SQLAlchemyError) as exc:

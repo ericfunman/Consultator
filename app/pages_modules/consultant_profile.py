@@ -181,12 +181,13 @@ def _display_consultant_tabs(consultant_id):
         )
 
         # Onglets de détail
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
             [
                 "📋 Informations",
                 "💼 Compétences",
                 "🌍 Langues",
                 "🚀 Missions",
+                "🎯 Missions VSA",
                 "📁 Documents",
             ]
         )
@@ -212,6 +213,11 @@ def _display_consultant_tabs(consultant_id):
             show_consultant_missions_tab(consultant_obj)
 
         with tab5:
+            # Afficher les missions VSA
+            from .consultant_info import _display_vsa_missions
+            _display_vsa_missions(consultant_obj)
+
+        with tab6:
             from .consultants import show_consultant_documents_tab
 
             show_consultant_documents_tab(consultant_obj)
