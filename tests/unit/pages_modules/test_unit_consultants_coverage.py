@@ -51,14 +51,19 @@ class TestShowFunction:
 
     def test_show_basic_structure(self):
         """Test de la structure de base de la fonction show"""
-        with patch("streamlit.session_state", {}), \
-             patch("streamlit.title") as mock_title, \
-             patch("streamlit.tabs") as mock_tabs, \
-             patch("streamlit.columns") as mock_columns, \
-             patch("app.pages_modules.consultants.show_cv_analysis_fullwidth"), \
-             patch("app.pages_modules.consultants.show_consultant_profile"), \
-             patch("app.pages_modules.consultants.show_consultants_list"), \
-             patch("app.pages_modules.consultants.imports_ok", True):
+        with patch("streamlit.session_state", {}), patch(
+            "streamlit.title"
+        ) as mock_title, patch("streamlit.tabs") as mock_tabs, patch(
+            "streamlit.columns"
+        ) as mock_columns, patch(
+            "app.pages_modules.consultants.show_cv_analysis_fullwidth"
+        ), patch(
+            "app.pages_modules.consultants.show_consultant_profile"
+        ), patch(
+            "app.pages_modules.consultants.show_consultants_list"
+        ), patch(
+            "app.pages_modules.consultants.imports_ok", True
+        ):
 
             # Configure mock_tabs to return a tuple of 2 mock objects for unpacking
             mock_tab1 = MagicMock()
@@ -69,12 +74,15 @@ class TestShowFunction:
             # This handles various calls to st.columns() with different numbers of columns
             def mock_columns_func(n):
                 return tuple(MagicMock() for _ in range(n))
+
             mock_columns.side_effect = mock_columns_func
 
             consultants.show()
 
             mock_title.assert_called_once()
-            mock_tabs.assert_called_once_with([" Consultants", "➕ Ajouter un consultant"])
+            mock_tabs.assert_called_once_with(
+                [" Consultants", "➕ Ajouter un consultant"]
+            )
 
     @patch("streamlit.title")
     @patch("streamlit.tabs")
@@ -101,9 +109,7 @@ class TestCVAnalysisFullwidth:
     @patch("streamlit.file_uploader")
     @patch("streamlit.button")
     @patch("streamlit.success")
-    def test_cv_analysis_no_file(
-        self, mock_success, mock_button, mock_uploader
-    ):
+    def test_cv_analysis_no_file(self, mock_success, mock_button, mock_uploader):
         """Test analyse CV sans données dans session_state"""
         mock_uploader.return_value = None
         mock_button.return_value = False
@@ -122,22 +128,40 @@ class TestCVAnalysisFullwidth:
     @patch("app.pages_modules.consultants.show_cv_summary")
     @patch("app.pages_modules.consultants.show_cv_actions")
     def test_cv_analysis_with_data(
-        self, mock_actions, mock_summary, mock_skills, mock_missions,
-        mock_tabs, mock_success, mock_button, mock_uploader
+        self,
+        mock_actions,
+        mock_summary,
+        mock_skills,
+        mock_missions,
+        mock_tabs,
+        mock_success,
+        mock_button,
+        mock_uploader,
     ):
         """Test analyse CV avec données dans session_state"""
         # Mock session_state avec données d'analyse
         mock_session_state = MagicMock()
         mock_session_state.cv_analysis = {
-            "analysis": {"missions": [], "langages_techniques": [], "competences_fonctionnelles": []},
+            "analysis": {
+                "missions": [],
+                "langages_techniques": [],
+                "competences_fonctionnelles": [],
+            },
             "consultant": MagicMock(),
-            "file_name": "test_cv.pdf"
+            "file_name": "test_cv.pdf",
         }
 
-        with patch("app.pages_modules.consultants.st.session_state", mock_session_state):
+        with patch(
+            "app.pages_modules.consultants.st.session_state", mock_session_state
+        ):
             mock_uploader.return_value = None
             mock_button.return_value = False
-            mock_tabs.return_value = [MagicMock(), MagicMock(), MagicMock(), MagicMock()]
+            mock_tabs.return_value = [
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+                MagicMock(),
+            ]
 
             # La fonction ne doit pas planter quand cv_analysis est présent
             try:
@@ -148,7 +172,9 @@ class TestCVAnalysisFullwidth:
                 success = False
                 print(f"Exception: {e}")
 
-            assert success, "La fonction show_cv_analysis_fullwidth ne doit pas planter avec cv_analysis présent"
+            assert (
+                success
+            ), "La fonction show_cv_analysis_fullwidth ne doit pas planter avec cv_analysis présent"
 
 
 class TestConsultantProfile:
@@ -273,15 +299,23 @@ class TestConsultantInfo:
         mock_submit.return_value = False
 
         # Mock all database-related functions to avoid SQLAlchemy errors and max() on empty list
-        with patch("app.pages_modules.consultants.get_database_session"), \
-             patch("app.services.practice_service.PracticeService.get_all_practices"), \
-             patch("app.pages_modules.consultants._load_consultant_for_edit") as mock_load, \
-             patch("app.pages_modules.consultants._render_basic_consultant_fields"), \
-             patch("app.pages_modules.consultants._render_company_history_fields"), \
-             patch("app.pages_modules.consultants._render_professional_profile_fields"), \
-             patch("app.pages_modules.consultants._display_consultant_status"), \
-             patch("app.pages_modules.consultants._manage_consultant_salary_history") as mock_manage_salary, \
-             patch("streamlit.columns") as mock_columns:  # Ajouter le mock pour st.columns
+        with patch("app.pages_modules.consultants.get_database_session"), patch(
+            "app.services.practice_service.PracticeService.get_all_practices"
+        ), patch(
+            "app.pages_modules.consultants._load_consultant_for_edit"
+        ) as mock_load, patch(
+            "app.pages_modules.consultants._render_basic_consultant_fields"
+        ), patch(
+            "app.pages_modules.consultants._render_company_history_fields"
+        ), patch(
+            "app.pages_modules.consultants._render_professional_profile_fields"
+        ), patch(
+            "app.pages_modules.consultants._display_consultant_status"
+        ), patch(
+            "app.pages_modules.consultants._manage_consultant_salary_history"
+        ) as mock_manage_salary, patch(
+            "streamlit.columns"
+        ) as mock_columns:  # Ajouter le mock pour st.columns
 
             # Mock st.columns to return a tuple
             mock_col1 = MagicMock()
@@ -289,8 +323,14 @@ class TestConsultantInfo:
             mock_columns.return_value = (mock_col1, mock_col2)
 
             # Mock the return value of _load_consultant_for_edit to avoid database calls
-            mock_load.return_value = (mock_consultant, {}, 1, "Manager Test", "manager@test.com")
-            
+            mock_load.return_value = (
+                mock_consultant,
+                {},
+                1,
+                "Manager Test",
+                "manager@test.com",
+            )
+
             # Mock _manage_consultant_salary_history to avoid max() on empty list
             mock_manage_salary.return_value = None
 
@@ -354,19 +394,33 @@ class TestConsultantInfo:
         consultants.imports_ok = True
 
         # Mock all database-related functions to avoid SQLAlchemy errors
-        with patch("app.pages_modules.consultants.get_database_session"), \
-             patch("app.services.practice_service.PracticeService.get_all_practices"), \
-             patch("app.pages_modules.consultants._load_consultant_for_edit") as mock_load, \
-             patch("app.pages_modules.consultants._render_basic_consultant_fields"), \
-             patch("app.pages_modules.consultants._render_company_history_fields"), \
-             patch("app.pages_modules.consultants._render_professional_profile_fields"), \
-             patch("app.pages_modules.consultants._display_consultant_status"), \
-             patch("app.pages_modules.consultants._manage_consultant_salary_history") as mock_manage_salary, \
-             patch("app.pages_modules.consultants._process_consultant_form_data"):
+        with patch("app.pages_modules.consultants.get_database_session"), patch(
+            "app.services.practice_service.PracticeService.get_all_practices"
+        ), patch(
+            "app.pages_modules.consultants._load_consultant_for_edit"
+        ) as mock_load, patch(
+            "app.pages_modules.consultants._render_basic_consultant_fields"
+        ), patch(
+            "app.pages_modules.consultants._render_company_history_fields"
+        ), patch(
+            "app.pages_modules.consultants._render_professional_profile_fields"
+        ), patch(
+            "app.pages_modules.consultants._display_consultant_status"
+        ), patch(
+            "app.pages_modules.consultants._manage_consultant_salary_history"
+        ) as mock_manage_salary, patch(
+            "app.pages_modules.consultants._process_consultant_form_data"
+        ):
 
             # Mock the return value of _load_consultant_for_edit to avoid database calls
-            mock_load.return_value = (mock_consultant, {}, 1, "Manager Test", "manager@test.com")
-            
+            mock_load.return_value = (
+                mock_consultant,
+                {},
+                1,
+                "Manager Test",
+                "manager@test.com",
+            )
+
             # Mock _manage_consultant_salary_history to avoid max() on empty list
             mock_manage_salary.return_value = None
 
@@ -434,9 +488,7 @@ class TestConsultantLanguages:
 
     @patch("streamlit.subheader")
     @patch("streamlit.info")
-    def test_show_consultant_languages_no_data(
-        self, mock_info, mock_subheader
-    ):
+    def test_show_consultant_languages_no_data(self, mock_info, mock_subheader):
         """Test affichage des langues sans données"""
         # Cette fonction n'existe pas dans l'implémentation actuelle
         # Le test vérifie simplement que la fonction principale existe
@@ -475,9 +527,7 @@ class TestConsultantMissions:
 
     @patch("streamlit.subheader")
     @patch("streamlit.info")
-    def test_show_consultant_missions_no_data(
-        self, mock_info, mock_subheader
-    ):
+    def test_show_consultant_missions_no_data(self, mock_info, mock_subheader):
         """Test affichage des missions sans données"""
         # Cette fonction n'existe pas dans l'implémentation actuelle
         # Le test vérifie simplement que la fonction principale existe
@@ -488,9 +538,7 @@ class TestConsultantMissions:
 
     @patch("streamlit.subheader")
     @patch("streamlit.tabs")
-    def test_show_consultant_missions_with_data(
-        self, mock_tabs, mock_subheader
-    ):
+    def test_show_consultant_missions_with_data(self, mock_tabs, mock_subheader):
         """Test affichage des missions avec données"""
         # Cette fonction n'existe pas dans l'implémentation actuelle
         # Le test vérifie simplement que la fonction principale existe
@@ -830,7 +878,8 @@ class TestMissionFunctions:
 
     def test_placeholder(self):
         """Test placeholder pour la classe"""
-        assert True
+        # Test basique pour éviter les avertissements de couverture
+        self.assertTrue(True)
 
 
 class TestDocumentFunctions:
@@ -914,8 +963,14 @@ class TestUtilityFunctionsExtended:
 
     def test_detect_document_type_motivation(self):
         """Test détection type document lettre motivation"""
-        assert consultants.detect_document_type("lettre_motivation.pdf") == "Lettre de motivation"
-        assert consultants.detect_document_type("cover_letter.docx") == "Lettre de motivation"
+        assert (
+            consultants.detect_document_type("lettre_motivation.pdf")
+            == "Lettre de motivation"
+        )
+        assert (
+            consultants.detect_document_type("cover_letter.docx")
+            == "Lettre de motivation"
+        )
 
     def test_detect_document_type_certificate(self):
         """Test détection type document certificat"""
@@ -929,7 +984,10 @@ class TestUtilityFunctionsExtended:
 
     def test_detect_document_type_presentation(self):
         """Test détection type document présentation"""
-        assert consultants.detect_document_type("presentation_projet.pptx") == "Présentation"
+        assert (
+            consultants.detect_document_type("presentation_projet.pptx")
+            == "Présentation"
+        )
         assert consultants.detect_document_type("demo_slides.ppt") == "Présentation"
 
     def test_detect_document_type_default(self):
@@ -943,17 +1001,28 @@ class TestUtilityFunctionsExtended:
 
     def test_get_mime_type_word(self):
         """Test récupération type MIME Word"""
-        assert consultants.get_mime_type("document.docx") == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        assert (
+            consultants.get_mime_type("document.docx")
+            == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
         assert consultants.get_mime_type("document.doc") == "application/msword"
 
     def test_get_mime_type_powerpoint(self):
         """Test récupération type MIME PowerPoint"""
-        assert consultants.get_mime_type("presentation.pptx") == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-        assert consultants.get_mime_type("presentation.ppt") == "application/vnd.ms-powerpoint"
+        assert (
+            consultants.get_mime_type("presentation.pptx")
+            == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        )
+        assert (
+            consultants.get_mime_type("presentation.ppt")
+            == "application/vnd.ms-powerpoint"
+        )
 
     def test_get_mime_type_unknown(self):
         """Test récupération type MIME inconnu"""
-        assert consultants.get_mime_type("document.unknown") == "application/octet-stream"
+        assert (
+            consultants.get_mime_type("document.unknown") == "application/octet-stream"
+        )
         assert consultants.get_mime_type("document") == "application/octet-stream"
 
     def test_extract_original_filename_simple(self):
@@ -1266,6 +1335,7 @@ class TestDocumentPreview:
     def test_preview_pdf_success(self, mock_file, mock_expander):
         """Test aperçu PDF avec succès"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = True
         mock_file_path.suffix = ".pdf"
@@ -1282,6 +1352,7 @@ class TestDocumentPreview:
     def test_preview_word_success(self, mock_metric, mock_subheader, mock_expander):
         """Test aperçu Word avec succès"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = True
         mock_file_path.suffix = ".docx"
@@ -1296,9 +1367,12 @@ class TestDocumentPreview:
     @patch("streamlit.expander")
     @patch("streamlit.subheader")
     @patch("streamlit.metric")
-    def test_preview_powerpoint_success(self, mock_metric, mock_subheader, mock_expander):
+    def test_preview_powerpoint_success(
+        self, mock_metric, mock_subheader, mock_expander
+    ):
         """Test aperçu PowerPoint avec succès"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = True
         mock_file_path.suffix = ".pptx"
@@ -1314,6 +1388,7 @@ class TestDocumentPreview:
     def test_preview_document_file_not_exists(self, mock_error):
         """Test aperçu document fichier inexistant"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = False
 
@@ -1332,7 +1407,9 @@ class TestMissionValidation:
         date_debut = datetime.now().date()
         mission_num = 1
 
-        errors = consultants.validate_mission_fields(client, titre, date_debut, mission_num)
+        errors = consultants.validate_mission_fields(
+            client, titre, date_debut, mission_num
+        )
 
         assert errors == []
 
@@ -1343,7 +1420,9 @@ class TestMissionValidation:
         date_debut = datetime.now().date()
         mission_num = 1
 
-        errors = consultants.validate_mission_fields(client, titre, date_debut, mission_num)
+        errors = consultants.validate_mission_fields(
+            client, titre, date_debut, mission_num
+        )
 
         assert f"mission_{mission_num}_client" in errors
 
@@ -1354,7 +1433,9 @@ class TestMissionValidation:
         date_debut = datetime.now().date()
         mission_num = 1
 
-        errors = consultants.validate_mission_fields(client, titre, date_debut, mission_num)
+        errors = consultants.validate_mission_fields(
+            client, titre, date_debut, mission_num
+        )
 
         assert f"mission_{mission_num}_titre" in errors
 
@@ -1365,7 +1446,9 @@ class TestMissionValidation:
         date_debut = None
         mission_num = 1
 
-        errors = consultants.validate_mission_fields(client, titre, date_debut, mission_num)
+        errors = consultants.validate_mission_fields(
+            client, titre, date_debut, mission_num
+        )
 
         assert f"mission_{mission_num}_debut" in errors
 
@@ -1398,6 +1481,7 @@ class TestDocumentDeletion:
     def test_delete_consultant_document_success(self, mock_success):
         """Test suppression document consultant avec succès"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = True
         mock_file_path.unlink.return_value = None
@@ -1411,6 +1495,7 @@ class TestDocumentDeletion:
     def test_delete_consultant_document_not_exists(self, mock_error):
         """Test suppression document inexistant"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = False
 
@@ -1422,19 +1507,24 @@ class TestDocumentDeletion:
     def test_delete_consultant_document_error(self, mock_error):
         """Test suppression document avec erreur"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = True
         mock_file_path.unlink.side_effect = OSError("Permission denied")
 
         consultants.delete_consultant_document(mock_file_path)
 
-        mock_error.assert_called_with("❌ Erreur lors de la suppression: Permission denied")
+        mock_error.assert_called_with(
+            "❌ Erreur lors de la suppression: Permission denied"
+        )
+
     """Tests pour les fonctions de suppression de documents"""
 
     @patch("streamlit.success")
     def test_delete_consultant_document_success(self, mock_success):
         """Test suppression document consultant avec succès"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = True
         mock_file_path.unlink.return_value = None
@@ -1448,6 +1538,7 @@ class TestDocumentDeletion:
     def test_delete_consultant_document_not_exists(self, mock_error):
         """Test suppression document inexistant"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = False
 
@@ -1459,10 +1550,13 @@ class TestDocumentDeletion:
     def test_delete_consultant_document_error(self, mock_error):
         """Test suppression document avec erreur"""
         from pathlib import Path
+
         mock_file_path = MagicMock(spec=Path)
         mock_file_path.exists.return_value = True
         mock_file_path.unlink.side_effect = OSError("Permission denied")
 
         consultants.delete_consultant_document(mock_file_path)
 
-        mock_error.assert_called_with("❌ Erreur lors de la suppression: Permission denied")
+        mock_error.assert_called_with(
+            "❌ Erreur lors de la suppression: Permission denied"
+        )
