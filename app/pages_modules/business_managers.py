@@ -113,11 +113,11 @@ def _display_bm_general_info(bm, session):
         col_edit, col_delete = st.columns(2)
 
         with col_edit:
-            if st.button("✏️ Modifier", width="stretch"):
+            if st.button("✏️ Modifier", width='stretch'):
                 st.session_state.edit_bm_mode = True
 
         with col_delete:
-            if st.button("🗑️ Supprimer", width="stretch", type="primary"):
+            if st.button("🗑️ Supprimer", width='stretch', type="primary"):
                 st.session_state.delete_bm_mode = True
 
 
@@ -364,7 +364,7 @@ def show_delete_bm_confirmation(bm):
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("🗑️ Oui, supprimer", type="primary", width="stretch"):
+                if st.button("🗑️ Oui, supprimer", type="primary", width='stretch'):
                     try:
                         # Clôturer les assignations actives
                         active_assignments = (
@@ -409,7 +409,7 @@ def show_delete_bm_confirmation(bm):
                         st.error(ERROR_DELETE.format(e))
 
             with col2:
-                if st.button("❌ Non, annuler", width="stretch"):
+                if st.button("❌ Non, annuler", width='stretch'):
                     st.session_state.delete_bm_mode = False
                     st.rerun()
 
@@ -551,7 +551,7 @@ def _handle_assignment_selection(current_assignments, data, session):
     # Affichage avec sélection
     event = st.dataframe(
         pd.DataFrame(data),
-        width="stretch",
+        width='stretch',
         hide_index=True,
         on_select="rerun",
         selection_mode="single-row",
@@ -1005,7 +1005,7 @@ def show_bm_assignments_history(bm, session):
 
         st.dataframe(
             df,
-            width="stretch",
+            width='stretch',
             hide_index=True,
             column_config={
                 "Consultant": st.column_config.TextColumn("Consultant", width="large"),

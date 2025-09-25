@@ -1,5 +1,5 @@
-ï»¿"""
-Service de gestion des technologies personnalisÃ©es
+"""
+Service de gestion des technologies personnalisées
 """
 
 import os
@@ -20,11 +20,11 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 class TechnologyService:
     @staticmethod
     def get_all_available_technologies() -> List[str]:
-        """Retourne toutes les technologies disponibles (rÃ©fÃ©rentiel + personnalisÃ©es)"""
-        # Technologies du rÃ©fÃ©rentiel
+        """Retourne toutes les technologies disponibles (référentiel + personnalisées)"""
+        # Technologies du référentiel
         ref_technologies = get_all_technologies()
 
-        # Technologies personnalisÃ©es en base
+        # Technologies personnalisées en base
         try:
             with get_database_session() as session:
                 custom_techs = session.query(CustomTechnology).all()
@@ -36,16 +36,16 @@ class TechnologyService:
 
         except SQLAlchemyError as e:
             print(
-                f"Erreur lors de la rÃ©cupÃ©ration des technologies personnalisÃ©es: {e}"
+                f"Erreur lors de la récupération des technologies personnalisées: {e}"
             )
             return ref_technologies
 
     @staticmethod
-    def add_custom_technology(name: str, category: str = "PersonnalisÃ©es") -> bool:
-        """Ajoute une technologie personnalisÃ©e en base de donnÃ©es"""
+    def add_custom_technology(name: str, category: str = "Personnalisées") -> bool:
+        """Ajoute une technologie personnalisée en base de données"""
         try:
             with get_database_session() as session:
-                # VÃ©rifier si elle existe dÃ©jï¿½
+                # Vérifier si elle existe déj?
                 existing = (
                     session.query(CustomTechnology)
                     .filter(CustomTechnology.nom == name)
@@ -59,7 +59,7 @@ class TechnologyService:
                 new_tech = CustomTechnology(
                     nom=name,
                     categorie=category,
-                    description=f"Technologie personnalisÃ©e: {name}",
+                    description=f"Technologie personnalisée: {name}",
                 )
 
                 session.add(new_tech)
@@ -72,7 +72,7 @@ class TechnologyService:
 
     @staticmethod
     def get_custom_technologies() -> List[dict]:
-        """Retourne la liste des technologies personnalisÃ©es"""
+        """Retourne la liste des technologies personnalisées"""
         try:
             with get_database_session() as session:
                 custom_techs = session.query(CustomTechnology).all()
@@ -89,13 +89,13 @@ class TechnologyService:
 
         except SQLAlchemyError as e:
             print(
-                f"Erreur lors de la rÃ©cupÃ©ration des technologies personnalisÃ©es: {e}"
+                f"Erreur lors de la récupération des technologies personnalisées: {e}"
             )
             return []
 
     @staticmethod
     def delete_custom_technology(tech_id: int) -> bool:
-        """Supprime une technologie personnalisÃ©e"""
+        """Supprime une technologie personnalisée"""
         try:
             with get_database_session() as session:
                 tech = (
@@ -123,11 +123,11 @@ class TechnologyService:
 
     @staticmethod
     def get_technologies_by_category() -> dict:
-        """Retourne les technologies organisÃ©es par catÃ©gorie"""
-        # RÃ©fÃ©rentiel de base
+        """Retourne les technologies organisées par catégorie"""
+        # Référentiel de base
         technologies = TECHNOLOGIES_REFERENTIEL.copy()
 
-        # Ajouter les technologies personnalisÃ©es
+        # Ajouter les technologies personnalisées
         custom_techs = TechnologyService.get_custom_technologies()
         for tech in custom_techs:
             category = tech["categorie"]
@@ -135,7 +135,7 @@ class TechnologyService:
                 technologies[category] = []
             technologies[category].append(tech["nom"])
 
-        # Trier chaque catÃ©gorie
+        # Trier chaque catégorie
         for category in technologies:
             technologies[category] = sorted(technologies[category])
 
