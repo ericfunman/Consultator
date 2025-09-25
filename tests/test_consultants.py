@@ -505,8 +505,8 @@ class TestConstants:
         assert MSG_CHAMPS_OBLIGATOIRES == "❌ Veuillez remplir tous les champs obligatoires (*)"
 
 
-@patch('streamlit.markdown')
-@patch('streamlit.write')
+@patch('app.pages_modules.consultants.st.markdown')
+@patch('app.pages_modules.consultants.st.write')
 class TestValidationDisplay:
     """Tests pour l'affichage des erreurs de validation"""
 

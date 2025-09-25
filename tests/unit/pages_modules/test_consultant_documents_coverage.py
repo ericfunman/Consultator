@@ -769,12 +769,3 @@ if __name__ == "__main__":
 
         mock_st.columns.assert_called_with(2)
         assert mock_st.button.call_count == 2
-
-
-if __name__ == "__main__":
-    import unittest
-    unittest.main()</content>
-
-if __name__ == "__main__":
-    import unittest
-    unittest.main()

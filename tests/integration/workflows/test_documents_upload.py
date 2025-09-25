@@ -17,8 +17,8 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
     """Tests pour le module documents_upload"""
 
     @patch("app.pages_modules.documents_upload.imports_ok", True)
-    @patch("streamlit.title")
-    @patch("streamlit.markdown")
+    @patch("app.pages_modules.documents_upload.st.title")
+    @patch("app.pages_modules.documents_upload.st.markdown")
     @patch("app.pages_modules.documents_upload.show_document_upload_section")
     def test_show_success(self, mock_show_section, mock_markdown, mock_title):
         """Test de show() avec imports réussis"""
@@ -29,9 +29,9 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_show_section.assert_called_once()
 
     @patch("app.pages_modules.documents_upload.imports_ok", False)
-    @patch("streamlit.title")
-    @patch("streamlit.markdown")
-    @patch("streamlit.error")
+    @patch("app.pages_modules.documents_upload.st.title")
+    @patch("app.pages_modules.documents_upload.st.markdown")
+    @patch("app.pages_modules.documents_upload.st.error")
     def test_show_imports_failed(self, mock_error, mock_markdown, mock_title):
         """Test de show() avec imports échoués"""
         show()
