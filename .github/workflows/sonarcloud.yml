@@ -29,7 +29,14 @@ jobs:
       
       - name: Run ALL tests with coverage
         run: |
-          python -m pytest tests/unit/ tests/working/ tests/auto_generated/ tests/ui/ \
+          python -m pytest tests/unit/ tests/working/ tests/auto_generated/ tests/ui/ tests/integration/ \
+            tests/problematic_tests/unit/test_helpers_maximum_coverage_fixed.py \
+            tests/problematic_tests/unit/utils/ \
+            tests/test_additional_consultant_missions_coverage.py \
+            tests/test_ci_debug.py \
+            tests/test_consultants.py \
+            tests/test_performance_v14.py \
+            tests/test_simple.py \
             --cov=app \
             --cov-report=xml:reports/coverage.xml \
             --cov-report=term-missing \
@@ -37,14 +44,27 @@ jobs:
             --tb=short \
             --ignore=tests/regression_backup \
             --ignore=tests/problematic_tests/regression \
-            --ignore=tests/problematic_tests/unit/test_helpers_maximum_coverage_fixed.py \
-            --ignore=tests/templates \
-            --ignore=tests/integration/workflows
+            --ignore=tests/templates
       
       - name: Copy coverage report
         run: |
           mkdir -p reports
-          cp reports/coverage.xml coverage.xml || echo "Coverage file created in reports/"
+          ls -la reports/ || echo "Reports directory content:"
+          cp reports/coverage.xml . || echo "Coverage file not found in reports/"
+          ls -la coverage.xml || echo "Coverage file not found at root"
+      
+      - name: Debug file structure
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          ls -la
+          echo "=== App directory ==="
+          ls -la app/ | head -10
+          echo "=== Reports directory ==="
+          ls -la reports/ || echo "No reports directory"
+          echo "=== Coverage file check ==="
+          [ -f reports/coverage.xml ] && echo "coverage.xml found in reports/" || echo "coverage.xml NOT found in reports/"
+          [ -f coverage.xml ] && echo "coverage.xml found at root" || echo "coverage.xml NOT found at root"
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
