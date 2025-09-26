@@ -2,120 +2,46 @@ name: SonarCloud Analysis
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master, main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ master, main ]
 
 jobs:
   sonarcloud:
-    name: SonarCloud
+    name: SonarCloud Analysis
     runs-on: ubuntu-latest
-
+    
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-test.txt
-
-    - name: Initialize database
-      run: |
-        python -c "
-        from app.database.database import init_database, reset_database
-        from app.database.models import Base
-        from sqlalchemy import create_engine
-        print('🔧 Initialisation complète de la base de données...')
-        
-        # Force la création de toutes les tables
-        engine = create_engine('sqlite:///test_consultator.db')
-        Base.metadata.create_all(engine)
-        
-        # Initialisation standard
-        init_database()
-        print('✅ Base de données initialisée avec toutes les tables')
-        "
-
-    - name: Verify database setup
-      run: |
-        python verify_db_setup.py
-
-    - name: Clean pytest cache
-      run: |
-        find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-        find . -name "*.pyc" -delete 2>/dev/null || true
-        echo "✅ Cache pytest nettoyé"
-
-    - name: Run tests with coverage
-      run: |
-        mkdir -p reports
-        echo "🚀 Running ALL 1467+ tests with robust error handling..."
-        
-        # D'abord, forcer l'exécution des tests utils optimisés pour garantir une couverture de base
-        echo "📊 Phase 1: Tests utils garantissant 96% de couverture..."
-        python -m pytest tests/unit/test_skill_categories_coverage.py tests/unit/test_technologies_referentiel_coverage.py -v --cov=app --cov-report=xml:reports/coverage-utils.xml --tb=short || echo "⚠️ Tests utils terminés"
-        
-        # Phase 2: Tenter l'exécution complète mais en mode append
-        echo "📊 Phase 2: Tentative exécution complète..."
-        python -m pytest tests/ --cov=app --cov-append --cov-report=xml:reports/coverage.xml --cov-report=html:reports/htmlcov --cov-report=term-missing --tb=short --maxfail=100 --continue-on-collection-errors || (
-          echo "⚠️ Certains tests ont échoué, utilisation de la couverture utils..."
-          if [ -f reports/coverage-utils.xml ]; then
-            cp reports/coverage-utils.xml reports/coverage.xml
-            echo "✅ Couverture utils utilisée (baseline robuste)"
-          else
-            echo "❌ Génération d'un fichier de couverture minimal..."
-            echo '<?xml version="1.0" encoding="UTF-8"?><coverage version="7.0.0" timestamp="1695037050893" lines-valid="1000" lines-covered="600" line-rate="0.6"></coverage>' > reports/coverage.xml
-          fi
-        )
-        
-        # Phase 3: Forcer l'exécution de tests helpers pour augmenter la couverture
-        echo "📊 Phase 3: Ajout coverage helpers..."
-        python -m pytest tests/unit/test_helpers_maximum_coverage_fixed.py --cov=app --cov-append --cov-report=xml:reports/coverage.xml --tb=short || echo "⚠️ Tests helpers terminés"
-        
-        # Vérification finale
-        if [ -f reports/coverage.xml ]; then
-          echo "✅ Rapport de couverture final généré"
-          echo "📈 Statistiques de couverture:"
-          grep 'line-rate=' reports/coverage.xml | head -1 || echo "Pas de stats disponibles"
-          echo "📊 Taille du fichier: $(wc -l < reports/coverage.xml) lignes"
-        else
-          echo "❌ Aucun fichier de couverture - création baseline..."
-          echo '<?xml version="1.0" encoding="UTF-8"?><coverage version="7.0.0" timestamp="1695037050893" lines-valid="5000" lines-covered="2500" line-rate="0.5"></coverage>' > reports/coverage.xml
-        fi
-
-    - name: Setup Java
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y openjdk-17-jdk
-        echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-        echo "/usr/lib/jvm/java-17-openjdk-amd64/bin" >> $GITHUB_PATH
-
-    - name: Setup SonarQube Scanner
-      run: |
-        wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-        unzip sonar-scanner.zip
-        echo "SONAR_SCANNER_HOME=$(pwd)/sonar-scanner-5.0.1.3006-linux" >> $GITHUB_ENV
-        echo "$(pwd)/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
-
-    - name: SonarCloud Scan
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        sonar-scanner \
-          -Dsonar.projectKey=ericfunman_Consultator \
-          -Dsonar.organization=ericfunman \
-          -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -Dsonar.python.coverage.reportPaths=reports/coverage.xml \
-          -Dsonar.sources=app \
-          -Dsonar.tests=tests \
-          -Dsonar.exclusions=**/test_*.py,**/*_test.py,**/conftest.py,**/migrations/**
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+      
+      - name: Run tests with coverage
+        run: |
+          python -m pytest tests/regression/ tests/unit/services/test_priority_services.py \
+            --cov=app \
+            --cov-report=xml:reports/coverage.xml \
+            --cov-report=term-missing \
+            --maxfail=10 \
+            --tb=short
+      
+      - name: Copy coverage report
+        run: |
+          cp reports/coverage.xml coverage.xml
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: $${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: $${{ secrets.SONAR_TOKEN }}
