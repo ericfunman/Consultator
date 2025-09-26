@@ -2,10 +2,13 @@
 Tests pour le module database
 """
 
-import pytest
 import os
 import sys
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 
 # Ajouter le répertoire parent au path pour les imports
 current_dir = os.path.dirname(os.path.abspath(__file__))

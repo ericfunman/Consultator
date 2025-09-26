@@ -2,8 +2,11 @@
 Tests pour le module technologies.py
 """
 
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch
+
 from app.pages_modules.technologies import show
 from tests.fixtures.base_test import BaseUITest
 

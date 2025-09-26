@@ -3,11 +3,16 @@ Tests pour le service PracticeService
 Couverture des fonctionnalités CRUD et recherche
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
+
+from app.database.models import Consultant
+from app.database.models import Practice
 from app.services.practice_service import PracticeService
-from app.database.models import Practice, Consultant
 
 
 class TestPracticeService:

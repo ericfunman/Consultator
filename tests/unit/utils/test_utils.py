@@ -3,35 +3,37 @@ Tests complets pour les utilitaires
 Couvre les fonctions utilitaires et helpers
 """
 
-import pytest
-from datetime import date, datetime
-from unittest.mock import Mock, patch, MagicMock
+import json
 import os
 import tempfile
-import json
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
 
-from app.utils.helpers import (
-    format_currency,
-    format_date,
-    format_percentage,
-    calculate_age,
-    calculate_experience_years,
-    validate_email,
-    validate_phone,
-    validate_date,
-    safe_divide,
-    round_to_nearest,
-    generate_id,
-    clean_string,
-    normalize_text,
-    slugify,
-    get_file_extension,
-    is_valid_file_type,
-    calculate_percentage_change,
-    format_number,
-    truncate_text,
-    split_list_into_chunks,
-)
+import pytest
+
+from app.utils.helpers import calculate_age
+from app.utils.helpers import calculate_experience_years
+from app.utils.helpers import calculate_percentage_change
+from app.utils.helpers import clean_string
+from app.utils.helpers import format_currency
+from app.utils.helpers import format_date
+from app.utils.helpers import format_number
+from app.utils.helpers import format_percentage
+from app.utils.helpers import generate_id
+from app.utils.helpers import get_file_extension
+from app.utils.helpers import is_valid_file_type
+from app.utils.helpers import normalize_text
+from app.utils.helpers import round_to_nearest
+from app.utils.helpers import safe_divide
+from app.utils.helpers import slugify
+from app.utils.helpers import split_list_into_chunks
+from app.utils.helpers import truncate_text
+from app.utils.helpers import validate_date
+from app.utils.helpers import validate_email
+from app.utils.helpers import validate_phone
 
 
 class TestFormattingUtils:

@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 from datetime import date
 from unittest.mock import patch
 
@@ -9,36 +9,34 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 # Imports des fonctions à tester
-from app.pages_modules.consultants import (
-    detect_document_type,
-    get_mime_type,
-    extract_original_filename,
-    validate_mission_fields,
-    _is_timestamp_part,
-    _find_original_parts_before_timestamp,
-    _extract_original_name_from_parts,
-    _add_extension_to_original_name,
-    _handle_extension_in_last_part,
-    _add_extension_from_full_filename,
-    _get_filename_remaining_parts,
-    _handle_no_timestamp_found,
-    show_validation_errors,
-    _build_consultant_data,
-    _build_update_data_from_form,
-    _build_update_data,
-    STATUT_NON_AFFECTE,
-    STATUT_DISPONIBLE,
-    FORMAT_DATE,
-    LABEL_STATUT,
-    LABEL_PRACTICE,
-    LABEL_COMPETENCES,
-    VALEUR_NON_SPECIFIE,
-    LABEL_TECHNOLOGIES,
-    LABEL_TAILLE,
-    MSG_FICHIER_INTROUVABLE,
-    MSG_CHAMP_OBLIGATOIRE,
-    MSG_CHAMPS_OBLIGATOIRES,
-)
+from app.pages_modules.consultants import FORMAT_DATE
+from app.pages_modules.consultants import LABEL_COMPETENCES
+from app.pages_modules.consultants import LABEL_PRACTICE
+from app.pages_modules.consultants import LABEL_STATUT
+from app.pages_modules.consultants import LABEL_TAILLE
+from app.pages_modules.consultants import LABEL_TECHNOLOGIES
+from app.pages_modules.consultants import MSG_CHAMP_OBLIGATOIRE
+from app.pages_modules.consultants import MSG_CHAMPS_OBLIGATOIRES
+from app.pages_modules.consultants import MSG_FICHIER_INTROUVABLE
+from app.pages_modules.consultants import STATUT_DISPONIBLE
+from app.pages_modules.consultants import STATUT_NON_AFFECTE
+from app.pages_modules.consultants import VALEUR_NON_SPECIFIE
+from app.pages_modules.consultants import _add_extension_from_full_filename
+from app.pages_modules.consultants import _add_extension_to_original_name
+from app.pages_modules.consultants import _build_consultant_data
+from app.pages_modules.consultants import _build_update_data
+from app.pages_modules.consultants import _build_update_data_from_form
+from app.pages_modules.consultants import _extract_original_name_from_parts
+from app.pages_modules.consultants import _find_original_parts_before_timestamp
+from app.pages_modules.consultants import _get_filename_remaining_parts
+from app.pages_modules.consultants import _handle_extension_in_last_part
+from app.pages_modules.consultants import _handle_no_timestamp_found
+from app.pages_modules.consultants import _is_timestamp_part
+from app.pages_modules.consultants import detect_document_type
+from app.pages_modules.consultants import extract_original_filename
+from app.pages_modules.consultants import get_mime_type
+from app.pages_modules.consultants import show_validation_errors
+from app.pages_modules.consultants import validate_mission_fields
 
 
 class TestDocumentTypeDetection:
@@ -55,7 +53,9 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert (
+                result == expected
+            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_lettre_motivation(self):
         """Test de détection des lettres de motivation"""
@@ -67,7 +67,9 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert (
+                result == expected
+            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_certificats(self):
         """Test de détection des certificats"""
@@ -79,7 +81,9 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert (
+                result == expected
+            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_contrats(self):
         """Test de détection des contrats"""
@@ -91,7 +95,9 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert (
+                result == expected
+            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_presentations(self):
         """Test de détection des présentations"""
@@ -103,7 +109,9 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert (
+                result == expected
+            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_extensions(self):
         """Test de détection basée sur les extensions"""
@@ -115,7 +123,9 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert (
+                result == expected
+            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_powerpoint_extensions(self):
         """Test de détection des fichiers PowerPoint par extension"""
@@ -126,7 +136,9 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert (
+                result == expected
+            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_unknown(self):
         """Test avec des fichiers inconnus"""
@@ -138,7 +150,9 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert (
+                result == expected
+            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
 
 class TestMimeTypeDetection:
@@ -150,12 +164,18 @@ class TestMimeTypeDetection:
 
     def test_get_mime_type_word(self):
         """Test du type MIME pour Word"""
-        assert get_mime_type("document.docx") == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        assert (
+            get_mime_type("document.docx")
+            == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
         assert get_mime_type("document.doc") == "application/msword"
 
     def test_get_mime_type_powerpoint(self):
         """Test du type MIME pour PowerPoint"""
-        assert get_mime_type("presentation.pptx") == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        assert (
+            get_mime_type("presentation.pptx")
+            == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        )
         assert get_mime_type("presentation.ppt") == "application/vnd.ms-powerpoint"
 
     def test_get_mime_type_unknown(self):
@@ -253,12 +273,16 @@ class TestFilenameExtraction:
 
     def test_add_extension_to_original_name_with_dot(self):
         """Test d'ajout d'extension quand elle existe déjà"""
-        result = _add_extension_to_original_name("CV", ["20231201", "120000.pdf"], True, "full.pdf")
+        result = _add_extension_to_original_name(
+            "CV", ["20231201", "120000.pdf"], True, "full.pdf"
+        )
         assert result == "CV.pdf"
 
     def test_add_extension_to_original_name_without_dot(self):
         """Test d'ajout d'extension depuis le nom complet"""
-        result = _add_extension_to_original_name("CV", ["20231201", "120000"], True, "full.pdf")
+        result = _add_extension_to_original_name(
+            "CV", ["20231201", "120000"], True, "full.pdf"
+        )
         assert result == "CV.pdf"
 
     def test_handle_extension_in_last_part_timestamp(self):
@@ -367,7 +391,9 @@ class TestDataBuilding:
 
         notes = "Consultant expérimenté"
 
-        result = _build_consultant_data(basic_data, company_data, professional_data, notes)
+        result = _build_consultant_data(
+            basic_data, company_data, professional_data, notes
+        )
 
         assert result["prenom"] == "Jean"
         assert result["nom"] == "Dupont"
@@ -502,11 +528,14 @@ class TestConstants:
         assert LABEL_TAILLE == "📊 Taille"
         assert MSG_FICHIER_INTROUVABLE == "❌ Fichier introuvable"
         assert MSG_CHAMP_OBLIGATOIRE == "Ce champ est obligatoire"
-        assert MSG_CHAMPS_OBLIGATOIRES == "❌ Veuillez remplir tous les champs obligatoires (*)"
+        assert (
+            MSG_CHAMPS_OBLIGATOIRES
+            == "❌ Veuillez remplir tous les champs obligatoires (*)"
+        )
 
 
-@patch('app.pages_modules.consultants.st.markdown')
-@patch('app.pages_modules.consultants.st.write')
+@patch("app.pages_modules.consultants.st.markdown")
+@patch("app.pages_modules.consultants.st.write")
 class TestValidationDisplay:
     """Tests pour l'affichage des erreurs de validation"""
 

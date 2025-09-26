@@ -5,9 +5,12 @@ Amélioration de la couverture pour les fonctions de gestion de documents
 
 import os
 import sys
-from unittest.mock import MagicMock, patch, mock_open
-import pytest
 from io import BytesIO
+from unittest.mock import MagicMock
+from unittest.mock import mock_open
+from unittest.mock import patch
+
+import pytest
 
 # Ajouter le chemin du module
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
@@ -24,7 +27,9 @@ class TestDocumentsFunctions:
         mock_exists.return_value = False
 
         try:
-            from app.pages_modules.documents_functions import show_existing_documents
+            from app.pages_modules.documents_functions import (
+                show_existing_documents,
+            )
 
             # Créer un mock consultant
             mock_consultant = MagicMock()
@@ -50,30 +55,30 @@ class TestDocumentsFunctions:
 
     @patch("app.pages_modules.documents_functions.st")
     @patch("app.pages_modules.documents_functions.DocumentService")
-    def test_show_existing_documents_with_files(
-        self, mock_document_service, mock_st
-    ):
+    def test_show_existing_documents_with_files(self, mock_document_service, mock_st):
         """Test affichage documents - avec fichiers"""
         # Mock du répertoire d'upload
         mock_upload_dir = MagicMock()
-        
+
         # Créer des mocks de fichiers
         mock_file1 = MagicMock()
         mock_file1.name = "Jean_Dupont_CV_20240115_120000.pdf"
         mock_file1.stat.return_value.st_mtime = 1705320000  # timestamp
         mock_file1.stat.return_value.st_size = 1024
-        
+
         mock_file2 = MagicMock()
         mock_file2.name = "Jean_Dupont_Lettre_de_motivation_20240120_130000.docx"
         mock_file2.stat.return_value.st_mtime = 1705752000  # timestamp plus récent
         mock_file2.stat.return_value.st_size = 2048
-        
+
         # Configurer le mock pour retourner les fichiers
         mock_upload_dir.glob.return_value = [mock_file1, mock_file2]
         mock_document_service.init_upload_directory.return_value = mock_upload_dir
 
         try:
-            from app.pages_modules.documents_functions import show_existing_documents
+            from app.pages_modules.documents_functions import (
+                show_existing_documents,
+            )
 
             # Créer un mock consultant
             mock_consultant = MagicMock()
@@ -114,7 +119,9 @@ class TestDocumentsFunctions:
         mock_consultant.id = 1
 
         try:
-            from app.pages_modules.documents_functions import save_consultant_document
+            from app.pages_modules.documents_functions import (
+                save_consultant_document,
+            )
 
             # La fonction attend (uploaded_file, consultant, document_type, _)
             save_consultant_document(
@@ -125,7 +132,9 @@ class TestDocumentsFunctions:
             mock_st.success.assert_called()
         except ImportError:
             # Test simulé
-            def save_consultant_document(uploaded_file, consultant, document_type, description):
+            def save_consultant_document(
+                uploaded_file, consultant, document_type, description
+            ):
                 if uploaded_file and uploaded_file.name.endswith(".pdf"):
                     return True
                 return False
@@ -144,18 +153,20 @@ class TestDocumentsFunctions:
         mock_consultant.id = 1
 
         try:
-            from app.pages_modules.documents_functions import save_consultant_document
+            from app.pages_modules.documents_functions import (
+                save_consultant_document,
+            )
 
             # La fonction attend (uploaded_file, consultant, document_type, _)
-            save_consultant_document(
-                None, mock_consultant, "CV", "Test"
-            )
+            save_consultant_document(None, mock_consultant, "CV", "Test")
 
             # Vérifier que la fonction gère l'erreur
             mock_st.error.assert_called()
         except ImportError:
             # Test simulé
-            def save_consultant_document(uploaded_file, consultant, document_type, description):
+            def save_consultant_document(
+                uploaded_file, consultant, document_type, description
+            ):
                 if not uploaded_file:
                     return False
                 return True
@@ -177,18 +188,20 @@ class TestDocumentsFunctions:
         mock_consultant.id = 1
 
         try:
-            from app.pages_modules.documents_functions import save_consultant_document
+            from app.pages_modules.documents_functions import (
+                save_consultant_document,
+            )
 
             # La fonction attend (uploaded_file, consultant, document_type, _)
-            save_consultant_document(
-                mock_uploaded_file, mock_consultant, "CV", "Test"
-            )
+            save_consultant_document(mock_uploaded_file, mock_consultant, "CV", "Test")
 
             # Devrait échouer pour un type non autorisé
             mock_st.error.assert_called()
         except ImportError:
             # Test simulé
-            def save_consultant_document(uploaded_file, consultant, document_type, description):
+            def save_consultant_document(
+                uploaded_file, consultant, document_type, description
+            ):
                 allowed_types = [".pdf", ".docx", ".doc"]
                 if not any(uploaded_file.name.endswith(ext) for ext in allowed_types):
                     return False
@@ -218,12 +231,12 @@ class TestDocumentsFunctions:
         mock_file_open.side_effect = IOError("Disk full")
 
         try:
-            from app.pages_modules.documents_functions import save_consultant_document
+            from app.pages_modules.documents_functions import (
+                save_consultant_document,
+            )
 
             # La fonction attend (uploaded_file, consultant, document_type, _)
-            save_consultant_document(
-                mock_uploaded_file, mock_consultant, "CV", "Test"
-            )
+            save_consultant_document(mock_uploaded_file, mock_consultant, "CV", "Test")
 
             # Devrait gérer l'erreur
             mock_st.error.assert_called()
@@ -277,9 +290,13 @@ class TestDocumentValidation:
             safe_chars = re.sub(r'[<>:"/\\|?*]', "_", filename)
             # Limiter la longueur en préservant l'extension
             if len(safe_chars) > 255:
-                name_part, ext_part = safe_chars.rsplit(".", 1) if "." in safe_chars else (safe_chars, "")
+                name_part, ext_part = (
+                    safe_chars.rsplit(".", 1) if "." in safe_chars else (safe_chars, "")
+                )
                 max_name_len = 255 - len(ext_part) - 1 if ext_part else 255
-                safe_chars = name_part[:max_name_len] + ("." + ext_part if ext_part else "")
+                safe_chars = name_part[:max_name_len] + (
+                    "." + ext_part if ext_part else ""
+                )
             return safe_chars
 
         # Tests

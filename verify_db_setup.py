@@ -4,8 +4,8 @@ Script de vérification de l'initialisation de la base de données pour CI/CD
 Teste que toutes les tables sont créées correctement
 """
 
-import sys
 import os
+import sys
 
 # Ajouter le répertoire app au PYTHONPATH
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "app"))
@@ -17,17 +17,17 @@ def verify_database_setup():
         print("🔍 Vérification de l'initialisation de la base de données...")
 
         # Import des modèles
-        from app.database.models import (
-            Base,
-            Consultant,
-            Practice,
-            Mission,
-            Competence,
-            ConsultantCompetence,
-            CV,
-        )
-        from app.database.database import init_database, get_database_engine
         from sqlalchemy import inspect
+
+        from app.database.database import get_database_engine
+        from app.database.database import init_database
+        from app.database.models import CV
+        from app.database.models import Base
+        from app.database.models import Competence
+        from app.database.models import Consultant
+        from app.database.models import ConsultantCompetence
+        from app.database.models import Mission
+        from app.database.models import Practice
 
         print(f"✅ Modèles importés: {len(Base.metadata.tables)} tables")
 

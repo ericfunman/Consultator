@@ -1,16 +1,24 @@
 """Tests d'intégration pour le workflow de statistiques et tableaux de bord"""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-import streamlit as st
-from datetime import datetime, date, timedelta
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pandas as pd
+import pytest
+import streamlit as st
+
+from app.database.database import get_database_session
+from app.database.models import Consultant
+from app.database.models import Mission
+from app.database.models import Practice
 
 # Import des services principaux
 from app.services.consultant_service import ConsultantService
 from app.services.practice_service import PracticeService
-from app.database.database import get_database_session
-from app.database.models import Practice, Consultant, Mission
 
 
 @pytest.fixture(scope="function")
@@ -18,8 +26,11 @@ def real_db_session(test_db):
     """Fixture pour patcher get_database_session avec la vraie session de test"""
     test_session = test_db()
 
-    with patch('app.database.database.get_database_session', return_value=test_session):
-        with patch('app.services.consultant_service.get_database_session', return_value=test_session):
+    with patch("app.database.database.get_database_session", return_value=test_session):
+        with patch(
+            "app.services.consultant_service.get_database_session",
+            return_value=test_session,
+        ):
             yield test_session
 
 
@@ -52,7 +63,11 @@ def statistics_test_data(test_db, real_db_session):
     for practice_data in practices_data:
         with test_db() as session:
             # Vérifier si la practice existe déjà
-            existing_practice = session.query(Practice).filter(Practice.nom == practice_data["nom"]).first()
+            existing_practice = (
+                session.query(Practice)
+                .filter(Practice.nom == practice_data["nom"])
+                .first()
+            )
             if existing_practice:
                 practice_ids.append(existing_practice.id)
             else:
@@ -220,13 +235,14 @@ class TestStatisticsWorkflowIntegration:
 
         # Récupérer tous les consultants avec stats
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        
+
         # Filtrer seulement les consultants créés dans ce test
         test_consultants = [
-            c for c in all_consultants 
+            c
+            for c in all_consultants
             if c["id"] in statistics_test_data["consultant_ids"]
         ]
-        
+
         assert len(test_consultants) == len(statistics_test_data["consultant_ids"])
 
         # Calculer les métriques de base
@@ -264,10 +280,11 @@ class TestStatisticsWorkflowIntegration:
         print("=== TEST STATISTIQUES PAR PRACTICE ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        
+
         # Filtrer seulement les consultants créés dans ce test
         test_consultants = [
-            c for c in all_consultants 
+            c
+            for c in all_consultants
             if c["id"] in statistics_test_data["consultant_ids"]
         ]
 
@@ -323,10 +340,11 @@ class TestStatisticsWorkflowIntegration:
         print("=== TEST STATISTIQUES PAR GRADE ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        
+
         # Filtrer seulement les consultants créés dans ce test
         test_consultants = [
-            c for c in all_consultants 
+            c
+            for c in all_consultants
             if c["id"] in statistics_test_data["consultant_ids"]
         ]
 
@@ -382,13 +400,14 @@ class TestStatisticsWorkflowIntegration:
         print("=== TEST DISTRIBUTION SALARIALE ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        
+
         # Filtrer seulement les consultants créés dans ce test
         test_consultants = [
-            c for c in all_consultants 
+            c
+            for c in all_consultants
             if c["id"] in statistics_test_data["consultant_ids"]
         ]
-        
+
         salaries = [c["salaire_actuel"] for c in test_consultants]
 
         # Calculer les quartiles
@@ -440,10 +459,11 @@ class TestStatisticsWorkflowIntegration:
         print("=== TEST MÉTRIQUES TABLEAU DE BORD ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        
+
         # Filtrer seulement les consultants créés dans ce test
         test_consultants = [
-            c for c in all_consultants 
+            c
+            for c in all_consultants
             if c["id"] in statistics_test_data["consultant_ids"]
         ]
 
@@ -527,10 +547,11 @@ class TestStatisticsWorkflowIntegration:
         print("=== TEST EXPORT STATISTIQUES ===")
 
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        
+
         # Filtrer seulement les consultants créés dans ce test
         test_consultants = [
-            c for c in all_consultants 
+            c
+            for c in all_consultants
             if c["id"] in statistics_test_data["consultant_ids"]
         ]
 

@@ -1,20 +1,22 @@
 """Tests pour le module consultant_skills - Interface utilisateur"""
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from app.pages_modules.consultant_skills import (
-    show_consultant_skills,
-    get_niveau_label,
-    show_skills_statistics,
-    show_add_skill_form,
-    add_skill_to_consultant,
-    show_edit_skill_form,
-    update_consultant_skill,
-    delete_skill,
-    show_skills_analysis,
-    show_skills_evolution,
-)
+
+from app.pages_modules.consultant_skills import add_skill_to_consultant
+from app.pages_modules.consultant_skills import delete_skill
+from app.pages_modules.consultant_skills import get_niveau_label
+from app.pages_modules.consultant_skills import show_add_skill_form
+from app.pages_modules.consultant_skills import show_consultant_skills
+from app.pages_modules.consultant_skills import show_edit_skill_form
+from app.pages_modules.consultant_skills import show_skills_analysis
+from app.pages_modules.consultant_skills import show_skills_evolution
+from app.pages_modules.consultant_skills import show_skills_statistics
+from app.pages_modules.consultant_skills import update_consultant_skill
 from tests.fixtures.base_test import BaseUITest
 
 

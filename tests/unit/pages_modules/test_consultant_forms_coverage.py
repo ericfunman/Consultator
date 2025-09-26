@@ -3,9 +3,12 @@ Tests pour le module consultant_forms.py
 Couverture des fonctions d'ajout, modification et suppression de consultants
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 
 
 class TestConsultantForms:
@@ -31,7 +34,12 @@ class TestConsultantForms:
         mock_st.form_submit_button.return_value = True
 
         # Mock form inputs
-        mock_st.text_input.side_effect = ["Jean", "Dupont", "jean@test.com", "0123456789"]
+        mock_st.text_input.side_effect = [
+            "Jean",
+            "Dupont",
+            "jean@test.com",
+            "0123456789",
+        ]
         mock_st.number_input.return_value = 50000
         mock_st.selectbox.return_value = 1
         mock_st.checkbox.return_value = True
@@ -48,12 +56,16 @@ class TestConsultantForms:
     @patch("app.pages_modules.consultant_forms.st")
     def test_show_add_consultant_form_no_practices(self, mock_st):
         """Test affichage formulaire quand aucune practice"""
-        with patch("app.pages_modules.consultant_forms.get_database_session") as mock_session:
+        with patch(
+            "app.pages_modules.consultant_forms.get_database_session"
+        ) as mock_session:
             mock_session_instance = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_session_instance
             mock_session_instance.query.return_value.all.return_value = []
 
-            from app.pages_modules.consultant_forms import show_add_consultant_form
+            from app.pages_modules.consultant_forms import (
+                show_add_consultant_form,
+            )
 
             show_add_consultant_form()
 
@@ -122,7 +134,9 @@ class TestConsultantForms:
         mock_session.return_value.__exit__.return_value = None
 
         # Mock existing check (no existing consultant)
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            None
+        )
 
         # Mock consultant creation
         mock_consultant = MagicMock()
@@ -138,7 +152,7 @@ class TestConsultantForms:
             "salaire_actuel": 50000,
             "practice_id": 1,
             "disponibilite": True,
-            "notes": "Test notes"
+            "notes": "Test notes",
         }
 
         result = create_consultant(test_data)
@@ -159,7 +173,9 @@ class TestConsultantForms:
 
         # Mock existing consultant with same email
         mock_existing = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_existing
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            mock_existing
+        )
 
         test_data = {
             "prenom": "Jean",
@@ -169,7 +185,7 @@ class TestConsultantForms:
             "salaire_actuel": 50000,
             "practice_id": 1,
             "disponibilite": True,
-            "notes": "Test notes"
+            "notes": "Test notes",
         }
 
         result = create_consultant(test_data)
@@ -181,7 +197,9 @@ class TestConsultantForms:
     @patch("app.pages_modules.consultant_forms.get_database_session")
     def test_show_edit_consultant_form_success(self, mock_session, mock_st):
         """Test affichage formulaire modification consultant"""
-        from app.pages_modules.consultant_forms import show_edit_consultant_form
+        from app.pages_modules.consultant_forms import (
+            show_edit_consultant_form,
+        )
 
         # Mock session
         mock_session_instance = MagicMock()
@@ -227,7 +245,9 @@ class TestConsultantForms:
     @patch("app.pages_modules.consultant_forms.get_database_session")
     def test_show_edit_consultant_form_not_found(self, mock_session, mock_st):
         """Test affichage formulaire consultant introuvable"""
-        from app.pages_modules.consultant_forms import show_edit_consultant_form
+        from app.pages_modules.consultant_forms import (
+            show_edit_consultant_form,
+        )
 
         # Mock session
         mock_session_instance = MagicMock()
@@ -262,10 +282,15 @@ class TestConsultantForms:
 
         # Setup query
         mock_query = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         # Mock email check (no conflict)
-        mock_session_instance.query.return_value.filter.return_value.first.side_effect = [mock_consultant, None]
+        mock_session_instance.query.return_value.filter.return_value.first.side_effect = [
+            mock_consultant,
+            None,
+        ]
 
         test_data = {
             "prenom": "Jean-Marie",
@@ -275,7 +300,7 @@ class TestConsultantForms:
             "salaire_actuel": 55000,
             "practice_id": 1,
             "disponibilite": True,
-            "notes": "Updated notes"
+            "notes": "Updated notes",
         }
 
         result = update_consultant(1, test_data)
@@ -294,9 +319,16 @@ class TestConsultantForms:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock query returns None
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            None
+        )
 
-        test_data = {"prenom": "Jean", "nom": "Dupont", "email": "jean@test.com", "practice_id": 1}
+        test_data = {
+            "prenom": "Jean",
+            "nom": "Dupont",
+            "email": "jean@test.com",
+            "practice_id": 1,
+        }
 
         result = update_consultant(999, test_data)
 
@@ -318,7 +350,9 @@ class TestConsultantForms:
         mock_consultant.id = 1
 
         # Setup query
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
 
         result = delete_consultant(1)
 
@@ -337,7 +371,9 @@ class TestConsultantForms:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock query returns None
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            None
+        )
 
         result = delete_consultant(999)
 

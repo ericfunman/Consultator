@@ -1,8 +1,12 @@
 """Tests pour le module consultant_forms - Interface utilisateur"""
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
+
 from app.pages_modules.consultant_forms import show_add_consultant_form
 from tests.fixtures.base_test import BaseUITest
 

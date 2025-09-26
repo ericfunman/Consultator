@@ -3,14 +3,13 @@ Tests pour le module technologies_referentiel.py
 """
 
 import pytest
-from app.utils.technologies_referentiel import (
-    TECHNOLOGIES_REFERENTIEL,
-    TECHNOLOGIES_POPULAIRES,
-    get_all_technologies,
-    get_technologies_by_category,
-    search_technologies,
-    add_custom_technology,
-)
+
+from app.utils.technologies_referentiel import TECHNOLOGIES_POPULAIRES
+from app.utils.technologies_referentiel import TECHNOLOGIES_REFERENTIEL
+from app.utils.technologies_referentiel import add_custom_technology
+from app.utils.technologies_referentiel import get_all_technologies
+from app.utils.technologies_referentiel import get_technologies_by_category
+from app.utils.technologies_referentiel import search_technologies
 
 
 class TestTechnologiesReferentiel:

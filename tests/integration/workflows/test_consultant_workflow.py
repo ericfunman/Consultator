@@ -1,21 +1,24 @@
 """Tests d'intégration pour le workflow consultant complet"""
 
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from datetime import datetime, date
+
+from app.database.database import get_database_session
+from app.database.models import Competence
+from app.database.models import Consultant
+from app.database.models import ConsultantCompetence
+from app.database.models import Mission
+from app.database.models import Practice
 
 # Import des services principaux
 from app.services.consultant_service import ConsultantService
 from app.services.practice_service import PracticeService
-from app.database.database import get_database_session
-from app.database.models import (
-    Consultant,
-    Practice,
-    Competence,
-    ConsultantCompetence,
-    Mission,
-)
 
 
 # Fixtures pour les tests d'intégration
@@ -288,6 +291,7 @@ class TestConsultantWorkflowIntegration:
         """Test du workflow de recherche et filtrage de consultants"""
 
         import uuid
+
         unique_suffix = str(uuid.uuid4())[:8]
 
         # Créer plusieurs consultants pour les tests

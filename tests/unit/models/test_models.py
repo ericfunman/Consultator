@@ -2,24 +2,26 @@
 Tests pour les modèles de base de données
 """
 
-import pytest
-from datetime import date, datetime, timedelta
-from unittest.mock import Mock, patch
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from unittest.mock import Mock
+from unittest.mock import patch
 
-from app.database.models import (
-    Practice,
-    Consultant,
-    Competence,
-    ConsultantCompetence,
-    Mission,
-    CV,
-    CustomTechnology,
-    ConsultantSalaire,
-    Langue,
-    ConsultantLangue,
-    BusinessManager,
-    ConsultantBusinessManager,
-)
+import pytest
+
+from app.database.models import CV
+from app.database.models import BusinessManager
+from app.database.models import Competence
+from app.database.models import Consultant
+from app.database.models import ConsultantBusinessManager
+from app.database.models import ConsultantCompetence
+from app.database.models import ConsultantLangue
+from app.database.models import ConsultantSalaire
+from app.database.models import CustomTechnology
+from app.database.models import Langue
+from app.database.models import Mission
+from app.database.models import Practice
 
 
 class TestPracticeModel:

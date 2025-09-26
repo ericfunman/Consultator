@@ -69,7 +69,7 @@ def show_consultants_list():
             # Afficher le tableau
             df = pd.DataFrame(consultants_data)
 
-            st.dataframe(df, width='stretch', hide_index=True)
+            st.dataframe(df, width="stretch", hide_index=True)
 
             # Métriques générales
             st.markdown("---")

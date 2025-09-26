@@ -2,14 +2,16 @@
 Tests pour le module documents_upload.py
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from io import BytesIO
-from app.pages_modules.documents_upload import (
-    show,
-    show_document_upload_section,
-    save_uploaded_document,
-)
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
+
+from app.pages_modules.documents_upload import save_uploaded_document
+from app.pages_modules.documents_upload import show
+from app.pages_modules.documents_upload import show_document_upload_section
 from tests.fixtures.base_test import BaseIntegrationTest
 
 

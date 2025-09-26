@@ -5,9 +5,12 @@ Script de test pour le service OpenAI GPT-4
 
 import os
 import sys
-sys.path.append('app')
 
-from services.ai_openai_service import OpenAIChatGPTService, is_grok_available
+sys.path.append("app")
+
+from services.ai_openai_service import OpenAIChatGPTService
+from services.ai_openai_service import is_grok_available
+
 
 def test_openai_api_key():
     """Test simple de la validité de la clé API"""
@@ -75,15 +78,17 @@ def test_openai_api_key():
         print(f"🤖 Modèle: {result.get('_metadata', {}).get('model_used', 'N/A')}")
 
         # Afficher un résumé des résultats
-        if 'consultant_info' in result:
-            info = result['consultant_info']
+        if "consultant_info" in result:
+            info = result["consultant_info"]
             print(f"👤 Consultant: {info.get('prenom', '')} {info.get('nom', '')}")
 
-        if 'missions' in result and result['missions']:
+        if "missions" in result and result["missions"]:
             print(f"💼 Missions détectées: {len(result['missions'])}")
 
-        if 'competences' in result and 'techniques' in result['competences']:
-            print(f"🛠️ Compétences techniques: {len(result['competences']['techniques'])}")
+        if "competences" in result and "techniques" in result["competences"]:
+            print(
+                f"🛠️ Compétences techniques: {len(result['competences']['techniques'])}"
+            )
 
         # Estimation du coût
         cost = service.get_cost_estimate(len(test_cv))
@@ -94,6 +99,7 @@ def test_openai_api_key():
     except Exception as e:
         print(f"❌ Erreur lors du test: {e}")
         return False
+
 
 if __name__ == "__main__":
     success = test_openai_api_key()

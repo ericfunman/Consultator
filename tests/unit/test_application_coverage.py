@@ -3,19 +3,20 @@ Tests d'import et de couverture pour améliorer les métriques SonarQube
 Ces tests importent le vrai code de l'application pour augmenter la couverture
 """
 
-import pytest
 import os
 import sys
 
+import pytest
 
 """
 Tests d'import et de couverture pour améliorer les métriques SonarQube
 Ces tests importent le vrai code de l'application pour augmenter la couverture
 """
 
-import pytest
 import os
 import sys
+
+import pytest
 
 
 class TestRealCodeExecution:
@@ -24,11 +25,9 @@ class TestRealCodeExecution:
     def test_skill_categories_real_execution(self):
         """Test exécution réelle du module skill_categories"""
         # Importer le vrai module
-        from app.utils.skill_categories import (
-            get_all_competences,
-            get_competences_by_category,
-            get_all_categories,
-        )
+        from app.utils.skill_categories import get_all_categories
+        from app.utils.skill_categories import get_all_competences
+        from app.utils.skill_categories import get_competences_by_category
 
         # Exécuter les vraies fonctions
         all_competences = get_all_competences()
@@ -52,11 +51,11 @@ class TestRealCodeExecution:
 
     def test_technologies_referentiel_real_execution(self):
         """Test exécution réelle du module technologies_referentiel"""
+        from app.utils.technologies_referentiel import get_all_technologies
         from app.utils.technologies_referentiel import (
-            get_all_technologies,
             get_technologies_by_category,
-            search_technologies,
         )
+        from app.utils.technologies_referentiel import search_technologies
 
         # Exécuter les vraies fonctions
         all_technologies = get_all_technologies()
@@ -79,18 +78,16 @@ class TestRealCodeExecution:
 
     def test_database_models_real_import(self):
         """Test import réel des modèles de base de données"""
-        from app.database.models import (
-            Base,
-            Consultant,
-            Practice,
-            BusinessManager,
-            Mission,
-            Competence,
-            ConsultantCompetence,
-            Langue,
-            ConsultantLangue,
-            CV,
-        )
+        from app.database.models import CV
+        from app.database.models import Base
+        from app.database.models import BusinessManager
+        from app.database.models import Competence
+        from app.database.models import Consultant
+        from app.database.models import ConsultantCompetence
+        from app.database.models import ConsultantLangue
+        from app.database.models import Langue
+        from app.database.models import Mission
+        from app.database.models import Practice
 
         # Vérifier que les classes existent
         assert Base is not None
@@ -108,11 +105,9 @@ class TestRealCodeExecution:
 
     def test_database_functions_real_import(self):
         """Test import réel des fonctions de base de données"""
-        from app.database.database import (
-            get_database_session,
-            init_database,
-            get_database_info,
-        )
+        from app.database.database import get_database_info
+        from app.database.database import get_database_session
+        from app.database.database import init_database
 
         # Vérifier que les fonctions existent
         assert get_database_session is not None
@@ -132,7 +127,9 @@ class TestRealCodeExecution:
             print("⚠️ ConsultantService non disponible")
 
         try:
-            from app.services.business_manager_service import BusinessManagerService
+            from app.services.business_manager_service import (
+                BusinessManagerService,
+            )
 
             assert BusinessManagerService is not None
             print("✅ BusinessManagerService importé avec succès")

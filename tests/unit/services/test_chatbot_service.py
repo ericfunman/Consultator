@@ -3,9 +3,10 @@ Tests unitaires pour le service chatbot
 Couvre les méthodes utilitaires et de traitement de texte
 """
 
-import pytest
 from unittest.mock import MagicMock
 from unittest.mock import patch
+
+import pytest
 
 from app.services.chatbot_service import ChatbotService
 

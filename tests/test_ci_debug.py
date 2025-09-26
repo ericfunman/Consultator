@@ -2,9 +2,10 @@
 Test de debug pour CI - sans dépendances externes
 """
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 
 def test_python_basics():
@@ -28,8 +29,8 @@ class TestCIEnvironment:
 
     def test_imports_basic(self):
         """Test imports Python de base"""
-        import json
         import datetime
+        import json
 
         # Vérification que les modules sont bien importés
         assert hasattr(json, "loads")

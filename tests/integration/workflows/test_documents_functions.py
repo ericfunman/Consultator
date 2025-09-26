@@ -1,16 +1,17 @@
-import pytest
-from unittest.mock import patch, MagicMock, mock_open
-from pathlib import Path
-from datetime import datetime
-import tempfile
 import os
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from unittest.mock import MagicMock
+from unittest.mock import mock_open
+from unittest.mock import patch
 
-from app.pages_modules.documents_functions import (
-    show_consultant_documents,
-    save_consultant_document,
-    show_existing_documents,
-    delete_consultant_document,
-)
+import pytest
+
+from app.pages_modules.documents_functions import delete_consultant_document
+from app.pages_modules.documents_functions import save_consultant_document
+from app.pages_modules.documents_functions import show_consultant_documents
+from app.pages_modules.documents_functions import show_existing_documents
 
 
 class MockConsultant:

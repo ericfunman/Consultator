@@ -1,24 +1,26 @@
 """Tests pour le module consultant_documents - Gestion des documents"""
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from app.pages_modules.consultant_documents import (
-    show_consultant_documents,
-    show_document_details,
-    show_documents_statistics,
-    show_upload_document_form,
-    upload_document,
-    download_document,
-    reanalyze_document,
-    show_rename_document_form,
-    rename_document,
-    delete_document,
-    analyze_consultant_cv,
-    show_full_cv_analysis,
-    generate_cv_report,
-    show_documents_report,
-)
+
+from app.pages_modules.consultant_documents import analyze_consultant_cv
+from app.pages_modules.consultant_documents import delete_document
+from app.pages_modules.consultant_documents import download_document
+from app.pages_modules.consultant_documents import generate_cv_report
+from app.pages_modules.consultant_documents import reanalyze_document
+from app.pages_modules.consultant_documents import rename_document
+from app.pages_modules.consultant_documents import show_consultant_documents
+from app.pages_modules.consultant_documents import show_document_details
+from app.pages_modules.consultant_documents import show_documents_report
+from app.pages_modules.consultant_documents import show_documents_statistics
+from app.pages_modules.consultant_documents import show_full_cv_analysis
+from app.pages_modules.consultant_documents import show_rename_document_form
+from app.pages_modules.consultant_documents import show_upload_document_form
+from app.pages_modules.consultant_documents import upload_document
 from tests.fixtures.base_test import BaseIntegrationTest
 
 

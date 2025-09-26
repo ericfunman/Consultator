@@ -4,14 +4,17 @@ Script de nettoyage automatique des imports inutilisés
 Nettoie automatiquement les imports non utilisés dans le projet Python
 """
 
+import ast
+import logging
 import os
 import re
-import ast
 import sys
-from pathlib import Path
-from typing import Dict, List, Set, Tuple
 from dataclasses import dataclass
-import logging
+from pathlib import Path
+from typing import Dict
+from typing import List
+from typing import Set
+from typing import Tuple
 
 # Configuration du logging
 logging.basicConfig(

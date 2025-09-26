@@ -3,9 +3,10 @@ Tests unitaires pour le service DocumentAnalyzer
 Couvre l'extraction et l'analyse de contenu de CV
 """
 
-import pytest
 from unittest.mock import MagicMock
 from unittest.mock import patch
+
+import pytest
 
 from app.services.document_analyzer import DocumentAnalyzer
 

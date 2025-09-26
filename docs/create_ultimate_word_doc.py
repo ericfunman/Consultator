@@ -7,11 +7,14 @@ avec table des matières cliquable et contenu propre
 import os
 import re
 from pathlib import Path
+
 from docx import Document
-from docx.shared import Inches, Pt, RGBColor
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.shared import Inches
+from docx.shared import Pt
+from docx.shared import RGBColor
 
 
 def setup_professional_styles(doc):
@@ -416,8 +419,9 @@ def create_ultimate_word_documentation():
     setup_professional_styles(doc)
 
     # Importer les modules nécessaires pour la TOC
-    from docx.oxml.ns import nsdecls, qn
     from docx.oxml import parse_xml
+    from docx.oxml.ns import nsdecls
+    from docx.oxml.ns import qn
 
     # Lire index.rst pour extraire la TOC
     docs_dir = Path(__file__).parent

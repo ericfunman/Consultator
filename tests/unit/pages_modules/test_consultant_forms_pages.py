@@ -2,10 +2,13 @@
 Tests pour les pages modules consultant forms
 """
 
-import pytest
-import sys
 import os
-from unittest.mock import Mock, patch, MagicMock
+import sys
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 
 # Ajouter le répertoire parent au path pour les imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -45,7 +48,9 @@ class TestConsultantProfile:
         # Mock du session state
         mock_st.session_state.view_consultant_profile = 1
 
-        from app.pages_modules.consultant_profile import show_consultant_profile
+        from app.pages_modules.consultant_profile import (
+            show_consultant_profile,
+        )
 
         # Test que la fonction s'ex�cute sans erreur
         try:
@@ -76,7 +81,9 @@ class TestConsultantProfile:
             mock_get_session.return_value.__enter__.return_value = mock_session
             mock_get_session.return_value.__exit__.return_value = None
 
-            from app.pages_modules.consultant_profile import show_consultant_profile
+            from app.pages_modules.consultant_profile import (
+                show_consultant_profile,
+            )
 
             show_consultant_profile()
 
@@ -95,7 +102,9 @@ class TestConsultantProfile:
         ) as mock_get_session:
             mock_get_session.return_value.__enter__.side_effect = Exception("Erreur DB")
 
-            from app.pages_modules.consultant_profile import show_consultant_profile
+            from app.pages_modules.consultant_profile import (
+                show_consultant_profile,
+            )
 
             show_consultant_profile()
 

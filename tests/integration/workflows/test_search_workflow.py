@@ -1,15 +1,21 @@
 """Tests d'intégration pour le workflow de recherche et filtrage"""
 
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from datetime import datetime, date
+
+from app.database.database import get_database_session
+from app.database.models import Consultant
+from app.database.models import Practice
 
 # Import des services principaux
 from app.services.consultant_service import ConsultantService
 from app.services.practice_service import PracticeService
-from app.database.database import get_database_session
-from app.database.models import Practice, Consultant
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -39,6 +45,7 @@ def search_test_data():
 
     # Créer des practices avec des noms uniques pour éviter les conflits
     import uuid
+
     unique_suffix = str(uuid.uuid4())[:8]
 
     practices_data = [
@@ -66,12 +73,14 @@ def search_test_data():
 
     practice_ids = []
 
+
 @pytest.fixture
 def search_test_data():
     """Créer un jeu de données complet pour les tests de recherche"""
 
     # Créer des practices avec des noms uniques pour éviter les conflits
     import uuid
+
     unique_suffix = str(uuid.uuid4())[:8]
 
     practices_data = [
@@ -102,18 +111,28 @@ def search_test_data():
     for practice_data in practices_data:
         with get_database_session() as session:
             # Vérifier si la practice existe déjà et la supprimer si nécessaire
-            existing = session.query(Practice).filter(Practice.nom == practice_data["nom"]).first()
+            existing = (
+                session.query(Practice)
+                .filter(Practice.nom == practice_data["nom"])
+                .first()
+            )
             if existing:
                 # Supprimer la practice existante et ses dépendances
                 try:
                     # Supprimer les consultants associés d'abord
-                    consultants_to_delete = session.query(Consultant).filter(Consultant.practice_id == existing.id).all()
+                    consultants_to_delete = (
+                        session.query(Consultant)
+                        .filter(Consultant.practice_id == existing.id)
+                        .all()
+                    )
                     for consultant in consultants_to_delete:
                         session.delete(consultant)
                     session.delete(existing)
                     session.commit()
                 except Exception as e:
-                    print(f"Erreur lors de la suppression de practice existante {practice_data['nom']}: {e}")
+                    print(
+                        f"Erreur lors de la suppression de practice existante {practice_data['nom']}: {e}"
+                    )
                     session.rollback()
 
             # Créer la nouvelle practice
@@ -123,10 +142,16 @@ def search_test_data():
                 session.commit()
                 practice_ids.append(practice.id)
             except Exception as e:
-                print(f"Erreur lors de la création de practice {practice_data['nom']}: {e}")
+                print(
+                    f"Erreur lors de la création de practice {practice_data['nom']}: {e}"
+                )
                 session.rollback()
                 # Essayer de récupérer une practice existante si la création échoue
-                existing = session.query(Practice).filter(Practice.nom == practice_data["nom"]).first()
+                existing = (
+                    session.query(Practice)
+                    .filter(Practice.nom == practice_data["nom"])
+                    .first()
+                )
                 if existing:
                     practice_ids.append(existing.id)
 
@@ -257,7 +282,9 @@ def search_test_data():
             try:
                 ConsultantService.delete_consultant(existing_consultant.id)
             except Exception as e:
-                print(f"Erreur lors de la suppression de consultant existant {data['email']}: {e}")
+                print(
+                    f"Erreur lors de la suppression de consultant existant {data['email']}: {e}"
+                )
 
         # Créer le nouveau consultant
         try:
@@ -314,7 +341,9 @@ class TestSearchWorkflowIntegration:
         all_results = ConsultantService.search_consultants_optimized(
             "", page=1, per_page=50
         )
-        assert len(all_results) >= len(search_test_data["consultant_ids"])  # Au moins nos consultants de test
+        assert len(all_results) >= len(
+            search_test_data["consultant_ids"]
+        )  # Au moins nos consultants de test
 
         # Recherche par prénom
         alice_results = ConsultantService.search_consultants_optimized(
@@ -332,7 +361,8 @@ class TestSearchWorkflowIntegration:
         )  # Au moins Alice Data (nom), Bob AI (societe=DataCorp), Claire ML (societe=DataCorp)
         # Vérifier qu'Alice Data est dans les résultats
         alice_in_results = any(
-            r["nom"] == "Data" and r["prenom"] == f"Alice_{unique_suffix}" for r in data_results
+            r["nom"] == "Data" and r["prenom"] == f"Alice_{unique_suffix}"
+            for r in data_results
         )
         assert alice_in_results
 
@@ -373,7 +403,9 @@ class TestSearchWorkflowIntegration:
         senior_results = ConsultantService.search_consultants_optimized(
             "", page=1, per_page=50, grade_filter="Senior"
         )
-        assert len(senior_results) >= 7  # Au moins Bob, Claire, David, Felix, Henry, Iris, Kate
+        assert (
+            len(senior_results) >= 7
+        )  # Au moins Bob, Claire, David, Felix, Henry, Iris, Kate
 
         # Filtre par disponibilité
         available_results = ConsultantService.search_consultants_optimized(
@@ -522,7 +554,9 @@ class TestSearchWorkflowIntegration:
 
         # Statistiques générales
         all_consultants = ConsultantService.get_all_consultants_with_stats()
-        assert len(all_consultants) >= len(search_test_data["consultant_ids"])  # Au moins nos consultants de test
+        assert len(all_consultants) >= len(
+            search_test_data["consultant_ids"]
+        )  # Au moins nos consultants de test
 
         # Calculer les statistiques manuellement pour vérification
         total_consultants = len(all_consultants)
@@ -539,7 +573,9 @@ class TestSearchWorkflowIntegration:
         for practice_name in ["Data Science", "Frontend", "Backend", "DevOps"]:
             practice_name_with_suffix = f"{practice_name}_{unique_suffix}"
             practice_consultants = [
-                c for c in all_consultants if c.get("practice_name") == practice_name_with_suffix
+                c
+                for c in all_consultants
+                if c.get("practice_name") == practice_name_with_suffix
             ]
             if practice_consultants:
                 practice_available = sum(
@@ -583,9 +619,7 @@ class TestSearchWorkflowIntegration:
         # Test performance recherche simple
         start_time = time.time()
         for _ in range(10):
-            _ = ConsultantService.search_consultants_optimized(
-                "", page=1, per_page=50
-            )
+            _ = ConsultantService.search_consultants_optimized("", page=1, per_page=50)
         simple_search_time = (time.time() - start_time) / 10
 
         # Test performance avec filtres

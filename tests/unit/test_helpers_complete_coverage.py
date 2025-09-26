@@ -5,10 +5,13 @@ Tests ciblés sur les fonctions manquantes des modules helpers et autres
 
 import os
 import sys
-from unittest.mock import MagicMock, patch
-import pytest
-from datetime import date, datetime
 import tempfile
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
+import pytest
 
 # Ajouter le chemin du module
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
@@ -189,7 +192,9 @@ class TestDatabaseModelsAdvanced:
     def test_model_repr_methods(self):
         """Test des méthodes __repr__ des modèles"""
         try:
-            from app.database.models import Consultant, Mission, Competence
+            from app.database.models import Competence
+            from app.database.models import Consultant
+            from app.database.models import Mission
 
             # Tester si les modèles ont des __repr__
             models = [Consultant, Mission, Competence]
@@ -433,7 +438,8 @@ class TestErrorHandlingAndEdgeCases:
 
     def test_date_edge_cases(self):
         """Test des cas limites pour les dates"""
-        from app.utils.helpers import calculate_age, format_date
+        from app.utils.helpers import calculate_age
+        from app.utils.helpers import format_date
 
         # Test avec date future (âge négatif)
         future_date = date(2030, 1, 1)
@@ -450,7 +456,8 @@ class TestErrorHandlingAndEdgeCases:
 
     def test_validation_edge_cases(self):
         """Test des cas limites pour les validations"""
-        from app.utils.helpers import validate_email, validate_phone
+        from app.utils.helpers import validate_email
+        from app.utils.helpers import validate_phone
 
         # Emails limites
         edge_emails = [
@@ -530,7 +537,9 @@ class TestRealDataProcessing:
 
     def test_text_processing_real(self):
         """Test de traitement de texte réel"""
-        from app.utils.helpers import clean_string, normalize_text, slugify
+        from app.utils.helpers import clean_string
+        from app.utils.helpers import normalize_text
+        from app.utils.helpers import slugify
 
         # Textes réels avec caractères spéciaux français
         texts = [
@@ -551,7 +560,9 @@ class TestRealDataProcessing:
 
     def test_number_processing_real(self):
         """Test de traitement de nombres réels"""
-        from app.utils.helpers import format_currency, format_number, format_percentage
+        from app.utils.helpers import format_currency
+        from app.utils.helpers import format_number
+        from app.utils.helpers import format_percentage
 
         # Données financières réelles
         salaries = [45000, 65000, 85000, 120000, 200000]

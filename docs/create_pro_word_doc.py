@@ -7,11 +7,14 @@ avec sommaire fonctionnel et présentation améliorée
 import os
 import re
 from pathlib import Path
+
 from docx import Document
-from docx.shared import Inches, Pt, RGBColor
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.shared import Inches
+from docx.shared import Pt
+from docx.shared import RGBColor
 
 
 def setup_professional_styles(doc):

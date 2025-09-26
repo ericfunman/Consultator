@@ -3,10 +3,14 @@ Tests de couverture pour ui/enhanced_ui.py
 Couvre les classes et fonctions d'interface utilisateur améliorée
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, date
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pandas as pd
+import pytest
 
 
 class TestEnhancedUICoverage:
@@ -33,7 +37,7 @@ class TestEnhancedUICoverage:
                 "cjm_formatted": "45.8k€",
                 "salaire_formatted": "50.0k€",
                 "experience_formatted": "5.5 ans",
-                "statut": "Disponible"
+                "statut": "Disponible",
             },
             {
                 "id": 2,
@@ -52,8 +56,8 @@ class TestEnhancedUICoverage:
                 "cjm_formatted": "52.1k€",
                 "salaire_formatted": "60.0k€",
                 "experience_formatted": "8.0 ans",
-                "statut": "En mission"
-            }
+                "statut": "En mission",
+            },
         ]
 
     @patch("app.ui.enhanced_ui.st")
@@ -170,7 +174,7 @@ class TestEnhancedUICoverage:
         assert search.should_search() is True
 
         # Recherche immédiate - devrait échouer (debounce)
-        mock_time.time.return_value = 0.45  # 450ms 
+        mock_time.time.return_value = 0.45  # 450ms
         assert search.should_search() is False
 
         # Recherche après debounce - devrait réussir
@@ -188,7 +192,9 @@ class TestEnhancedUICoverage:
         mock_st.info.assert_called_with("📝 Aucune donnée à afficher")
 
     @patch("app.ui.enhanced_ui.st")
-    def test_data_table_enhancer_render_enhanced_table_with_data(self, mock_st, sample_consultant_data):
+    def test_data_table_enhancer_render_enhanced_table_with_data(
+        self, mock_st, sample_consultant_data
+    ):
         """Test de l'affichage du tableau avec données"""
         # Mock st.columns pour retourner des objets avec context manager
         mock_columns = [Mock() for _ in range(4)]
@@ -219,7 +225,9 @@ class TestEnhancedUICoverage:
         assert result is None
 
     @patch("app.ui.enhanced_ui.st")
-    def test_data_table_enhancer_render_action_buttons_with_data(self, mock_st, sample_consultant_data):
+    def test_data_table_enhancer_render_action_buttons_with_data(
+        self, mock_st, sample_consultant_data
+    ):
         """Test des boutons d'action avec données sélectionnées"""
         # Mock st.columns pour retourner 3 colonnes avec context manager
         mock_columns = [Mock() for _ in range(3)]
@@ -231,7 +239,9 @@ class TestEnhancedUICoverage:
         from app.ui.enhanced_ui import DataTableEnhancer
 
         selected_data = sample_consultant_data[0]
-        DataTableEnhancer.render_action_buttons(selected_data, ["view", "edit", "delete"])
+        DataTableEnhancer.render_action_buttons(
+            selected_data, ["view", "edit", "delete"]
+        )
 
         mock_st.success.assert_called_once()
         # Vérifier que les boutons ont été créés
@@ -265,7 +275,9 @@ class TestEnhancedUICoverage:
         from app.ui.enhanced_ui import NotificationManager
 
         with patch("app.ui.enhanced_ui.st") as mock_st:
-            NotificationManager.show_success("Test success", 0)  # duration=0 pour éviter sleep
+            NotificationManager.show_success(
+                "Test success", 0
+            )  # duration=0 pour éviter sleep
 
             mock_st.success.assert_called_with("Test success")
 
@@ -304,8 +316,14 @@ class TestEnhancedUICoverage:
     @patch("app.ui.enhanced_ui._load_consultant_data")
     @patch("app.ui.enhanced_ui._display_metrics")
     @patch("app.ui.enhanced_ui._handle_consultant_selection")
-    def test_create_enhanced_consultants_view(self, mock_handle_selection, mock_display_metrics,
-                                             mock_load_data, mock_init_components, mock_st):
+    def test_create_enhanced_consultants_view(
+        self,
+        mock_handle_selection,
+        mock_display_metrics,
+        mock_load_data,
+        mock_init_components,
+        mock_st,
+    ):
         """Test de la fonction principale create_enhanced_consultants_view"""
         # Mock des composants
         mock_filters = Mock()
@@ -323,7 +341,9 @@ class TestEnhancedUICoverage:
 
         create_enhanced_consultants_view()
 
-        mock_st.title.assert_called_with("👥 Gestion des consultants - Version Améliorée")
+        mock_st.title.assert_called_with(
+            "👥 Gestion des consultants - Version Améliorée"
+        )
         mock_init_components.assert_called_once()
         mock_load_data.assert_called_once()
         mock_display_metrics.assert_called_once()
@@ -341,7 +361,10 @@ class TestEnhancedUICoverage:
         assert enhancer is not None
 
         # Vérifier les types
-        from app.ui.enhanced_ui import AdvancedUIFilters, RealTimeSearch, DataTableEnhancer
+        from app.ui.enhanced_ui import AdvancedUIFilters
+        from app.ui.enhanced_ui import DataTableEnhancer
+        from app.ui.enhanced_ui import RealTimeSearch
+
         assert isinstance(filters, AdvancedUIFilters)
         assert isinstance(search, RealTimeSearch)
         assert isinstance(enhancer, DataTableEnhancer)
@@ -349,15 +372,17 @@ class TestEnhancedUICoverage:
     @patch("app.ui.enhanced_ui.st")
     @patch("app.ui.enhanced_ui.get_cached_consultants_list")
     @patch("app.ui.enhanced_ui.get_cached_search_results")
-    def test_load_consultant_data_no_search(self, mock_search_results, mock_list, mock_st):
+    def test_load_consultant_data_no_search(
+        self, mock_search_results, mock_list, mock_st
+    ):
         """Test du chargement des données sans recherche"""
         mock_st.text_input.return_value = ""
         mock_list.return_value = [{"id": 1, "nom": "Test"}]
 
-        from app.ui.enhanced_ui import _load_consultant_data
-
         # Créer une instance de RealTimeSearch pour le test
         from app.ui.enhanced_ui import RealTimeSearch
+        from app.ui.enhanced_ui import _load_consultant_data
+
         search = RealTimeSearch()
 
         result = _load_consultant_data(search)
@@ -368,15 +393,17 @@ class TestEnhancedUICoverage:
     @patch("app.ui.enhanced_ui.st")
     @patch("app.ui.enhanced_ui.get_cached_consultants_list")
     @patch("app.ui.enhanced_ui.get_cached_search_results")
-    def test_load_consultant_data_with_search(self, mock_search_results, mock_list, mock_st):
+    def test_load_consultant_data_with_search(
+        self, mock_search_results, mock_list, mock_st
+    ):
         """Test du chargement des données avec recherche"""
         mock_st.text_input.return_value = "test search"
         mock_search_results.return_value = [{"id": 1, "nom": "Test"}]
 
-        from app.ui.enhanced_ui import _load_consultant_data
-
         # Créer une instance de RealTimeSearch pour le test
         from app.ui.enhanced_ui import RealTimeSearch
+        from app.ui.enhanced_ui import _load_consultant_data
+
         search = RealTimeSearch()
 
         result = _load_consultant_data(search)
@@ -421,7 +448,9 @@ class TestEnhancedUICoverage:
         assert result is None
 
     @patch("app.ui.enhanced_ui.st")
-    def test_handle_consultant_selection_with_event(self, mock_st, sample_consultant_data):
+    def test_handle_consultant_selection_with_event(
+        self, mock_st, sample_consultant_data
+    ):
         """Test de la gestion de sélection avec événement"""
         # Mock event avec sélection
         mock_event = Mock()
@@ -453,7 +482,9 @@ class TestEnhancedUICoverage:
 
     @patch("app.ui.enhanced_ui.st")
     @patch("app.ui.enhanced_ui.ConsultantService")
-    def test_execute_consultant_action_delete_success(self, mock_consultant_service, mock_st):
+    def test_execute_consultant_action_delete_success(
+        self, mock_consultant_service, mock_st
+    ):
         """Test de l'exécution de l'action 'delete' avec succès"""
         mock_consultant_service.delete_consultant.return_value = True
 
@@ -467,7 +498,9 @@ class TestEnhancedUICoverage:
 
     @patch("app.ui.enhanced_ui.st")
     @patch("app.ui.enhanced_ui.ConsultantService")
-    def test_execute_consultant_action_delete_failure(self, mock_consultant_service, mock_st):
+    def test_execute_consultant_action_delete_failure(
+        self, mock_consultant_service, mock_st
+    ):
         """Test de l'exécution de l'action 'delete' avec échec"""
         mock_consultant_service.delete_consultant.return_value = False
 
@@ -490,14 +523,14 @@ class TestEnhancedUICoverage:
         mock_st.sidebar.text_input.return_value = "test search"
         mock_st.sidebar.markdown = Mock()
         mock_st.sidebar.subheader = Mock()
-        
+
         # Mock columns pour supporter les context managers
         mock_columns = [Mock() for _ in range(2)]
         for col in mock_columns:
             col.__enter__ = Mock(return_value=col)
             col.__exit__ = Mock(return_value=None)
         mock_st.sidebar.columns.return_value = mock_columns
-        
+
         mock_st.sidebar.selectbox.return_value = None
         mock_st.sidebar.number_input.return_value = 0
         mock_st.sidebar.date_input.return_value = None
@@ -519,13 +552,13 @@ class TestEnhancedUICoverage:
     def test_real_time_search_search_with_cache_empty_search(self, mock_st):
         """Test de recherche avec terme vide"""
         from app.ui.enhanced_ui import RealTimeSearch
-        
+
         with patch("app.ui.enhanced_ui.get_cached_consultants_list") as mock_get_list:
             mock_get_list.return_value = [{"id": 1, "nom": "Test"}]
-            
+
             search = RealTimeSearch()
             result = search.search_with_cache("")
-            
+
             mock_get_list.assert_called_with(1, 50)
             assert result == [{"id": 1, "nom": "Test"}]
 
@@ -533,18 +566,20 @@ class TestEnhancedUICoverage:
     def test_real_time_search_search_with_cache_with_term(self, mock_st):
         """Test de recherche avec terme non vide"""
         from app.ui.enhanced_ui import RealTimeSearch
-        
+
         with patch("app.ui.enhanced_ui.get_cached_search_results") as mock_search:
             mock_search.return_value = [{"id": 1, "nom": "Test"}]
-            
+
             search = RealTimeSearch()
             result = search.search_with_cache("test search")
-            
+
             mock_search.assert_called_with("test search", 1, 50)
             assert result == [{"id": 1, "nom": "Test"}]
 
     @patch("app.ui.enhanced_ui.st")
-    def test_data_table_enhancer_column_mapping_and_display(self, mock_st, sample_consultant_data):
+    def test_data_table_enhancer_column_mapping_and_display(
+        self, mock_st, sample_consultant_data
+    ):
         """Test du mapping des colonnes et de l'affichage"""
         # Mock pour st.dataframe
         mock_event = Mock()
@@ -560,9 +595,9 @@ class TestEnhancedUICoverage:
         # Vérifier que st.dataframe a été appelé avec les bonnes configurations
         mock_st.dataframe.assert_called_once()
         call_args = mock_st.dataframe.call_args
-        
+
         # Vérifier les paramètres passés à dataframe
-        assert call_args[1]["width"] == 'stretch'
+        assert call_args[1]["width"] == "stretch"
         assert call_args[1]["hide_index"] is True
         assert call_args[1]["on_select"] == "rerun"
         assert call_args[1]["selection_mode"] == "single-row"
@@ -603,17 +638,20 @@ class TestEnhancedUICoverage:
         with patch("app.ui.enhanced_ui.get_cached_consultants_list") as mock_get_list:
             mock_get_list.return_value = [{"id": 1, "nom": "Test"}]
 
-            from app.ui.enhanced_ui import _load_consultant_data, RealTimeSearch
+            from app.ui.enhanced_ui import RealTimeSearch
+            from app.ui.enhanced_ui import _load_consultant_data
 
             # Mock should_search pour retourner False
             search = RealTimeSearch()
-            with patch.object(search, 'should_search', return_value=False):
+            with patch.object(search, "should_search", return_value=False):
                 _load_consultant_data(search)
 
             mock_get_list.assert_called_once()
 
     @patch("app.ui.enhanced_ui.st")
-    def test_handle_consultant_selection_invalid_index(self, mock_st, sample_consultant_data):
+    def test_handle_consultant_selection_invalid_index(
+        self, mock_st, sample_consultant_data
+    ):
         """Test de gestion de sélection avec index invalide"""
         # Mock event avec index hors limite
         mock_event = Mock()
@@ -622,11 +660,11 @@ class TestEnhancedUICoverage:
         from app.ui.enhanced_ui import _handle_consultant_selection
 
         result = _handle_consultant_selection(mock_event, sample_consultant_data, None)
-        
+
         # Ne devrait rien faire et retourner None
         assert result is None
 
-    @patch("app.ui.enhanced_ui.st") 
+    @patch("app.ui.enhanced_ui.st")
     def test_handle_consultant_selection_empty_rows(self, mock_st):
         """Test de gestion de sélection avec liste de rows vide"""
         # Mock event avec rows vide
@@ -636,12 +674,14 @@ class TestEnhancedUICoverage:
         from app.ui.enhanced_ui import _handle_consultant_selection
 
         result = _handle_consultant_selection(mock_event, [], None)
-        
+
         # Ne devrait rien faire et retourner None
         assert result is None
 
     @patch("app.ui.enhanced_ui.st")
-    def test_display_metrics_calculation_accuracy(self, mock_st, sample_consultant_data):
+    def test_display_metrics_calculation_accuracy(
+        self, mock_st, sample_consultant_data
+    ):
         """Test de précision des calculs de métriques"""
         # Mock st.columns pour retourner 4 colonnes avec context manager
         mock_columns = [Mock() for _ in range(4)]
@@ -659,7 +699,7 @@ class TestEnhancedUICoverage:
 
         # Vérifier les calculs dans les appels
         call_args_list = mock_st.metric.call_args_list
-        
+
         # Premier appel : Total
         assert call_args_list[0][0][0] == "👥 Total"
         assert call_args_list[0][0][1] == 2  # 2 consultants dans sample_data
@@ -669,7 +709,7 @@ class TestEnhancedUICoverage:
         assert call_args_list[1][0][1] == 1  # Marie est disponible
 
         # Troisième appel : Occupés
-        assert call_args_list[2][0][0] == "🔴 Occupés" 
+        assert call_args_list[2][0][0] == "🔴 Occupés"
         assert call_args_list[2][0][1] == 1  # Pierre n'est pas disponible
 
         # Quatrième appel : Salaire moyen

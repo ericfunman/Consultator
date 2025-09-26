@@ -4,13 +4,16 @@ Couverture complète des filtres avancés et recherche en temps réel
 """
 
 import time
-from datetime import date, datetime
-from unittest.mock import MagicMock, patch
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 import streamlit as st
 
-from app.ui.enhanced_ui import AdvancedUIFilters, RealTimeSearch
+from app.ui.enhanced_ui import AdvancedUIFilters
+from app.ui.enhanced_ui import RealTimeSearch
 
 
 class TestAdvancedUIFilters:

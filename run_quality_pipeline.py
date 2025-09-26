@@ -4,10 +4,10 @@ Script de pipeline de qualité pour Consultator
 Exécute les tests de régression et les contrôles qualité
 """
 
-import sys
-import os
 import argparse
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 

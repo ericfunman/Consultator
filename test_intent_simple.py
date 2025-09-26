@@ -2,8 +2,9 @@ import sys
 
 sys.path.append(".")
 sys.path.append("app")
-from unittest.mock import Mock, patch
 from contextlib import contextmanager
+from unittest.mock import Mock
+from unittest.mock import patch
 
 
 @contextmanager

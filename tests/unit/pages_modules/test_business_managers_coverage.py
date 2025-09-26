@@ -3,10 +3,14 @@ Tests de couverture pour business_managers.py
 Couvre les principales fonctions avec mocks extensifs pour Streamlit et la base de données
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, date
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pandas as pd
+import pytest
 
 
 class TestBusinessManagersCoverage:
@@ -212,7 +216,9 @@ class TestBusinessManagersCoverage:
         # Mock du bouton de suppression
         mock_st.button.return_value = False  # Pas de confirmation
 
-        from app.pages_modules.business_managers import show_delete_bm_confirmation
+        from app.pages_modules.business_managers import (
+            show_delete_bm_confirmation,
+        )
 
         show_delete_bm_confirmation(mock_business_manager)
 
@@ -294,7 +300,9 @@ class TestBusinessManagersCoverage:
         mock_event.selection.rows = []
         mock_st.dataframe.return_value = mock_event
 
-        from app.pages_modules.business_managers import show_current_bm_consultants
+        from app.pages_modules.business_managers import (
+            show_current_bm_consultants,
+        )
 
         show_current_bm_consultants(mock_business_manager, mock_session)
 
@@ -357,7 +365,9 @@ class TestBusinessManagersCoverage:
             mock_assignment = Mock()
             mock_cbm_class.return_value = mock_assignment
 
-            from app.pages_modules.business_managers import show_add_bm_assignment
+            from app.pages_modules.business_managers import (
+                show_add_bm_assignment,
+            )
 
             try:
                 show_add_bm_assignment(mock_business_manager, mock_session)
@@ -390,7 +400,9 @@ class TestBusinessManagersCoverage:
             (mock_assignment, mock_consultant)
         ]
 
-        from app.pages_modules.business_managers import show_bm_assignments_history
+        from app.pages_modules.business_managers import (
+            show_bm_assignments_history,
+        )
 
         show_bm_assignments_history(mock_business_manager, mock_session)
 
@@ -424,7 +436,9 @@ class TestBusinessManagersCoverage:
             mock_get_session.return_value.__enter__.return_value = mock_session
             mock_session.query().filter().count.return_value = 10
 
-            from app.pages_modules.business_managers import show_business_managers_list
+            from app.pages_modules.business_managers import (
+                show_business_managers_list,
+            )
 
             show_business_managers_list()
 
@@ -468,7 +482,9 @@ class TestBusinessManagersCoverage:
         mock_st.checkbox.return_value = True
         mock_st.text_area.return_value = "Nouveau BM"
 
-        from app.pages_modules.business_managers import show_add_business_manager
+        from app.pages_modules.business_managers import (
+            show_add_business_manager,
+        )
 
         show_add_business_manager()
 
@@ -513,7 +529,9 @@ class TestBusinessManagersCoverage:
         mock_st.checkbox.return_value = True
         mock_st.text_area.return_value = "Nouveau BM"
 
-        from app.pages_modules.business_managers import show_add_business_manager
+        from app.pages_modules.business_managers import (
+            show_add_business_manager,
+        )
 
         show_add_business_manager()
 
@@ -592,7 +610,9 @@ class TestBusinessManagersCoverage:
         # Mock session.query().get() pour retourner l'assignation
         mock_session.query().get.return_value = mock_assignment
 
-        from app.pages_modules.business_managers import show_current_bm_consultants
+        from app.pages_modules.business_managers import (
+            show_current_bm_consultants,
+        )
 
         show_current_bm_consultants(mock_business_manager, mock_session)
 
@@ -654,7 +674,9 @@ class TestBusinessManagersCoverage:
             mock_assignment = Mock()
             mock_cbm_class.return_value = mock_assignment
 
-            from app.pages_modules.business_managers import show_add_bm_assignment
+            from app.pages_modules.business_managers import (
+                show_add_bm_assignment,
+            )
 
             show_add_bm_assignment(mock_business_manager, mock_session)
 
@@ -699,7 +721,9 @@ class TestBusinessManagersCoverage:
             # Mock bouton cliqué
             mock_st.button.return_value = True
 
-            from app.pages_modules.business_managers import show_business_managers_list
+            from app.pages_modules.business_managers import (
+                show_business_managers_list,
+            )
 
             show_business_managers_list()
 
@@ -748,7 +772,9 @@ class TestBusinessManagersCoverage:
         # Mock bouton de confirmation
         mock_st.button.side_effect = [True, False]  # Confirmer la suppression
 
-        from app.pages_modules.business_managers import show_delete_bm_confirmation
+        from app.pages_modules.business_managers import (
+            show_delete_bm_confirmation,
+        )
 
         show_delete_bm_confirmation(mock_business_manager)
 
@@ -760,29 +786,33 @@ class TestBusinessManagersCoverage:
 
     @patch("app.pages_modules.business_managers.st")
     @patch("app.pages_modules.business_managers.get_database_session")
-    def test_validate_and_convert_bm_id_invalid_string(
-        self, mock_get_session, mock_st
-    ):
+    def test_validate_and_convert_bm_id_invalid_string(self, mock_get_session, mock_st):
         """Test de la validation d'ID BM avec chaîne invalide"""
-        from app.pages_modules.business_managers import _validate_and_convert_bm_id
+        from app.pages_modules.business_managers import (
+            _validate_and_convert_bm_id,
+        )
 
         # Test avec chaîne non convertible
         result = _validate_and_convert_bm_id("invalid")
         assert result is None
-        mock_st.error.assert_called_with("❌ Erreur : ID du Business Manager invalide (invalid)")
+        mock_st.error.assert_called_with(
+            "❌ Erreur : ID du Business Manager invalide (invalid)"
+        )
 
     @patch("app.pages_modules.business_managers.st")
     @patch("app.pages_modules.business_managers.get_database_session")
-    def test_validate_and_convert_bm_id_invalid_type(
-        self, mock_get_session, mock_st
-    ):
+    def test_validate_and_convert_bm_id_invalid_type(self, mock_get_session, mock_st):
         """Test de la validation d'ID BM avec type invalide"""
-        from app.pages_modules.business_managers import _validate_and_convert_bm_id
+        from app.pages_modules.business_managers import (
+            _validate_and_convert_bm_id,
+        )
 
         # Test avec objet non convertible
         result = _validate_and_convert_bm_id({"id": 1})
         assert result is None
-        mock_st.error.assert_called_with("❌ Erreur : ID du Business Manager invalide ({'id': 1})")
+        mock_st.error.assert_called_with(
+            "❌ Erreur : ID du Business Manager invalide ({'id': 1})"
+        )
 
     @patch("app.pages_modules.business_managers.st")
     @patch("app.pages_modules.business_managers.get_database_session")
@@ -807,12 +837,14 @@ class TestBusinessManagersCoverage:
         # Mock bouton retour cliqué
         mock_st.button.return_value = True
 
-        from app.pages_modules.business_managers import _display_bm_header_and_info
+        from app.pages_modules.business_managers import (
+            _display_bm_header_and_info,
+        )
 
         _display_bm_header_and_info(mock_business_manager)
 
         # Vérifier que view_bm_profile a été supprimé
-        assert not hasattr(mock_st.session_state, 'view_bm_profile')
+        assert not hasattr(mock_st.session_state, "view_bm_profile")
         mock_st.rerun.assert_called_once()
 
     @patch("app.pages_modules.business_managers.st")
@@ -843,7 +875,9 @@ class TestBusinessManagersCoverage:
         # Mock boutons - premier bouton (modifier) cliqué
         mock_st.button.side_effect = [True, False]
 
-        from app.pages_modules.business_managers import _display_bm_general_info
+        from app.pages_modules.business_managers import (
+            _display_bm_general_info,
+        )
 
         _display_bm_general_info(mock_business_manager, mock_session)
 
@@ -878,7 +912,9 @@ class TestBusinessManagersCoverage:
         # Mock boutons - deuxième bouton (supprimer) cliqué
         mock_st.button.side_effect = [False, True]
 
-        from app.pages_modules.business_managers import _display_bm_general_info
+        from app.pages_modules.business_managers import (
+            _display_bm_general_info,
+        )
 
         _display_bm_general_info(mock_business_manager, mock_session)
 
@@ -899,7 +935,9 @@ class TestBusinessManagersCoverage:
         with patch(
             "app.pages_modules.business_managers.show_edit_bm_form"
         ) as mock_show_edit:
-            from app.pages_modules.business_managers import _handle_bm_form_actions
+            from app.pages_modules.business_managers import (
+                _handle_bm_form_actions,
+            )
 
             _handle_bm_form_actions(mock_business_manager)
 
@@ -913,13 +951,17 @@ class TestBusinessManagersCoverage:
         """Test de l'affichage de la confirmation de suppression"""
         # Mock session state avec delete_bm_mode activé
         mock_session_state = Mock()
-        mock_session_state.get.side_effect = lambda key, default: key == "delete_bm_mode"
+        mock_session_state.get.side_effect = (
+            lambda key, default: key == "delete_bm_mode"
+        )
         mock_st.session_state = mock_session_state
 
         with patch(
             "app.pages_modules.business_managers.show_delete_bm_confirmation"
         ) as mock_show_delete:
-            from app.pages_modules.business_managers import _handle_bm_form_actions
+            from app.pages_modules.business_managers import (
+                _handle_bm_form_actions,
+            )
 
             _handle_bm_form_actions(mock_business_manager)
 
@@ -927,9 +969,7 @@ class TestBusinessManagersCoverage:
 
     @patch("app.pages_modules.business_managers.st")
     @patch("app.pages_modules.business_managers.get_database_session")
-    def test_show_bm_profile_invalid_id_conversion(
-        self, mock_get_session, mock_st
-    ):
+    def test_show_bm_profile_invalid_id_conversion(self, mock_get_session, mock_st):
         """Test de show_bm_profile avec ID invalide"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -945,7 +985,7 @@ class TestBusinessManagersCoverage:
 
         # Vérifier que l'erreur a été affichée et l'état nettoyé
         mock_st.error.assert_called()
-        assert not hasattr(mock_st.session_state, 'view_bm_profile')
+        assert not hasattr(mock_st.session_state, "view_bm_profile")
 
     @patch("app.pages_modules.business_managers.st")
     @patch("app.pages_modules.business_managers.get_database_session")
@@ -1013,10 +1053,14 @@ class TestBusinessManagersCoverage:
         # Mock session state comme un objet avec attributs
         mock_session_state = Mock()
         mock_session_state.delete_bm_mode = True
-        mock_session_state.get.side_effect = lambda key, default=None: getattr(mock_session_state, key, default)
+        mock_session_state.get.side_effect = lambda key, default=None: getattr(
+            mock_session_state, key, default
+        )
         mock_st.session_state = mock_session_state
 
-        from app.pages_modules.business_managers import show_delete_bm_confirmation
+        from app.pages_modules.business_managers import (
+            show_delete_bm_confirmation,
+        )
 
         show_delete_bm_confirmation(mock_business_manager)
 
@@ -1036,7 +1080,9 @@ class TestBusinessManagersCoverage:
         # Mock aucune assignation
         mock_session.query().join().filter().all.return_value = []
 
-        from app.pages_modules.business_managers import show_current_bm_consultants
+        from app.pages_modules.business_managers import (
+            show_current_bm_consultants,
+        )
 
         show_current_bm_consultants(mock_business_manager, mock_session)
 
@@ -1095,12 +1141,14 @@ class TestBusinessManagersCoverage:
         # Mock session.query().get()
         mock_session.query().get.return_value = mock_assignment
 
-        from app.pages_modules.business_managers import show_current_bm_consultants
+        from app.pages_modules.business_managers import (
+            show_current_bm_consultants,
+        )
 
         show_current_bm_consultants(mock_business_manager, mock_session)
 
         # Vérifier que le commentaire a été ajouté
-        assert not hasattr(mock_st.session_state, 'add_comment_assignment')
+        assert not hasattr(mock_st.session_state, "add_comment_assignment")
         mock_session.commit.assert_called()
         mock_st.success.assert_called_with("✅ Commentaire ajouté !")
 
@@ -1116,7 +1164,9 @@ class TestBusinessManagersCoverage:
         # Mock aucune assignation
         mock_session.query().join().filter().order_by().all.return_value = []
 
-        from app.pages_modules.business_managers import show_bm_assignments_history
+        from app.pages_modules.business_managers import (
+            show_bm_assignments_history,
+        )
 
         show_bm_assignments_history(mock_business_manager, mock_session)
 
@@ -1133,7 +1183,9 @@ class TestBusinessManagersCoverage:
         mock_session_state = Mock()
         mock_st.session_state = mock_session_state
 
-        from app.pages_modules.business_managers import show_business_managers_list
+        from app.pages_modules.business_managers import (
+            show_business_managers_list,
+        )
 
         show_business_managers_list()
 
@@ -1153,7 +1205,9 @@ class TestBusinessManagersCoverage:
         # Mock text_input pour retourner une chaîne vide (pas de recherche)
         mock_st.text_input.return_value = ""
 
-        from app.pages_modules.business_managers import show_business_managers_list
+        from app.pages_modules.business_managers import (
+            show_business_managers_list,
+        )
 
         show_business_managers_list()
 
@@ -1187,17 +1241,26 @@ class TestBusinessManagersCoverage:
         mock_st.checkbox.return_value = True
         mock_st.text_area.return_value = ""
 
-        from app.pages_modules.business_managers import show_add_business_manager
+        from app.pages_modules.business_managers import (
+            show_add_business_manager,
+        )
 
         show_add_business_manager()
 
-        mock_st.error.assert_called_with("❌ Les champs Nom, Prénom et Email sont obligatoires")
+        mock_st.error.assert_called_with(
+            "❌ Les champs Nom, Prénom et Email sont obligatoires"
+        )
 
         # Reset mocks
         mock_st.reset_mock()
 
         # Test 2: Email invalide
-        mock_st.text_input.side_effect = ["Dupont", "invalid-email", "Jean", "0123456789"]
+        mock_st.text_input.side_effect = [
+            "Dupont",
+            "invalid-email",
+            "Jean",
+            "0123456789",
+        ]
         mock_st.checkbox.return_value = True
         mock_st.text_area.return_value = ""
 
@@ -1224,13 +1287,15 @@ class TestBusinessManagersCoverage:
 
         # Mock monthly_stats retournant vide
         mock_monthly_query = Mock()
-        mock_monthly_query.group_by.return_value.order_by.return_value.limit.return_value.all.return_value = []
+        mock_monthly_query.group_by.return_value.order_by.return_value.limit.return_value.all.return_value = (
+            []
+        )
 
         mock_session.query.side_effect = [
-            mock_bm_query,      # BusinessManager query (total_bms)
-            mock_bm_query,      # BusinessManager query (total_active_bms)
-            mock_cbm_query,     # ConsultantBusinessManager query
-            mock_bm_stats_query, # bm_stats_query
+            mock_bm_query,  # BusinessManager query (total_bms)
+            mock_bm_query,  # BusinessManager query (total_active_bms)
+            mock_cbm_query,  # ConsultantBusinessManager query
+            mock_bm_stats_query,  # bm_stats_query
             mock_monthly_query,  # monthly_stats query
         ]
 
@@ -1256,9 +1321,11 @@ class TestBusinessManagersCoverage:
         mock_bm_stats_query = Mock()
         mock_bm_stats_query.all.return_value = [("Jean", "Dupont", 2)]
         mock_session.query.side_effect = [
-            Mock(), Mock(), Mock(),  # Premières requêtes
-            mock_bm_stats_query,     # bm_stats_query
-            Mock(),                  # monthly_stats query
+            Mock(),
+            Mock(),
+            Mock(),  # Premières requêtes
+            mock_bm_stats_query,  # bm_stats_query
+            Mock(),  # monthly_stats query
         ]
 
         # Mock monthly_stats retournant vide

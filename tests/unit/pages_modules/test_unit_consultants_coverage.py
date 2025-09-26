@@ -6,7 +6,9 @@ Couverture des fonctions principales de gestion des consultants
 import os
 import sys
 from datetime import datetime
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
@@ -16,8 +18,8 @@ import streamlit as st
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 
 try:
-    from app.pages_modules.consultants import show
     import app.pages_modules.consultants as consultants
+    from app.pages_modules.consultants import show
 except ImportError:
     consultants = None
 

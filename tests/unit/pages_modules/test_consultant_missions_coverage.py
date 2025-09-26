@@ -2,9 +2,11 @@
 Tests de couverture pour consultant_missions.py
 """
 
-import pytest
-from unittest.mock import Mock, patch
 from datetime import date
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 
 
 class TestConsultantMissionsCoverage:
@@ -47,11 +49,19 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.show_missions_statistics")
     @patch("app.pages_modules.consultant_missions.get_database_session")
     @patch("app.pages_modules.consultant_missions.st")
-    def test_show_consultant_missions_with_data(self, mock_st, mock_get_session, mock_show_stats, mock_consultant, mock_mission_active, mocker):
+    def test_show_consultant_missions_with_data(
+        self,
+        mock_st,
+        mock_get_session,
+        mock_show_stats,
+        mock_consultant,
+        mock_mission_active,
+        mocker,
+    ):
         """Test de l'affichage des missions avec données"""
         # Set imports_ok to True
         mocker.patch("app.pages_modules.consultant_missions.imports_ok", True)
-        
+
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
 
@@ -70,7 +80,10 @@ class TestConsultantMissionsCoverage:
         # Mock show_missions_statistics to do nothing
         mock_show_stats.return_value = None
 
-        from app.pages_modules.consultant_missions import show_consultant_missions
+        from app.pages_modules.consultant_missions import (
+            show_consultant_missions,
+        )
+
         show_consultant_missions(mock_consultant)
 
         # Vérifier que st.markdown a été appelé pour le titre
@@ -80,17 +93,20 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.show_add_mission_form")
     @patch("app.pages_modules.consultant_missions.get_database_session")
     @patch("app.pages_modules.consultant_missions.st")
-    def test_show_consultant_missions_no_data(self, mock_st, mock_get_session, mock_show_add, mock_joinedload, mock_consultant):
+    def test_show_consultant_missions_no_data(
+        self, mock_st, mock_get_session, mock_show_add, mock_joinedload, mock_consultant
+    ):
         """Test de l'affichage des missions sans données"""
         # Patch imports_ok and the model classes before importing the module
         import app.pages_modules.consultant_missions as cm_module
+
         cm_module.imports_ok = True
         # Create mock classes for the models
         mock_mission_class = Mock()
         mock_client_class = Mock()
         cm_module.Mission = mock_mission_class
         cm_module.Client = mock_client_class
-        
+
         mock_session = Mock()
         # Properly mock the context manager
         mock_get_session.return_value.__enter__ = Mock(return_value=mock_session)
@@ -114,11 +130,16 @@ class TestConsultantMissionsCoverage:
         # Mock show_add_mission_form to do nothing
         mock_show_add.return_value = None
 
-        from app.pages_modules.consultant_missions import show_consultant_missions
+        from app.pages_modules.consultant_missions import (
+            show_consultant_missions,
+        )
+
         show_consultant_missions(mock_consultant)
 
         # Vérifier que st.info a été appelé pour les missions vides
-        mock_st.info.assert_called_with("ℹ️ Aucune mission enregistrée pour ce consultant")
+        mock_st.info.assert_called_with(
+            "ℹ️ Aucune mission enregistrée pour ce consultant"
+        )
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_validate_mission_form_valid(self, mock_st):
@@ -130,7 +151,7 @@ class TestConsultantMissionsCoverage:
             client_id=1,
             date_debut=date(2024, 1, 1),
             en_cours=False,
-            date_fin=date(2024, 6, 30)
+            date_fin=date(2024, 6, 30),
         )
 
         assert result is True
@@ -145,7 +166,7 @@ class TestConsultantMissionsCoverage:
             client_id=1,
             date_debut=date(2024, 1, 1),
             en_cours=True,
-            date_fin=None
+            date_fin=None,
         )
 
         assert result is False
@@ -162,11 +183,13 @@ class TestConsultantMissionsCoverage:
             client_id=1,
             date_debut=date(2024, 6, 30),
             en_cours=False,
-            date_fin=date(2024, 1, 1)
+            date_fin=date(2024, 1, 1),
         )
 
         assert result is False
-        mock_st.error.assert_called_with("❌ La date de fin doit être postérieure à la date de début")
+        mock_st.error.assert_called_with(
+            "❌ La date de fin doit être postérieure à la date de début"
+        )
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_validate_mission_form_missing_client(self, mock_st):
@@ -178,7 +201,7 @@ class TestConsultantMissionsCoverage:
             client_id=None,
             date_debut=date(2024, 1, 1),
             en_cours=True,
-            date_fin=None
+            date_fin=None,
         )
 
         assert result is False
@@ -202,7 +225,9 @@ class TestConsultantMissionsCoverage:
             col.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = mock_columns
 
-        from app.pages_modules.consultant_missions import show_missions_statistics
+        from app.pages_modules.consultant_missions import (
+            show_missions_statistics,
+        )
 
         missions = [mock_mission_active]
         show_missions_statistics(missions)
@@ -220,7 +245,9 @@ class TestConsultantMissionsCoverage:
             col.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = mock_columns
 
-        from app.pages_modules.consultant_missions import show_missions_analysis
+        from app.pages_modules.consultant_missions import (
+            show_missions_analysis,
+        )
 
         missions = [mock_mission_active]
         show_missions_analysis(missions)
@@ -237,7 +264,9 @@ class TestConsultantMissionsCoverage:
             col.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = mock_columns
 
-        from app.pages_modules.consultant_missions import show_missions_revenues
+        from app.pages_modules.consultant_missions import (
+            show_missions_revenues,
+        )
 
         missions = [mock_mission_active]
         show_missions_revenues(missions)
@@ -260,7 +289,9 @@ class TestConsultantMissionsCoverage:
         # Mock bouton
         mock_st.button.return_value = False  # Bouton non cliqué
 
-        from app.pages_modules.consultant_missions import show_mission_full_details
+        from app.pages_modules.consultant_missions import (
+            show_mission_full_details,
+        )
 
         show_mission_full_details(mock_mission_active)
 
@@ -303,7 +334,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_statistics_empty_list(self, mock_st):
         """Test des statistiques avec liste vide"""
-        from app.pages_modules.consultant_missions import show_missions_statistics
+        from app.pages_modules.consultant_missions import (
+            show_missions_statistics,
+        )
 
         missions = []
         show_missions_statistics(missions)
@@ -314,7 +347,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_analysis_empty_list(self, mock_st):
         """Test de l'analyse avec liste vide"""
-        from app.pages_modules.consultant_missions import show_missions_analysis
+        from app.pages_modules.consultant_missions import (
+            show_missions_analysis,
+        )
 
         missions = []
         show_missions_analysis(missions)
@@ -325,7 +360,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_revenues_empty_list(self, mock_st):
         """Test de l'analyse des revenus avec liste vide"""
-        from app.pages_modules.consultant_missions import show_missions_revenues
+        from app.pages_modules.consultant_missions import (
+            show_missions_revenues,
+        )
 
         missions = []
         show_missions_revenues(missions)
@@ -337,16 +374,22 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_consultant_missions_imports_failed(self, mock_st, mock_consultant):
         """Test de l'affichage quand les imports ont échoué"""
-        from app.pages_modules.consultant_missions import show_consultant_missions
+        from app.pages_modules.consultant_missions import (
+            show_consultant_missions,
+        )
 
         show_consultant_missions(mock_consultant)
 
-        mock_st.error.assert_called_once_with("❌ Les services de base ne sont pas disponibles")
+        mock_st.error.assert_called_once_with(
+            "❌ Les services de base ne sont pas disponibles"
+        )
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_consultant_missions_no_consultant(self, mock_st):
         """Test de l'affichage sans consultant fourni"""
-        from app.pages_modules.consultant_missions import show_consultant_missions
+        from app.pages_modules.consultant_missions import (
+            show_consultant_missions,
+        )
 
         show_consultant_missions(None)
 
@@ -356,17 +399,20 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.show_add_mission_form")
     @patch("app.pages_modules.consultant_missions.get_database_session")
     @patch("app.pages_modules.consultant_missions.st")
-    def test_show_consultant_missions_empty_list(self, mock_st, mock_get_session, mock_show_add, mock_joinedload, mock_consultant):
+    def test_show_consultant_missions_empty_list(
+        self, mock_st, mock_get_session, mock_show_add, mock_joinedload, mock_consultant
+    ):
         """Test de l'affichage avec une liste de missions vide"""
         # Patch imports_ok and the model classes before importing the module
         import app.pages_modules.consultant_missions as cm_module
+
         cm_module.imports_ok = True
         # Create mock classes for the models
         mock_mission_class = Mock()
         mock_client_class = Mock()
         cm_module.Mission = mock_mission_class
         cm_module.Client = mock_client_class
-        
+
         mock_session = Mock()
         # Properly mock the context manager
         mock_get_session.return_value.__enter__ = Mock(return_value=mock_session)
@@ -390,16 +436,23 @@ class TestConsultantMissionsCoverage:
         # Mock show_add_mission_form to do nothing
         mock_show_add.return_value = None
 
-        from app.pages_modules.consultant_missions import show_consultant_missions
+        from app.pages_modules.consultant_missions import (
+            show_consultant_missions,
+        )
+
         show_consultant_missions(mock_consultant)
 
         # Vérifier que st.info a été appelé pour les missions vides
-        mock_st.info.assert_called_with("ℹ️ Aucune mission enregistrée pour ce consultant")
+        mock_st.info.assert_called_with(
+            "ℹ️ Aucune mission enregistrée pour ce consultant"
+        )
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_render_mission_remuneration(self, mock_st):
         """Test du rendu des champs de rémunération"""
-        from app.pages_modules.consultant_missions import _render_mission_remuneration
+        from app.pages_modules.consultant_missions import (
+            _render_mission_remuneration,
+        )
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
@@ -413,7 +466,11 @@ class TestConsultantMissionsCoverage:
         mock_col3.__exit__ = Mock(return_value=None)
 
         mock_st.columns.return_value = (mock_col1, mock_col2, mock_col3)
-        mock_st.number_input.side_effect = [450, 500, 6000]  # taux_journalier, tjm, salaire_mensuel
+        mock_st.number_input.side_effect = [
+            450,
+            500,
+            6000,
+        ]  # taux_journalier, tjm, salaire_mensuel
 
         result = _render_mission_remuneration()
 
@@ -424,7 +481,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_render_mission_description(self, mock_st):
         """Test du rendu des champs de description"""
-        from app.pages_modules.consultant_missions import _render_mission_description
+        from app.pages_modules.consultant_missions import (
+            _render_mission_description,
+        )
 
         mock_st.text_area.side_effect = ["Description test", "Python, SQL"]
 
@@ -438,7 +497,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_load_clients_for_mission(self, mock_st, mock_get_session):
         """Test du chargement des clients pour les missions"""
-        from app.pages_modules.consultant_missions import _load_clients_for_mission
+        from app.pages_modules.consultant_missions import (
+            _load_clients_for_mission,
+        )
 
         # Mock de la session DB
         mock_session = Mock()
@@ -464,8 +525,11 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_render_mission_general_info_with_clients(self, mock_st, mock_load_clients):
         """Test du rendu des informations générales avec clients disponibles"""
-        from app.pages_modules.consultant_missions import _render_mission_general_info
         from datetime import date
+
+        from app.pages_modules.consultant_missions import (
+            _render_mission_general_info,
+        )
 
         # Mock _load_clients_for_mission
         mock_load_clients.return_value = {1: "Client A", 2: "Client B"}
@@ -495,7 +559,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_render_mission_general_info_no_clients(self, mock_st, mock_load_clients):
         """Test du rendu des informations générales sans clients"""
-        from app.pages_modules.consultant_missions import _render_mission_general_info
+        from app.pages_modules.consultant_missions import (
+            _render_mission_general_info,
+        )
 
         # Mock _load_clients_for_mission retournant un dict vide
         mock_load_clients.return_value = {}
@@ -503,15 +569,18 @@ class TestConsultantMissionsCoverage:
         result = _render_mission_general_info()
 
         assert result == (None, None, None, None, None)
-        mock_st.warning.assert_called_with("⚠️ Aucun client trouvé. Veuillez créer des clients d'abord.")
-
-
+        mock_st.warning.assert_called_with(
+            "⚠️ Aucun client trouvé. Veuillez créer des clients d'abord."
+        )
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_render_edit_mission_general_info(self, mock_st, mock_mission_active):
         """Test du rendu des informations générales en édition"""
-        from app.pages_modules.consultant_missions import _render_edit_mission_general_info
         from datetime import date
+
+        from app.pages_modules.consultant_missions import (
+            _render_edit_mission_general_info,
+        )
 
         client_options = {1: "Client A", 2: "Client B"}
 
@@ -533,13 +602,21 @@ class TestConsultantMissionsCoverage:
 
         result = _render_edit_mission_general_info(mock_mission_active, client_options)
 
-        assert result == ("Mission modifiée", 2, date(2024, 2, 1), False, date(2024, 7, 31))
+        assert result == (
+            "Mission modifiée",
+            2,
+            date(2024, 2, 1),
+            False,
+            date(2024, 7, 31),
+        )
         mock_st.markdown.assert_called_with("#### 📋 Informations générales")
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_render_edit_mission_remuneration(self, mock_st, mock_mission_active):
         """Test du rendu de la rémunération en édition"""
-        from app.pages_modules.consultant_missions import _render_edit_mission_remuneration
+        from app.pages_modules.consultant_missions import (
+            _render_edit_mission_remuneration,
+        )
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
@@ -550,7 +627,10 @@ class TestConsultantMissionsCoverage:
         mock_col2.__exit__ = Mock(return_value=None)
 
         mock_st.columns.return_value = (mock_col1, mock_col2)
-        mock_st.number_input.side_effect = [500, 7000]  # taux_journalier, salaire_mensuel
+        mock_st.number_input.side_effect = [
+            500,
+            7000,
+        ]  # taux_journalier, salaire_mensuel
 
         result = _render_edit_mission_remuneration(mock_mission_active)
 
@@ -560,7 +640,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_render_edit_mission_description(self, mock_st, mock_mission_active):
         """Test du rendu de la description en édition"""
-        from app.pages_modules.consultant_missions import _render_edit_mission_description
+        from app.pages_modules.consultant_missions import (
+            _render_edit_mission_description,
+        )
 
         mock_st.text_area.side_effect = ["Description modifiée", "Python, ML"]
 
@@ -572,8 +654,11 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_mission_chronology_completed(self, mock_st, mock_mission_active):
         """Test de l'affichage de la chronologie pour mission terminée"""
-        from app.pages_modules.consultant_missions import _display_mission_chronology
         from datetime import date
+
+        from app.pages_modules.consultant_missions import (
+            _display_mission_chronology,
+        )
 
         # Modifier la mission pour qu'elle soit terminée
         mock_mission_active.date_fin = date(2024, 6, 30)
@@ -585,13 +670,17 @@ class TestConsultantMissionsCoverage:
         mock_st.write.assert_any_call("**Date de début :** 01/01/2024")
         mock_st.write.assert_any_call("**Date de fin :** 30/06/2024")
         # Vérifier que la durée est calculée (environ 5 mois)
-        duration_calls = [call for call in mock_st.write.call_args_list if "Durée" in str(call)]
+        duration_calls = [
+            call for call in mock_st.write.call_args_list if "Durée" in str(call)
+        ]
         assert len(duration_calls) > 0
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_mission_chronology_ongoing(self, mock_st, mock_mission_active):
         """Test de l'affichage de la chronologie pour mission en cours"""
-        from app.pages_modules.consultant_missions import _display_mission_chronology
+        from app.pages_modules.consultant_missions import (
+            _display_mission_chronology,
+        )
 
         _display_mission_chronology(mock_mission_active)
 
@@ -602,7 +691,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_mission_financial_aspects(self, mock_st, mock_mission_active):
         """Test de l'affichage des aspects financiers"""
-        from app.pages_modules.consultant_missions import _display_mission_financial_aspects
+        from app.pages_modules.consultant_missions import (
+            _display_mission_financial_aspects,
+        )
 
         _display_mission_financial_aspects(mock_mission_active)
 
@@ -612,7 +703,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_mission_descriptions(self, mock_st, mock_mission_active):
         """Test de l'affichage des descriptions"""
-        from app.pages_modules.consultant_missions import _display_mission_descriptions
+        from app.pages_modules.consultant_missions import (
+            _display_mission_descriptions,
+        )
 
         _display_mission_descriptions(mock_mission_active)
 
@@ -622,7 +715,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_mission_client_info(self, mock_st, mock_mission_active):
         """Test de l'affichage des informations client"""
-        from app.pages_modules.consultant_missions import _display_mission_client_info
+        from app.pages_modules.consultant_missions import (
+            _display_mission_client_info,
+        )
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
@@ -642,7 +737,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_mission_full_details(self, mock_st, mock_mission_active):
         """Test de l'affichage des détails complets de mission"""
-        from app.pages_modules.consultant_missions import show_mission_full_details
+        from app.pages_modules.consultant_missions import (
+            show_mission_full_details,
+        )
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
@@ -663,7 +760,9 @@ class TestConsultantMissionsCoverage:
 
     def test_calculate_mission_statistics(self, mock_mission_active):
         """Test du calcul des statistiques de missions"""
-        from app.pages_modules.consultant_missions import _calculate_mission_statistics
+        from app.pages_modules.consultant_missions import (
+            _calculate_mission_statistics,
+        )
 
         missions = [mock_mission_active]
         client_counts, status_counts = _calculate_mission_statistics(missions)
@@ -674,7 +773,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_missions_by_client_and_status(self, mock_st):
         """Test de l'affichage de la répartition par client et statut"""
-        from app.pages_modules.consultant_missions import _display_missions_by_client_and_status
+        from app.pages_modules.consultant_missions import (
+            _display_missions_by_client_and_status,
+        )
 
         client_counts = {"Client A": 2, "Client B": 1}
         status_counts = {"En cours": 2, "Terminées": 1}
@@ -696,7 +797,9 @@ class TestConsultantMissionsCoverage:
 
     def test_group_missions_by_year(self, mock_mission_active):
         """Test du groupement des missions par année"""
-        from app.pages_modules.consultant_missions import _group_missions_by_year
+        from app.pages_modules.consultant_missions import (
+            _group_missions_by_year,
+        )
 
         missions = [mock_mission_active]
         result = _group_missions_by_year(missions)
@@ -706,8 +809,11 @@ class TestConsultantMissionsCoverage:
 
     def test_calculate_year_revenue(self, mock_mission_active):
         """Test du calcul des revenus par année"""
-        from app.pages_modules.consultant_missions import _calculate_year_revenue
         from datetime import date
+
+        from app.pages_modules.consultant_missions import (
+            _calculate_year_revenue,
+        )
 
         # Modifier la mission pour qu'elle soit terminée
         mock_mission_active.date_fin = date(2024, 6, 30)
@@ -721,7 +827,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_analyze_missions_by_year(self, mock_st, mock_mission_active):
         """Test de l'analyse temporelle des missions"""
-        from app.pages_modules.consultant_missions import _analyze_missions_by_year
+        from app.pages_modules.consultant_missions import (
+            _analyze_missions_by_year,
+        )
 
         missions = [mock_mission_active]
         _analyze_missions_by_year(missions)
@@ -732,7 +840,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_analysis_with_data(self, mock_st, mock_mission_active):
         """Test de l'analyse complète des missions avec données"""
-        from app.pages_modules.consultant_missions import show_missions_analysis
+        from app.pages_modules.consultant_missions import (
+            show_missions_analysis,
+        )
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
@@ -753,8 +863,11 @@ class TestConsultantMissionsCoverage:
 
     def test_calculate_mission_revenue_completed(self, mock_mission_active):
         """Test du calcul des revenus pour mission terminée"""
-        from app.pages_modules.consultant_missions import _calculate_mission_revenue
         from datetime import date
+
+        from app.pages_modules.consultant_missions import (
+            _calculate_mission_revenue,
+        )
 
         # Modifier la mission pour qu'elle soit terminée
         mock_mission_active.date_fin = date(2024, 6, 30)
@@ -766,7 +879,9 @@ class TestConsultantMissionsCoverage:
 
     def test_calculate_mission_revenue_ongoing(self, mock_mission_active):
         """Test du calcul des revenus pour mission en cours"""
-        from app.pages_modules.consultant_missions import _calculate_mission_revenue
+        from app.pages_modules.consultant_missions import (
+            _calculate_mission_revenue,
+        )
 
         revenue = _calculate_mission_revenue(mock_mission_active)
 
@@ -787,7 +902,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_revenue_statistics(self, mock_st, mock_mission_active):
         """Test de l'affichage des statistiques de revenus"""
-        from app.pages_modules.consultant_missions import _display_revenue_statistics
+        from app.pages_modules.consultant_missions import (
+            _display_revenue_statistics,
+        )
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
@@ -812,9 +929,13 @@ class TestConsultantMissionsCoverage:
 
     @patch("app.pages_modules.consultant_missions._build_revenue_data")
     @patch("app.pages_modules.consultant_missions.st")
-    def test_show_missions_revenues_with_data(self, mock_st, mock_build_revenue, mock_mission_active):
+    def test_show_missions_revenues_with_data(
+        self, mock_st, mock_build_revenue, mock_mission_active
+    ):
         """Test de l'affichage des revenus avec données"""
-        from app.pages_modules.consultant_missions import show_missions_revenues
+        from app.pages_modules.consultant_missions import (
+            show_missions_revenues,
+        )
 
         # Mock _build_revenue_data
         revenue_data = [
@@ -823,7 +944,7 @@ class TestConsultantMissionsCoverage:
                 "Client": "Test Client",
                 "Revenus": 10000,
                 "TJM": 450,
-                "Statut": "En cours"
+                "Statut": "En cours",
             }
         ]
         mock_build_revenue.return_value = (revenue_data, 10000)
@@ -852,7 +973,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_render_mission_general_info_no_clients(self, mock_st, mock_load_clients):
         """Test du rendu des informations générales sans clients"""
-        from app.pages_modules.consultant_missions import _render_mission_general_info
+        from app.pages_modules.consultant_missions import (
+            _render_mission_general_info,
+        )
 
         # Mock qui retourne un dictionnaire vide
         mock_load_clients.return_value = {}
@@ -860,12 +983,18 @@ class TestConsultantMissionsCoverage:
         result = _render_mission_general_info()
 
         assert result == (None, None, None, None, None)
-        mock_st.warning.assert_called_with("⚠️ Aucun client trouvé. Veuillez créer des clients d'abord.")
+        mock_st.warning.assert_called_with(
+            "⚠️ Aucun client trouvé. Veuillez créer des clients d'abord."
+        )
 
     @patch("app.pages_modules.consultant_missions.show_missions_revenues")
-    def test_show_missions_analysis_empty_list(self, mock_show_revenues, mock_mission_active):
+    def test_show_missions_analysis_empty_list(
+        self, mock_show_revenues, mock_mission_active
+    ):
         """Test de l'analyse des missions avec liste vide"""
-        from app.pages_modules.consultant_missions import show_missions_analysis
+        from app.pages_modules.consultant_missions import (
+            show_missions_analysis,
+        )
 
         with patch("app.pages_modules.consultant_missions.st") as mock_st:
             show_missions_analysis([])
@@ -875,17 +1004,23 @@ class TestConsultantMissionsCoverage:
 
     def test_show_missions_revenues_empty_list(self):
         """Test de l'affichage des revenus avec liste vide"""
-        from app.pages_modules.consultant_missions import show_missions_revenues
+        from app.pages_modules.consultant_missions import (
+            show_missions_revenues,
+        )
 
         with patch("app.pages_modules.consultant_missions.st") as mock_st:
             show_missions_revenues([])
 
             mock_st.markdown.assert_called_with("### 📈 Analyse des revenus")
-            mock_st.info.assert_called_with("ℹ️ Aucune mission pour analyser les revenus")
+            mock_st.info.assert_called_with(
+                "ℹ️ Aucune mission pour analyser les revenus"
+            )
 
     def test_show_missions_revenues_no_revenue_data(self):
         """Test de l'affichage des revenus sans données de revenus"""
-        from app.pages_modules.consultant_missions import show_missions_revenues
+        from app.pages_modules.consultant_missions import (
+            show_missions_revenues,
+        )
 
         # Mission sans taux journalier
         mission_no_tjm = Mock()
@@ -902,9 +1037,13 @@ class TestConsultantMissionsCoverage:
             mock_st.info.assert_called_with("ℹ️ Aucune donnée de revenus disponible")
 
     @patch("app.pages_modules.consultant_missions.st")
-    def test_display_mission_client_info_with_address_and_contact(self, mock_st, mock_mission_active):
+    def test_display_mission_client_info_with_address_and_contact(
+        self, mock_st, mock_mission_active
+    ):
         """Test de l'affichage des informations client avec adresse et contact"""
-        from app.pages_modules.consultant_missions import _display_mission_client_info
+        from app.pages_modules.consultant_missions import (
+            _display_mission_client_info,
+        )
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
@@ -929,7 +1068,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_mission_descriptions_with_data(self, mock_st, mock_mission_active):
         """Test de l'affichage des descriptions avec données"""
-        from app.pages_modules.consultant_missions import _display_mission_descriptions
+        from app.pages_modules.consultant_missions import (
+            _display_mission_descriptions,
+        )
 
         _display_mission_descriptions(mock_mission_active)
 
@@ -943,7 +1084,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_mission_descriptions_no_description(self, mock_st):
         """Test de l'affichage des descriptions sans description"""
-        from app.pages_modules.consultant_missions import _display_mission_descriptions
+        from app.pages_modules.consultant_missions import (
+            _display_mission_descriptions,
+        )
 
         mission = Mock()
         mission.description = None
@@ -958,7 +1101,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_display_mission_descriptions_no_competences(self, mock_st):
         """Test de l'affichage des descriptions sans compétences"""
-        from app.pages_modules.consultant_missions import _display_mission_descriptions
+        from app.pages_modules.consultant_missions import (
+            _display_mission_descriptions,
+        )
 
         mission = Mock()
         mission.description = "Description test"
@@ -973,21 +1118,33 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_edit_mission_form_exception_handling(self, mock_st):
         """Test de la gestion d'exception dans show_edit_mission_form"""
-        from app.pages_modules.consultant_missions import show_edit_mission_form
+        from app.pages_modules.consultant_missions import (
+            show_edit_mission_form,
+        )
 
         # Mock pour lever une exception
-        with patch("app.pages_modules.consultant_missions._load_mission_for_edit", side_effect=Exception("Test error")):
+        with patch(
+            "app.pages_modules.consultant_missions._load_mission_for_edit",
+            side_effect=Exception("Test error"),
+        ):
             show_edit_mission_form(1)
 
-            mock_st.error.assert_called_with("❌ Erreur lors du chargement du formulaire de modification: Test error")
+            mock_st.error.assert_called_with(
+                "❌ Erreur lors du chargement du formulaire de modification: Test error"
+            )
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_edit_mission_form_mission_not_found(self, mock_st):
         """Test de show_edit_mission_form quand la mission n'est pas trouvée"""
-        from app.pages_modules.consultant_missions import show_edit_mission_form
+        from app.pages_modules.consultant_missions import (
+            show_edit_mission_form,
+        )
 
         # Mock pour retourner None (mission non trouvée)
-        with patch("app.pages_modules.consultant_missions._load_mission_for_edit", return_value=(None, {})):
+        with patch(
+            "app.pages_modules.consultant_missions._load_mission_for_edit",
+            return_value=(None, {}),
+        ):
             show_edit_mission_form(999)
 
             mock_st.error.assert_called_with("❌ Mission introuvable")
@@ -995,18 +1152,24 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_consultant_missions_imports_failed(self, mock_st):
         """Test de show_consultant_missions quand les imports ont échoué"""
-        from app.pages_modules.consultant_missions import show_consultant_missions
+        from app.pages_modules.consultant_missions import (
+            show_consultant_missions,
+        )
 
         # Mock pour que imports_ok soit False
         with patch("app.pages_modules.consultant_missions.imports_ok", False):
             show_consultant_missions(Mock())
 
-            mock_st.error.assert_called_with("❌ Les services de base ne sont pas disponibles")
+            mock_st.error.assert_called_with(
+                "❌ Les services de base ne sont pas disponibles"
+            )
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_consultant_missions_no_consultant(self, mock_st):
         """Test de show_consultant_missions sans consultant"""
-        from app.pages_modules.consultant_missions import show_consultant_missions
+        from app.pages_modules.consultant_missions import (
+            show_consultant_missions,
+        )
 
         show_consultant_missions(None)
 
@@ -1015,13 +1178,17 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_consultant_missions_exception_handling(self, mock_st):
         """Test de la gestion d'exception dans show_consultant_missions"""
-        from app.pages_modules.consultant_missions import show_consultant_missions
+        from app.pages_modules.consultant_missions import (
+            show_consultant_missions,
+        )
 
         consultant = Mock()
         consultant.id = 1
 
         # Mock pour lever une exception lors de la récupération des missions
-        with patch("app.pages_modules.consultant_missions.get_database_session") as mock_get_session:
+        with patch(
+            "app.pages_modules.consultant_missions.get_database_session"
+        ) as mock_get_session:
             mock_session = Mock()
             mock_get_session.return_value.__enter__.return_value = mock_session
             mock_get_session.return_value.__exit__.return_value = None
@@ -1031,12 +1198,16 @@ class TestConsultantMissionsCoverage:
 
             show_consultant_missions(consultant)
 
-            mock_st.error.assert_called_with("❌ Erreur lors de l'affichage des missions: Database error")
+            mock_st.error.assert_called_with(
+                "❌ Erreur lors de l'affichage des missions: Database error"
+            )
             mock_st.code.assert_called_with("Database error")
 
     def test_display_mission_period_with_dates(self, mock_mission_active):
         """Test de l'affichage de la période avec dates"""
-        from app.pages_modules.consultant_missions import _display_mission_period
+        from app.pages_modules.consultant_missions import (
+            _display_mission_period,
+        )
 
         with patch("app.pages_modules.consultant_missions.st") as mock_st:
             _display_mission_period(mock_mission_active)
@@ -1046,7 +1217,9 @@ class TestConsultantMissionsCoverage:
 
     def test_display_mission_period_ongoing(self):
         """Test de l'affichage de la période pour mission en cours"""
-        from app.pages_modules.consultant_missions import _display_mission_period
+        from app.pages_modules.consultant_missions import (
+            _display_mission_period,
+        )
 
         mission = Mock()
         mission.date_debut = date(2024, 1, 1)
@@ -1062,7 +1235,9 @@ class TestConsultantMissionsCoverage:
 
     def test_display_mission_remuneration_with_tjm(self, mock_mission_active):
         """Test de l'affichage de la rémunération avec TJM"""
-        from app.pages_modules.consultant_missions import _display_mission_remuneration
+        from app.pages_modules.consultant_missions import (
+            _display_mission_remuneration,
+        )
 
         with patch("app.pages_modules.consultant_missions.st") as mock_st:
             _display_mission_remuneration(mock_mission_active)
@@ -1072,7 +1247,9 @@ class TestConsultantMissionsCoverage:
 
     def test_display_mission_remuneration_with_old_rate(self):
         """Test de l'affichage de la rémunération avec ancien taux"""
-        from app.pages_modules.consultant_missions import _display_mission_remuneration
+        from app.pages_modules.consultant_missions import (
+            _display_mission_remuneration,
+        )
 
         mission = Mock()
         mission.tjm = None
@@ -1093,13 +1270,19 @@ class TestConsultantMissionsCoverage:
             _display_mission_info(mock_mission_active)
 
             mock_st.markdown.assert_called_with("**📊 Informations**")
-            mock_st.write.assert_called_with("**Description :** Développement d'un système d'analyse de données...")
+            mock_st.write.assert_called_with(
+                "**Description :** Développement d'un système d'analyse de données..."
+            )
 
     @patch("app.pages_modules.consultant_missions.get_database_session")
     @patch("app.pages_modules.consultant_missions.joinedload", create=True)
-    def test_load_mission_for_edit_found(self, mock_joinedload, mock_get_session, mock_mission_active):
+    def test_load_mission_for_edit_found(
+        self, mock_joinedload, mock_get_session, mock_mission_active
+    ):
         """Test du chargement de mission existante pour édition"""
-        from app.pages_modules.consultant_missions import _load_mission_for_edit
+        from app.pages_modules.consultant_missions import (
+            _load_mission_for_edit,
+        )
 
         # Mock de la session DB
         mock_session = Mock()
@@ -1131,7 +1314,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.joinedload", create=True)
     def test_load_mission_for_edit_not_found(self, mock_joinedload, mock_get_session):
         """Test du chargement de mission inexistante pour édition"""
-        from app.pages_modules.consultant_missions import _load_mission_for_edit
+        from app.pages_modules.consultant_missions import (
+            _load_mission_for_edit,
+        )
 
         # Mock de la session DB
         mock_session = Mock()
@@ -1158,7 +1343,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_handle_mission_update_success(self, mock_st, mock_update, mock_validate):
         """Test de la gestion de mise à jour réussie"""
-        from app.pages_modules.consultant_missions import _handle_mission_update
+        from app.pages_modules.consultant_missions import (
+            _handle_mission_update,
+        )
 
         mock_validate.return_value = True
         mock_update.return_value = True
@@ -1174,11 +1361,15 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_handle_mission_deletion(self, mock_st):
         """Test de la gestion de suppression de mission"""
-        from app.pages_modules.consultant_missions import _handle_mission_deletion
+        from app.pages_modules.consultant_missions import (
+            _handle_mission_deletion,
+        )
 
         mock_st.checkbox.return_value = True
 
-        with patch("app.pages_modules.consultant_missions.delete_mission", return_value=True):
+        with patch(
+            "app.pages_modules.consultant_missions.delete_mission", return_value=True
+        ):
             _handle_mission_deletion(1)
 
         mock_st.warning.assert_called_with("⚠️ Cette action est irréversible !")
@@ -1186,7 +1377,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_handle_mission_cancellation(self, mock_st):
         """Test de l'annulation d'édition"""
-        from app.pages_modules.consultant_missions import _handle_mission_cancellation
+        from app.pages_modules.consultant_missions import (
+            _handle_mission_cancellation,
+        )
 
         _handle_mission_cancellation()
 
@@ -1196,7 +1389,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_handle_edit_mission_buttons(self, mock_st):
         """Test de la gestion des boutons du formulaire d'édition"""
-        from app.pages_modules.consultant_missions import _handle_edit_mission_buttons
+        from app.pages_modules.consultant_missions import (
+            _handle_edit_mission_buttons,
+        )
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
@@ -1214,17 +1409,24 @@ class TestConsultantMissionsCoverage:
 
         form_data = ("Titre", 1, date.today(), False, None, 450, 5000, "Desc", "Skills")
 
-        with patch("app.pages_modules.consultant_missions._handle_mission_update") as mock_handle:
+        with patch(
+            "app.pages_modules.consultant_missions._handle_mission_update"
+        ) as mock_handle:
             _handle_edit_mission_buttons(1, form_data)
 
             mock_handle.assert_called_once_with(1, form_data)
 
     def test_load_mission_for_edit_not_found(self):
         """Test du chargement de mission inexistante pour édition"""
-        from app.pages_modules.consultant_missions import _load_mission_for_edit
+        from app.pages_modules.consultant_missions import (
+            _load_mission_for_edit,
+        )
 
-        with patch("app.pages_modules.consultant_missions.get_database_session") as mock_get_session, \
-             patch("app.pages_modules.consultant_missions.joinedload"):
+        with patch(
+            "app.pages_modules.consultant_missions.get_database_session"
+        ) as mock_get_session, patch(
+            "app.pages_modules.consultant_missions.joinedload"
+        ):
             mock_session = Mock()
             mock_get_session.return_value.__enter__.return_value = mock_session
 
@@ -1242,7 +1444,9 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_revenues_no_data(self, mock_st):
         """Test de show_missions_revenues sans données"""
-        from app.pages_modules.consultant_missions import show_missions_revenues
+        from app.pages_modules.consultant_missions import (
+            show_missions_revenues,
+        )
 
         # Appeler avec une liste vide
         show_missions_revenues([])
@@ -1254,10 +1458,15 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_edit_mission_form_mission_not_found(self, mock_st):
         """Test de show_edit_mission_form quand la mission n'est pas trouvée"""
-        from app.pages_modules.consultant_missions import show_edit_mission_form
+        from app.pages_modules.consultant_missions import (
+            show_edit_mission_form,
+        )
 
         # Mock pour retourner None (mission non trouvée)
-        with patch("app.pages_modules.consultant_missions._load_mission_for_edit", return_value=(None, {})):
+        with patch(
+            "app.pages_modules.consultant_missions._load_mission_for_edit",
+            return_value=(None, {}),
+        ):
             show_edit_mission_form(999)
 
             mock_st.error.assert_called_with("❌ Mission introuvable")

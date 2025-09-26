@@ -1,9 +1,16 @@
 """Tests pour le module main.py - Interface principale de l'application"""
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from app.main import load_module_safe, show_navigation, main, show_fallback_home
+
+from app.main import load_module_safe
+from app.main import main
+from app.main import show_fallback_home
+from app.main import show_navigation
 from tests.fixtures.base_test import BaseUITest
 
 

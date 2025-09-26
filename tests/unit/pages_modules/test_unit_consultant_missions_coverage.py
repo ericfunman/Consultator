@@ -5,8 +5,10 @@ Tests ciblés pour améliorer la couverture de la gestion des missions
 
 import os
 import sys
-from datetime import datetime, date
-from unittest.mock import MagicMock, patch
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 import streamlit as st

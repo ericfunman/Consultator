@@ -3,12 +3,18 @@ Tests pour le service BusinessManagerService
 Couverture des fonctionnalités CRUD et recherche
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
+
+from app.database.models import BusinessManager
+from app.database.models import ConsultantBusinessManager
 from app.services.business_manager_service import BusinessManagerService
-from app.database.models import BusinessManager, ConsultantBusinessManager
-from tests.fixtures.base_test import BaseServiceTest, TestDataFactory
+from tests.fixtures.base_test import BaseServiceTest
+from tests.fixtures.base_test import TestDataFactory
 
 
 class TestBusinessManagerService(BaseServiceTest):

@@ -3,8 +3,11 @@ Tests de couverture ciblés pour consultants.py
 Approche simple et efficace pour maximiser la couverture
 """
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 
 
 class TestConsultantsImports:
@@ -252,12 +255,10 @@ class TestConsultantsBasicFunctions:
 
     def test_utility_functions_basic(self):
         """Test basique des fonctions utilitaires"""
-        from app.pages_modules.consultants import (
-            _save_consultant_competence,
-            _save_consultant_language,
-            _delete_consultant_competence,
-            _delete_consultant_language,
-        )
+        from app.pages_modules.consultants import _delete_consultant_competence
+        from app.pages_modules.consultants import _delete_consultant_language
+        from app.pages_modules.consultants import _save_consultant_competence
+        from app.pages_modules.consultants import _save_consultant_language
 
         # Ces fonctions existent et sont importables
         assert callable(_save_consultant_competence)

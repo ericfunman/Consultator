@@ -1,14 +1,22 @@
 """Tests d'intégration pour le workflow mission complet"""
 
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from datetime import datetime, date, timedelta
+
+from app.database.database import get_database_session
+from app.database.models import Consultant
+from app.database.models import Mission
+from app.database.models import Practice
 
 # Import des services principaux
 from app.services.consultant_service import ConsultantService
-from app.database.database import get_database_session
-from app.database.models import Consultant, Practice, Mission
 
 
 # Fixtures pour les tests de mission
@@ -32,8 +40,9 @@ def sample_mission_data():
 def sample_consultant_for_mission():
     """Créer un consultant de test pour les missions"""
     import uuid
+
     unique_id = str(uuid.uuid4())[:8]
-    
+
     data = {
         "prenom": "Marie",
         "nom": f"Leroy_{unique_id}",

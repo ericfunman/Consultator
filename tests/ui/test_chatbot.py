@@ -1,6 +1,11 @@
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from app.pages_modules.chatbot import show_data_insights, show_sidebar, show
+
+from app.pages_modules.chatbot import show
+from app.pages_modules.chatbot import show_data_insights
+from app.pages_modules.chatbot import show_sidebar
 from tests.fixtures.base_test import BaseUITest
 
 

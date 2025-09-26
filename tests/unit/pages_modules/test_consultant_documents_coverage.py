@@ -1,51 +1,53 @@
 """
 Tests complets pour consultant_documents.py - Amélioration de la couverture
 """
+
 import json
 import os
 import tempfile
 from datetime import datetime
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock
+from unittest.mock import mock_open
+from unittest.mock import patch
+
 import pytest
 
-from app.pages_modules.consultant_documents import (
-    show_consultant_documents,
-    show_document_details,
-    show_documents_statistics,
-    show_upload_document_form,
-    upload_document,
-    analyze_consultant_cv,
-    perform_cv_analysis,
-    show_full_cv_analysis,
-    show_documents_report,
-    download_document,
-    reanalyze_document,
-    rename_document,
-    delete_document,
-    show_rename_document_form,
-    generate_cv_report,
-)
+from app.pages_modules.consultant_documents import analyze_consultant_cv
+from app.pages_modules.consultant_documents import delete_document
+from app.pages_modules.consultant_documents import download_document
+from app.pages_modules.consultant_documents import generate_cv_report
+from app.pages_modules.consultant_documents import perform_cv_analysis
+from app.pages_modules.consultant_documents import reanalyze_document
+from app.pages_modules.consultant_documents import rename_document
+from app.pages_modules.consultant_documents import show_consultant_documents
+from app.pages_modules.consultant_documents import show_document_details
+from app.pages_modules.consultant_documents import show_documents_report
+from app.pages_modules.consultant_documents import show_documents_statistics
+from app.pages_modules.consultant_documents import show_full_cv_analysis
+from app.pages_modules.consultant_documents import show_rename_document_form
+from app.pages_modules.consultant_documents import show_upload_document_form
+from app.pages_modules.consultant_documents import upload_document
 
 
 class TestConsultantDocumentsCoverage:
     """Tests complets pou        mock_st.columns.assert_called_with(2)
-        assert mock_st.button.call_count == 2
+            assert mock_st.button.call_count == 2
 
 
-if __name__ == "__main__":
-    import unittest
-    unittest.main()rer la couverture de consultant_documents.py"""
+    if __name__ == "__main__":
+        import unittest
+        unittest.main()rer la couverture de consultant_documents.py"""
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_show_documents_statistics_no_documents(self, mock_session, mock_st):
         """Test des statistiques sans documents"""
         show_documents_statistics([])
         # Ne devrait rien afficher de spécial
         mock_st.markdown.assert_not_called()
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_show_documents_statistics_with_documents(self, mock_session, mock_st):
         """Test des statistiques avec documents"""
         # Créer des mocks de documents
@@ -70,8 +72,8 @@ if __name__ == "__main__":
         mock_st.metric.assert_any_call("Analysés CV", 1)
         mock_st.metric.assert_any_call("Taille totale", "1.4 MB")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_show_upload_document_form_display(self, mock_session, mock_st):
         """Test de l'affichage du formulaire d'upload"""
         mock_st.form.return_value.__enter__ = MagicMock()
@@ -83,17 +85,22 @@ if __name__ == "__main__":
         mock_st.markdown.assert_any_call("### 📤 Uploader un document")
         mock_st.markdown.assert_any_call("#### 📄 Informations du document")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.upload_document')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
-    def test_show_upload_document_form_submit_success(self, mock_session, mock_upload, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.upload_document")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
+    def test_show_upload_document_form_submit_success(
+        self, mock_session, mock_upload, mock_st
+    ):
         """Test de soumission réussie du formulaire d'upload"""
         mock_upload.return_value = True
 
         # Mock form submission
         mock_st.form.return_value.__enter__ = MagicMock()
         mock_st.form.return_value.__exit__ = MagicMock()
-        mock_st.form_submit_button.side_effect = [True, False]  # submitted=True, cancel=False
+        mock_st.form_submit_button.side_effect = [
+            True,
+            False,
+        ]  # submitted=True, cancel=False
         mock_st.file_uploader.return_value = MagicMock()
         mock_st.selectbox.return_value = "CV"
         mock_st.text_area.return_value = "Test description"
@@ -104,15 +111,20 @@ if __name__ == "__main__":
         mock_upload.assert_called_once()
         mock_st.success.assert_called_with("✅ Document uploadé avec succès !")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.upload_document')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
-    def test_show_upload_document_form_submit_no_file(self, mock_session, mock_upload, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.upload_document")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
+    def test_show_upload_document_form_submit_no_file(
+        self, mock_session, mock_upload, mock_st
+    ):
         """Test de soumission sans fichier"""
         # Mock form submission
         mock_st.form.return_value.__enter__ = MagicMock()
         mock_st.form.return_value.__exit__ = MagicMock()
-        mock_st.form_submit_button.side_effect = [True, False]  # submitted=True, cancel=False
+        mock_st.form_submit_button.side_effect = [
+            True,
+            False,
+        ]  # submitted=True, cancel=False
         mock_st.file_uploader.return_value = None  # No file
         mock_st.columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
 
@@ -121,11 +133,13 @@ if __name__ == "__main__":
         mock_st.error.assert_called_with("❌ Veuillez sélectionner un fichier")
         mock_upload.assert_not_called()
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.os.makedirs')
-    @patch('app.pages_modules.consultant_documents.DocumentAnalyzer')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
-    def test_upload_document_success(self, mock_session, mock_analyzer, mock_makedirs, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.os.makedirs")
+    @patch("app.pages_modules.consultant_documents.DocumentAnalyzer")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
+    def test_upload_document_success(
+        self, mock_session, mock_analyzer, mock_makedirs, mock_st
+    ):
         """Test d'upload de document réussi"""
         # Mock file
         mock_file = MagicMock()
@@ -141,21 +155,17 @@ if __name__ == "__main__":
         mock_session_instance = MagicMock()
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
-        data = {
-            "file": mock_file,
-            "type_document": "CV",
-            "description": "Test CV"
-        }
+        data = {"file": mock_file, "type_document": "CV", "description": "Test CV"}
 
-        with patch('builtins.open', mock_open()):
+        with patch("builtins.open", mock_open()):
             result = upload_document(1, data)
 
         assert result is True
         mock_session_instance.add.assert_called_once()
         mock_session_instance.commit.assert_called_once()
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_upload_document_error(self, mock_session, mock_st):
         """Test d'upload avec erreur"""
         # Mock session to raise exception
@@ -169,8 +179,8 @@ if __name__ == "__main__":
         assert result is False
         mock_st.error.assert_called_with("❌ Erreur lors de l'upload: DB Error")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_analyze_consultant_cv_no_cv_found(self, mock_session, mock_st):
         """Test d'analyse CV quand aucun CV n'est trouvé"""
         # Mock session
@@ -190,10 +200,12 @@ if __name__ == "__main__":
 
         mock_st.warning.assert_called_with("⚠️ Aucun CV trouvé pour ce consultant")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.is_grok_available')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
-    def test_analyze_consultant_cv_with_cv_no_grok(self, mock_session, mock_is_grok, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.is_grok_available")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
+    def test_analyze_consultant_cv_with_cv_no_grok(
+        self, mock_session, mock_is_grok, mock_st
+    ):
         """Test d'analyse CV avec CV trouvé mais pas de Grok"""
         mock_is_grok.return_value = False
 
@@ -221,14 +233,16 @@ if __name__ == "__main__":
             "Choisissez la méthode d'analyse :",
             options=["🔍 Analyse classique"],
             index=0,
-            help="OpenAI GPT-4 offre une analyse plus précise et détaillée"
+            help="OpenAI GPT-4 offre une analyse plus précise et détaillée",
         )
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.perform_cv_analysis')
-    @patch('app.pages_modules.consultant_documents.is_grok_available')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
-    def test_analyze_consultant_cv_start_analysis(self, mock_session, mock_is_grok, mock_perform, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.perform_cv_analysis")
+    @patch("app.pages_modules.consultant_documents.is_grok_available")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
+    def test_analyze_consultant_cv_start_analysis(
+        self, mock_session, mock_is_grok, mock_perform, mock_st
+    ):
         """Test du démarrage de l'analyse CV"""
         mock_is_grok.return_value = True
         mock_perform.return_value = True
@@ -258,14 +272,16 @@ if __name__ == "__main__":
         mock_perform.assert_called_once()
         mock_st.success.assert_called_with("✅ Analyse terminée avec succès !")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.DocumentAnalyzer')
-    @patch('app.pages_modules.consultant_documents.get_grok_service')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
-    def test_perform_cv_analysis_grok_method(self, mock_session, mock_grok, mock_analyzer, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.DocumentAnalyzer")
+    @patch("app.pages_modules.consultant_documents.get_grok_service")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
+    def test_perform_cv_analysis_grok_method(
+        self, mock_session, mock_grok, mock_analyzer, mock_st
+    ):
         """Test d'analyse CV avec méthode Grok"""
         # Mock file existence
-        with patch('os.path.exists', return_value=True):
+        with patch("os.path.exists", return_value=True):
             # Mock text extraction
             mock_analyzer.extract_text_from_file.return_value = "test cv content"
 
@@ -287,19 +303,23 @@ if __name__ == "__main__":
             mock_session_instance = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_session_instance
 
-            result = perform_cv_analysis(mock_cv_doc, mock_consultant, "🤖 IA avec GPT-4")
+            result = perform_cv_analysis(
+                mock_cv_doc, mock_consultant, "🤖 IA avec GPT-4"
+            )
 
             assert result is True
             mock_grok_service.analyze_cv.assert_called_once_with("test cv content")
             mock_session_instance.commit.assert_called_once()
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.DocumentAnalyzer')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
-    def test_perform_cv_analysis_classic_method(self, mock_session, mock_analyzer, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.DocumentAnalyzer")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
+    def test_perform_cv_analysis_classic_method(
+        self, mock_session, mock_analyzer, mock_st
+    ):
         """Test d'analyse CV avec méthode classique"""
         # Mock file existence
-        with patch('os.path.exists', return_value=True):
+        with patch("os.path.exists", return_value=True):
             # Mock text extraction
             mock_analyzer.extract_text_from_file.return_value = "test cv content"
             mock_analyzer.analyze_cv_content.return_value = {"test": "classic_analysis"}
@@ -316,16 +336,20 @@ if __name__ == "__main__":
             mock_session_instance = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_session_instance
 
-            result = perform_cv_analysis(mock_cv_doc, mock_consultant, "🔍 Analyse classique")
+            result = perform_cv_analysis(
+                mock_cv_doc, mock_consultant, "🔍 Analyse classique"
+            )
 
             assert result is True
-            mock_analyzer.analyze_cv_content.assert_called_once_with("test cv content", "Jean Dupont")
+            mock_analyzer.analyze_cv_content.assert_called_once_with(
+                "test cv content", "Jean Dupont"
+            )
             mock_session_instance.commit.assert_called_once()
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_perform_cv_analysis_file_not_found(self, mock_st):
         """Test d'analyse CV quand le fichier n'existe pas"""
-        with patch('os.path.exists', return_value=False):
+        with patch("os.path.exists", return_value=False):
             mock_cv_doc = MagicMock()
             mock_cv_doc.chemin_fichier = "/path/to/missing.pdf"
 
@@ -334,20 +358,27 @@ if __name__ == "__main__":
             assert result is False
             mock_st.error.assert_called_with("❌ Fichier CV introuvable")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents._display_cv_resume')
-    @patch('app.pages_modules.consultant_documents._display_cv_missions')
-    @patch('app.pages_modules.consultant_documents._display_cv_competences')
-    @patch('app.pages_modules.consultant_documents._display_cv_contact')
-    @patch('app.pages_modules.consultant_documents._display_cv_actions')
-    def test_show_full_cv_analysis_complete(self, mock_actions, mock_contact, mock_competences,
-                                          mock_missions, mock_resume, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents._display_cv_resume")
+    @patch("app.pages_modules.consultant_documents._display_cv_missions")
+    @patch("app.pages_modules.consultant_documents._display_cv_competences")
+    @patch("app.pages_modules.consultant_documents._display_cv_contact")
+    @patch("app.pages_modules.consultant_documents._display_cv_actions")
+    def test_show_full_cv_analysis_complete(
+        self,
+        mock_actions,
+        mock_contact,
+        mock_competences,
+        mock_missions,
+        mock_resume,
+        mock_st,
+    ):
         """Test d'affichage complet de l'analyse CV"""
         analysis = {
             "resume": "Test resume",
             "missions": [{"titre": "Test mission"}],
             "competences": ["Python", "SQL"],
-            "contact": {"email": "test@test.com"}
+            "contact": {"email": "test@test.com"},
         }
 
         mock_consultant = MagicMock()
@@ -363,15 +394,15 @@ if __name__ == "__main__":
         mock_contact.assert_called_once_with(analysis)
         mock_actions.assert_called_once_with(analysis, mock_consultant)
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_show_documents_report_no_documents(self, mock_st):
         """Test du rapport de documents sans documents"""
         show_documents_report([])
 
         mock_st.info.assert_called_with("ℹ️ Aucun document à analyser")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('pandas.DataFrame')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("pandas.DataFrame")
     def test_show_documents_report_with_documents(self, mock_df, mock_st):
         """Test du rapport de documents avec documents"""
         # Mock documents
@@ -396,9 +427,9 @@ if __name__ == "__main__":
         mock_st.markdown.assert_any_call("### 📊 Rapport des documents")
         mock_st.dataframe.assert_called_once()
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('builtins.open', new_callable=mock_open, read_data=b"test content")
-    @patch('os.path.exists')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("builtins.open", new_callable=mock_open, read_data=b"test content")
+    @patch("os.path.exists")
     def test_download_document_success(self, mock_exists, mock_file, mock_st):
         """Test de téléchargement de document réussi"""
         mock_exists.return_value = True
@@ -412,8 +443,8 @@ if __name__ == "__main__":
 
         mock_st.download_button.assert_called_once()
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('os.path.exists')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("os.path.exists")
     def test_download_document_file_not_found(self, mock_exists, mock_st):
         """Test de téléchargement quand le fichier n'existe pas"""
         mock_exists.return_value = False
@@ -425,9 +456,9 @@ if __name__ == "__main__":
 
         mock_st.error.assert_called_with("❌ Fichier introuvable sur le serveur")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.DocumentAnalyzer')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.DocumentAnalyzer")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_reanalyze_document_success(self, mock_session, mock_analyzer, mock_st):
         """Test de réanalyse de document réussie"""
         # Mock analyzer
@@ -449,14 +480,14 @@ if __name__ == "__main__":
 
         mock_consultant = MagicMock()
 
-        with patch('os.path.exists', return_value=True):
+        with patch("os.path.exists", return_value=True):
             result = reanalyze_document(1, mock_consultant)
 
         assert result is True
         mock_st.success.assert_called_with("✅ Document réanalysé avec succès !")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_reanalyze_document_not_found(self, mock_session, mock_st):
         """Test de réanalyse de document non trouvé"""
         # Mock session - document not found
@@ -473,8 +504,8 @@ if __name__ == "__main__":
         assert result is False
         mock_st.error.assert_called_with("❌ Document introuvable")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_rename_document_success(self, mock_session, mock_st):
         """Test de renommage de document réussi"""
         # Mock document
@@ -498,11 +529,13 @@ if __name__ == "__main__":
         assert mock_document.description == "New description"
         mock_session_instance.commit.assert_called_once()
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('os.remove')
-    @patch('os.path.exists')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
-    def test_delete_document_success(self, mock_session, mock_exists, mock_remove, mock_st):
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("os.remove")
+    @patch("os.path.exists")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
+    def test_delete_document_success(
+        self, mock_session, mock_exists, mock_remove, mock_st
+    ):
         """Test de suppression de document réussie"""
         mock_exists.return_value = True
 
@@ -527,9 +560,9 @@ if __name__ == "__main__":
         mock_session_instance.commit.assert_called_once()
         mock_st.info.assert_called_with("✅ Document supprimé")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents._load_document_for_rename')
-    @patch('app.pages_modules.consultant_documents.get_database_session')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents._load_document_for_rename")
+    @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_show_rename_document_form_display(self, mock_session, mock_load, mock_st):
         """Test d'affichage du formulaire de renommage"""
         # Mock document
@@ -547,13 +580,20 @@ if __name__ == "__main__":
 
         mock_st.markdown.assert_any_call("### ✏️ Renommer un document")
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_generate_cv_report_success(self, mock_st):
         """Test de génération de rapport CV réussi"""
         analysis = {
             "resume": "Test resume",
-            "missions": [{"titre": "Mission 1", "client": "Client A", "periode": "2023", "description": "Test"}],
-            "competences": ["Python", "SQL"]
+            "missions": [
+                {
+                    "titre": "Mission 1",
+                    "client": "Client A",
+                    "periode": "2023",
+                    "description": "Test",
+                }
+            ],
+            "competences": ["Python", "SQL"],
         }
 
         mock_consultant = MagicMock()
@@ -567,10 +607,12 @@ if __name__ == "__main__":
 
     # Tests pour les fonctions helper de show_document_details
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_display_document_basic_info(self, mock_st):
         """Test d'affichage des informations de base du document"""
-        from app.pages_modules.consultant_documents import _display_document_basic_info
+        from app.pages_modules.consultant_documents import (
+            _display_document_basic_info,
+        )
 
         mock_document = MagicMock()
         mock_document.nom_fichier = "test.pdf"
@@ -585,10 +627,12 @@ if __name__ == "__main__":
         mock_st.write.assert_any_call("**Type :** CV")
         mock_st.write.assert_any_call("**Upload :** 01/01/2023 12:00")
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_display_document_metadata(self, mock_st):
         """Test d'affichage des métadonnées du document"""
-        from app.pages_modules.consultant_documents import _display_document_metadata
+        from app.pages_modules.consultant_documents import (
+            _display_document_metadata,
+        )
 
         mock_document = MagicMock()
         mock_document.mimetype = "application/pdf"
@@ -600,15 +644,19 @@ if __name__ == "__main__":
         mock_st.markdown.assert_called_with("**📊 Métadonnées**")
         mock_st.write.assert_any_call("**Analyse CV :** ✅ Disponible")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.show_full_cv_analysis')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.show_full_cv_analysis")
     def test_display_cv_analysis_summary_with_analysis(self, mock_show_full, mock_st):
         """Test d'affichage du résumé d'analyse CV quand disponible"""
-        from app.pages_modules.consultant_documents import _display_cv_analysis_summary
+        from app.pages_modules.consultant_documents import (
+            _display_cv_analysis_summary,
+        )
 
         mock_document = MagicMock()
         mock_document.id = 1
-        mock_document.analyse_cv = '{"missions": [{"titre": "Mission 1"}], "competences": ["Python", "SQL"]}'
+        mock_document.analyse_cv = (
+            '{"missions": [{"titre": "Mission 1"}], "competences": ["Python", "SQL"]}'
+        )
 
         mock_consultant = MagicMock()
 
@@ -622,10 +670,12 @@ if __name__ == "__main__":
         mock_st.write.assert_any_call("**Compétences détectées :** 2")
         mock_show_full.assert_called_once()
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_display_cv_analysis_summary_no_analysis(self, mock_st):
         """Test d'affichage du résumé d'analyse CV quand non disponible"""
-        from app.pages_modules.consultant_documents import _display_cv_analysis_summary
+        from app.pages_modules.consultant_documents import (
+            _display_cv_analysis_summary,
+        )
 
         mock_document = MagicMock()
         mock_document.analyse_cv = None
@@ -635,12 +685,14 @@ if __name__ == "__main__":
         # Should not display anything
         mock_st.markdown.assert_not_called()
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.download_document')
-    @patch('app.pages_modules.consultant_documents.reanalyze_document')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.download_document")
+    @patch("app.pages_modules.consultant_documents.reanalyze_document")
     def test_display_document_actions(self, mock_reanalyze, mock_download, mock_st):
         """Test d'affichage des actions sur le document"""
-        from app.pages_modules.consultant_documents import _display_document_actions
+        from app.pages_modules.consultant_documents import (
+            _display_document_actions,
+        )
 
         mock_document = MagicMock()
         mock_document.id = 1
@@ -648,7 +700,12 @@ if __name__ == "__main__":
         mock_consultant = MagicMock()
 
         # Mock columns and buttons
-        mock_col1, mock_col2, mock_col3, mock_col4 = MagicMock(), MagicMock(), MagicMock(), MagicMock()
+        mock_col1, mock_col2, mock_col3, mock_col4 = (
+            MagicMock(),
+            MagicMock(),
+            MagicMock(),
+            MagicMock(),
+        )
         mock_st.columns.return_value = [mock_col1, mock_col2, mock_col3, mock_col4]
         mock_st.button.return_value = False  # No button clicked
 
@@ -659,8 +716,8 @@ if __name__ == "__main__":
         # Should have 4 button calls
         assert mock_st.button.call_count == 4
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.show_rename_document_form')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.show_rename_document_form")
     def test_handle_rename_form_active(self, mock_show_form, mock_st):
         """Test de gestion du formulaire de renommage quand activé"""
         from app.pages_modules.consultant_documents import _handle_rename_form
@@ -669,12 +726,15 @@ if __name__ == "__main__":
         mock_document.id = 1
 
         # Mock session state to have rename active
-        with patch('app.pages_modules.consultant_documents.st.session_state', {'rename_document': 1}):
+        with patch(
+            "app.pages_modules.consultant_documents.st.session_state",
+            {"rename_document": 1},
+        ):
             _handle_rename_form(mock_document)
 
         mock_show_form.assert_called_once_with(1)
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_handle_rename_form_inactive(self, mock_st):
         """Test de gestion du formulaire de renommage quand inactif"""
         from app.pages_modules.consultant_documents import _handle_rename_form
@@ -683,7 +743,7 @@ if __name__ == "__main__":
         mock_document.id = 1
 
         # Mock session state without rename
-        with patch('app.pages_modules.consultant_documents.st.session_state', {}):
+        with patch("app.pages_modules.consultant_documents.st.session_state", {}):
             _handle_rename_form(mock_document)
 
         # Should not show form
@@ -691,7 +751,7 @@ if __name__ == "__main__":
 
     # Tests pour les fonctions d'affichage d'analyse CV
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_display_cv_resume(self, mock_st):
         """Test d'affichage du résumé CV"""
         from app.pages_modules.consultant_documents import _display_cv_resume
@@ -703,14 +763,19 @@ if __name__ == "__main__":
         mock_st.markdown.assert_called_with("#### 📋 Résumé")
         mock_st.write.assert_called_with("This is a test resume")
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_display_cv_missions(self, mock_st):
         """Test d'affichage des missions CV"""
         from app.pages_modules.consultant_documents import _display_cv_missions
 
         analysis = {
             "missions": [
-                {"titre": "Developer", "client": "Company A", "periode": "2020-2023", "description": "Dev work"}
+                {
+                    "titre": "Developer",
+                    "client": "Company A",
+                    "periode": "2020-2023",
+                    "description": "Dev work",
+                }
             ]
         }
 
@@ -719,10 +784,12 @@ if __name__ == "__main__":
         mock_st.markdown.assert_called_with("#### 🚀 Missions détectées")
         mock_st.expander.assert_called_once()
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_display_cv_competences(self, mock_st):
         """Test d'affichage des compétences CV"""
-        from app.pages_modules.consultant_documents import _display_cv_competences
+        from app.pages_modules.consultant_documents import (
+            _display_cv_competences,
+        )
 
         analysis = {"competences": ["Python", "SQL", "JavaScript"]}
 
@@ -733,17 +800,12 @@ if __name__ == "__main__":
         mock_st.write.assert_any_call("• SQL")
         mock_st.write.assert_any_call("• JavaScript")
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_display_cv_contact(self, mock_st):
         """Test d'affichage des informations de contact CV"""
         from app.pages_modules.consultant_documents import _display_cv_contact
 
-        analysis = {
-            "contact": {
-                "email": "test@test.com",
-                "telephone": "0123456789"
-            }
-        }
+        analysis = {"contact": {"email": "test@test.com", "telephone": "0123456789"}}
 
         _display_cv_contact(analysis)
 
@@ -751,8 +813,8 @@ if __name__ == "__main__":
         mock_st.write.assert_any_call("**Email :** test@test.com")
         mock_st.write.assert_any_call("**Téléphone :** 0123456789")
 
-    @patch('app.pages_modules.consultant_documents.st')
-    @patch('app.pages_modules.consultant_documents.generate_cv_report')
+    @patch("app.pages_modules.consultant_documents.st")
+    @patch("app.pages_modules.consultant_documents.generate_cv_report")
     def test_display_cv_actions(self, mock_generate, mock_st):
         """Test d'affichage des actions sur l'analyse CV"""
         from app.pages_modules.consultant_documents import _display_cv_actions

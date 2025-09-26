@@ -3,10 +3,11 @@ Tests de performance pour Consultator
 Utilise pytest-benchmark pour mesurer les performances
 """
 
-import pytest
-import sys
 import os
+import sys
 import time
+
+import pytest
 
 # Ajouter le chemin du projet
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

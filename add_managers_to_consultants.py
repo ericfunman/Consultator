@@ -12,7 +12,9 @@ from datetime import date
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "app"))
 
 from app.database.database import get_database_session
-from app.database.models import Consultant, BusinessManager, ConsultantBusinessManager
+from app.database.models import BusinessManager
+from app.database.models import Consultant
+from app.database.models import ConsultantBusinessManager
 
 
 def assign_managers_to_consultants():

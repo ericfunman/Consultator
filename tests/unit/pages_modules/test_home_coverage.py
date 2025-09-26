@@ -3,8 +3,10 @@ Tests pour améliorer la couverture de home.py
 Objectif: Passer de 44% à 80%+ de couverture
 """
 
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 
 from app.pages_modules.home import show
 
@@ -37,7 +39,9 @@ class TestHomeCoverage:
         mock_st.button.return_value = True
 
         # Mock init_database function
-        with patch("database.database.init_database", return_value=True) as mock_init_db:
+        with patch(
+            "database.database.init_database", return_value=True
+        ) as mock_init_db:
             mock_init_db.return_value = True
 
             # Execute
@@ -59,7 +63,9 @@ class TestHomeCoverage:
         mock_st.button.return_value = True
 
         # Mock init_database function to fail
-        with patch("database.database.init_database", return_value=False) as mock_init_db:
+        with patch(
+            "database.database.init_database", return_value=False
+        ) as mock_init_db:
             mock_init_db.return_value = False
 
             # Execute
@@ -155,12 +161,11 @@ class TestHomeCoverage:
         # Mock columns to return appropriate number of columns
         def mock_columns(n):
             return [MagicMock() for _ in range(n)]
+
         mock_st.columns.side_effect = mock_columns
 
         # Mock services and charts - removed since services are not used in home.py
-        with patch(
-            "app.pages_modules.home.pd"
-        ) as mock_pd, patch(
+        with patch("app.pages_modules.home.pd") as mock_pd, patch(
             "app.pages_modules.home.px"
         ) as mock_px:
 
@@ -218,6 +223,7 @@ class TestHomeCoverage:
         # Mock columns to return appropriate number of columns
         def mock_columns(n):
             return [MagicMock() for _ in range(n)]
+
         mock_st.columns.side_effect = mock_columns
 
         # Mock services with large data - removed since services are not used

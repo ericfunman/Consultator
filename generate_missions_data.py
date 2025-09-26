@@ -4,10 +4,12 @@ Crée des missions réalistes avec des clients, dates, et rémunérations
 """
 
 import os
-import sys
 import random
-from datetime import timedelta, date
-from typing import List, Dict
+import sys
+from datetime import date
+from datetime import timedelta
+from typing import Dict
+from typing import List
 
 # Ajouter le chemin de l'application
 current_dir = os.path.dirname(__file__)
@@ -16,8 +18,10 @@ if app_dir not in sys.path:
     sys.path.insert(0, app_dir)
 
 try:
-    from database.database import get_database_session, init_database
-    from database.models import Consultant, Mission
+    from database.database import get_database_session
+    from database.database import init_database
+    from database.models import Consultant
+    from database.models import Mission
 
     print("✅ Imports réussis")
 except ImportError as e:

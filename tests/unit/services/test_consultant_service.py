@@ -1,11 +1,18 @@
 """Tests pour ConsultantService - Version corrigée avec vraies méthodes"""
 
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, date
+
+from app.database.models import Consultant
+from app.database.models import Practice
 from app.services.consultant_service import ConsultantService
-from app.database.models import Consultant, Practice
-from tests.fixtures.base_test import BaseServiceTest, TestDataFactory
+from tests.fixtures.base_test import BaseServiceTest
+from tests.fixtures.base_test import TestDataFactory
 
 
 class TestConsultantService(BaseServiceTest):

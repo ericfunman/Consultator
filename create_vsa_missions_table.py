@@ -5,7 +5,18 @@ Ajoute la table vsa_missions à la base de données existante
 
 import os
 import sys
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, Float, Text, DateTime, Index
+
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import DateTime
+from sqlalchemy import Float
+from sqlalchemy import Index
+from sqlalchemy import Integer
+from sqlalchemy import MetaData
+from sqlalchemy import String
+from sqlalchemy import Table
+from sqlalchemy import Text
+from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
 # Ajouter les chemins nécessaires
@@ -15,6 +26,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 from app.database.database import DATABASE_URL
+
 
 def create_vsa_missions_table():
     """Crée la table vsa_missions dans la base de données"""
@@ -28,10 +40,14 @@ def create_vsa_missions_table():
     try:
         with engine.connect() as conn:
             # Vérifier si la table existe déjà
-            result = conn.execute(text("""
+            result = conn.execute(
+                text(
+                    """
                 SELECT name FROM sqlite_master
                 WHERE type='table' AND name='vsa_missions'
-            """))
+            """
+                )
+            )
 
             if result.fetchone():
                 print("✅ La table vsa_missions existe déjà")
@@ -78,6 +94,7 @@ def create_vsa_missions_table():
     except Exception as e:
         print(f"❌ Erreur lors de la création de la table: {e}")
         raise
+
 
 if __name__ == "__main__":
     create_vsa_missions_table()

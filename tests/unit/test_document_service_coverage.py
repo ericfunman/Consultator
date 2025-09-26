@@ -6,12 +6,20 @@ Tests des fonctionnalités de gestion des documents et d'extraction de texte
 import os
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, mock_open, MagicMock, PropertyMock
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import PropertyMock
+from unittest.mock import mock_open
+from unittest.mock import patch
+
 import pytest
 import streamlit as st
 
 # Mock dependencies optionnelles avant import
-with patch.dict("sys.modules", {"pdfplumber": Mock(), "pypdf": Mock(), "docx": Mock(), "pptx": Mock()}):
+with patch.dict(
+    "sys.modules",
+    {"pdfplumber": Mock(), "pypdf": Mock(), "docx": Mock(), "pptx": Mock()},
+):
     from app.services.document_service import DocumentService
 
 
@@ -121,7 +129,9 @@ class TestDocumentServiceCoverage:
         assert result["type"] == "application/pdf"
         assert result["extension"] == "pdf"
         assert result["consultant_id"] == 123
-        assert "consultant_123" in result["file_path"]  # Vérifier que le répertoire consultant est créé
+        assert (
+            "consultant_123" in result["file_path"]
+        )  # Vérifier que le répertoire consultant est créé
 
     @patch("builtins.open", side_effect=OSError("Disk full"))
     def test_save_uploaded_file_os_error(self, mock_file):
@@ -226,21 +236,29 @@ class TestDocumentServiceCoverage:
 
     def test_extract_text_from_pdf_empty_pages(self):
         """Test extraction PDF avec pages vides"""
-        with patch.object(DocumentService, '_extract_text_from_pdf', return_value=""):
+        with patch.object(DocumentService, "_extract_text_from_pdf", return_value=""):
             result = DocumentService._extract_text_from_pdf("empty.pdf")
 
             assert result == ""
 
     def test_extract_text_from_pdf_os_error(self):
         """Test extraction PDF avec erreur OS"""
-        with patch.object(DocumentService, '_extract_text_from_pdf', return_value="Erreur PDF: File error"):
+        with patch.object(
+            DocumentService,
+            "_extract_text_from_pdf",
+            return_value="Erreur PDF: File error",
+        ):
             result = DocumentService._extract_text_from_pdf("error.pdf")
 
             assert "Erreur PDF: File error" in result
 
     def test_extract_text_from_pdf_value_error(self):
         """Test extraction PDF avec erreur de valeur"""
-        with patch.object(DocumentService, '_extract_text_from_pdf', return_value="Erreur PDF: Invalid PDF format"):
+        with patch.object(
+            DocumentService,
+            "_extract_text_from_pdf",
+            return_value="Erreur PDF: Invalid PDF format",
+        ):
             result = DocumentService._extract_text_from_pdf("invalid.pdf")
 
             assert "Erreur PDF: Invalid PDF format" in result
@@ -248,7 +266,11 @@ class TestDocumentServiceCoverage:
     def test_extract_text_from_docx_success(self):
         """Test extraction texte DOCX avec succès"""
         # Mock the entire method instead of trying to mock the import
-        with patch.object(DocumentService, '_extract_text_from_docx', return_value="Premier paragraphe\nDeuxième paragraphe") as mock_extract:
+        with patch.object(
+            DocumentService,
+            "_extract_text_from_docx",
+            return_value="Premier paragraphe\nDeuxième paragraphe",
+        ) as mock_extract:
             result = DocumentService._extract_text_from_docx("test.docx")
 
             assert result == "Premier paragraphe\nDeuxième paragraphe"
@@ -256,21 +278,33 @@ class TestDocumentServiceCoverage:
 
     def test_extract_text_from_docx_os_error(self):
         """Test extraction DOCX avec erreur OS"""
-        with patch.object(DocumentService, '_extract_text_from_docx', return_value="Erreur DOCX: File not accessible"):
+        with patch.object(
+            DocumentService,
+            "_extract_text_from_docx",
+            return_value="Erreur DOCX: File not accessible",
+        ):
             result = DocumentService._extract_text_from_docx("error.docx")
 
             assert "Erreur DOCX: File not accessible" in result
 
     def test_extract_text_from_docx_io_error(self):
         """Test extraction DOCX avec erreur IO"""
-        with patch.object(DocumentService, '_extract_text_from_docx', return_value="Erreur DOCX: Read error"):
+        with patch.object(
+            DocumentService,
+            "_extract_text_from_docx",
+            return_value="Erreur DOCX: Read error",
+        ):
             result = DocumentService._extract_text_from_docx("corrupt.docx")
 
             assert "Erreur DOCX: Read error" in result
 
     def test_extract_text_from_docx_value_error(self):
         """Test extraction DOCX avec erreur de valeur"""
-        with patch.object(DocumentService, '_extract_text_from_docx', return_value="Erreur DOCX: Invalid document"):
+        with patch.object(
+            DocumentService,
+            "_extract_text_from_docx",
+            return_value="Erreur DOCX: Invalid document",
+        ):
             result = DocumentService._extract_text_from_docx("invalid.docx")
 
             assert "Erreur DOCX: Invalid document" in result
@@ -373,7 +407,11 @@ class TestDocumentServiceCoverage:
 
         # Si la méthode existe, on la teste
         if hasattr(DocumentService, "_extract_text_from_pptx"):
-            with patch.object(DocumentService, '_extract_text_from_pptx', return_value="Slide content\n"):
+            with patch.object(
+                DocumentService,
+                "_extract_text_from_pptx",
+                return_value="Slide content\n",
+            ):
                 result = DocumentService._extract_text_from_pptx("test.pptx")
                 assert "Slide content" in result
         else:

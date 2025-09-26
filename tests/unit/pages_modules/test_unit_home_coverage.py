@@ -5,7 +5,8 @@ Tests ciblés pour améliorer la couverture de la page d'accueil
 
 import os
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 import streamlit as st
@@ -305,7 +306,8 @@ class TestDataRefresh:
 
     def test_data_freshness(self):
         """Test de la fraîcheur des données"""
-        from datetime import datetime, timedelta
+        from datetime import datetime
+        from datetime import timedelta
 
         # Simuler des timestamps de données
         current_time = datetime.now()
@@ -382,7 +384,9 @@ class TestPerformanceOptimization:
         processing_time = end_time - start_time
 
         # Vérifications
-        assert len(filtered_data) == 200  # 200 éléments dont la valeur est divisible par 100 (0, 100, 200, ..., 9900)
+        assert (
+            len(filtered_data) == 200
+        )  # 200 éléments dont la valeur est divisible par 100 (0, 100, 200, ..., 9900)
         assert processing_time < 1.0  # Moins d'1 seconde
 
     def test_memory_efficiency(self):

@@ -3,14 +3,18 @@ Tests complets pour les services métier existants
 Couvre les classes de service et leurs méthodes
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import date, datetime
-import pandas as pd
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
 
+import pandas as pd
+import pytest
+
+from app.services.business_manager_service import BusinessManagerService
 from app.services.consultant_service import ConsultantService
 from app.services.practice_service import PracticeService
-from app.services.business_manager_service import BusinessManagerService
 from app.services.technology_service import TechnologyService
 
 

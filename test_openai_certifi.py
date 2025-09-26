@@ -4,12 +4,14 @@ Test OpenAI avec certificats corrects
 """
 
 import os
-import requests
+
 import certifi
+import requests
+
 
 def test_openai_with_certifi():
     """Test OpenAI avec certificats certifi"""
-    
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("❌ OPENAI_API_KEY non définie")
@@ -18,15 +20,12 @@ def test_openai_with_certifi():
     print(f"🔑 Test avec certificats certifi...")
     print(f"📄 Bundle CA: {certifi.where()}")
 
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
     payload = {
         "model": "gpt-3.5-turbo",
         "messages": [{"role": "user", "content": "Bonjour"}],
-        "max_tokens": 5
+        "max_tokens": 5,
     }
 
     try:
@@ -35,9 +34,9 @@ def test_openai_with_certifi():
             headers=headers,
             json=payload,
             timeout=30,
-            verify=certifi.where()  # Utiliser les certificats certifi
+            verify=certifi.where(),  # Utiliser les certificats certifi
         )
-        
+
         if response.status_code == 200:
             result = response.json()
             content = result["choices"][0]["message"]["content"]
@@ -50,6 +49,7 @@ def test_openai_with_certifi():
     except Exception as e:
         print(f"❌ Erreur: {e}")
         return False
+
 
 if __name__ == "__main__":
     test_openai_with_certifi()

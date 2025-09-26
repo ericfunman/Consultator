@@ -3,9 +3,13 @@ Tests pour le module consultant_info.py
 Couverture des fonctions de gestion des informations personnelles du consultant
 """
 
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 
 
@@ -79,7 +83,9 @@ class TestConsultantInfo:
         show_consultant_info(mock_consultant)
 
         # Vérifier qu'une erreur est affichée
-        mock_st.error.assert_called_with("❌ Les services de base ne sont pas disponibles")
+        mock_st.error.assert_called_with(
+            "❌ Les services de base ne sont pas disponibles"
+        )
 
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")
@@ -137,15 +143,20 @@ class TestConsultantInfo:
 
         # Vérifier que rien n'est affiché pour l'historique
         # (pas d'appel à markdown pour l'historique)
-        calls = [call for call in mock_st.markdown.call_args_list
-                if "Évolution salariale récente" in str(call)]
+        calls = [
+            call
+            for call in mock_st.markdown.call_args_list
+            if "Évolution salariale récente" in str(call)
+        ]
         assert len(calls) == 0
 
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")
     def test_show_detailed_salary_history_success(self, mock_session, mock_st):
         """Test affichage historique salarial détaillé avec succès"""
-        from app.pages_modules.consultant_info import show_detailed_salary_history
+        from app.pages_modules.consultant_info import (
+            show_detailed_salary_history,
+        )
 
         # Mock session
         mock_session_instance = MagicMock()
@@ -183,7 +194,9 @@ class TestConsultantInfo:
     @patch("app.pages_modules.consultant_info.get_database_session")
     def test_show_detailed_salary_history_empty(self, mock_session, mock_st):
         """Test affichage historique salarial détaillé vide"""
-        from app.pages_modules.consultant_info import show_detailed_salary_history
+        from app.pages_modules.consultant_info import (
+            show_detailed_salary_history,
+        )
 
         # Mock session
         mock_session_instance = MagicMock()
@@ -272,7 +285,9 @@ class TestConsultantInfo:
     @patch("app.pages_modules.consultant_info.ConsultantSalaire")
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")
-    def test_update_consultant_info_success(self, mock_session, mock_st, mock_salary_class):
+    def test_update_consultant_info_success(
+        self, mock_session, mock_st, mock_salary_class
+    ):
         """Test mise à jour informations consultant avec succès"""
         from app.pages_modules.consultant_info import update_consultant_info
 
@@ -289,10 +304,10 @@ class TestConsultantInfo:
         mock_query1 = MagicMock()
         mock_query2 = MagicMock()
         mock_session_instance.query.side_effect = [mock_query1, mock_query2]
-        
+
         # First query returns the consultant
         mock_query1.filter.return_value.first.return_value = mock_consultant
-        
+
         # Second query for email uniqueness returns None (no existing email)
         mock_query2.filter.return_value.first.return_value = None
 
@@ -308,7 +323,7 @@ class TestConsultantInfo:
             "salaire_actuel": 50000,  # Changed salary
             "disponibilite": True,
             "notes": "Updated notes",
-            "commentaire": "Augmentation annuelle"
+            "commentaire": "Augmentation annuelle",
         }
 
         result = update_consultant_info(1, test_data)
@@ -327,9 +342,15 @@ class TestConsultantInfo:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock query returns None
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
+            None
+        )
 
-        test_data = {"prenom": "Jean", "nom": "Dupont", "email": "jean.dupont@email.com"}
+        test_data = {
+            "prenom": "Jean",
+            "nom": "Dupont",
+            "email": "jean.dupont@email.com",
+        }
 
         result = update_consultant_info(999, test_data)
 
@@ -357,25 +378,32 @@ class TestConsultantInfo:
         # Setup queries
         mock_query1 = MagicMock()
         mock_session_instance.query.return_value = mock_query1
-        mock_query1.filter.return_value.first.side_effect = [mock_consultant, mock_existing]
+        mock_query1.filter.return_value.first.side_effect = [
+            mock_consultant,
+            mock_existing,
+        ]
 
         test_data = {
             "prenom": "Jean",
             "nom": "Dupont",
             "email": "existing@email.com",
-            "salaire_actuel": 50000
+            "salaire_actuel": 50000,
         }
 
         result = update_consultant_info(1, test_data)
 
         assert result is False
-        mock_st.error.assert_called_with("❌ Cet email est déjà utilisé par un autre consultant")
+        mock_st.error.assert_called_with(
+            "❌ Cet email est déjà utilisé par un autre consultant"
+        )
 
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")
     def test_generate_consultant_report_success(self, mock_session, mock_st):
         """Test génération rapport consultant avec succès"""
-        from app.pages_modules.consultant_info import generate_consultant_report
+        from app.pages_modules.consultant_info import (
+            generate_consultant_report,
+        )
 
         # Mock consultant
         mock_consultant = MagicMock()
@@ -411,7 +439,9 @@ class TestConsultantInfo:
     @patch("app.pages_modules.consultant_info.st")
     def test_generate_consultant_report_no_practice(self, mock_st):
         """Test génération rapport consultant sans practice"""
-        from app.pages_modules.consultant_info import generate_consultant_report
+        from app.pages_modules.consultant_info import (
+            generate_consultant_report,
+        )
 
         # Mock consultant without practice
         mock_consultant = MagicMock()

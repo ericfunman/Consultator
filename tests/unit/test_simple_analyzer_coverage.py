@@ -3,10 +3,13 @@ Tests complets pour SimpleDocumentAnalyzer pour augmenter la couverture de 15% √
 Module sans d√©pendance DB, tests plus simples et robustes
 """
 
-import tempfile
 import os
+import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock
+from unittest.mock import mock_open
+from unittest.mock import patch
+
 import pytest
 import streamlit as st
 

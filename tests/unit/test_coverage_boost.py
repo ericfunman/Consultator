@@ -5,7 +5,8 @@ Tests simples et efficaces pour divers modules
 
 import os
 import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 
@@ -111,7 +112,8 @@ class TestUtilsModules:
 
     def test_helpers_date_functions(self):
         """Test des fonctions de date"""
-        from datetime import datetime, date
+        from datetime import date
+        from datetime import datetime
 
         # Fonction d'aide - calcul d'âge
         def calculate_age(birth_date):

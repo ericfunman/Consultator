@@ -1,8 +1,12 @@
 """Tests pour le module consultant_languages - Interface utilisateur"""
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
+
 from app.pages_modules.consultant_languages import show_consultant_languages
 from tests.fixtures.base_test import BaseUITest
 
@@ -229,7 +233,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.st")
     def test_show_languages_statistics_with_data(self, mock_st):
         """Test affichage des statistiques avec données"""
-        from app.pages_modules.consultant_languages import show_languages_statistics
+        from app.pages_modules.consultant_languages import (
+            show_languages_statistics,
+        )
 
         # Mock consultant_langues
         mock_langues = []
@@ -252,7 +258,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.st")
     def test_show_languages_statistics_empty(self, mock_st):
         """Test affichage des statistiques sans données"""
-        from app.pages_modules.consultant_languages import show_languages_statistics
+        from app.pages_modules.consultant_languages import (
+            show_languages_statistics,
+        )
 
         show_languages_statistics([])
 
@@ -263,7 +271,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.get_database_session")
     def test_show_add_language_form_success(self, mock_session, mock_st):
         """Test formulaire d'ajout avec succès"""
-        from app.pages_modules.consultant_languages import show_add_language_form
+        from app.pages_modules.consultant_languages import (
+            show_add_language_form,
+        )
 
         # Mock langues disponibles
         mock_langue = MagicMock()
@@ -301,7 +311,9 @@ class TestConsultantLanguages(BaseUITest):
         self, mock_consultant_langue, mock_session, mock_st
     ):
         """Test ajout de langue réussie"""
-        from app.pages_modules.consultant_languages import add_language_to_consultant
+        from app.pages_modules.consultant_languages import (
+            add_language_to_consultant,
+        )
 
         # Mock session
         mock_session_instance = MagicMock()
@@ -333,7 +345,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.get_database_session")
     def test_add_language_to_consultant_duplicate(self, mock_session, mock_st):
         """Test ajout de langue déjà existante"""
-        from app.pages_modules.consultant_languages import add_language_to_consultant
+        from app.pages_modules.consultant_languages import (
+            add_language_to_consultant,
+        )
 
         # Mock session avec doublon existant
         mock_session_instance = MagicMock()
@@ -360,7 +374,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.get_database_session")
     def test_add_language_to_consultant_database_error(self, mock_session, mock_st):
         """Test ajout de langue avec erreur DB"""
-        from app.pages_modules.consultant_languages import add_language_to_consultant
+        from app.pages_modules.consultant_languages import (
+            add_language_to_consultant,
+        )
 
         # Mock session qui lève une exception
         mock_session_instance = MagicMock()
@@ -387,7 +403,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.get_database_session")
     def test_show_edit_language_form_success(self, mock_session, mock_st):
         """Test formulaire d'édition avec succès"""
-        from app.pages_modules.consultant_languages import show_edit_language_form
+        from app.pages_modules.consultant_languages import (
+            show_edit_language_form,
+        )
 
         # Mock consultant_langue
         mock_cl = MagicMock()
@@ -426,7 +444,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.get_database_session")
     def test_update_consultant_language_success(self, mock_session, mock_st):
         """Test mise à jour de langue réussie"""
-        from app.pages_modules.consultant_languages import update_consultant_language
+        from app.pages_modules.consultant_languages import (
+            update_consultant_language,
+        )
 
         # Mock session et consultant_langue
         mock_session_instance = MagicMock()
@@ -453,7 +473,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.get_database_session")
     def test_update_consultant_language_not_found(self, mock_session, mock_st):
         """Test mise à jour de langue inexistante"""
-        from app.pages_modules.consultant_languages import update_consultant_language
+        from app.pages_modules.consultant_languages import (
+            update_consultant_language,
+        )
 
         # Mock session qui ne trouve pas la langue
         mock_session_instance = MagicMock()
@@ -514,7 +536,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.st")
     def test_show_languages_analysis_with_data(self, mock_st):
         """Test analyse des langues avec données"""
-        from app.pages_modules.consultant_languages import show_languages_analysis
+        from app.pages_modules.consultant_languages import (
+            show_languages_analysis,
+        )
 
         # Mock consultant_langues
         mock_langues = []
@@ -537,7 +561,9 @@ class TestConsultantLanguages(BaseUITest):
     @patch("pandas.DataFrame")
     def test_show_languages_comparison_with_data(self, mock_dataframe, mock_st):
         """Test comparaison des langues avec données"""
-        from app.pages_modules.consultant_languages import show_languages_comparison
+        from app.pages_modules.consultant_languages import (
+            show_languages_comparison,
+        )
 
         # Mock DataFrame
         mock_df = MagicMock()

@@ -6,12 +6,15 @@ Script pour convertir la documentation Sphinx RST en document Word
 import os
 import re
 from pathlib import Path
+
 from docx import Document
-from docx.shared import Inches, Pt
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.style import WD_STYLE_TYPE
-from docx.oxml.ns import nsdecls, qn
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
+from docx.oxml.ns import qn
+from docx.shared import Inches
+from docx.shared import Pt
 
 
 def setup_document_styles(doc):

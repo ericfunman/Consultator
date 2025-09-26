@@ -1,8 +1,12 @@
 """Tests pour le module consultant_info - Interface utilisateur"""
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
+
 from app.pages_modules.consultant_info import show_consultant_info
 from tests.fixtures.base_test import BaseUITest
 

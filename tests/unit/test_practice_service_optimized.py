@@ -3,8 +3,12 @@ Tests de couverture optimisés pour practice_service.py - Version corrigée
 Tests robustes avec bon mocking pour atteindre 95% de couverture
 """
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+
 from app.services.practice_service import PracticeService
 
 

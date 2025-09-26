@@ -14,14 +14,14 @@ import pytest
 from app.services.cache_service import CacheService
 from app.services.cache_service import cached
 from app.services.cache_service import get_cache_service
+from app.services.cache_service import get_cached_consultant_stats
+from app.services.cache_service import get_cached_consultants_list
+from app.services.cache_service import get_cached_search_results
 from app.services.cache_service import invalidate_cache
 from app.services.cache_service import invalidate_consultant_cache
 from app.services.cache_service import invalidate_mission_cache
 from app.services.cache_service import invalidate_practice_cache
 from app.services.cache_service import invalidate_search_cache
-from app.services.cache_service import get_cached_consultant_stats
-from app.services.cache_service import get_cached_consultants_list
-from app.services.cache_service import get_cached_search_results
 
 
 class TestCacheService:

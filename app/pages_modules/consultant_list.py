@@ -156,7 +156,11 @@ def _create_search_filters(df: pd.DataFrame) -> tuple:
 
 
 def _apply_filters(
-    df: pd.DataFrame, search_term: str, practice_filter: str, entite_filter: str, availability_filter: str
+    df: pd.DataFrame,
+    search_term: str,
+    practice_filter: str,
+    entite_filter: str,
+    availability_filter: str,
 ) -> pd.DataFrame:
     """Applique les filtres au DataFrame"""
     filtered_df = df.copy()
@@ -361,7 +365,9 @@ def show_consultants_list():
         df = _convert_consultants_to_dataframe(consultants)
 
         # Filtres et recherche
-        search_term, practice_filter, entite_filter, availability_filter = _create_search_filters(df)
+        search_term, practice_filter, entite_filter, availability_filter = (
+            _create_search_filters(df)
+        )
 
         # Appliquer les filtres
         filtered_df = _apply_filters(

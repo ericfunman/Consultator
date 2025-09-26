@@ -7,24 +7,26 @@ Version optimisée avec données réalistes françaises
 import os
 import random
 import sys
-from datetime import date, datetime, timedelta
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+
 from faker import Faker
 
 # Ajouter le répertoire app au PYTHONPATH
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "app"))
 
-from app.database.database import get_database_session, init_database
-from app.database.models import (
-    Consultant,
-    Practice,
-    BusinessManager,
-    Competence,
-    ConsultantCompetence,
-    Mission,
-    Langue,
-    ConsultantLangue,
-    ConsultantBusinessManager,
-)
+from app.database.database import get_database_session
+from app.database.database import init_database
+from app.database.models import BusinessManager
+from app.database.models import Competence
+from app.database.models import Consultant
+from app.database.models import ConsultantBusinessManager
+from app.database.models import ConsultantCompetence
+from app.database.models import ConsultantLangue
+from app.database.models import Langue
+from app.database.models import Mission
+from app.database.models import Practice
 
 # Configuration
 fake = Faker("fr_FR")

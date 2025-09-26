@@ -1,15 +1,21 @@
 """Tests d'intégration pour le workflow practice complet"""
 
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from datetime import datetime, date
+
+from app.database.database import get_database_session
+from app.database.models import Consultant
+from app.database.models import Practice
+from app.services.consultant_service import ConsultantService
 
 # Import des services principaux
 from app.services.practice_service import PracticeService
-from app.services.consultant_service import ConsultantService
-from app.database.database import get_database_session
-from app.database.models import Practice, Consultant
 
 
 # Fixtures pour les tests de practice
@@ -17,8 +23,9 @@ from app.database.models import Practice, Consultant
 def sample_practice_data():
     """Données de test pour une practice"""
     import uuid
+
     unique_id = str(uuid.uuid4())[:8]
-    
+
     return {
         "nom": f"Data Science & AI {unique_id}",
         "description": "Practice spécialisée dans la data science et l'intelligence artificielle",
@@ -30,8 +37,9 @@ def sample_practice_data():
 def sample_consultants_for_practice():
     """Créer plusieurs consultants de test pour une practice"""
     import uuid
+
     unique_id = str(uuid.uuid4())[:8]
-    
+
     consultants_data = [
         {
             "prenom": "Alice",
@@ -148,10 +156,12 @@ class TestPracticeWorkflowIntegration:
                     .all()
                 )
                 assert len(consultants_in_practice) == len(consultant_ids)
-                
+
                 # Calculer les statistiques manuellement
                 total_salary = sum(c.salaire_actuel for c in consultants_in_practice)
-                available_count = sum(1 for c in consultants_in_practice if c.disponibilite)
+                available_count = sum(
+                    1 for c in consultants_in_practice if c.disponibilite
+                )
                 unavailable_count = len(consultants_in_practice) - available_count
 
                 print(
@@ -230,6 +240,7 @@ class TestPracticeWorkflowIntegration:
         """Test du workflow des statistiques de practice"""
 
         import uuid
+
         unique_id = str(uuid.uuid4())[:8]
 
         # Créer plusieurs practices avec des consultants
@@ -314,7 +325,7 @@ class TestPracticeWorkflowIntegration:
             # Analyser les statistiques par practice - filtrer directement sur nos practice_ids
             with get_database_session() as session:
                 from sqlalchemy.orm import joinedload
-                
+
                 frontend_consultants_db = (
                     session.query(Consultant)
                     .options(joinedload(Consultant.practice))
@@ -331,45 +342,53 @@ class TestPracticeWorkflowIntegration:
             # Convertir en dictionnaires comme le fait get_all_consultants
             frontend_consultants = []
             for consultant in frontend_consultants_db:
-                frontend_consultants.append({
-                    "id": consultant.id,
-                    "prenom": consultant.prenom,
-                    "nom": consultant.nom,
-                    "email": consultant.email,
-                    "telephone": consultant.telephone,
-                    "salaire_actuel": consultant.salaire_actuel,
-                    "disponibilite": consultant.disponibilite,
-                    "practice_name": consultant.practice.nom if consultant.practice else "N/A",
-                    "date_creation": consultant.date_creation,
-                    "derniere_maj": consultant.derniere_maj,
-                    # Éviter les propriétés lazy-loaded qui causent DetachedInstanceError
-                    # "date_disponibilite": consultant.date_disponibilite,
-                    "experience_annees": consultant.experience_annees,
-                    "grade": consultant.grade,
-                    "type_contrat": consultant.type_contrat,
-                    "societe": consultant.societe,
-                })
+                frontend_consultants.append(
+                    {
+                        "id": consultant.id,
+                        "prenom": consultant.prenom,
+                        "nom": consultant.nom,
+                        "email": consultant.email,
+                        "telephone": consultant.telephone,
+                        "salaire_actuel": consultant.salaire_actuel,
+                        "disponibilite": consultant.disponibilite,
+                        "practice_name": (
+                            consultant.practice.nom if consultant.practice else "N/A"
+                        ),
+                        "date_creation": consultant.date_creation,
+                        "derniere_maj": consultant.derniere_maj,
+                        # Éviter les propriétés lazy-loaded qui causent DetachedInstanceError
+                        # "date_disponibilite": consultant.date_disponibilite,
+                        "experience_annees": consultant.experience_annees,
+                        "grade": consultant.grade,
+                        "type_contrat": consultant.type_contrat,
+                        "societe": consultant.societe,
+                    }
+                )
 
             backend_consultants = []
             for consultant in backend_consultants_db:
-                backend_consultants.append({
-                    "id": consultant.id,
-                    "prenom": consultant.prenom,
-                    "nom": consultant.nom,
-                    "email": consultant.email,
-                    "telephone": consultant.telephone,
-                    "salaire_actuel": consultant.salaire_actuel,
-                    "disponibilite": consultant.disponibilite,
-                    "practice_name": consultant.practice.nom if consultant.practice else "N/A",
-                    "date_creation": consultant.date_creation,
-                    "derniere_maj": consultant.derniere_maj,
-                    # Éviter les propriétés lazy-loaded qui causent DetachedInstanceError
-                    # "date_disponibilite": consultant.date_disponibilite,
-                    "experience_annees": consultant.experience_annees,
-                    "grade": consultant.grade,
-                    "type_contrat": consultant.type_contrat,
-                    "societe": consultant.societe,
-                })
+                backend_consultants.append(
+                    {
+                        "id": consultant.id,
+                        "prenom": consultant.prenom,
+                        "nom": consultant.nom,
+                        "email": consultant.email,
+                        "telephone": consultant.telephone,
+                        "salaire_actuel": consultant.salaire_actuel,
+                        "disponibilite": consultant.disponibilite,
+                        "practice_name": (
+                            consultant.practice.nom if consultant.practice else "N/A"
+                        ),
+                        "date_creation": consultant.date_creation,
+                        "derniere_maj": consultant.derniere_maj,
+                        # Éviter les propriétés lazy-loaded qui causent DetachedInstanceError
+                        # "date_disponibilite": consultant.date_disponibilite,
+                        "experience_annees": consultant.experience_annees,
+                        "grade": consultant.grade,
+                        "type_contrat": consultant.type_contrat,
+                        "societe": consultant.societe,
+                    }
+                )
 
             # Vérifications Frontend
             assert len(frontend_consultants) == 2
@@ -426,6 +445,7 @@ class TestPracticeWorkflowIntegration:
         """Test de réassignation de consultants entre practices"""
 
         import uuid
+
         unique_id = str(uuid.uuid4())[:8]
 
         # Créer deux practices
@@ -485,7 +505,7 @@ class TestPracticeWorkflowIntegration:
             # Vérifier les statistiques des practices - filtrer directement
             with get_database_session() as session:
                 from sqlalchemy.orm import joinedload
-                
+
                 old_practice_consultants_db = (
                     session.query(Consultant)
                     .options(joinedload(Consultant.practice))
@@ -501,21 +521,29 @@ class TestPracticeWorkflowIntegration:
 
             old_practice_consultants = []
             for consultant in old_practice_consultants_db:
-                old_practice_consultants.append({
-                    "id": consultant.id,
-                    "prenom": consultant.prenom,
-                    "nom": consultant.nom,
-                    "practice_name": consultant.practice.nom if consultant.practice else "N/A",
-                })
+                old_practice_consultants.append(
+                    {
+                        "id": consultant.id,
+                        "prenom": consultant.prenom,
+                        "nom": consultant.nom,
+                        "practice_name": (
+                            consultant.practice.nom if consultant.practice else "N/A"
+                        ),
+                    }
+                )
 
             new_practice_consultants = []
             for consultant in new_practice_consultants_db:
-                new_practice_consultants.append({
-                    "id": consultant.id,
-                    "prenom": consultant.prenom,
-                    "nom": consultant.nom,
-                    "practice_name": consultant.practice.nom if consultant.practice else "N/A",
-                })
+                new_practice_consultants.append(
+                    {
+                        "id": consultant.id,
+                        "prenom": consultant.prenom,
+                        "nom": consultant.nom,
+                        "practice_name": (
+                            consultant.practice.nom if consultant.practice else "N/A"
+                        ),
+                    }
+                )
 
             assert (
                 len(old_practice_consultants) == 0

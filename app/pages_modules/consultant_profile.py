@@ -215,6 +215,7 @@ def _display_consultant_tabs(consultant_id):
         with tab5:
             # Afficher les missions VSA
             from .consultant_info import _display_vsa_missions
+
             _display_vsa_missions(consultant_obj)
 
         with tab6:

@@ -528,7 +528,8 @@ def mock_streamlit_complete():
 @pytest.fixture(scope="function", autouse=True)
 def mock_sqlalchemy_models_global():
     """Mock global des modèles SQLAlchemy pour tous les tests"""
-    from unittest.mock import MagicMock, patch
+    from unittest.mock import MagicMock
+    from unittest.mock import patch
 
     # Créer des mocks simples pour les modèles
     class MockPractice:
@@ -886,7 +887,8 @@ def mock_streamlit_singleton():
 @pytest.fixture(scope="function", autouse=True)
 def disable_streamlit_cache():
     """Disable Streamlit caching during tests to avoid pickling mock objects"""
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock
+    from unittest.mock import patch
 
     def mock_cache_data(*args, **kwargs):
         """Mock cache_data decorator that just returns the original function"""

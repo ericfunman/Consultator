@@ -3,8 +3,12 @@ Tests de couverture ciblés pour consultant_service.py
 Amélioration de la couverture du ConsultantService (module critique de 1153 lignes)
 """
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+
 from app.services.consultant_service import ConsultantService
 
 

@@ -1,23 +1,26 @@
 """Tests pour le module consultant_missions - Interface utilisateur"""
 
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import date, datetime
 import streamlit as st
-from app.pages_modules.consultant_missions import (
-    show_consultant_missions,
-    show_mission_details,
-    show_missions_statistics,
-    show_add_mission_form,
-    validate_mission_form,
-    create_mission,
-    show_edit_mission_form,
-    update_mission,
-    delete_mission,
-    show_mission_full_details,
-    show_missions_analysis,
-    show_missions_revenues,
-)
+
+from app.pages_modules.consultant_missions import create_mission
+from app.pages_modules.consultant_missions import delete_mission
+from app.pages_modules.consultant_missions import show_add_mission_form
+from app.pages_modules.consultant_missions import show_consultant_missions
+from app.pages_modules.consultant_missions import show_edit_mission_form
+from app.pages_modules.consultant_missions import show_mission_details
+from app.pages_modules.consultant_missions import show_mission_full_details
+from app.pages_modules.consultant_missions import show_missions_analysis
+from app.pages_modules.consultant_missions import show_missions_revenues
+from app.pages_modules.consultant_missions import show_missions_statistics
+from app.pages_modules.consultant_missions import update_mission
+from app.pages_modules.consultant_missions import validate_mission_form
 from tests.fixtures.base_test import BaseUITest
 
 
@@ -362,7 +365,9 @@ class TestConsultantMissions(BaseUITest):
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_statistics_with_data(self, mock_st):
         """Test affichage des statistiques avec données"""
-        from app.pages_modules.consultant_missions import show_missions_statistics
+        from app.pages_modules.consultant_missions import (
+            show_missions_statistics,
+        )
 
         # Mock missions
         mock_missions = []
@@ -390,7 +395,9 @@ class TestConsultantMissions(BaseUITest):
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_statistics_empty(self, mock_st):
         """Test affichage des statistiques sans données"""
-        from app.pages_modules.consultant_missions import show_missions_statistics
+        from app.pages_modules.consultant_missions import (
+            show_missions_statistics,
+        )
 
         show_missions_statistics([])
 
@@ -432,7 +439,9 @@ class TestConsultantMissions(BaseUITest):
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_mission_details_with_client(self, mock_st):
         """Test affichage des détails de mission avec client"""
-        from app.pages_modules.consultant_missions import show_mission_full_details
+        from app.pages_modules.consultant_missions import (
+            show_mission_full_details,
+        )
 
         # Mock mission avec client
         mock_mission = MagicMock()
@@ -465,7 +474,9 @@ class TestConsultantMissions(BaseUITest):
     @patch("app.pages_modules.consultant_missions.date")
     def test_show_missions_analysis_with_data(self, mock_date_class, mock_st):
         """Test analyse des missions avec données"""
-        from app.pages_modules.consultant_missions import show_missions_analysis
+        from app.pages_modules.consultant_missions import (
+            show_missions_analysis,
+        )
 
         # Mock date.today()
         mock_today = MagicMock()
@@ -497,7 +508,9 @@ class TestConsultantMissions(BaseUITest):
     @patch("pandas.DataFrame")
     def test_show_missions_revenues_with_data(self, mock_dataframe, mock_st):
         """Test analyse des revenus avec données"""
-        from app.pages_modules.consultant_missions import show_missions_revenues
+        from app.pages_modules.consultant_missions import (
+            show_missions_revenues,
+        )
 
         # Mock pandas DataFrame
         mock_df = MagicMock()

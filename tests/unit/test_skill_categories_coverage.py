@@ -4,16 +4,15 @@ Module utils avec référentiels et utilitaires de compétences
 """
 
 import pytest
-from app.utils.skill_categories import (
-    COMPETENCES_TECHNIQUES,
-    COMPETENCES_FONCTIONNELLES,
-    NIVEAUX_MAITRISE,
-    NIVEAUX_REQUIS,
-    get_all_competences,
-    get_competences_by_category,
-    get_all_categories,
-    search_competences,
-)
+
+from app.utils.skill_categories import COMPETENCES_FONCTIONNELLES
+from app.utils.skill_categories import COMPETENCES_TECHNIQUES
+from app.utils.skill_categories import NIVEAUX_MAITRISE
+from app.utils.skill_categories import NIVEAUX_REQUIS
+from app.utils.skill_categories import get_all_categories
+from app.utils.skill_categories import get_all_competences
+from app.utils.skill_categories import get_competences_by_category
+from app.utils.skill_categories import search_competences
 
 
 class TestSkillCategoriesCoverage:

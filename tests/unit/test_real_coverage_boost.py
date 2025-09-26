@@ -5,9 +5,12 @@ Tests spécifiques pour app.utils.helpers et autres modules existants
 
 import os
 import sys
-from unittest.mock import MagicMock, patch
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 import pytest
-from datetime import date, datetime
 
 # Ajouter le chemin du module
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
@@ -423,7 +426,8 @@ class TestRealCodeExecution:
     def test_real_calculation_functions(self):
         """Test d'exécution réelle de fonctions de calcul"""
         try:
-            from app.utils.helpers import safe_divide, calculate_percentage_change
+            from app.utils.helpers import calculate_percentage_change
+            from app.utils.helpers import safe_divide
 
             # Exécuter des calculs réels
             result1 = safe_divide(100, 4)
@@ -446,7 +450,8 @@ class TestRealCodeExecution:
     def test_real_validation_functions(self):
         """Test d'exécution réelle de fonctions de validation"""
         try:
-            from app.utils.helpers import validate_email, validate_phone
+            from app.utils.helpers import validate_email
+            from app.utils.helpers import validate_phone
 
             # Exécuter des validations réelles
             emails = [
@@ -472,11 +477,9 @@ class TestRealCodeExecution:
     def test_real_formatting_functions(self):
         """Test d'exécution réelle de fonctions de formatage"""
         try:
-            from app.utils.helpers import (
-                format_currency,
-                format_date,
-                format_percentage,
-            )
+            from app.utils.helpers import format_currency
+            from app.utils.helpers import format_date
+            from app.utils.helpers import format_percentage
 
             # Exécuter des formatages réels
             amounts = [1234.56, 0, 1000000, None]

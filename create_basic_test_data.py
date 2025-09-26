@@ -2,16 +2,21 @@
 Script simple pour générer des données de test de base
 """
 
-import sys
 import os
+import sys
 from datetime import datetime
+
 from faker import Faker
 
 # Ajouter le dossier app au path
 sys.path.append(os.path.join(os.path.dirname(__file__), "app"))
 
-from app.database.database import get_database_session, init_database
-from app.database.models import Practice, BusinessManager, Consultant, Competence
+from app.database.database import get_database_session
+from app.database.database import init_database
+from app.database.models import BusinessManager
+from app.database.models import Competence
+from app.database.models import Consultant
+from app.database.models import Practice
 
 fake = Faker("fr_FR")
 

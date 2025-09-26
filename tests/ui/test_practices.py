@@ -1,14 +1,13 @@
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
+from app.pages_modules.practices import show
+from app.pages_modules.practices import show_consultants_by_practice
+from app.pages_modules.practices import show_practice_management
+from app.pages_modules.practices import show_practice_overview
 from tests.fixtures.base_test import BaseUITest
-
-from app.pages_modules.practices import (
-    show,
-    show_practice_overview,
-    show_consultants_by_practice,
-    show_practice_management,
-)
-
 
 # ===== DONNÉES DE TEST =====
 
@@ -182,7 +181,9 @@ class TestShowConsultantsByPractice(BaseUITest):
     @patch("app.pages_modules.practices.st")
     @patch("app.services.consultant_service.ConsultantService")
     @patch("app.pages_modules.practices.PracticeService")
-    def test_show_consultants_with_data(self, mock_service, mock_consultant_service, mock_st):
+    def test_show_consultants_with_data(
+        self, mock_service, mock_consultant_service, mock_st
+    ):
         """Test affichage consultants avec données"""
 
         # Create mock practice and consultant objects
@@ -205,15 +206,24 @@ class TestShowConsultantsByPractice(BaseUITest):
         class MockContextManager:
             def __enter__(self):
                 return self
+
             def __exit__(self, *args):
                 pass
 
         mock_st.subheader = MagicMock()
         mock_st.selectbox = MagicMock(return_value=mock_practices[0])
-        mock_st.tabs = MagicMock(return_value=(MockContextManager(), MockContextManager(), MockContextManager()))
+        mock_st.tabs = MagicMock(
+            return_value=(
+                MockContextManager(),
+                MockContextManager(),
+                MockContextManager(),
+            )
+        )
         mock_st.write = MagicMock()
         mock_st.dataframe = MagicMock()
-        mock_st.columns = MagicMock(return_value=[MockContextManager(), MockContextManager()])
+        mock_st.columns = MagicMock(
+            return_value=[MockContextManager(), MockContextManager()]
+        )
         mock_st.button = MagicMock(return_value=False)
         mock_st.info = MagicMock()
         mock_st.warning = MagicMock()

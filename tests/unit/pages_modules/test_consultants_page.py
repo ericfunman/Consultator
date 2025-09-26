@@ -2,10 +2,13 @@
 Tests pour les pages modules consultants
 """
 
-import pytest
-import sys
 import os
-from unittest.mock import Mock, patch, MagicMock
+import sys
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 
 # Ajouter le répertoire parent au path pour les imports
 current_dir = os.path.dirname(os.path.abspath(__file__))

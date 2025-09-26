@@ -4,10 +4,14 @@ Ajoute des missions aux consultants qui n'en ont pas
 """
 
 import os
-import sys
 import random
-from datetime import datetime, timedelta, date
-from typing import List, Dict, Set
+import sys
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from typing import Dict
+from typing import List
+from typing import Set
 
 # Ajouter le chemin de l'application
 current_dir = os.path.dirname(__file__)
@@ -16,9 +20,12 @@ if app_dir not in sys.path:
     sys.path.insert(0, app_dir)
 
 try:
-    from database.database import get_database_session, init_database
-    from database.models import Consultant, Mission
     from sqlalchemy import func
+
+    from database.database import get_database_session
+    from database.database import init_database
+    from database.models import Consultant
+    from database.models import Mission
 
     print("✅ Imports réussis")
 except ImportError as e:

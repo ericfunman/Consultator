@@ -4,9 +4,12 @@ Le plus gros module de l'application (3162 lignes)
 29 méthodes principales à tester
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from contextlib import contextmanager
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 
 
 class TestChatbotServiceCoverage:
@@ -236,7 +239,9 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__exit__.return_value = None
 
         # Mock query results - consultant avec salaire numérique
-        mock_db.query.return_value.filter.return_value.first.return_value = self._create_mock_consultant()
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            self._create_mock_consultant()
+        )
 
         # Execution
         chatbot = ChatbotService()
@@ -387,7 +392,9 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__exit__.return_value = None
 
         # Mock query results - retourner une liste de missions
-        mock_db.query.return_value.filter.return_value.all.return_value = [self._create_mock_mission()]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            self._create_mock_mission()
+        ]
 
         # Execution
         chatbot = ChatbotService()
@@ -419,7 +426,9 @@ class TestChatbotServiceCoverage:
         # Mock query results pour stats - retourner des valeurs numériques
         mock_db.query.return_value.count.return_value = 100
         mock_db.query.return_value.filter.return_value.count.return_value = 80
-        mock_db.query.return_value.filter.return_value.scalar.return_value = 45000.0  # Valeur numérique
+        mock_db.query.return_value.filter.return_value.scalar.return_value = (
+            45000.0  # Valeur numérique
+        )
 
         # Mock pour les stats détaillées
         mock_db.query.return_value.filter.return_value.all.return_value = [
@@ -498,7 +507,9 @@ class TestChatbotServiceCoverage:
 
         # Mock query results
         mock_consultant = self._create_mock_consultant()
-        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            mock_consultant
+        )
         mock_db.query.return_value.filter.return_value.all.return_value = [
             mock_consultant
         ]
@@ -541,7 +552,9 @@ class TestChatbotServiceCoverage:
         mock_practice = Mock()
         mock_practice.nom = "Data Science"
         mock_practice.consultants = [self._create_mock_consultant()]  # Liste réelle
-        mock_db.query.return_value.filter.return_value.first.return_value = mock_practice
+        mock_db.query.return_value.filter.return_value.first.return_value = (
+            mock_practice
+        )
 
         # Execution
         chatbot = ChatbotService()
@@ -565,7 +578,9 @@ class TestChatbotServiceCoverage:
 
         # Mock query results for general stats
         mock_db.query.return_value.count.return_value = 10
-        mock_db.query.return_value.join.return_value.distinct.return_value.count.return_value = 8
+        mock_db.query.return_value.join.return_value.distinct.return_value.count.return_value = (
+            8
+        )
 
         # Mock query results for top consultants by CVs - retourne une liste de tuples (consultant, nb_cvs)
         mock_db.query.return_value.join.return_value.group_by.return_value.order_by.return_value.limit.return_value.all.return_value = [
@@ -980,7 +995,9 @@ class TestChatbotServiceCoverage:
         mock_practice = Mock()
         mock_practice.nom = "Data Science"
         mock_practice.actif = True
-        mock_db.query.return_value.filter.return_value.all.return_value = [mock_practice]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            mock_practice
+        ]
 
         chatbot = ChatbotService()
 
@@ -1176,7 +1193,9 @@ class TestChatbotServiceCoverage:
 
         # Mock count result et liste vide pour len()
         mock_db.query.return_value.filter.return_value.count.return_value = 5
-        mock_db.query.return_value.filter.return_value.all.return_value = []  # Liste vide pour len()
+        mock_db.query.return_value.filter.return_value.all.return_value = (
+            []
+        )  # Liste vide pour len()
 
         chatbot = ChatbotService()
         chatbot.last_question = "Combien de missions chez Google?"
@@ -1246,7 +1265,9 @@ class TestChatbotServiceCoverage:
         # Mock compétences pour _extract_skills
         mock_competence = Mock()
         mock_competence.nom = "Python"
-        mock_db.query.return_value.filter.return_value.all.return_value = [mock_competence]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            mock_competence
+        ]
 
         # Mock langues pour _extract_languages
         mock_langue = Mock()

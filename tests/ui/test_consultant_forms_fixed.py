@@ -1,15 +1,19 @@
 """Tests pour les formulaires de consultants - Interface utilisateur"""
 
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, date
 import streamlit as st
-from app.pages_modules.consultants import (
-    show_consultants_list,
-    show_add_consultant_form,
-    show_consultant_profile,
-)
-from app.database.models import Consultant, Practice
+
+from app.database.models import Consultant
+from app.database.models import Practice
+from app.pages_modules.consultants import show_add_consultant_form
+from app.pages_modules.consultants import show_consultant_profile
+from app.pages_modules.consultants import show_consultants_list
 from tests.fixtures.base_test import BaseUITest
 
 

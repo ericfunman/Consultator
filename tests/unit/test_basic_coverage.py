@@ -10,8 +10,8 @@ import sys
 def test_basic_imports():
     """Test d'imports de base qui couvre toujours du code"""
     # Import des modules principaux
-    import app.database.models
     import app.database.database
+    import app.database.models
     import app.utils.skill_categories
     import app.utils.technologies_referentiel
 

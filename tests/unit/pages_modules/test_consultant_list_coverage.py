@@ -3,10 +3,13 @@ Tests de couverture pour consultant_list.py
 Couvre les principales fonctions avec mocks extensifs pour Streamlit et la base de données
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pandas as pd
+import pytest
 
 
 class TestConsultantListCoverage:
@@ -53,24 +56,28 @@ class TestConsultantListCoverage:
     @pytest.fixture
     def sample_dataframe(self, mock_consultant, mock_consultant_busy):
         """DataFrame d'exemple pour les tests"""
-        return pd.DataFrame({
-            "ID": [1, 2],
-            "Prénom": ["Marie", "Pierre"],
-            "Nom": ["Martin", "Dubois"],
-            "Email": ["marie.martin@email.com", "pierre.dubois@email.com"],
-            "Téléphone": ["0123456789", "0987654321"],
-            "Salaire annuel": [50000, 60000],
-            "Disponibilité": ["✅ Disponible", "🔴 En mission"],
-            "Date disponibilité": ["2025-01-15", "2025-03-01"],
-            "Grade": ["Senior", "Lead"],
-            "Type contrat": ["CDI", "CDD"],
-            "Practice": ["Data Science", "Cloud"],
-            "Date création": ["01/01/2024", "15/06/2023"]
-        })
+        return pd.DataFrame(
+            {
+                "ID": [1, 2],
+                "Prénom": ["Marie", "Pierre"],
+                "Nom": ["Martin", "Dubois"],
+                "Email": ["marie.martin@email.com", "pierre.dubois@email.com"],
+                "Téléphone": ["0123456789", "0987654321"],
+                "Salaire annuel": [50000, 60000],
+                "Disponibilité": ["✅ Disponible", "🔴 En mission"],
+                "Date disponibilité": ["2025-01-15", "2025-03-01"],
+                "Grade": ["Senior", "Lead"],
+                "Type contrat": ["CDI", "CDD"],
+                "Practice": ["Data Science", "Cloud"],
+                "Date création": ["01/01/2024", "15/06/2023"],
+            }
+        )
 
     @patch("app.pages_modules.consultant_list.st")
     @patch("app.pages_modules.consultant_list.get_database_session")
-    def test_show_consultants_list_with_data(self, mock_get_session, mock_st, mock_consultant, mock_consultant_busy):
+    def test_show_consultants_list_with_data(
+        self, mock_get_session, mock_st, mock_consultant, mock_consultant_busy
+    ):
         """Test de l'affichage de la liste avec données"""
         # Mock st.columns pour les filtres
         mock_columns_filters = [Mock() for _ in range(3)]
@@ -90,20 +97,30 @@ class TestConsultantListCoverage:
             col.__enter__ = Mock(return_value=col)
             col.__exit__ = Mock(return_value=None)
 
-        mock_st.columns.side_effect = [mock_columns_filters, mock_columns_stats, mock_columns_actions]
+        mock_st.columns.side_effect = [
+            mock_columns_filters,
+            mock_columns_stats,
+            mock_columns_actions,
+        ]
 
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         # Mock des consultants
-        mock_session.query().options().all.return_value = [mock_consultant, mock_consultant_busy]
+        mock_session.query().options().all.return_value = [
+            mock_consultant,
+            mock_consultant_busy,
+        ]
 
         # Mock session state
         mock_st.session_state = {}
 
         # Mock inputs
         mock_st.text_input.return_value = ""
-        mock_st.selectbox.side_effect = ["Tous", "Tous"]  # practice_filter, availability_filter
+        mock_st.selectbox.side_effect = [
+            "Tous",
+            "Tous",
+        ]  # practice_filter, availability_filter
 
         # Mock dataframe
         mock_event = Mock()
@@ -130,12 +147,18 @@ class TestConsultantListCoverage:
 
         show_consultants_list()
 
-        mock_st.info.assert_called_with("ℹ️ Aucun consultant trouvé dans la base de données")
+        mock_st.info.assert_called_with(
+            "ℹ️ Aucun consultant trouvé dans la base de données"
+        )
 
     @patch("app.pages_modules.consultant_list.st")
-    def test_convert_consultants_to_dataframe(self, mock_st, mock_consultant, mock_consultant_busy):
+    def test_convert_consultants_to_dataframe(
+        self, mock_st, mock_consultant, mock_consultant_busy
+    ):
         """Test de la conversion des consultants en DataFrame"""
-        from app.pages_modules.consultant_list import _convert_consultants_to_dataframe
+        from app.pages_modules.consultant_list import (
+            _convert_consultants_to_dataframe,
+        )
 
         df = _convert_consultants_to_dataframe([mock_consultant, mock_consultant_busy])
 
@@ -201,8 +224,14 @@ class TestConsultantListCoverage:
         columns = _get_display_columns()
 
         expected_columns = [
-            "Prénom", "Nom", "Email", "Disponibilité",
-            "Date disponibilité", "Grade", "Type contrat", "Practice"
+            "Prénom",
+            "Nom",
+            "Email",
+            "Disponibilité",
+            "Date disponibilité",
+            "Grade",
+            "Type contrat",
+            "Practice",
         ]
         assert columns == expected_columns
 
@@ -235,7 +264,9 @@ class TestConsultantListCoverage:
         # Mock session_state comme un MagicMock pour permettre l'attribution dynamique
         mock_st.session_state = MagicMock()
 
-        from app.pages_modules.consultant_list import _handle_consultant_selection
+        from app.pages_modules.consultant_list import (
+            _handle_consultant_selection,
+        )
 
         _handle_consultant_selection(mock_event, sample_dataframe)
 
@@ -249,7 +280,9 @@ class TestConsultantListCoverage:
         mock_st.selectbox.return_value = "Marie Martin (ID: 1)"
         mock_st.button.return_value = False  # Bouton non cliqué
 
-        from app.pages_modules.consultant_list import _handle_alternative_selection
+        from app.pages_modules.consultant_list import (
+            _handle_alternative_selection,
+        )
 
         _handle_alternative_selection(sample_dataframe)
 
@@ -283,7 +316,7 @@ class TestConsultantListCoverage:
     def test_export_to_excel_missing_openpyxl(self, mock_st, sample_dataframe):
         """Test de l'export Excel avec openpyxl manquant"""
         # Simuler l'absence d'openpyxl en patchant sys.modules
-        with patch.dict('sys.modules', {'openpyxl': None}):
+        with patch.dict("sys.modules", {"openpyxl": None}):
             from app.pages_modules.consultant_list import export_to_excel
 
             export_to_excel(sample_dataframe)
@@ -302,7 +335,9 @@ class TestConsultantListCoverage:
             col.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = mock_columns_stats
 
-        from app.pages_modules.consultant_list import generate_consultants_report
+        from app.pages_modules.consultant_list import (
+            generate_consultants_report,
+        )
 
         generate_consultants_report(sample_dataframe)
 
@@ -319,11 +354,15 @@ class TestConsultantListCoverage:
 
             show_consultants_list()
 
-            mock_st.error.assert_called_with("❌ Les services de base ne sont pas disponibles")
+            mock_st.error.assert_called_with(
+                "❌ Les services de base ne sont pas disponibles"
+            )
 
     @patch("app.pages_modules.consultant_list.st")
     @patch("app.pages_modules.consultant_list.get_database_session")
-    def test_show_consultants_list_with_filtered_results(self, mock_get_session, mock_st, mock_consultant, mock_consultant_busy):
+    def test_show_consultants_list_with_filtered_results(
+        self, mock_get_session, mock_st, mock_consultant, mock_consultant_busy
+    ):
         """Test avec résultats filtrés"""
         # Mock st.columns pour les filtres
         mock_columns_filters = [Mock() for _ in range(3)]
@@ -343,20 +382,30 @@ class TestConsultantListCoverage:
             col.__enter__ = Mock(return_value=col)
             col.__exit__ = Mock(return_value=None)
 
-        mock_st.columns.side_effect = [mock_columns_filters, mock_columns_stats, mock_columns_actions]
+        mock_st.columns.side_effect = [
+            mock_columns_filters,
+            mock_columns_stats,
+            mock_columns_actions,
+        ]
 
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         # Mock des consultants
-        mock_session.query().options().all.return_value = [mock_consultant, mock_consultant_busy]
+        mock_session.query().options().all.return_value = [
+            mock_consultant,
+            mock_consultant_busy,
+        ]
 
         # Mock session state
         mock_st.session_state = {}
 
         # Mock inputs avec filtres
         mock_st.text_input.return_value = "Marie"  # Recherche
-        mock_st.selectbox.side_effect = ["Data Science", "Disponible"]  # practice_filter, availability_filter
+        mock_st.selectbox.side_effect = [
+            "Data Science",
+            "Disponible",
+        ]  # practice_filter, availability_filter
 
         # Mock dataframe
         mock_event = Mock()
@@ -410,7 +459,9 @@ class TestConsultantListEdgeCases:
         mock_consultant.date_creation = datetime(2024, 1, 1)
         mock_consultant.practice = None  # Pas de practice
 
-        from app.pages_modules.consultant_list import _convert_consultants_to_dataframe
+        from app.pages_modules.consultant_list import (
+            _convert_consultants_to_dataframe,
+        )
 
         df = _convert_consultants_to_dataframe([mock_consultant])
 
@@ -436,7 +487,9 @@ class TestConsultantListEdgeCases:
         mock_consultant.practice = Mock()
         mock_consultant.practice.nom = "Data Science"
 
-        from app.pages_modules.consultant_list import _convert_consultants_to_dataframe
+        from app.pages_modules.consultant_list import (
+            _convert_consultants_to_dataframe,
+        )
 
         df = _convert_consultants_to_dataframe([mock_consultant])
 
@@ -486,7 +539,9 @@ class TestConsultantListEdgeCases:
         mock_st.session_state = {}
 
         # Mock inputs qui filtrent tout
-        mock_st.text_input.return_value = "XYZ_NON_EXISTANT"  # Recherche qui ne trouve rien
+        mock_st.text_input.return_value = (
+            "XYZ_NON_EXISTANT"  # Recherche qui ne trouve rien
+        )
         mock_st.selectbox.side_effect = ["Tous", "Tous"]
 
         from app.pages_modules.consultant_list import show_consultants_list
@@ -494,26 +549,30 @@ class TestConsultantListEdgeCases:
         show_consultants_list()
 
         # Vérifier que le message "aucun résultat" est affiché
-        mock_st.info.assert_any_call("ℹ️ Aucun consultant ne correspond aux critères de recherche")
+        mock_st.info.assert_any_call(
+            "ℹ️ Aucun consultant ne correspond aux critères de recherche"
+        )
 
     @patch("app.pages_modules.consultant_list.st")
     def test_export_to_excel_success(self, mock_st):
         """Test de l'export Excel avec succès"""
         # Mock DataFrame
-        df = pd.DataFrame({
-            "ID": [1, 2],
-            "Prénom": ["Marie", "Pierre"],
-            "Nom": ["Martin", "Dubois"],
-            "Email": ["marie.martin@email.com", "pierre.dubois@email.com"],
-            "Téléphone": ["0123456789", "0987654321"],
-            "Salaire annuel": [50000, 60000],
-            "Disponibilité": ["✅ Disponible", "🔴 En mission"],
-            "Date disponibilité": ["2025-01-15", "2025-03-01"],
-            "Grade": ["Senior", "Lead"],
-            "Type contrat": ["CDI", "CDD"],
-            "Practice": ["Data Science", "Cloud"],
-            "Date création": ["01/01/2024", "15/06/2023"]
-        })
+        df = pd.DataFrame(
+            {
+                "ID": [1, 2],
+                "Prénom": ["Marie", "Pierre"],
+                "Nom": ["Martin", "Dubois"],
+                "Email": ["marie.martin@email.com", "pierre.dubois@email.com"],
+                "Téléphone": ["0123456789", "0987654321"],
+                "Salaire annuel": [50000, 60000],
+                "Disponibilité": ["✅ Disponible", "🔴 En mission"],
+                "Date disponibilité": ["2025-01-15", "2025-03-01"],
+                "Grade": ["Senior", "Lead"],
+                "Type contrat": ["CDI", "CDD"],
+                "Practice": ["Data Science", "Cloud"],
+                "Date création": ["01/01/2024", "15/06/2023"],
+            }
+        )
 
         from app.pages_modules.consultant_list import export_to_excel
 
@@ -526,13 +585,15 @@ class TestConsultantListEdgeCases:
     @patch("app.pages_modules.consultant_list.st")
     def test_generate_consultants_report_single_practice(self, mock_st):
         """Test du rapport avec une seule practice"""
-        df = pd.DataFrame({
-            "Prénom": ["Marie"],
-            "Nom": ["Martin"],
-            "Salaire annuel": [50000],
-            "Disponibilité": ["✅ Disponible"],
-            "Practice": ["Data Science"]
-        })
+        df = pd.DataFrame(
+            {
+                "Prénom": ["Marie"],
+                "Nom": ["Martin"],
+                "Salaire annuel": [50000],
+                "Disponibilité": ["✅ Disponible"],
+                "Practice": ["Data Science"],
+            }
+        )
 
         # Mock st.columns pour les statistiques
         mock_columns_stats = [Mock() for _ in range(3)]
@@ -541,25 +602,31 @@ class TestConsultantListEdgeCases:
             col.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = mock_columns_stats
 
-        from app.pages_modules.consultant_list import generate_consultants_report
+        from app.pages_modules.consultant_list import (
+            generate_consultants_report,
+        )
 
         generate_consultants_report(df)
 
         # Avec une seule practice, le graphique ne devrait pas être affiché
         # Vérifier que bar_chart n'est pas appelé pour les practices
-        bar_chart_calls = [call for call in mock_st.bar_chart.call_args_list if len(call[0]) == 1]
+        bar_chart_calls = [
+            call for call in mock_st.bar_chart.call_args_list if len(call[0]) == 1
+        ]
         assert len(bar_chart_calls) <= 1  # Seulement le graphique des salaires
 
     @patch("app.pages_modules.consultant_list.st")
     def test_generate_consultants_report_single_consultant(self, mock_st):
         """Test du rapport avec un seul consultant"""
-        df = pd.DataFrame({
-            "Prénom": ["Marie"],
-            "Nom": ["Martin"],
-            "Salaire annuel": [50000],
-            "Disponibilité": ["✅ Disponible"],
-            "Practice": ["Data Science"]
-        })
+        df = pd.DataFrame(
+            {
+                "Prénom": ["Marie"],
+                "Nom": ["Martin"],
+                "Salaire annuel": [50000],
+                "Disponibilité": ["✅ Disponible"],
+                "Practice": ["Data Science"],
+            }
+        )
 
         # Mock st.columns pour les statistiques
         mock_columns_stats = [Mock() for _ in range(3)]
@@ -568,7 +635,9 @@ class TestConsultantListEdgeCases:
             col.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = mock_columns_stats
 
-        from app.pages_modules.consultant_list import generate_consultants_report
+        from app.pages_modules.consultant_list import (
+            generate_consultants_report,
+        )
 
         generate_consultants_report(df)
 

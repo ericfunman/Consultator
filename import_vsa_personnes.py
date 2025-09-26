@@ -3,10 +3,15 @@ Script d'import des données VSA Personnes depuis Excel
 Importe les consultants et business managers depuis le fichier Excel
 """
 
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
+
 from app.database.database import get_database_session
-from app.database.models import Consultant, BusinessManager, Practice, ConsultantBusinessManager
+from app.database.models import BusinessManager
+from app.database.models import Consultant
+from app.database.models import ConsultantBusinessManager
+from app.database.models import Practice
 
 
 def classify_person_by_job_title(job_title: str) -> str:
@@ -20,25 +25,25 @@ def classify_person_by_job_title(job_title: str) -> str:
         str: 'bm' pour Business Manager, 'consultant' pour Consultant
     """
     if pd.isna(job_title):
-        return 'consultant'
+        return "consultant"
 
     job_lower = job_title.lower()
 
     # Patterns pour identifier les Business Managers
     bm_patterns = [
-        'business manager',
-        'senior business manager'
+        "business manager",
+        "senior business manager",
         # 'directeur' retiré car un Directeur de Practice est d'abord un consultant
     ]
 
     # Exception spéciale : Directeur de Practice est considéré comme consultant
-    if 'directeur de practice' in job_lower:
-        return 'consultant'
+    if "directeur de practice" in job_lower:
+        return "consultant"
 
     if any(pattern in job_lower for pattern in bm_patterns):
-        return 'bm'
+        return "bm"
 
-    return 'consultant'
+    return "consultant"
 
 
 def map_contract_type(contract_code: str) -> str:
@@ -52,20 +57,20 @@ def map_contract_type(contract_code: str) -> str:
         str: 'cdi', 'cdd', 'stage', 'apprentissage', 'autre'
     """
     if pd.isna(contract_code):
-        return 'autre'
+        return "autre"
 
     code_lower = contract_code.lower()
 
-    if 'cdi' in code_lower:
-        return 'cdi'
-    elif 'cdd' in code_lower:
-        return 'cdd'
-    elif 'stage' in code_lower:
-        return 'stage'
-    elif 'apprentissage' in code_lower:
-        return 'apprentissage'
+    if "cdi" in code_lower:
+        return "cdi"
+    elif "cdd" in code_lower:
+        return "cdd"
+    elif "stage" in code_lower:
+        return "stage"
+    elif "apprentissage" in code_lower:
+        return "apprentissage"
     else:
-        return 'autre'
+        return "autre"
 
 
 def import_vsa_personnes_data(excel_path: str, practice_mapping: dict = None):
@@ -84,14 +89,18 @@ def import_vsa_personnes_data(excel_path: str, practice_mapping: dict = None):
         print(f"📊 {len(df)} lignes lues depuis Excel")
 
         # Statistiques de classification
-        classifications = df['job_title'].apply(classify_person_by_job_title).value_counts()
-        print(f"👥 Classification: {classifications.get('consultant', 0)} consultants, {classifications.get('bm', 0)} business managers")
+        classifications = (
+            df["job_title"].apply(classify_person_by_job_title).value_counts()
+        )
+        print(
+            f"👥 Classification: {classifications.get('consultant', 0)} consultants, {classifications.get('bm', 0)} business managers"
+        )
 
         # Première passe: Identifier les BM qui ont des consultants
         bm_with_consultants = set()
         for _, row in df.iterrows():
-            if classify_person_by_job_title(row['job_title']) == 'consultant':
-                manager_name = row['ManagerName']
+            if classify_person_by_job_title(row["job_title"]) == "consultant":
+                manager_name = row["ManagerName"]
                 if pd.notna(manager_name):
                     bm_with_consultants.add(manager_name.strip())
 
@@ -103,7 +112,7 @@ def import_vsa_personnes_data(excel_path: str, practice_mapping: dict = None):
 
         with get_database_session() as session:
             for _, row in df.iterrows():
-                if classify_person_by_job_title(row['job_title']) == 'bm':
+                if classify_person_by_job_title(row["job_title"]) == "bm":
                     manager_name = f"{row['firstname']} {row['lastname']}".strip()
 
                     # Ne créer que les BM qui ont des consultants
@@ -111,9 +120,11 @@ def import_vsa_personnes_data(excel_path: str, practice_mapping: dict = None):
                         continue
 
                     # Vérifier si le BM existe déjà
-                    existing_bm = session.query(BusinessManager).filter(
-                        BusinessManager.email == row['email'].strip().lower()
-                    ).first()
+                    existing_bm = (
+                        session.query(BusinessManager)
+                        .filter(BusinessManager.email == row["email"].strip().lower())
+                        .first()
+                    )
 
                     if existing_bm:
                         created_bms[manager_name] = existing_bm.id
@@ -121,12 +132,16 @@ def import_vsa_personnes_data(excel_path: str, practice_mapping: dict = None):
 
                     # Créer le BM
                     bm = BusinessManager(
-                        nom=row['lastname'].strip(),
-                        prenom=row['firstname'].strip(),
-                        email=row['email'].strip().lower(),
-                        telephone=row['mobile_number'] if pd.notna(row['mobile_number']) else None,
+                        nom=row["lastname"].strip(),
+                        prenom=row["firstname"].strip(),
+                        email=row["email"].strip().lower(),
+                        telephone=(
+                            row["mobile_number"]
+                            if pd.notna(row["mobile_number"])
+                            else None
+                        ),
                         actif=True,  # Tous les BM sont actifs
-                        date_creation=datetime.now()
+                        date_creation=datetime.now(),
                     )
 
                     session.add(bm)
@@ -147,13 +162,15 @@ def import_vsa_personnes_data(excel_path: str, practice_mapping: dict = None):
 
         with get_database_session() as session:
             for _, row in df.iterrows():
-                if classify_person_by_job_title(row['job_title']) != 'consultant':
+                if classify_person_by_job_title(row["job_title"]) != "consultant":
                     continue
 
                 # Vérifier si le consultant existe déjà
-                existing_consultant = session.query(Consultant).filter(
-                    Consultant.email == row['email'].strip().lower()
-                ).first()
+                existing_consultant = (
+                    session.query(Consultant)
+                    .filter(Consultant.email == row["email"].strip().lower())
+                    .first()
+                )
 
                 if existing_consultant:
                     skipped_count += 1
@@ -161,24 +178,64 @@ def import_vsa_personnes_data(excel_path: str, practice_mapping: dict = None):
 
                 # Trouver le BM
                 bm_id = None
-                manager_name = row['ManagerName']
+                manager_name = row["ManagerName"]
                 if pd.notna(manager_name):
                     bm_id = created_bms.get(manager_name.strip())
 
                 # Créer le consultant
                 consultant = Consultant(
-                    nom=row['lastname'].strip(),
-                    prenom=row['firstname'].strip(),
-                    email=row['email'].strip().lower(),
-                    telephone=row['mobile_number'] if pd.notna(row['mobile_number']) else None,
-                    salaire_actuel=float(row['Salaire']) if pd.notna(row['Salaire']) else None,
-                    disponibilite=row['UseActive'].strip().lower() == 'active' if pd.notna(row['UseActive']) else True,
-                    date_entree_societe=pd.to_datetime(row['contract_date']).date() if pd.notna(row['contract_date']) else None,
+                    nom=row["lastname"].strip(),
+                    prenom=row["firstname"].strip(),
+                    email=row["email"].strip().lower(),
+                    telephone=(
+                        row["mobile_number"] if pd.notna(row["mobile_number"]) else None
+                    ),
+                    salaire_actuel=(
+                        float(row["Salaire"]) if pd.notna(row["Salaire"]) else None
+                    ),
+                    disponibilite=(
+                        row["UseActive"].strip().lower() == "active"
+                        if pd.notna(row["UseActive"])
+                        else True
+                    ),
+                    date_entree_societe=(
+                        pd.to_datetime(row["contract_date"]).date()
+                        if pd.notna(row["contract_date"])
+                        else None
+                    ),
                     # practice_id sera défini quand l'utilisateur nous donnera le mapping
-                    type_contrat=map_contract_type(row['contract_type_code']) if pd.notna(row['contract_type_code']) else 'cdi',
-                    societe=row['EntiteCollab'].strip() if pd.notna(row['EntiteCollab']) else 'Quanteam',
-                    entite=row['EntiteCollab'].strip() if pd.notna(row['EntiteCollab']) else None,
-                    date_creation=datetime.now()
+                    type_contrat=(
+                        map_contract_type(row["contract_type_code"])
+                        if pd.notna(row["contract_type_code"])
+                        else "cdi"
+                    ),
+                    societe=(
+                        row["EntiteCollab"].strip()
+                        if pd.notna(row["EntiteCollab"])
+                        else "Quanteam"
+                    ),
+                    entite=(
+                        row["EntiteCollab"].strip()
+                        if pd.notna(row["EntiteCollab"])
+                        else None
+                    ),
+                    # Nouveaux champs période d'essai et statut actif
+                    etat_periode_essai=(
+                        row["Etat P.Test"].strip()
+                        if pd.notna(row["Etat P.Test"])
+                        else None
+                    ),
+                    fin_periode_essai=(
+                        pd.to_datetime(row["Fin P.Test"]).date()
+                        if pd.notna(row["Fin P.Test"])
+                        else None
+                    ),
+                    actif=(
+                        row["UseActive"].strip().lower() == "active"
+                        if pd.notna(row["UseActive"])
+                        else True
+                    ),
+                    date_creation=datetime.now(),
                 )
 
                 session.add(consultant)
@@ -189,8 +246,12 @@ def import_vsa_personnes_data(excel_path: str, practice_mapping: dict = None):
                     cbm = ConsultantBusinessManager(
                         consultant_id=consultant.id,
                         business_manager_id=bm_id,
-                        date_debut=pd.to_datetime(row['contract_date']).date() if pd.notna(row['contract_date']) else datetime.now().date(),
-                        date_creation=datetime.now()
+                        date_debut=(
+                            pd.to_datetime(row["contract_date"]).date()
+                            if pd.notna(row["contract_date"])
+                            else datetime.now().date()
+                        ),
+                        date_creation=datetime.now(),
                     )
                     session.add(cbm)
 

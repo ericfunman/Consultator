@@ -8,17 +8,17 @@ import json
 import os
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
 
 import pytest
 import requests
 
-from app.services.ai_openai_service import (
-    OpenAIChatGPTService,
-    get_grok_service,
-    is_grok_available,
-    show_grok_config_interface,
-)
+from app.services.ai_openai_service import OpenAIChatGPTService
+from app.services.ai_openai_service import get_grok_service
+from app.services.ai_openai_service import is_grok_available
+from app.services.ai_openai_service import show_grok_config_interface
 
 
 class TestOpenAIChatGPTService(unittest.TestCase):
@@ -170,7 +170,9 @@ class TestOpenAIChatGPTService(unittest.TestCase):
             ]
         }
 
-        result = self.service._parse_and_validate_response(api_response, "original text")
+        result = self.service._parse_and_validate_response(
+            api_response, "original text"
+        )
 
         # Vérifications
         self.assertIn("consultant_info", result)
@@ -182,13 +184,7 @@ class TestOpenAIChatGPTService(unittest.TestCase):
     def test_parse_and_validate_response_json_with_markers(self):
         """Test de parsing JSON avec marqueurs ```json```"""
         api_response = {
-            "choices": [
-                {
-                    "message": {
-                        "content": "```json\n{\"test\": \"data\"}\n```"
-                    }
-                }
-            ]
+            "choices": [{"message": {"content": '```json\n{"test": "data"}\n```'}}]
         }
 
         result = self.service._parse_and_validate_response(api_response, "text")
@@ -198,15 +194,7 @@ class TestOpenAIChatGPTService(unittest.TestCase):
 
     def test_parse_and_validate_response_invalid_json(self):
         """Test de parsing avec JSON invalide"""
-        api_response = {
-            "choices": [
-                {
-                    "message": {
-                        "content": "invalid json content"
-                    }
-                }
-            ]
-        }
+        api_response = {"choices": [{"message": {"content": "invalid json content"}}]}
 
         with self.assertRaises(ValueError) as context:
             self.service._parse_and_validate_response(api_response, "text")
@@ -220,11 +208,7 @@ class TestOpenAIChatGPTService(unittest.TestCase):
         # Réponse API avec un contenu JSON qui est une liste au lieu d'un objet
         api_response = {
             "choices": [
-                {
-                    "message": {
-                        "content": '["item1", "item2"]'  # JSON qui est une liste
-                    }
-                }
+                {"message": {"content": '["item1", "item2"]'}}  # JSON qui est une liste
             ]
         }
 
@@ -270,7 +254,10 @@ class TestOpenAIChatGPTService(unittest.TestCase):
         self.assertTrue(is_grok_available())
 
     @patch.dict(os.environ, {}, clear=True)
-    @patch("app.services.ai_openai_service.OpenAIChatGPTService.__init__", side_effect=RuntimeError("Unexpected error"))
+    @patch(
+        "app.services.ai_openai_service.OpenAIChatGPTService.__init__",
+        side_effect=RuntimeError("Unexpected error"),
+    )
     def test_is_grok_available_exception_handling(self, mock_init):
         """Test de is_grok_available quand une exception inattendue est levée"""
         from app.services.ai_openai_service import is_grok_available
@@ -313,7 +300,9 @@ class TestOpenAIChatGPTService(unittest.TestCase):
         mock_st.button.return_value = True  # Bouton "Tester avec cette clé" cliqué
 
         # Mock de l'API OpenAI
-        with patch.object(OpenAIChatGPTService, '_call_openai_api', return_value={"test": "ok"}):
+        with patch.object(
+            OpenAIChatGPTService, "_call_openai_api", return_value={"test": "ok"}
+        ):
             show_grok_config_interface()
 
             mock_st.success.assert_any_call(
@@ -326,7 +315,9 @@ class TestOpenAIChatGPTService(unittest.TestCase):
         """Test du bouton de test de connexion avec clé existante"""
         mock_st.button.return_value = True  # Bouton "Tester la connexion" cliqué
 
-        with patch.object(OpenAIChatGPTService, '_call_openai_api', return_value={"test": "ok"}):
+        with patch.object(
+            OpenAIChatGPTService, "_call_openai_api", return_value={"test": "ok"}
+        ):
             show_grok_config_interface()
 
             mock_st.success.assert_any_call("✅ Connexion OpenAI réussie !")
@@ -337,7 +328,9 @@ class TestOpenAIChatGPTService(unittest.TestCase):
         """Test du bouton de test de connexion avec erreur"""
         mock_st.button.return_value = True
 
-        with patch.object(OpenAIChatGPTService, '_call_openai_api', side_effect=Exception("API Error")):
+        with patch.object(
+            OpenAIChatGPTService, "_call_openai_api", side_effect=Exception("API Error")
+        ):
             show_grok_config_interface()
 
             mock_st.error.assert_any_call("❌ Erreur de connexion: API Error")

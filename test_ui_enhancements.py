@@ -4,8 +4,8 @@ Test rapide des améliorations UI pour Consultator
 Vérifie que tous les composants fonctionnent correctement
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Ajouter le répertoire racine au path
@@ -21,13 +21,11 @@ def test_imports():
     try:
         # Test import direct depuis le répertoire app
         sys.path.insert(0, str(root_dir / "app"))
-        from ui.enhanced_ui import (
-            AdvancedUIFilters,
-            RealTimeSearch,
-            DataTableEnhancer,
-            LoadingSpinner,
-            NotificationManager,
-        )
+        from ui.enhanced_ui import AdvancedUIFilters
+        from ui.enhanced_ui import DataTableEnhancer
+        from ui.enhanced_ui import LoadingSpinner
+        from ui.enhanced_ui import NotificationManager
+        from ui.enhanced_ui import RealTimeSearch
 
         print("✅ Tous les imports réussis")
         return True
@@ -77,7 +75,8 @@ def test_ui_components():
     print("\n🔍 Test des composants UI...")
 
     try:
-        from ui.enhanced_ui import AdvancedUIFilters, RealTimeSearch
+        from ui.enhanced_ui import AdvancedUIFilters
+        from ui.enhanced_ui import RealTimeSearch
 
         # Test filtres
         filters = AdvancedUIFilters()

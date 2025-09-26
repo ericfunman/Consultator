@@ -1,28 +1,30 @@
 """Tests pour le module consultant_cv - Analyse CV"""
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from app.pages_modules.consultant_cv import (
-    show_cv_missions,
-    show_cv_skills,
-    show_cv_summary,
-    show_cv_actions,
-    categorize_skill,
-    check_existing_skill,
-    add_skill_from_cv,
-    show_cv_skills_statistics,
-    calculate_cv_quality_score,
-    show_cv_recommendations,
-    create_mission_from_cv,
-    save_mission_from_cv,
-    analyze_mission_details,
-    copy_mission_to_clipboard,
-    save_cv_analysis_to_profile,
-    generate_cv_analysis_report,
-    compare_cv_with_profile,
-    show_career_suggestions,
-)
+
+from app.pages_modules.consultant_cv import add_skill_from_cv
+from app.pages_modules.consultant_cv import analyze_mission_details
+from app.pages_modules.consultant_cv import calculate_cv_quality_score
+from app.pages_modules.consultant_cv import categorize_skill
+from app.pages_modules.consultant_cv import check_existing_skill
+from app.pages_modules.consultant_cv import compare_cv_with_profile
+from app.pages_modules.consultant_cv import copy_mission_to_clipboard
+from app.pages_modules.consultant_cv import create_mission_from_cv
+from app.pages_modules.consultant_cv import generate_cv_analysis_report
+from app.pages_modules.consultant_cv import save_cv_analysis_to_profile
+from app.pages_modules.consultant_cv import save_mission_from_cv
+from app.pages_modules.consultant_cv import show_career_suggestions
+from app.pages_modules.consultant_cv import show_cv_actions
+from app.pages_modules.consultant_cv import show_cv_missions
+from app.pages_modules.consultant_cv import show_cv_recommendations
+from app.pages_modules.consultant_cv import show_cv_skills
+from app.pages_modules.consultant_cv import show_cv_skills_statistics
+from app.pages_modules.consultant_cv import show_cv_summary
 from tests.fixtures.base_test import BaseIntegrationTest
 
 

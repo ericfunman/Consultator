@@ -3,35 +3,36 @@ Tests complets pour maximiser la couverture du module helpers.py
 Objectif: Atteindre 95%+ de couverture avec des tests robustes
 """
 
-import pytest
-from datetime import datetime, date
 import os
 import tempfile
 import uuid
-from unittest.mock import patch, Mock
+from datetime import date
+from datetime import datetime
+from unittest.mock import Mock
+from unittest.mock import patch
 
-from app.utils.helpers import (
-    format_currency,
-    format_date,
-    format_percentage,
-    format_number,
-    calculate_age,
-    calculate_experience_years,
-    safe_divide,
-    round_to_nearest,
-    calculate_percentage_change,
-    validate_email,
-    validate_phone,
-    validate_date,
-    is_valid_file_type,
-    clean_string,
-    normalize_text,
-    slugify,
-    truncate_text,
-    split_list_into_chunks,
-    generate_id,
-    get_file_extension,
-)
+import pytest
+
+from app.utils.helpers import calculate_age
+from app.utils.helpers import calculate_experience_years
+from app.utils.helpers import calculate_percentage_change
+from app.utils.helpers import clean_string
+from app.utils.helpers import format_currency
+from app.utils.helpers import format_date
+from app.utils.helpers import format_number
+from app.utils.helpers import format_percentage
+from app.utils.helpers import generate_id
+from app.utils.helpers import get_file_extension
+from app.utils.helpers import is_valid_file_type
+from app.utils.helpers import normalize_text
+from app.utils.helpers import round_to_nearest
+from app.utils.helpers import safe_divide
+from app.utils.helpers import slugify
+from app.utils.helpers import split_list_into_chunks
+from app.utils.helpers import truncate_text
+from app.utils.helpers import validate_date
+from app.utils.helpers import validate_email
+from app.utils.helpers import validate_phone
 
 
 class TestHelpersMaxCoverage:

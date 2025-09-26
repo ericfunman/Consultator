@@ -3,33 +3,57 @@ Tests avancés pour business_managers.py - Fonctions complexes
 Visant à améliorer la couverture vers 80%+
 """
 
-from unittest.mock import MagicMock, patch, mock_open
-import pytest
 import json
-from datetime import datetime, date
-from pathlib import Path
 import tempfile
+from datetime import date
+from datetime import datetime
+from pathlib import Path
+from unittest.mock import MagicMock
+from unittest.mock import mock_open
+from unittest.mock import patch
 
+import pytest
+
+from app.database.models import BusinessManager
+from app.database.models import Consultant
+from app.database.models import ConsultantBusinessManager
+from app.pages_modules.business_managers import _add_comment_to_assignment
+from app.pages_modules.business_managers import _build_bm_data_table
+from app.pages_modules.business_managers import _build_consultant_options
 from app.pages_modules.business_managers import (
-    show_edit_bm_form, show_delete_bm_confirmation,
-    show_current_bm_consultants, show_add_bm_assignment,
-    show_bm_assignments_history, _get_current_assignments,
-    _get_mission_data, _format_consultant_data, _handle_assignment_selection,
-    _end_assignment, _handle_comment_form, _add_comment_to_assignment,
-    _get_consultant_assignment_status, _build_consultant_options,
-    _process_assignment_creation, _separate_consultants_by_status,
-    _build_consultant_options_for_assignment, _handle_assignment_transfer,
-    _create_new_assignment, _display_assignment_success_message,
-    _build_bm_data_table, _display_bm_table_header, _display_bm_table_row,
-    _display_bm_metrics
+    _build_consultant_options_for_assignment,
 )
-from app.database.models import Consultant, ConsultantBusinessManager, BusinessManager
+from app.pages_modules.business_managers import _create_new_assignment
+from app.pages_modules.business_managers import (
+    _display_assignment_success_message,
+)
+from app.pages_modules.business_managers import _display_bm_metrics
+from app.pages_modules.business_managers import _display_bm_table_header
+from app.pages_modules.business_managers import _display_bm_table_row
+from app.pages_modules.business_managers import _end_assignment
+from app.pages_modules.business_managers import _format_consultant_data
+from app.pages_modules.business_managers import (
+    _get_consultant_assignment_status,
+)
+from app.pages_modules.business_managers import _get_current_assignments
+from app.pages_modules.business_managers import _get_mission_data
+from app.pages_modules.business_managers import _handle_assignment_selection
+from app.pages_modules.business_managers import _handle_assignment_transfer
+from app.pages_modules.business_managers import _handle_comment_form
+from app.pages_modules.business_managers import _process_assignment_creation
+from app.pages_modules.business_managers import _separate_consultants_by_status
+from app.pages_modules.business_managers import show_add_bm_assignment
+from app.pages_modules.business_managers import show_bm_assignments_history
+from app.pages_modules.business_managers import show_current_bm_consultants
+from app.pages_modules.business_managers import show_delete_bm_confirmation
+from app.pages_modules.business_managers import show_edit_bm_form
+
 
 class TestBusinessManagersAdvanced:
     """Tests avancés pour les fonctions complexes de business_managers.py"""
 
-    @patch('app.pages_modules.business_managers.st')
-    @patch('app.pages_modules.business_managers.get_database_session')
+    @patch("app.pages_modules.business_managers.st")
+    @patch("app.pages_modules.business_managers.get_database_session")
     def test_show_edit_bm_form_success(self, mock_session, mock_st):
         """Test d'édition réussie d'un BM"""
         # Mock st.columns pour retourner des objets mock
@@ -54,13 +78,18 @@ class TestBusinessManagersAdvanced:
         mock_bm_to_update = MagicMock()
         mock_session_instance.query.return_value.get.return_value = mock_bm_to_update
 
-        with patch('streamlit.form') as mock_form:
+        with patch("streamlit.form") as mock_form:
             mock_form_instance = MagicMock()
             mock_form.return_value.__enter__.return_value = mock_form_instance
             mock_form_instance.form_submit_button.return_value = True
 
             # Mock les champs modifiés (4 appels à text_input dans show_edit_bm_form)
-            mock_st.text_input.side_effect = ["Martin", "jean.martin@test.com", "Jean", "0123456789"]
+            mock_st.text_input.side_effect = [
+                "Martin",
+                "jean.martin@test.com",
+                "Jean",
+                "0123456789",
+            ]
             mock_st.text_area.return_value = "Notes mises à jour"
             mock_st.checkbox.return_value = False
 
@@ -76,8 +105,8 @@ class TestBusinessManagersAdvanced:
             mock_session_instance.commit.assert_called_once()
             mock_st.success.assert_called_once()
 
-    @patch('app.pages_modules.business_managers.st')
-    @patch('app.pages_modules.business_managers.get_database_session')
+    @patch("app.pages_modules.business_managers.st")
+    @patch("app.pages_modules.business_managers.get_database_session")
     def test_show_delete_bm_confirmation_with_assignments(self, mock_session, mock_st):
         """Test de suppression d'un BM avec assignations actives"""
         # Mock BM
@@ -89,12 +118,12 @@ class TestBusinessManagersAdvanced:
         # Mock context managers pour les sessions
         mock_count_session = MagicMock()
         mock_delete_session = MagicMock()
-        
+
         # Mock context managers
         mock_count_context = MagicMock()
         mock_count_context.__enter__.return_value = mock_count_session
         mock_count_context.__exit__.return_value = None
-        
+
         mock_delete_context = MagicMock()
         mock_delete_context.__enter__.return_value = mock_delete_session
         mock_delete_context.__exit__.return_value = None
@@ -103,16 +132,24 @@ class TestBusinessManagersAdvanced:
         mock_session.side_effect = [mock_count_context, mock_delete_context]
 
         # Mock compteurs d'assignations
-        mock_count_session.query.return_value.filter.return_value.count.side_effect = [2, 5]  # active, total
+        mock_count_session.query.return_value.filter.return_value.count.side_effect = [
+            2,
+            5,
+        ]  # active, total
 
         # Mock assignations actives
         mock_assignment1 = MagicMock()
         mock_assignment2 = MagicMock()
-        mock_count_session.query.return_value.filter.return_value.all.return_value = [mock_assignment1, mock_assignment2]
+        mock_count_session.query.return_value.filter.return_value.all.return_value = [
+            mock_assignment1,
+            mock_assignment2,
+        ]
 
         # Mock BM à supprimer
         mock_bm_to_delete = MagicMock()
-        mock_delete_session.query.return_value.filter.return_value.first.return_value = mock_bm_to_delete
+        mock_delete_session.query.return_value.filter.return_value.first.return_value = (
+            mock_bm_to_delete
+        )
 
         # Mock st.columns
         mock_st.columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
@@ -129,8 +166,9 @@ class TestBusinessManagersAdvanced:
         # Vérifier que le BM a été supprimé
         mock_delete_session.delete.assert_called_once_with(mock_bm_to_delete)
         mock_delete_session.commit.assert_called_once()
-    @patch('app.pages_modules.business_managers.st')
-    @patch('app.pages_modules.business_managers.get_database_session')
+
+    @patch("app.pages_modules.business_managers.st")
+    @patch("app.pages_modules.business_managers.get_database_session")
     def test_show_current_bm_consultants_with_data(self, mock_session, mock_st):
         """Test d'affichage des consultants actuels avec données"""
         # Mock session
@@ -158,8 +196,12 @@ class TestBusinessManagersAdvanced:
         mock_mission.date_debut = date.today()
 
         # Mock les requêtes
-        mock_session_instance.query.return_value.join.return_value.filter.return_value.all.return_value = [(mock_assignment, mock_consultant)]
-        mock_session_instance.query.return_value.filter.return_value.order_by.return_value.first.return_value = mock_mission
+        mock_session_instance.query.return_value.join.return_value.filter.return_value.all.return_value = [
+            (mock_assignment, mock_consultant)
+        ]
+        mock_session_instance.query.return_value.filter.return_value.order_by.return_value.first.return_value = (
+            mock_mission
+        )
 
         # Mock dataframe
         mock_df = MagicMock()
@@ -175,8 +217,8 @@ class TestBusinessManagersAdvanced:
         # Vérifier que dataframe a été appelé
         mock_st.dataframe.assert_called_once()
 
-    @patch('app.pages_modules.business_managers.st')
-    @patch('app.pages_modules.business_managers.get_database_session')
+    @patch("app.pages_modules.business_managers.st")
+    @patch("app.pages_modules.business_managers.get_database_session")
     def test_show_add_bm_assignment_available_consultant(self, mock_session, mock_st):
         """Test d'ajout d'assignation avec consultant disponible"""
         # Mock BM
@@ -198,26 +240,35 @@ class TestBusinessManagersAdvanced:
 
         # Mock les requêtes pour récupérer les consultants
         # assigned_consultant_ids query
-        mock_session_instance.query.return_value.filter.return_value.all.return_value = []  # Aucun assigné au BM
-        # all_consultants query  
+        mock_session_instance.query.return_value.filter.return_value.all.return_value = (
+            []
+        )  # Aucun assigné au BM
+        # all_consultants query
         mock_session_instance.query.return_value.all.return_value = [mock_consultant]
 
         # Mock _separate_consultants_by_status
-        with patch('app.pages_modules.business_managers._separate_consultants_by_status') as mock_separate:
-            mock_separate.return_value = ([mock_consultant], [])  # available, assigned_to_other
+        with patch(
+            "app.pages_modules.business_managers._separate_consultants_by_status"
+        ) as mock_separate:
+            mock_separate.return_value = (
+                [mock_consultant],
+                [],
+            )  # available, assigned_to_other
 
             # Mock _build_consultant_options_for_assignment
-            with patch('app.pages_modules.business_managers._build_consultant_options_for_assignment') as mock_build_options:
+            with patch(
+                "app.pages_modules.business_managers._build_consultant_options_for_assignment"
+            ) as mock_build_options:
                 mock_options = {
                     "🟢 Marie Martin (marie@test.com) - DISPONIBLE": {
                         "consultant": mock_consultant,
-                        "status": "available"
+                        "status": "available",
                     }
                 }
                 mock_build_options.return_value = mock_options
 
                 # Mock st.form
-                with patch('streamlit.form') as mock_form:
+                with patch("streamlit.form") as mock_form:
                     mock_form_instance = MagicMock()
                     mock_form.return_value.__enter__.return_value = mock_form_instance
                     mock_form.return_value.__exit__.return_value = None
@@ -234,8 +285,8 @@ class TestBusinessManagersAdvanced:
                     mock_session_instance.add.assert_called_once()
                     mock_session_instance.commit.assert_called_once()
 
-    @patch('app.pages_modules.business_managers.st')
-    @patch('app.pages_modules.business_managers.get_database_session')
+    @patch("app.pages_modules.business_managers.st")
+    @patch("app.pages_modules.business_managers.get_database_session")
     def test_show_bm_assignments_history_with_data(self, mock_session, mock_st):
         """Test d'affichage de l'historique des assignations"""
         # Mock session
@@ -253,7 +304,9 @@ class TestBusinessManagersAdvanced:
         mock_assignment.commentaire = "Test assignment"
 
         # Mock la requête
-        mock_session_instance.query.return_value.join.return_value.filter.return_value.order_by.return_value.all.return_value = [(mock_assignment, mock_consultant)]
+        mock_session_instance.query.return_value.join.return_value.filter.return_value.order_by.return_value.all.return_value = [
+            (mock_assignment, mock_consultant)
+        ]
 
         # Mock BM
         mock_bm = MagicMock()
@@ -273,7 +326,10 @@ class TestBusinessManagersAdvanced:
         mock_bm_id = 1
 
         # Mock la requête correctement
-        mock_session.query.return_value.join.return_value.filter.return_value.all.return_value = [("assignment", "consultant"), ("assignment2", "consultant2")]
+        mock_session.query.return_value.join.return_value.filter.return_value.all.return_value = [
+            ("assignment", "consultant"),
+            ("assignment2", "consultant2"),
+        ]
 
         result = _get_current_assignments(mock_bm_id, mock_session)
 
@@ -292,7 +348,9 @@ class TestBusinessManagersAdvanced:
         mock_mission.tjm = 500
         mock_mission.date_debut = date.today()
 
-        mock_session.query.return_value.filter.return_value.order_by.return_value.first.return_value = mock_mission
+        mock_session.query.return_value.filter.return_value.order_by.return_value.first.return_value = (
+            mock_mission
+        )
 
         result = _get_mission_data(mock_consultant, mock_session)
 
@@ -306,7 +364,9 @@ class TestBusinessManagersAdvanced:
         mock_consultant.id = 1
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.order_by.return_value.first.return_value = None
+        mock_session.query.return_value.filter.return_value.order_by.return_value.first.return_value = (
+            None
+        )
 
         result = _get_mission_data(mock_consultant, mock_session)
 
@@ -331,7 +391,7 @@ class TestBusinessManagersAdvanced:
             "client": "Client Test",
             "role": "Développeur",
             "tjm": 500,
-            "date_debut": "01/01/2024"
+            "date_debut": "01/01/2024",
         }
 
         result = _format_consultant_data(mock_assignment, mock_consultant, mission_data)
@@ -341,7 +401,7 @@ class TestBusinessManagersAdvanced:
         assert result["Client actuel"] == "Client Test"
         assert result["TJM"] == "500€"
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_handle_assignment_selection_end_assignment(self, mock_st):
         """Test de gestion de la sélection pour terminer une assignation"""
         # Mock st.columns
@@ -365,7 +425,7 @@ class TestBusinessManagersAdvanced:
         # Vérifier que le bouton Terminer a été affiché
         mock_st.button.assert_any_call("🔚 Terminer l'assignation", type="primary")
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_end_assignment_success(self, mock_st):
         """Test de terminaison réussie d'une assignation"""
         mock_assignment = MagicMock()
@@ -381,7 +441,7 @@ class TestBusinessManagersAdvanced:
         mock_session.commit.assert_called_once()
         mock_st.success.assert_called_once()
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_build_consultant_options(self, mock_st):
         """Test de construction des options de consultants"""
         mock_consultant_available = MagicMock()
@@ -402,7 +462,9 @@ class TestBusinessManagersAdvanced:
         mock_assignment.date_debut = date.today()
 
         available_consultants = [mock_consultant_available]
-        assigned_to_other_bm = [(mock_consultant_assigned, mock_current_bm, mock_assignment)]
+        assigned_to_other_bm = [
+            (mock_consultant_assigned, mock_current_bm, mock_assignment)
+        ]
 
         result = _build_consultant_options(available_consultants, assigned_to_other_bm)
 
@@ -426,12 +488,14 @@ class TestBusinessManagersAdvanced:
             "consultant": mock_consultant,
             "status": "available",
             "existing_assignment": None,
-            "current_bm": None
+            "current_bm": None,
         }
 
         mock_session = MagicMock()
 
-        result = _process_assignment_creation(mock_bm, selected_data, date.today(), "Test", mock_session)
+        result = _process_assignment_creation(
+            mock_bm, selected_data, date.today(), "Test", mock_session
+        )
 
         assert "assigné" in result
         mock_session.add.assert_called_once()
@@ -457,12 +521,14 @@ class TestBusinessManagersAdvanced:
             "consultant": mock_consultant,
             "status": "assigned",
             "existing_assignment": mock_existing_assignment,
-            "current_bm": mock_current_bm
+            "current_bm": mock_current_bm,
         }
 
         mock_session = MagicMock()
 
-        result = _process_assignment_creation(mock_bm, selected_data, date.today(), "Test", mock_session)
+        result = _process_assignment_creation(
+            mock_bm, selected_data, date.today(), "Test", mock_session
+        )
 
         assert "transféré" in result
         # Vérifier que l'ancienne assignation a été clôturée
@@ -493,16 +559,22 @@ class TestBusinessManagersAdvanced:
         mock_current_bm = MagicMock()
         mock_current_bm.prenom = "Pierre"
         mock_current_bm.nom = "Durand"
-        
-        # Mock first() pour retourner None pour consultant2, mock_assignment pour consultant3, mock_current_bm pour le BM
-        mock_session.query.return_value.filter.return_value.first.side_effect = [None, mock_assignment, mock_current_bm]
 
-        available, assigned = _separate_consultants_by_status(all_consultants, assigned_consultant_ids, mock_session)
+        # Mock first() pour retourner None pour consultant2, mock_assignment pour consultant3, mock_current_bm pour le BM
+        mock_session.query.return_value.filter.return_value.first.side_effect = [
+            None,
+            mock_assignment,
+            mock_current_bm,
+        ]
+
+        available, assigned = _separate_consultants_by_status(
+            all_consultants, assigned_consultant_ids, mock_session
+        )
 
         assert len(available) == 1  # consultant2 seulement
-        assert len(assigned) == 1   # consultant3 seulement
+        assert len(assigned) == 1  # consultant3 seulement
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_build_consultant_options_for_assignment(self, mock_st):
         """Test de construction des options pour assignation"""
         mock_consultant_available = MagicMock()
@@ -523,16 +595,22 @@ class TestBusinessManagersAdvanced:
         mock_assignment.date_debut = date.today()
 
         available_consultants = [mock_consultant_available]
-        assigned_to_other_bm = [(mock_consultant_assigned, mock_current_bm, mock_assignment)]
+        assigned_to_other_bm = [
+            (mock_consultant_assigned, mock_current_bm, mock_assignment)
+        ]
 
-        result = _build_consultant_options_for_assignment(available_consultants, assigned_to_other_bm)
+        result = _build_consultant_options_for_assignment(
+            available_consultants, assigned_to_other_bm
+        )
 
         assert len(result) == 2
         # Vérifier que les messages ont été affichés
         mock_st.write.assert_any_call("**🟢 Consultants disponibles :**")
-        mock_st.write.assert_any_call("**🔄 Consultants assignés à d'autres BMs (nécessite transfert) :**")
+        mock_st.write.assert_any_call(
+            "**🔄 Consultants assignés à d'autres BMs (nécessite transfert) :**"
+        )
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_handle_assignment_transfer(self, mock_st):
         """Test de gestion du transfert d'assignation"""
         mock_existing_assignment = MagicMock()
@@ -544,7 +622,7 @@ class TestBusinessManagersAdvanced:
 
         selected_data = {
             "existing_assignment": mock_existing_assignment,
-            "current_bm": MagicMock(prenom="Pierre", nom="Durand")
+            "current_bm": MagicMock(prenom="Pierre", nom="Durand"),
         }
 
         date_debut = date.today()
@@ -571,7 +649,9 @@ class TestBusinessManagersAdvanced:
         date_debut = date.today()
         commentaire = "Test assignment"
 
-        _create_new_assignment(mock_consultant, mock_bm, date_debut, commentaire, mock_session)
+        _create_new_assignment(
+            mock_consultant, mock_bm, date_debut, commentaire, mock_session
+        )
 
         mock_session.add.assert_called_once()
         # Vérifier que l'assignation a les bonnes valeurs
@@ -581,7 +661,7 @@ class TestBusinessManagersAdvanced:
         assert call_args.date_debut == date_debut
         assert call_args.commentaire == commentaire
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_display_assignment_success_message_available(self, mock_st):
         """Test d'affichage du message de succès pour consultant disponible"""
         selected_data = {"status": "available"}
@@ -594,7 +674,7 @@ class TestBusinessManagersAdvanced:
         success_message = mock_st.success.call_args[0][0]
         assert "assigné" in success_message
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_display_assignment_success_message_transfer(self, mock_st):
         """Test d'affichage du message de succès pour transfert"""
         selected_data = {"status": "assigned"}
@@ -611,21 +691,25 @@ class TestBusinessManagersAdvanced:
         """Test de construction du tableau de données BM"""
         mock_session = MagicMock()
 
-        bms_data_from_service = [{
-            "id": 1,
-            "prenom": "Jean",
-            "nom": "Dupont",
-            "email": "jean@test.com",
-            "telephone": "0123456789",
-            "consultants_count": 5,
-            "actif": True,
-            "date_creation": datetime.now()
-        }]
+        bms_data_from_service = [
+            {
+                "id": 1,
+                "prenom": "Jean",
+                "nom": "Dupont",
+                "email": "jean@test.com",
+                "telephone": "0123456789",
+                "consultants_count": 5,
+                "actif": True,
+                "date_creation": datetime.now(),
+            }
+        ]
 
         # Mock session pour compter les assignations
         mock_session_instance = MagicMock()
         mock_session.return_value.__enter__.return_value = mock_session_instance
-        mock_session_instance.query.return_value.filter.return_value.count.return_value = 10
+        mock_session_instance.query.return_value.filter.return_value.count.return_value = (
+            10
+        )
 
         result = _build_bm_data_table(bms_data_from_service)
 
@@ -635,7 +719,7 @@ class TestBusinessManagersAdvanced:
         assert result[0]["Nom"] == "Dupont"
         assert result[0]["Total assignations"] == 280
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_display_bm_table_header(self, mock_st):
         """Test d'affichage de l'en-tête du tableau BM"""
         # Mock st.columns
@@ -646,7 +730,7 @@ class TestBusinessManagersAdvanced:
         # Vérifier que les colonnes ont été créées
         mock_st.columns.assert_called_once_with([1, 3, 3, 2, 2, 2, 2])
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_display_bm_table_row(self, mock_st):
         """Test d'affichage d'une ligne du tableau BM"""
         # Mock st.columns
@@ -660,7 +744,7 @@ class TestBusinessManagersAdvanced:
             "Téléphone": "0123456789",
             "Consultants actuels": 5,
             "Total assignations": 10,
-            "Statut": "🟢 Actif"
+            "Statut": "🟢 Actif",
         }
 
         _display_bm_table_row(row, 0, 1)
@@ -668,22 +752,18 @@ class TestBusinessManagersAdvanced:
         # Vérifier que les colonnes ont été créées
         mock_st.columns.assert_called_once_with([1, 3, 3, 2, 2, 2, 2])
 
-    @patch('app.pages_modules.business_managers.st')
+    @patch("app.pages_modules.business_managers.st")
     def test_display_bm_metrics(self, mock_st):
         """Test d'affichage des métriques BM"""
         # Mock st.columns
         mock_st.columns.return_value = [MagicMock() for _ in range(4)]
 
-        bms_data_from_service = [
-            {"actif": True},
-            {"actif": False},
-            {"actif": True}
-        ]
+        bms_data_from_service = [{"actif": True}, {"actif": False}, {"actif": True}]
 
         bms_data = [
             {"Consultants actuels": 5},
             {"Consultants actuels": 3},
-            {"Consultants actuels": 2}
+            {"Consultants actuels": 2},
         ]
 
         _display_bm_metrics(bms_data_from_service, bms_data)

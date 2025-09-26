@@ -1,22 +1,24 @@
 """Tests unitaires pour le module consultant_forms"""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 import streamlit as st
 
-# Import des fonctions à tester
-from app.pages_modules.consultant_forms import (
-    validate_consultant_form,
-    create_consultant,
-    update_consultant,
-    delete_consultant,
-    show_add_consultant_form,
-    show_edit_consultant_form,
-)
-
 # Import des modèles pour les mocks
-from app.database.models import Consultant, Practice
+from app.database.models import Consultant
+from app.database.models import Practice
+
+# Import des fonctions à tester
+from app.pages_modules.consultant_forms import create_consultant
+from app.pages_modules.consultant_forms import delete_consultant
+from app.pages_modules.consultant_forms import show_add_consultant_form
+from app.pages_modules.consultant_forms import show_edit_consultant_form
+from app.pages_modules.consultant_forms import update_consultant
+from app.pages_modules.consultant_forms import validate_consultant_form
 
 
 class TestValidateConsultantForm:

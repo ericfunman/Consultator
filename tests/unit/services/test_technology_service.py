@@ -3,10 +3,10 @@ Tests unitaires pour le service TechnologyService
 Couvre toutes les méthodes statiques de gestion des technologies
 """
 
-import pytest
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import pytest
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.services.technology_service import TechnologyService

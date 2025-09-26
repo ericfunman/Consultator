@@ -3,11 +3,15 @@ Tests complets pour les pages Streamlit
 Couvre les fonctions show() et la logique des pages
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-import streamlit as st
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pandas as pd
-from datetime import date, datetime
+import pytest
+import streamlit as st
 
 # Mock streamlit pour les tests
 st_mock = MagicMock()

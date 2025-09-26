@@ -3,9 +3,13 @@ Classe de base réutilisable pour tous les tests Consultator
 Fournit des configurations communes et des utilitaires partagés
 """
 
+from typing import Any
+from typing import Dict
+from typing import Optional
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import MagicMock, patch
-from typing import Dict, Any, Optional
 
 
 class BaseTest:

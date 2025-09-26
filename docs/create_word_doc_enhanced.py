@@ -7,13 +7,17 @@ Version améliorée avec gestion des tableaux, liens, et mise en forme avancée
 import os
 import re
 from pathlib import Path
+
 from docx import Document
-from docx.shared import Inches, Pt, RGBColor
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.oxml.ns import nsdecls, qn
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
+from docx.oxml.ns import qn
+from docx.shared import Inches
+from docx.shared import Pt
+from docx.shared import RGBColor
 
 
 def setup_document_styles(doc):

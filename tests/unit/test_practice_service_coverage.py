@@ -3,9 +3,13 @@ Tests de couverture ciblés pour practice_service.py
 Tests réalistes basés sur le code existant
 """
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 from sqlalchemy.exc import SQLAlchemyError
+
 from app.services.practice_service import PracticeService
 
 

@@ -4,12 +4,14 @@ Test de diagnostic pour l'API OpenAI
 """
 
 import os
-import requests
 import ssl
+
+import requests
+
 
 def test_openai_diagnostic():
     """Test diagnostic complet pour OpenAI"""
-    
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("❌ OPENAI_API_KEY non définie")
@@ -21,7 +23,8 @@ def test_openai_diagnostic():
     print("\n1. Test résolution DNS...")
     try:
         import socket
-        ip = socket.gethostbyname('api.openai.com')
+
+        ip = socket.gethostbyname("api.openai.com")
         print(f"✅ DNS résolu: {ip}")
     except Exception as e:
         print(f"❌ Erreur DNS: {e}")
@@ -38,15 +41,12 @@ def test_openai_diagnostic():
 
     # Test 3: Test avec différents paramètres SSL
     print("\n3. Test API avec SSL strict...")
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
     payload = {
         "model": "gpt-3.5-turbo",
         "messages": [{"role": "user", "content": "Test"}],
-        "max_tokens": 5
+        "max_tokens": 5,
     }
 
     try:
@@ -54,7 +54,7 @@ def test_openai_diagnostic():
             "https://api.openai.com/v1/chat/completions",
             headers=headers,
             json=payload,
-            timeout=30
+            timeout=30,
         )
         print(f"✅ Réponse API: {response.status_code}")
         if response.status_code != 200:
@@ -69,7 +69,7 @@ def test_openai_diagnostic():
                 headers=headers,
                 json=payload,
                 timeout=30,
-                verify=False
+                verify=False,
             )
             print(f"✅ Sans SSL: {response.status_code}")
             if response.status_code != 200:
@@ -80,6 +80,7 @@ def test_openai_diagnostic():
     except Exception as e:
         print(f"❌ Autre erreur: {e}")
         return False
+
 
 if __name__ == "__main__":
     test_openai_diagnostic()

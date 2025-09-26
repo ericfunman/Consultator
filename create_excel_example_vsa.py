@@ -3,56 +3,74 @@ Script de création d'un fichier Excel d'exemple pour les missions VSA
 Montre la structure attendue pour l'import des missions
 """
 
-import pandas as pd
-from datetime import date, timedelta
 import random
+from datetime import date
+from datetime import timedelta
+
+import pandas as pd
 
 # Données d'exemple pour les missions VSA
 sample_data = {
-    'user_id': [1, 1, 2, 2, 3, 4, 5],
-    'Code': ['SG-001', 'BNP-002', 'CA-001', 'AXA-002', 'ORA-001', 'SFR-001', 'BOU-001'],
-    'Orderid': ['CMD-12345', 'CMD-23456', 'CMD-34567', 'CMD-45678', 'CMD-56789', 'CMD-67890', 'CMD-78901'],
-    'name': ['Société Générale', 'BNP Paribas', 'Crédit Agricole', 'AXA', 'Orange', 'SFR', 'Bouygues Telecom'],
-    'date_debut': [
+    "user_id": [1, 1, 2, 2, 3, 4, 5],
+    "Code": ["SG-001", "BNP-002", "CA-001", "AXA-002", "ORA-001", "SFR-001", "BOU-001"],
+    "Orderid": [
+        "CMD-12345",
+        "CMD-23456",
+        "CMD-34567",
+        "CMD-45678",
+        "CMD-56789",
+        "CMD-67890",
+        "CMD-78901",
+    ],
+    "name": [
+        "Société Générale",
+        "BNP Paribas",
+        "Crédit Agricole",
+        "AXA",
+        "Orange",
+        "SFR",
+        "Bouygues Telecom",
+    ],
+    "date_debut": [
         date(2024, 1, 15),
         date(2024, 3, 1),
         date(2024, 2, 10),
         date(2024, 4, 5),
         date(2024, 1, 20),
         date(2024, 5, 1),
-        date(2024, 6, 15)
+        date(2024, 6, 15),
     ],
-    'date_fin': [
+    "date_fin": [
         date(2024, 7, 15),
         date(2024, 9, 1),
         date(2024, 8, 10),
         date(2024, 10, 5),
         date(2024, 7, 20),
         date(2024, 11, 1),
-        date(2024, 12, 15)
+        date(2024, 12, 15),
     ],
-    'TJM': [450.0, 520.0, 380.0, 600.0, 480.0, 420.0, 550.0],
-    'CJM': [432.0, 498.0, 364.0, 576.0, 460.0, 403.0, 528.0],
-    'description': [
-        'Développement application bancaire',
-        'Refonte système de paiement',
-        'Migration infrastructure cloud',
-        'Développement API assurance',
-        'Optimisation réseau télécom',
-        'Modernisation plateforme mobile',
-        'Déploiement solution 5G'
-    ]
+    "TJM": [450.0, 520.0, 380.0, 600.0, 480.0, 420.0, 550.0],
+    "CJM": [432.0, 498.0, 364.0, 576.0, 460.0, 403.0, 528.0],
+    "description": [
+        "Développement application bancaire",
+        "Refonte système de paiement",
+        "Migration infrastructure cloud",
+        "Développement API assurance",
+        "Optimisation réseau télécom",
+        "Modernisation plateforme mobile",
+        "Déploiement solution 5G",
+    ],
 }
 
 # Créer le DataFrame
 df = pd.DataFrame(sample_data)
 
 # Créer le fichier Excel avec l'onglet Mission
-with pd.ExcelWriter('missions_vsa_example.xlsx', engine='openpyxl') as writer:
-    df.to_excel(writer, sheet_name='Mission', index=False)
+with pd.ExcelWriter("missions_vsa_example.xlsx", engine="openpyxl") as writer:
+    df.to_excel(writer, sheet_name="Mission", index=False)
 
     # Ajuster la largeur des colonnes
-    worksheet = writer.sheets['Mission']
+    worksheet = writer.sheets["Mission"]
     for column in worksheet.columns:
         max_length = 0
         column_letter = column[0].column_letter

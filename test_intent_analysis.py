@@ -3,9 +3,12 @@
 Script pour tester et corriger les assertions d'intention du chatbot
 """
 
-from app.services.chatbot_service import ChatbotService
-from unittest.mock import Mock, patch, MagicMock
 from contextlib import contextmanager
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+from app.services.chatbot_service import ChatbotService
 
 
 @contextmanager

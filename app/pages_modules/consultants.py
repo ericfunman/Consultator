@@ -294,7 +294,12 @@ def show_consultant_profile():
             )
 
             with tab1:
-                show_consultant_info(consultant_obj)
+                # Importer et utiliser la vraie fonction depuis consultant_info.py
+                from .consultant_info import (
+                    show_consultant_info as show_consultant_info_complete,
+                )
+
+                show_consultant_info_complete(consultant_obj)
 
             with tab2:
                 show_consultant_skills(consultant_obj)
@@ -308,6 +313,7 @@ def show_consultant_profile():
             with tab5:
                 # Afficher les missions VSA
                 from .consultant_info import _display_vsa_missions
+
                 _display_vsa_missions(consultant_obj)
 
             with tab6:
@@ -554,18 +560,6 @@ def _display_consultant_status(consultant_db):
             st.info("📊 **Expérience :** Calcul en cours...")
     else:
         st.info("📊 **Expérience :** Non calculée (date première mission manquante)")
-
-    # Statut société
-    try:
-        statut = consultant_db.statut_societe
-        if statut == "En poste":
-            st.success("✅ **Statut :** " + str(statut))
-        elif statut == "Départ prévu":
-            st.warning("⚠️ **Statut :** " + str(statut))
-        else:
-            st.error("❌ **Statut :** " + str(statut))
-    except (AttributeError, TypeError, ValueError):
-        st.info("📊 **Statut :** En cours de calcul...")
 
 
 def _process_consultant_form_submission(consultant, form_data):

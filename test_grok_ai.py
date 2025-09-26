@@ -13,8 +13,11 @@ app_dir = Path(__file__).parent / "app"
 sys.path.insert(0, str(app_dir))
 
 try:
-    from services.ai_grok_service import GrokAIService, is_grok_available, get_grok_service
     import json
+
+    from services.ai_grok_service import GrokAIService
+    from services.ai_grok_service import get_grok_service
+    from services.ai_grok_service import is_grok_available
 except ImportError as e:
     print(f"❌ Erreur d'import: {e}")
     print("Assurez-vous que vous êtes dans le répertoire racine du projet")
@@ -104,7 +107,9 @@ def test_cv_analysis():
             print(f"  • Missions détectées: {len(result['missions'])}")
 
         if "competences" in result and "techniques" in result["competences"]:
-            print(f"  • Compétences techniques: {len(result['competences']['techniques'])}")
+            print(
+                f"  • Compétences techniques: {len(result['competences']['techniques'])}"
+            )
 
         if "_cost_estimate" in result:
             print(f"  • Coût estimé: ${result['_cost_estimate']:.4f}")
@@ -134,7 +139,9 @@ def main():
     # Vérifier la clé API
     api_key = os.getenv("GROK_API_KEY")
     if api_key:
-        masked_key = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
+        masked_key = (
+            api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
+        )
         print(f"🔑 Clé API détectée: {masked_key}")
     else:
         print("⚠️ Aucune clé API détectée (GROK_API_KEY)")

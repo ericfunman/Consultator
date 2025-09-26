@@ -3,10 +3,13 @@ Tests optimisés ChatbotService - Objectif 80% de couverture
 Tests fonctionnels avec mocks corrects pour toutes les méthodes
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from unittest import TestCase
 from contextlib import contextmanager
+from unittest import TestCase
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 
 
 class TestChatbotService80Percent(TestCase):
@@ -235,7 +238,15 @@ class TestChatbotService80Percent(TestCase):
         with patch.object(
             chatbot, "_find_consultant_by_name", return_value=self.mock_consultant
         ), patch.object(
-            chatbot, "_get_salary_stats", return_value={"moyenne": 50000, "mediane": 50000, "minimum": 40000, "maximum": 60000, "total": 10}
+            chatbot,
+            "_get_salary_stats",
+            return_value={
+                "moyenne": 50000,
+                "mediane": 50000,
+                "minimum": 40000,
+                "maximum": 60000,
+                "total": 10,
+            },
         ):
             entities = {"noms": ["Jean"]}
             entities.update(self.full_entities)
@@ -354,7 +365,10 @@ class TestChatbotService80Percent(TestCase):
             assert isinstance(result, dict)
             assert "response" in result
             # Correction: vérifier le contenu exact de la réponse
-            assert "2 mission(s)" in result["response"] or "2 missions" in result["response"]
+            assert (
+                "2 mission(s)" in result["response"]
+                or "2 missions" in result["response"]
+            )
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_stats_question_with_mock(self, mock_session):
@@ -423,7 +437,9 @@ class TestChatbotService80Percent(TestCase):
             mock_practice
         )
         # Mock pour all() aussi
-        mock_db.query.return_value.filter.return_value.all.return_value = [mock_practice]
+        mock_db.query.return_value.filter.return_value.all.return_value = [
+            mock_practice
+        ]
 
         chatbot = ChatbotService()
         entities = {"practices": ["Data Science"]}
@@ -507,7 +523,9 @@ class TestChatbotService80Percent(TestCase):
         # Mock query result
         mock_distinct = Mock()
         mock_distinct.all.return_value = [(self.mock_consultant, Mock())]
-        mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value = mock_distinct
+        mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value = (
+            mock_distinct
+        )
 
         chatbot = ChatbotService()
         result = chatbot._find_consultants_by_skill("Python")
@@ -527,7 +545,9 @@ class TestChatbotService80Percent(TestCase):
         # Mock query result
         mock_distinct = Mock()
         mock_distinct.all.return_value = [self.mock_consultant]
-        mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value = mock_distinct
+        mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value = (
+            mock_distinct
+        )
 
         chatbot = ChatbotService()
         result = chatbot._find_consultants_by_language("Anglais")

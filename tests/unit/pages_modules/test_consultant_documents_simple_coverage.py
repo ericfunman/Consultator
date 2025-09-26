@@ -1,8 +1,11 @@
 """
 Tests de couverture pour consultant_documents.py - Version simplifiée
 """
+
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 import pytest
 
 from app.pages_modules.consultant_documents import show_documents_statistics
@@ -11,14 +14,14 @@ from app.pages_modules.consultant_documents import show_documents_statistics
 class TestConsultantDocumentsSimple:
     """Tests simples pour améliorer la couverture de consultant_documents.py"""
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_show_documents_statistics_no_documents(self, mock_st):
         """Test des statistiques sans documents"""
         show_documents_statistics([])
         # Ne devrait rien afficher de spécial
         mock_st.markdown.assert_not_called()
 
-    @patch('app.pages_modules.consultant_documents.st')
+    @patch("app.pages_modules.consultant_documents.st")
     def test_show_documents_statistics_with_documents(self, mock_st):
         """Test des statistiques avec documents"""
         # Mock st.columns pour retourner 4 mocks
@@ -49,4 +52,5 @@ class TestConsultantDocumentsSimple:
 
 if __name__ == "__main__":
     import unittest
+
     unittest.main()

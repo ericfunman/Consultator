@@ -3,8 +3,8 @@ Tests simples et robustes pour le pipeline CI/CD
 Tests minimaux pour éviter les échecs du workflow
 """
 
-import sys
 import os
+import sys
 
 
 def test_basic_import():

@@ -1,21 +1,23 @@
 """Tests pour les fonctions de base de données - Amélioration de la couverture"""
 
-import pytest
 import os
 import tempfile
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.database.database import (
-    get_database_engine,
-    get_session_factory,
-    get_database_session,
-    is_database_initialized,
-    init_database,
-    reset_database,
-    check_database_exists,
-    get_database_info,
-)
+
+from app.database.database import check_database_exists
+from app.database.database import get_database_engine
+from app.database.database import get_database_info
+from app.database.database import get_database_session
+from app.database.database import get_session_factory
+from app.database.database import init_database
+from app.database.database import is_database_initialized
+from app.database.database import reset_database
 from app.database.models import Base
 from tests.fixtures.base_test import BaseUnitTest
 

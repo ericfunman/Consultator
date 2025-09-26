@@ -1,8 +1,12 @@
 """Tests pour le module consultant_list - Interface utilisateur"""
 
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
+
 from app.pages_modules.consultant_list import show_consultants_list
 from tests.fixtures.base_test import BaseUITest
 
@@ -255,7 +259,9 @@ class TestConsultantList(BaseUITest):
     @patch("pandas.DataFrame")
     def test_generate_consultants_report_success(self, mock_dataframe, mock_st):
         """Test génération de rapport réussie"""
-        from app.pages_modules.consultant_list import generate_consultants_report
+        from app.pages_modules.consultant_list import (
+            generate_consultants_report,
+        )
 
         # Mock DataFrame
         mock_df = MagicMock()
@@ -285,7 +291,9 @@ class TestConsultantList(BaseUITest):
     @patch("pandas.DataFrame")
     def test_generate_consultants_report_empty(self, mock_dataframe, mock_st):
         """Test génération de rapport avec données vides"""
-        from app.pages_modules.consultant_list import generate_consultants_report
+        from app.pages_modules.consultant_list import (
+            generate_consultants_report,
+        )
 
         # Mock DataFrame vide
         mock_df = MagicMock()

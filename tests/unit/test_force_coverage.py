@@ -7,9 +7,13 @@ def test_force_code_execution():
     """Test qui force l'exécution de code pour augmenter la couverture"""
 
     # Import et exécution forcée des modules principaux
-    from app.database.models import Consultant, Practice, BusinessManager
-    from app.database.database import get_database_session, get_database_info
-    from app.utils.skill_categories import get_all_competences, get_all_categories
+    from app.database.database import get_database_info
+    from app.database.database import get_database_session
+    from app.database.models import BusinessManager
+    from app.database.models import Consultant
+    from app.database.models import Practice
+    from app.utils.skill_categories import get_all_categories
+    from app.utils.skill_categories import get_all_competences
     from app.utils.technologies_referentiel import get_all_technologies
 
     # Créer des instances pour forcer l'exécution du code
@@ -83,12 +87,10 @@ def test_execute_main_functions():
     """Test qui exécute les fonctions principales"""
 
     try:
-        from app.utils.skill_categories import (
-            get_all_competences,
-            get_competences_by_category,
-            get_all_categories,
-            search_competences,
-        )
+        from app.utils.skill_categories import get_all_categories
+        from app.utils.skill_categories import get_all_competences
+        from app.utils.skill_categories import get_competences_by_category
+        from app.utils.skill_categories import search_competences
 
         # Exécuter toutes les fonctions
         all_comp = get_all_competences()
@@ -109,11 +111,11 @@ def test_execute_main_functions():
         print(f"⚠️ Erreur fonctions skill_categories: {exc}")
 
     try:
+        from app.utils.technologies_referentiel import get_all_technologies
         from app.utils.technologies_referentiel import (
-            get_all_technologies,
             get_technologies_by_category,
-            search_technologies,
         )
+        from app.utils.technologies_referentiel import search_technologies
 
         # Exécuter toutes les fonctions
         all_tech = get_all_technologies()
@@ -137,7 +139,8 @@ def test_database_operations():
     """Test qui exécute des opérations de base de données"""
 
     try:
-        from app.database.database import get_database_info, create_engine
+        from app.database.database import create_engine
+        from app.database.database import get_database_info
 
         # Tenter d'obtenir les infos de la DB
         db_info = get_database_info()

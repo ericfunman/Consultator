@@ -1,20 +1,22 @@
 """Tests pour le module consultant_profile - Interface utilisateur"""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-import streamlit as st
 from datetime import datetime
-from app.pages_modules.consultant_profile import (
-    show,
-    show_consultant_profile,
-    show_cv_analysis_fullwidth,
-    show_cv_missions_tab,
-    show_cv_skills_tab,
-    show_cv_summary_tab,
-    show_cv_actions_tab,
-    categorize_skill,
-    calculate_cv_quality_score,
-)
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
+import pytest
+import streamlit as st
+
+from app.pages_modules.consultant_profile import calculate_cv_quality_score
+from app.pages_modules.consultant_profile import categorize_skill
+from app.pages_modules.consultant_profile import show
+from app.pages_modules.consultant_profile import show_consultant_profile
+from app.pages_modules.consultant_profile import show_cv_actions_tab
+from app.pages_modules.consultant_profile import show_cv_analysis_fullwidth
+from app.pages_modules.consultant_profile import show_cv_missions_tab
+from app.pages_modules.consultant_profile import show_cv_skills_tab
+from app.pages_modules.consultant_profile import show_cv_summary_tab
 from tests.fixtures.base_test import BaseUITest
 
 

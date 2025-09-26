@@ -4,8 +4,12 @@ Couvre les principales fonctions avec mocks extensifs pour Streamlit et la base 
 """
 
 import unittest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, date
+from datetime import date
+from datetime import datetime
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import patch
+
 import pandas as pd
 
 
@@ -90,14 +94,14 @@ class TestConsultantsCoverage(unittest.TestCase):
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.get_database_session")
-    def test_show_consultant_profile_success(
-        self, mock_get_session, mock_st
-    ):
+    def test_show_consultant_profile_success(self, mock_get_session, mock_st):
         """Test de l'affichage du profil consultant avec succès"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
         # Mock both queries - first one for loading consultant data, second one for tabs
-        mock_session.query().options().filter().first.return_value = self.mock_consultant
+        mock_session.query().options().filter().first.return_value = (
+            self.mock_consultant
+        )
         mock_session.query().filter().first.return_value = self.mock_consultant
 
         # Mock session state correctement
@@ -267,16 +271,41 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         # Mock inputs to return proper values - need more values for all text_input calls
         mock_st.text_input.side_effect = [
-            "Jean", "jean@example.com", "01.23.45.67.89", "Dupont",
-            "Test Notes", "Test Societe", "Test Grade", "Test Type",
-            "Additional Text 1", "Additional Text 2", "Additional Text 3", "Additional Text 4"
+            "Jean",
+            "jean@example.com",
+            "01.23.45.67.89",
+            "Dupont",
+            "Test Notes",
+            "Test Societe",
+            "Test Grade",
+            "Test Type",
+            "Additional Text 1",
+            "Additional Text 2",
+            "Additional Text 3",
+            "Additional Text 4",
         ]
         mock_st.number_input = Mock(return_value=50000)  # Replace the method entirely
         mock_st.checkbox.return_value = True
-        mock_st.selectbox.side_effect = ["Data Science", "Quanteam", "Confirmé", "CDI", "Option 1", "Option 2", "Option 3", "Option 4"]
+        mock_st.selectbox.side_effect = [
+            "Data Science",
+            "Quanteam",
+            "Confirmé",
+            "CDI",
+            "Option 1",
+            "Option 2",
+            "Option 3",
+            "Option 4",
+        ]
         mock_st.date_input.side_effect = [
-            date(2020, 1, 1), None, None, date(2023, 1, 1), date(2023, 12, 31), 
-            date(2024, 1, 1), date(2024, 6, 30), date(2025, 1, 1), date(2025, 12, 31)
+            date(2020, 1, 1),
+            None,
+            None,
+            date(2023, 1, 1),
+            date(2023, 12, 31),
+            date(2024, 1, 1),
+            date(2024, 6, 30),
+            date(2025, 1, 1),
+            date(2025, 12, 31),
         ]
         mock_st.text_area.return_value = "Notes mises à jour"
 
@@ -288,9 +317,7 @@ class TestConsultantsCoverage(unittest.TestCase):
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.get_database_session")
-    def test_show_consultant_skills_technical(
-        self, mock_get_session, mock_st
-    ):
+    def test_show_consultant_skills_technical(self, mock_get_session, mock_st):
         """Test de l'affichage des compétences techniques"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -341,9 +368,7 @@ class TestConsultantsCoverage(unittest.TestCase):
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.get_database_session")
-    def test_show_consultant_languages(
-        self, mock_get_session, mock_st
-    ):
+    def test_show_consultant_languages(self, mock_get_session, mock_st):
         """Test de l'affichage des langues du consultant"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -745,9 +770,7 @@ class TestConsultantsCoverage(unittest.TestCase):
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.get_database_session")
-    def test_add_functional_skill_form(
-        self, mock_get_session, mock_st
-    ):
+    def test_add_functional_skill_form(self, mock_get_session, mock_st):
         """Test du formulaire d'ajout de compétence fonctionnelle"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -776,7 +799,9 @@ class TestConsultantsCoverage(unittest.TestCase):
         with patch(
             "utils.skill_categories.COMPETENCES_FONCTIONNELLES", mock_competences
         ):
-            from app.pages_modules.consultants import _add_functional_skill_form
+            from app.pages_modules.consultants import (
+                _add_functional_skill_form,
+            )
 
             _add_functional_skill_form(self.mock_consultant)
 
@@ -858,7 +883,9 @@ class TestConsultantsCoverage(unittest.TestCase):
     @patch("app.pages_modules.consultants.st")
     def test_load_consultant_data_not_found(self, mock_st):
         """Test de _load_consultant_data consultant introuvable"""
-        with patch("app.pages_modules.consultants.get_database_session") as mock_get_session:
+        with patch(
+            "app.pages_modules.consultants.get_database_session"
+        ) as mock_get_session:
             mock_session = Mock()
             mock_get_session.return_value.__enter__.return_value = mock_session
             mock_session.query().options().filter().first.return_value = None
@@ -898,7 +925,7 @@ class TestConsultantsCoverage(unittest.TestCase):
             "salaire_actuel": 50000,
             "disponibilite": True,
             "date_creation": datetime.now(),
-            "practice_name": "Test Practice"
+            "practice_name": "Test Practice",
         }
 
         # Mock columns to return context manager mocks
@@ -962,7 +989,16 @@ class TestConsultantsCoverage(unittest.TestCase):
     @patch("app.pages_modules.consultants.st.date_input")
     @patch("app.pages_modules.consultants.st.text_area")
     @patch("app.pages_modules.consultants.st.columns")
-    def test_render_basic_consultant_fields(self, mock_columns, mock_text_area, mock_date_input, mock_selectbox, mock_checkbox, mock_text_input, mock_number_input):
+    def test_render_basic_consultant_fields(
+        self,
+        mock_columns,
+        mock_text_area,
+        mock_date_input,
+        mock_selectbox,
+        mock_checkbox,
+        mock_text_input,
+        mock_number_input,
+    ):
         """Test de _render_basic_consultant_fields"""
         mock_consultant = Mock()
         mock_consultant.prenom = "Jean"
@@ -995,10 +1031,16 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         mock_columns.return_value = tuple(mock_cols)
 
-        from app.pages_modules.consultants import _render_basic_consultant_fields
+        from app.pages_modules.consultants import (
+            _render_basic_consultant_fields,
+        )
 
         result = _render_basic_consultant_fields(
-            mock_consultant, practice_options, current_practice_id, bm_nom_complet, bm_email
+            mock_consultant,
+            practice_options,
+            current_practice_id,
+            bm_nom_complet,
+            bm_email,
         )
 
         self.assertEqual(len(result), 7)  # Should return 7 values
@@ -1021,10 +1063,12 @@ class TestConsultantsCoverage(unittest.TestCase):
                 mock_col.__exit__ = Mock(return_value=None)
                 mock_cols.append(mock_col)
             return tuple(mock_cols)
-        
+
         mock_st.columns.side_effect = mock_columns_side_effect
 
-        from app.pages_modules.consultants import _render_company_history_fields
+        from app.pages_modules.consultants import (
+            _render_company_history_fields,
+        )
 
         result = _render_company_history_fields(mock_consultant)
 
@@ -1047,7 +1091,9 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         mock_st.columns.return_value = tuple(mock_cols)
 
-        from app.pages_modules.consultants import _render_professional_profile_fields
+        from app.pages_modules.consultants import (
+            _render_professional_profile_fields,
+        )
 
         result = _render_professional_profile_fields(mock_consultant)
 
@@ -1092,10 +1138,12 @@ class TestConsultantsCoverage(unittest.TestCase):
             "date_sortie": None,
             "date_premiere_mission": date.today(),
             "grade": "Senior",
-            "type_contrat": "CDI"
+            "type_contrat": "CDI",
         }
 
-        from app.pages_modules.consultants import _process_consultant_form_submission
+        from app.pages_modules.consultants import (
+            _process_consultant_form_submission,
+        )
 
         result = _process_consultant_form_submission(mock_consultant, form_data)
 
@@ -1104,7 +1152,9 @@ class TestConsultantsCoverage(unittest.TestCase):
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.ConsultantService")
-    def test_process_consultant_form_submission_validation_error(self, mock_service, mock_st):
+    def test_process_consultant_form_submission_validation_error(
+        self, mock_service, mock_st
+    ):
         """Test de _process_consultant_form_submission avec erreur de validation"""
         mock_consultant = Mock()
         mock_consultant.id = 1
@@ -1112,19 +1162,25 @@ class TestConsultantsCoverage(unittest.TestCase):
         form_data = {
             "prenom": "",  # Empty required field
             "nom": "Dupont",
-            "email": "jean@test.com"
+            "email": "jean@test.com",
         }
 
-        from app.pages_modules.consultants import _process_consultant_form_submission
+        from app.pages_modules.consultants import (
+            _process_consultant_form_submission,
+        )
 
         result = _process_consultant_form_submission(mock_consultant, form_data)
 
         self.assertFalse(result)
-        mock_st.error.assert_called_with("❌ Veuillez remplir tous les champs obligatoires (*)")
+        mock_st.error.assert_called_with(
+            "❌ Veuillez remplir tous les champs obligatoires (*)"
+        )
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.ConsultantService")
-    def test_process_consultant_form_submission_email_exists(self, mock_service, mock_st):
+    def test_process_consultant_form_submission_email_exists(
+        self, mock_service, mock_st
+    ):
         """Test de _process_consultant_form_submission avec email existant"""
         mock_consultant = Mock()
         mock_consultant.id = 1
@@ -1147,15 +1203,19 @@ class TestConsultantsCoverage(unittest.TestCase):
             "date_sortie": None,
             "date_premiere_mission": date.today(),
             "grade": "Senior",
-            "type_contrat": "CDI"
+            "type_contrat": "CDI",
         }
 
-        from app.pages_modules.consultants import _process_consultant_form_submission
+        from app.pages_modules.consultants import (
+            _process_consultant_form_submission,
+        )
 
         result = _process_consultant_form_submission(mock_consultant, form_data)
 
         self.assertFalse(result)
-        mock_st.error.assert_called_with(f"❌ Un consultant avec l'email {form_data['email']} existe déjà !")
+        mock_st.error.assert_called_with(
+            f"❌ Un consultant avec l'email {form_data['email']} existe déjà !"
+        )
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.get_database_session")
@@ -1339,7 +1399,7 @@ class TestConsultantsCoverage(unittest.TestCase):
                 mock_col.__exit__ = Mock(return_value=None)
                 mock_cols.append(mock_col)
             return tuple(mock_cols)
-        
+
         mock_st.columns.side_effect = mock_columns_side_effect
 
         from app.pages_modules.consultants import _display_missions_with_tabs
@@ -1384,7 +1444,9 @@ class TestConsultantsCoverage(unittest.TestCase):
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.save_mission_changes")
     @patch("app.pages_modules.consultants.delete_mission")
-    def test_display_missions_list_edit_mode(self, mock_delete_mission, mock_save_changes, mock_st):
+    def test_display_missions_list_edit_mode(
+        self, mock_delete_mission, mock_save_changes, mock_st
+    ):
         """Test de _display_missions_list en mode édition"""
         # Create a mock mission with required attributes
         mock_mission = Mock()
@@ -1414,14 +1476,16 @@ class TestConsultantsCoverage(unittest.TestCase):
                 mock_col.__exit__ = Mock(return_value=None)
                 mock_cols.append(mock_col)
             return tuple(mock_cols)
-        
+
         mock_st.columns.side_effect = mock_columns_side_effect
 
         from app.pages_modules.consultants import _display_missions_list
 
         _display_missions_list(missions)
 
-        mock_st.info.assert_called_with("📝 Mode édition activé - Cliquez sur une mission pour la modifier")
+        mock_st.info.assert_called_with(
+            "📝 Mode édition activé - Cliquez sur une mission pour la modifier"
+        )
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.get_database_session")
@@ -1436,7 +1500,9 @@ class TestConsultantsCoverage(unittest.TestCase):
         # Mock competencies
         mock_competence = Mock()
         mock_consultant_comp = Mock()
-        mock_session.query().join().filter().all.return_value = [(mock_consultant_comp, mock_competence)]
+        mock_session.query().join().filter().all.return_value = [
+            (mock_consultant_comp, mock_competence)
+        ]
 
         # Mock missions
         mock_mission = Mock()
@@ -1474,7 +1540,9 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         mock_st.columns.return_value = tuple(mock_cols)
 
-        from app.pages_modules.consultants import _display_registered_technical_skills
+        from app.pages_modules.consultants import (
+            _display_registered_technical_skills,
+        )
 
         _display_registered_technical_skills(competences_tech)
 
@@ -1514,7 +1582,9 @@ class TestConsultantsCoverage(unittest.TestCase):
         # Mock competencies
         mock_competence = Mock()
         mock_consultant_comp = Mock()
-        mock_session.query().join().filter().order_by().all.return_value = [(mock_consultant_comp, mock_competence)]
+        mock_session.query().join().filter().order_by().all.return_value = [
+            (mock_consultant_comp, mock_competence)
+        ]
 
         from app.pages_modules.consultants import _load_functional_skills_data
 
@@ -1546,7 +1616,9 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         mock_st.columns.return_value = tuple(mock_cols)
 
-        from app.pages_modules.consultants import _display_functional_skills_by_category
+        from app.pages_modules.consultants import (
+            _display_functional_skills_by_category,
+        )
 
         _display_functional_skills_by_category(competences_func)
 
@@ -1556,7 +1628,9 @@ class TestConsultantsCoverage(unittest.TestCase):
     @patch("app.pages_modules.consultants.st")
     def test_display_no_functional_skills_message(self, mock_st):
         """Test de _display_no_functional_skills_message"""
-        from app.pages_modules.consultants import _display_no_functional_skills_message
+        from app.pages_modules.consultants import (
+            _display_no_functional_skills_message,
+        )
 
         _display_no_functional_skills_message()
 
@@ -1580,7 +1654,9 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         from app.pages_modules.consultants import _save_consultant_competence
 
-        _save_consultant_competence(1, "Python", "Langage", "technique", "Avancé", 5, "Certifié", "Projets")
+        _save_consultant_competence(
+            1, "Python", "Langage", "technique", "Avancé", 5, "Certifié", "Projets"
+        )
 
         mock_st.success.assert_called()
 
@@ -1597,7 +1673,9 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         from app.pages_modules.consultants import _save_consultant_competence
 
-        _save_consultant_competence(1, "Python", "Langage", "technique", "Avancé", 5, None, None)
+        _save_consultant_competence(
+            1, "Python", "Langage", "technique", "Avancé", 5, None, None
+        )
 
         mock_st.warning.assert_called()
 
@@ -1664,7 +1742,9 @@ class TestConsultantsCoverage(unittest.TestCase):
         with patch("app.pages_modules.consultants.ConsultantService") as mock_service:
             mock_service.get_all_consultants_with_stats.return_value = []
 
-            from app.pages_modules.consultants import show_consultants_list_classic
+            from app.pages_modules.consultants import (
+                show_consultants_list_classic,
+            )
 
             show_consultants_list_classic()
 
@@ -1673,19 +1753,34 @@ class TestConsultantsCoverage(unittest.TestCase):
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.get_database_session")
     @patch("app.pages_modules.consultants.ConsultantService")
-    def test_show_consultants_list_enhanced_success(self, mock_service, mock_get_session, mock_st):
+    def test_show_consultants_list_enhanced_success(
+        self, mock_service, mock_get_session, mock_st
+    ):
         """Test de show_consultants_list_enhanced avec données"""
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         # Mock consultants data
-        mock_consultants = [{
-            "id": 1, "prenom": "Jean", "nom": "Dupont", "email": "jean@test.com",
-            "societe": "Quanteam", "grade": "Senior", "type_contrat": "CDI",
-            "salaire_actuel": 50000, "disponibilite": True, "practice_name": "Data Science",
-            "experience_annees": 5, "nb_missions": 3, "salaire_formatted": "50 000€",
-            "cjm_formatted": "2 083€", "experience_formatted": "5 ans", "statut": "Disponible"
-        }]
+        mock_consultants = [
+            {
+                "id": 1,
+                "prenom": "Jean",
+                "nom": "Dupont",
+                "email": "jean@test.com",
+                "societe": "Quanteam",
+                "grade": "Senior",
+                "type_contrat": "CDI",
+                "salaire_actuel": 50000,
+                "disponibilite": True,
+                "practice_name": "Data Science",
+                "experience_annees": 5,
+                "nb_missions": 3,
+                "salaire_formatted": "50 000€",
+                "cjm_formatted": "2 083€",
+                "experience_formatted": "5 ans",
+                "statut": "Disponible",
+            }
+        ]
 
         mock_service.get_all_consultants_optimized.return_value = mock_consultants
 
@@ -1696,21 +1791,31 @@ class TestConsultantsCoverage(unittest.TestCase):
         mock_col1, mock_col2, mock_col3, mock_col4 = Mock(), Mock(), Mock(), Mock()
         mock_st.columns.return_value = (mock_col1, mock_col2, mock_col3, mock_col4)
 
-        from app.pages_modules.consultants import show_consultants_list_enhanced
+        from app.pages_modules.consultants import (
+            show_consultants_list_enhanced,
+        )
 
         show_consultants_list_enhanced()
 
-        mock_st.title.assert_called_with("👥 Gestion des consultants - Version Améliorée")
+        mock_st.title.assert_called_with(
+            "👥 Gestion des consultants - Version Améliorée"
+        )
 
     @patch("app.pages_modules.consultants.st")
     def test_constants_and_utilities(self, mock_st):
         """Test des constantes et utilitaires"""
-        from app.pages_modules.consultants import (
-            STATUT_NON_AFFECTE, STATUT_DISPONIBLE, VALEUR_NON_SPECIFIE,
-            LABEL_STATUT, FORMAT_DATE, LABEL_PRACTICE, LABEL_COMPETENCES,
-            LABEL_TECHNOLOGIES, LABEL_TAILLE, MSG_FICHIER_INTROUVABLE,
-            MSG_CHAMP_OBLIGATOIRE, MSG_CHAMPS_OBLIGATOIRES
-        )
+        from app.pages_modules.consultants import FORMAT_DATE
+        from app.pages_modules.consultants import LABEL_COMPETENCES
+        from app.pages_modules.consultants import LABEL_PRACTICE
+        from app.pages_modules.consultants import LABEL_STATUT
+        from app.pages_modules.consultants import LABEL_TAILLE
+        from app.pages_modules.consultants import LABEL_TECHNOLOGIES
+        from app.pages_modules.consultants import MSG_CHAMP_OBLIGATOIRE
+        from app.pages_modules.consultants import MSG_CHAMPS_OBLIGATOIRES
+        from app.pages_modules.consultants import MSG_FICHIER_INTROUVABLE
+        from app.pages_modules.consultants import STATUT_DISPONIBLE
+        from app.pages_modules.consultants import STATUT_NON_AFFECTE
+        from app.pages_modules.consultants import VALEUR_NON_SPECIFIE
 
         # Test constants
         self.assertEqual(STATUT_NON_AFFECTE, "Non affecté")
@@ -1724,24 +1829,29 @@ class TestConsultantsCoverage(unittest.TestCase):
         self.assertEqual(LABEL_TAILLE, "📊 Taille")
         self.assertEqual(MSG_FICHIER_INTROUVABLE, "❌ Fichier introuvable")
         self.assertEqual(MSG_CHAMP_OBLIGATOIRE, "Ce champ est obligatoire")
-        self.assertEqual(MSG_CHAMPS_OBLIGATOIRES, "❌ Veuillez remplir tous les champs obligatoires (*)")
+        self.assertEqual(
+            MSG_CHAMPS_OBLIGATOIRES,
+            "❌ Veuillez remplir tous les champs obligatoires (*)",
+        )
 
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.get_database_session")
     def test_error_handling_scenarios(self, mock_get_session, mock_st):
         """Test des scénarios de gestion d'erreur"""
         from sqlalchemy.exc import SQLAlchemyError
-        
+
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         # Test SQLAlchemy error in show_consultant_profile
-        mock_session.query().options().filter().first.side_effect = SQLAlchemyError("DB Error")
+        mock_session.query().options().filter().first.side_effect = SQLAlchemyError(
+            "DB Error"
+        )
 
         # Mock session_state correctly
         mock_st.session_state = Mock()
         mock_st.session_state.view_consultant_profile = 1
-        
+
         from app.pages_modules.consultants import show_consultant_profile
 
         show_consultant_profile()
@@ -1759,9 +1869,7 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         result = _render_societe_field(mock_consultant)
         mock_st.selectbox.assert_called_with(
-            "🏢 Société",
-            options=["Quanteam", "Asigma"],
-            index=0
+            "🏢 Société", options=["Quanteam", "Asigma"], index=0
         )
 
     @patch("app.pages_modules.consultants.st")
@@ -1773,11 +1881,12 @@ class TestConsultantsCoverage(unittest.TestCase):
         # Test _render_date_entree_field
         mock_consultant.date_entree_societe = test_date
         from app.pages_modules.consultants import _render_date_entree_field
+
         _render_date_entree_field(mock_consultant)
         mock_st.date_input.assert_called_with(
             "📅 Date d'entrée société",
             value=test_date,
-            help="Date d'entrée dans la société"
+            help="Date d'entrée dans la société",
         )
 
     @patch("app.pages_modules.consultants.st")
@@ -1817,7 +1926,7 @@ class TestConsultantsCoverage(unittest.TestCase):
         mock_session.query().filter().all.return_value = [mock_mission]
 
         # Mock pandas available
-        with patch('app.pages_modules.consultants.pd') as mock_pd:
+        with patch("app.pages_modules.consultants.pd") as mock_pd:
             mock_df = Mock()
             mock_pd.DataFrame.return_value = mock_df
             mock_df.to_csv.return_value = "csv,data"
@@ -1828,7 +1937,7 @@ class TestConsultantsCoverage(unittest.TestCase):
     @patch("app.pages_modules.consultants.st")
     def test_mission_csv_export_no_pandas(self, mock_st):
         """Test de l'export CSV sans pandas"""
-        with patch('app.pages_modules.consultants.pd', None):
+        with patch("app.pages_modules.consultants.pd", None):
             # Skip this test as _handle_csv_export doesn't exist
             pass
 
@@ -1885,7 +1994,7 @@ class TestConsultantsCoverage(unittest.TestCase):
             "date_sortie": None,
             "date_premiere_mission": date.today(),
             "grade": "Senior",
-            "type_contrat": "CDI"
+            "type_contrat": "CDI",
         }
 
         result = _build_update_data(form_data)
@@ -1909,7 +2018,9 @@ class TestConsultantsCoverage(unittest.TestCase):
 
         # Simulate attribute error in service call
         with patch("app.pages_modules.consultants.ConsultantService") as mock_service:
-            mock_service.update_consultant.side_effect = AttributeError("Test attribute error")
+            mock_service.update_consultant.side_effect = AttributeError(
+                "Test attribute error"
+            )
 
             form_data = {
                 "prenom": "Jean",
@@ -1925,10 +2036,12 @@ class TestConsultantsCoverage(unittest.TestCase):
                 "date_sortie": None,
                 "date_premiere_mission": date.today(),
                 "grade": "Senior",
-                "type_contrat": "CDI"
+                "type_contrat": "CDI",
             }
 
-            from app.pages_modules.consultants import _process_consultant_form_submission
+            from app.pages_modules.consultants import (
+                _process_consultant_form_submission,
+            )
 
             result = _process_consultant_form_submission(mock_consultant, form_data)
 
