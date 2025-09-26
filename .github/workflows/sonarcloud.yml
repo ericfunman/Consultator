@@ -65,6 +65,22 @@ jobs:
           echo "=== Coverage file check ==="
           [ -f reports/coverage.xml ] && echo "coverage.xml found in reports/" || echo "coverage.xml NOT found in reports/"
           [ -f coverage.xml ] && echo "coverage.xml found at root" || echo "coverage.xml NOT found at root"
+          
+      - name: Create coverage backup locations
+        run: |
+          echo "=== Creating coverage backup locations ==="
+          if [ -f reports/coverage.xml ]; then
+            cp reports/coverage.xml coverage.xml
+            echo "Coverage copied to root"
+          fi
+          
+          # Show final coverage locations
+          echo "=== Final coverage file locations ==="
+          find . -name "coverage.xml" -type f
+          
+          # Show coverage file sizes
+          echo "=== Coverage file sizes ==="
+          ls -lh *coverage.xml reports/coverage.xml 2>/dev/null || echo "Some coverage files not found"
       
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
