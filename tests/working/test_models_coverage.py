@@ -54,16 +54,16 @@ class TestModelsCoverage:
             from app.database.models import Mission
             
             mission = Mission(
-                nom="Mission Test",
+                nom_mission="Mission Test",
                 client="Client Test", 
-                debut=date(2024, 1, 1),
-                fin=date(2024, 12, 31)
+                date_debut=date(2024, 1, 1),
+                date_fin=date(2024, 12, 31)
             )
             
-            assert mission.nom == "Mission Test"
+            assert mission.nom_mission == "Mission Test"
             assert mission.client == "Client Test"
-            assert mission.debut == date(2024, 1, 1)
-            assert mission.fin == date(2024, 12, 31)
+            assert mission.date_debut == date(2024, 1, 1)
+            assert mission.date_fin == date(2024, 12, 31)
             
         except ImportError:
             pytest.skip("Mission model non disponible")

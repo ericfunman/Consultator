@@ -28,7 +28,7 @@ class TestBasicServicesCoverage:
         # Au moins 1 service doit s'importer
         assert imported_count >= 1, f"Services importés: {imported_count}"
     
-    @patch('app.database.database.get_db_session')
+    @patch('app.database.database.get_database_session')
     def test_consultant_service_basic_methods(self, mock_session):
         """Test méthodes basiques ConsultantService"""
         mock_session.return_value.__enter__ = Mock()

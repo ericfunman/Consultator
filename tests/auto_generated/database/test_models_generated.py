@@ -66,7 +66,7 @@ class TestMissionModel:
         """Test calcul durée mission"""
         mission = Mission(
             date_debut=date(2024, 1, 1),
-            fin=date(2024, 1, 31)
+            date_fin=date(2024, 1, 31)
         )
         
         # Test calcul durée (30 jours)
@@ -90,7 +90,7 @@ class TestCompetenceModel:
         """Test création compétence"""
         competence = Competence(
             nom="Python",
-            niveau_maitrise=4,
+            niveau=4,
             annees_experience=3
         )
         
@@ -101,7 +101,7 @@ class TestCompetenceModel:
     def test_competence_validation_niveau(self):
         """Test validation niveau compétence"""
         # Niveau doit être entre 1 et 5
-        competence = Competence(nom="Java", niveau_maitrise=3)
+        competence = Competence(nom="Java", niveau=3)
         assert 1 <= competence.niveau <= 5
 
 class TestBusinessManagerModel:
@@ -122,8 +122,8 @@ class TestBusinessManagerModel:
         """Test relation BM-consultants"""
         bm = BusinessManager(nom="Test", prenom="Manager")
         
-        # Test relation avec consultants
-        assert hasattr(bm, 'consultants')
+        # Test relation avec consultant_gestions (pas consultants direct)
+        assert hasattr(bm, 'consultant_gestions')
 
 class TestPracticeModel:
     """Tests pour le modèle Practice"""

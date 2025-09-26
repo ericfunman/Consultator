@@ -34,10 +34,10 @@ class TestUtilsCoverage:
             assert database is not None
             
             # Test fonctions si disponibles
-            if hasattr(database, 'get_db_session'):
+            if hasattr(database, 'get_database_session'):
                 # Même si ça échoue, ça couvre les lignes
                 try:
-                    with database.get_db_session() as session:
+                    with database.get_database_session() as session:
                         pass
                 except:
                     pass
