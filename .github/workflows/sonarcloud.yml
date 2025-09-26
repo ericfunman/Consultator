@@ -29,17 +29,17 @@ jobs:
       
       - name: Run ALL tests with coverage
         run: |
-          python -m pytest tests/unit/ tests/working/ tests/auto_generated/ \
+          python -m pytest tests/unit/ tests/working/ tests/auto_generated/ tests/ui/ \
             --cov=app \
             --cov-report=xml:reports/coverage.xml \
             --cov-report=term-missing \
             --maxfail=100 \
             --tb=short \
             --ignore=tests/regression_backup \
-            --ignore=tests/problematic_tests \
+            --ignore=tests/problematic_tests/regression \
+            --ignore=tests/problematic_tests/unit/test_helpers_maximum_coverage_fixed.py \
             --ignore=tests/templates \
-            --ignore=tests/integration/workflows \
-            --ignore=tests/ui
+            --ignore=tests/integration/workflows
       
       - name: Copy coverage report
         run: |
