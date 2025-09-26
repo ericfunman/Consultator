@@ -4,7 +4,7 @@
         {
             "label": "🚀 Run Consultator",
             "type": "shell",
-            "command": "python",
+            "command": "${workspaceFolder}\\.venv_clean\\Scripts\\python.exe",
             "args": ["run.py"],
             "group": {
                 "kind": "build",
@@ -18,7 +18,7 @@
             },
             "problemMatcher": [],
             "isBackground": false,
-            "detail": "Lance l'application Consultator avec Streamlit"
+            "detail": "Lance l'application Consultator avec l'environnement clean"
         },
         {
             "label": "📦 Install Dependencies",

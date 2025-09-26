@@ -39,6 +39,42 @@ parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
+def _calculate_availability_status(consultant) -> str:
+    """
+    Calcule le statut de disponibilité basé sur les missions du consultant
+    
+    Args:
+        consultant: Objet Consultant avec ses missions
+        
+    Returns:
+        str: Statut de disponibilité formaté
+    """
+    if not consultant.missions:
+        return STATUS_DISPONIBLE
+        
+    # Trouver la mission avec la date de fin la plus récente (future)
+    today = datetime.now().date()
+    latest_end_date = None
+    
+    for mission in consultant.missions:
+        if mission.date_fin and mission.date_fin >= today:
+            if latest_end_date is None or mission.date_fin > latest_end_date:
+                latest_end_date = mission.date_fin
+    
+    # Si aucune mission future trouvée, le consultant est disponible
+    if latest_end_date is None:
+        return STATUS_DISPONIBLE
+    
+    # Calculer les jours jusqu'à la fin de la mission
+    days_until_available = (latest_end_date - today).days
+    
+    if days_until_available <= 0:
+        return STATUS_DISPONIBLE
+    elif days_until_available <= 90:
+        return f"⏳ Disponible dans {days_until_available} jours"
+    else:
+        return "❌ Non disponible"
+
 # Variables pour les imports
 ConsultantService = None
 get_database_session = None
@@ -97,7 +133,7 @@ def _display_affectation_info(consultant) -> None:
     # Statuts
     col3, col4 = st.columns(2)
     with col3:
-        status = STATUS_DISPONIBLE if consultant.disponibilite else STATUS_EN_MISSION
+        status = _calculate_availability_status(consultant)
         st.write(f"**Disponibilité :** {status}")
     with col4:
         actif = getattr(consultant, "actif", True)
@@ -175,11 +211,13 @@ def _display_vsa_missions(consultant) -> None:
     # Checkbox pour filtrer la facturation interne
     # Par défaut, décoché = affiche les missions qui ne commencent pas par INT
     # Si coché = affiche seulement les missions qui commencent par INT
-    import time
+    
+    # Utiliser l'ID du consultant pour une clé unique et stable
+    checkbox_key = f"vsa_internal_checkbox_{consultant.id}"
 
     facturation_interne = st.checkbox(
         "Facturation interne",
-        key=f"vsa_internal_{consultant.id}_{int(time.time() * 1000) % 10000}",
+        key=checkbox_key,
         help="Coché: affiche seulement les missions internes (codes INT*). Décoché: affiche les missions externes (codes non INT*)",
     )
 

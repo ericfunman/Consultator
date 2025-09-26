@@ -58,7 +58,9 @@ def run_consultator():
     ]
 
     try:
-        subprocess.run(cmd, check=True)
+        # Utiliser Popen pour un meilleur contrôle
+        process = subprocess.Popen(cmd)
+        process.wait()
     except KeyboardInterrupt:
         print("\n👋 Arrêt de Consultator...")
     except Exception as e:

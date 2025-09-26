@@ -16,6 +16,7 @@ from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import joinedload
 
 # Imports des services existants
 from database.database import get_database_session
@@ -25,6 +26,14 @@ from database.models import ConsultantCompetence
 from database.models import ConsultantLangue
 from database.models import Langue
 from database.models import Mission
+
+# Import de la fonction de calcul de disponibilité
+try:
+    from pages_modules.consultant_info import _calculate_availability_status
+except ImportError:
+    # Fallback en cas d'import impossible
+    def _calculate_availability_status(consultant) -> str:
+        return "✅ Disponible" if consultant.disponibilite else "❌ Non disponible"
 
 
 class ChatbotService:
@@ -462,19 +471,21 @@ class ChatbotService:
     def _extract_consultant_names(self, question: str) -> List[str]:
         """Extrait les noms de consultants de la question"""
         noms = []
+        question_lower = question.lower()
+        
         with get_database_session() as session:
             all_consultants = session.query(Consultant).all()
 
         for consultant in all_consultants:
             # Chercher le prénom dans la question (insensible à la casse)
-            if re.search(rf"\b{re.escape(consultant.prenom.lower())}\b", question):
+            if re.search(rf"\b{re.escape(consultant.prenom.lower())}\b", question_lower):
                 noms.append(consultant.prenom)
             # Chercher le nom de famille dans la question
-            if re.search(rf"\b{re.escape(consultant.nom.lower())}\b", question):
+            if re.search(rf"\b{re.escape(consultant.nom.lower())}\b", question_lower):
                 noms.append(consultant.nom)
             # Chercher le nom complet
             nom_complet: str = f"{consultant.prenom} {consultant.nom}".lower()
-            if nom_complet in question:
+            if nom_complet in question_lower:
                 noms.append(f"{consultant.prenom} {consultant.nom}")
 
         # Supprimer les doublons en gardant l'ordre
@@ -2719,6 +2730,7 @@ class ChatbotService:
 
             consultant = (
                 session.query(Consultant)
+                .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
                 .filter(
                     or_(
                         func.lower(Consultant.nom) == nom_recherche.lower(),
@@ -2740,6 +2752,7 @@ class ChatbotService:
 
             consultant = (
                 session.query(Consultant)
+                .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
                 .filter(
                     or_(
                         func.lower(Consultant.nom).like(f"%{nom_recherche.lower()}%"),
@@ -3161,13 +3174,16 @@ class ChatbotService:
         )
 
     def _format_availability_status(self, consultant_db) -> str:
-        """Formate le statut de disponibilité"""
-        date_dispo = consultant_db.date_disponibilite
-
-        if date_dispo == "ASAP":
-            return self._format_asap_availability(consultant_db)
+        """Formate le statut de disponibilité basé sur les missions"""
+        # Utiliser la nouvelle logique de calcul dynamique
+        status = _calculate_availability_status(consultant_db)
+        
+        if "Disponible dans" in status:
+            return f"{status}\n\n"
+        elif "Non disponible" in status:
+            return f"{status}\n\n"
         else:
-            return self._format_planned_availability(consultant_db, date_dispo)
+            return f"{status}\n\n"
 
     def _format_asap_availability(self, consultant_db) -> str:
         """Formate la disponibilité ASAP"""
