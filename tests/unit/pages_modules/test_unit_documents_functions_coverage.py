@@ -20,11 +20,13 @@ class TestDocumentsFunctions:
     """Tests pour documents_functions.py"""
 
     @patch("app.pages_modules.documents_functions.st")
-    @patch("os.path.exists")
-    def test_show_existing_documents_no_files(self, mock_exists, mock_st):
+    @patch("app.pages_modules.documents_functions.DocumentService")
+    def test_show_existing_documents_no_files(self, mock_doc_service, mock_st):
         """Test affichage documents - aucun fichier"""
-        # Simuler aucun fichier
-        mock_exists.return_value = False
+        # Mock DocumentService pour retourner un répertoire sans fichiers
+        mock_upload_dir = MagicMock()
+        mock_upload_dir.glob.return_value = []  # Aucun fichier
+        mock_doc_service.init_upload_directory.return_value = mock_upload_dir
 
         try:
             from app.pages_modules.documents_functions import (
@@ -39,8 +41,8 @@ class TestDocumentsFunctions:
 
             show_existing_documents(mock_consultant)
 
-            # Vérifier l'affichage du message "aucun document"
-            mock_st.info.assert_called()
+            # Vérifier l'affichage du message spécifique
+            mock_st.info.assert_called_with("📄 Aucun document trouve pour ce consultant")
         except ImportError:
             # Module non disponible, créer une fonction test
             def show_existing_documents(consultant):
