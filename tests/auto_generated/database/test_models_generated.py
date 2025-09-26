@@ -90,19 +90,19 @@ class TestCompetenceModel:
         """Test création compétence"""
         competence = Competence(
             nom="Python",
-            niveau=4,
-            annees_experience=3
+            categorie="Backend",
+            niveau_requis="junior"
         )
         
         assert competence.nom == "Python"
-        assert competence.niveau == 4
-        assert competence.annees_experience == 3
+        assert competence.categorie == "Backend"
+        assert competence.niveau_requis == "junior"
     
     def test_competence_validation_niveau(self):
         """Test validation niveau compétence"""
-        # Niveau doit être entre 1 et 5
-        competence = Competence(nom="Java", niveau=3)
-        assert 1 <= competence.niveau <= 5
+        # niveau_requis peut être junior, medior, senior
+        competence = Competence(nom="Java", niveau_requis="medior")
+        assert competence.niveau_requis in ["junior", "medior", "senior"]
 
 class TestBusinessManagerModel:
     """Tests pour le modèle BusinessManager"""

@@ -75,13 +75,12 @@ class TestModelsCoverage:
             
             competence = Competence(
                 nom="Python",
-                niveau=4,
-                annees_experience=3
+                categorie="Backend",
+                niveau_requis="junior"
             )
             
             assert competence.nom == "Python"
-            assert competence.niveau == 4
-            assert competence.annees_experience == 3
+            assert competence.categorie == "Backend"
             
         except ImportError:
             pytest.skip("Competence model non disponible")
