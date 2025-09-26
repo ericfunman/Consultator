@@ -86,7 +86,9 @@ class Consultant(Base):
     )  # Date d'entrée dans la société
     date_sortie_societe: Mapped[Optional[datetime.date]] = Column(Date)
     societe: Mapped[str] = Column(String(50), default="Quanteam")  # Quanteam ou Asigma
-    entite: Mapped[Optional[str]] = Column(String(100))  # Entité (ASIGMA, QUANTEAM, etc.)
+    entite: Mapped[Optional[str]] = Column(
+        String(100)
+    )  # Entité (ASIGMA, QUANTEAM, etc.)
     date_premiere_mission: Mapped[Optional[datetime.date]] = Column(
         Date
     )  # Date de la première mission
@@ -96,6 +98,17 @@ class Consultant(Base):
     grade: Mapped[str] = Column(String(50), default="Junior")
     # CDI, CDD, Stagiaire, Alternant, Indépendant
     type_contrat: Mapped[str] = Column(String(20), default="CDI")
+
+    # Nouveaux champs période d'essai et statut actif V1.2.3
+    etat_periode_essai: Mapped[Optional[str]] = Column(
+        String(50)
+    )  # Statut période d'essai (Etat P.Test)
+    fin_periode_essai: Mapped[Optional[datetime.date]] = Column(
+        Date
+    )  # Date fin période d'essai (Fin P.Test)
+    actif: Mapped[bool] = Column(
+        Boolean, default=True
+    )  # Statut actif du consultant (UseActive)
 
     # Relations
     practice_id: Mapped[Optional[int]] = Column(Integer, ForeignKey("practices.id"))
@@ -589,7 +602,9 @@ class VSA_Mission(Base):
     __tablename__ = "vsa_missions"
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = Column(Integer, nullable=False)  # Lien avec consultant (non FK pour éviter dépendance)
+    user_id: Mapped[int] = Column(
+        Integer, nullable=False
+    )  # Lien avec consultant (non FK pour éviter dépendance)
     code: Mapped[str] = Column(String(100), nullable=False)  # Clé unique de la mission
     orderid: Mapped[str] = Column(String(100), nullable=False)  # Numéro de commande
     client_name: Mapped[str] = Column(String(200), nullable=False)  # Nom du client
@@ -598,7 +613,9 @@ class VSA_Mission(Base):
     tjm: Mapped[Optional[float]] = Column(Float)  # Taux Journalier Moyen
     cjm: Mapped[Optional[float]] = Column(Float)  # Coût Journalier Moyen
     description: Mapped[Optional[str]] = Column(Text)
-    statut: Mapped[str] = Column(String(50), default="active")  # active, completed, cancelled
+    statut: Mapped[str] = Column(
+        String(50), default="active"
+    )  # active, completed, cancelled
     date_import: Mapped[datetime] = Column(DateTime, default=datetime.now)
 
     # Index pour les recherches fréquentes
@@ -624,8 +641,11 @@ class VSA_Mission(Base):
     def consultant(self) -> Optional["Consultant"]:
         """Retourne le consultant associé (lazy loading)"""
         from database.database import get_database_session
+
         with get_database_session() as session:
-            return session.query(Consultant).filter(Consultant.id == self.user_id).first()
+            return (
+                session.query(Consultant).filter(Consultant.id == self.user_id).first()
+            )
 
     @property
     def est_active(self) -> bool:

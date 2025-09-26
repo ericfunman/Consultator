@@ -77,8 +77,44 @@ def _display_affectation_info(consultant) -> None:
     st.write(f"**Practice :** {practice_name}")
     st.write(f"**Entité :** {consultant.entite or 'N/A'}")
 
-    status = STATUS_DISPONIBLE if consultant.disponibilite else STATUS_EN_MISSION
-    st.write(f"**Statut :** {status}")
+    # Informations contractuelles avec période d'essai
+    col1, col2 = st.columns(2)
+    with col1:
+        type_contrat = getattr(consultant, "type_contrat", "N/A")
+        st.write(f"**Type de contrat :** {type_contrat}")
+    with col2:
+        etat_pe = getattr(consultant, "etat_periode_essai", None)
+        if etat_pe:
+            st.write(f"**Période d'essai :** {etat_pe}")
+        else:
+            st.write(f"**Période d'essai :** N/A")
+
+    # Date fin période d'essai si elle existe
+    fin_pe = getattr(consultant, "fin_periode_essai", None)
+    if fin_pe:
+        st.write(f"**Fin période d'essai :** {fin_pe.strftime('%d/%m/%Y')}")
+
+    # Statuts
+    col3, col4 = st.columns(2)
+    with col3:
+        status = STATUS_DISPONIBLE if consultant.disponibilite else STATUS_EN_MISSION
+        st.write(f"**Disponibilité :** {status}")
+    with col4:
+        actif = getattr(consultant, "actif", True)
+        statut_actif = "✅ Actif" if actif else "❌ Inactif"
+        st.write(f"**Statut :** {statut_actif}")
+
+    # Statut société
+    try:
+        statut_soc = consultant.statut_societe
+        if statut_soc == "En poste":
+            st.success(f"✅ **Statut société :** {statut_soc}")
+        elif statut_soc == "Départ prévu":
+            st.warning(f"⚠️ **Statut société :** {statut_soc}")
+        else:
+            st.error(f"❌ **Statut société :** {statut_soc}")
+    except (AttributeError, TypeError, ValueError):
+        st.info("📊 **Statut société :** En cours de calcul...")
 
     if consultant.date_creation:
         st.write(f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}")
@@ -136,6 +172,17 @@ def _display_vsa_missions(consultant) -> None:
     """Affiche les missions VSA du consultant"""
     st.markdown("#### 🎯 Missions VSA")
 
+    # Checkbox pour filtrer la facturation interne
+    # Par défaut, décoché = affiche les missions qui ne commencent pas par INT
+    # Si coché = affiche seulement les missions qui commencent par INT
+    import time
+
+    facturation_interne = st.checkbox(
+        "Facturation interne",
+        key=f"vsa_internal_{consultant.id}_{int(time.time() * 1000) % 10000}",
+        help="Coché: affiche seulement les missions internes (codes INT*). Décoché: affiche les missions externes (codes non INT*)",
+    )
+
     try:
         with get_database_session() as session:
             # Importer VSA_Mission ici pour éviter les dépendances circulaires
@@ -152,11 +199,33 @@ def _display_vsa_missions(consultant) -> None:
             st.info("ℹ️ Aucune mission VSA trouvée pour ce consultant")
             return
 
-        # Statistiques des missions VSA
-        _display_vsa_missions_stats(missions_vsa)
+        # Filtrage des missions selon la checkbox
+        if facturation_interne:
+            # Afficher seulement les missions internes (codes commençant par INT)
+            missions_filtrees = [m for m in missions_vsa if m.code.startswith("INT")]
+            filter_info = "🏢 Missions de facturation interne (INT*)"
+        else:
+            # Afficher seulement les missions externes (codes ne commençant pas par INT)
+            missions_filtrees = [
+                m for m in missions_vsa if not m.code.startswith("INT")
+            ]
+            filter_info = "🌍 Missions externes (hors INT*)"
 
-        # Tableau des missions VSA
-        _display_vsa_missions_table(missions_vsa, consultant)
+        # Affichage du filtre actuel
+        st.info(
+            f"{filter_info} - {len(missions_filtrees)} mission(s) sur {len(missions_vsa)} total"
+        )
+
+        if not missions_filtrees:
+            type_missions = "internes" if facturation_interne else "externes"
+            st.warning(f"ℹ️ Aucune mission {type_missions} trouvée pour ce consultant")
+            return
+
+        # Statistiques des missions VSA filtrées
+        _display_vsa_missions_stats(missions_filtrees)
+
+        # Tableau des missions VSA filtrées
+        _display_vsa_missions_table(missions_filtrees, consultant)
 
     except Exception as e:
         st.error(f"❌ Erreur lors du chargement des missions VSA: {e}")
@@ -176,7 +245,11 @@ def _display_vsa_missions_stats(missions_vsa) -> None:
 
     with col3:
         missions_with_tjm = [m for m in missions_vsa if m.tjm]
-        avg_tjm = sum(m.tjm for m in missions_with_tjm) / len(missions_with_tjm) if missions_with_tjm else 0
+        avg_tjm = (
+            sum(m.tjm for m in missions_with_tjm) / len(missions_with_tjm)
+            if missions_with_tjm
+            else 0
+        )
         st.metric("💰 TJM moyen", f"{avg_tjm:,.0f}€")
 
 
@@ -184,19 +257,32 @@ def _display_vsa_missions_table(missions_vsa, consultant) -> None:
     """Affiche le tableau des missions VSA"""
     missions_data = []
     for mission in missions_vsa:
-        missions_data.append({
-            COL_CODE: mission.code,
-            COL_ORDERID: mission.orderid,
-            COL_CLIENT: mission.client_name,
-            COL_DATE_DEBUT: mission.date_debut.strftime(DATE_FORMAT) if mission.date_debut else NA_VALUE,
-            COL_DATE_FIN: mission.date_fin.strftime(DATE_FORMAT) if mission.date_fin else NA_VALUE,
-            COL_TJM: f"{mission.tjm:,.0f}€" if mission.tjm else NA_VALUE,
-            COL_CJM: f"{mission.cjm:,.0f}€" if mission.cjm else NA_VALUE,
-            COL_STATUT: "✅ Active" if mission.est_active else "❌ Terminée",
-            COL_DUREE: f"{mission.duree_jours} jours" if mission.duree_jours else NA_VALUE
-        })
+        missions_data.append(
+            {
+                COL_CODE: mission.code,
+                COL_ORDERID: mission.orderid,
+                COL_CLIENT: mission.client_name,
+                COL_DATE_DEBUT: (
+                    mission.date_debut.strftime(DATE_FORMAT)
+                    if mission.date_debut
+                    else NA_VALUE
+                ),
+                COL_DATE_FIN: (
+                    mission.date_fin.strftime(DATE_FORMAT)
+                    if mission.date_fin
+                    else NA_VALUE
+                ),
+                COL_TJM: f"{mission.tjm:,.0f}€" if mission.tjm else NA_VALUE,
+                COL_CJM: f"{mission.cjm:,.0f}€" if mission.cjm else NA_VALUE,
+                COL_STATUT: "✅ Active" if mission.est_active else "❌ Terminée",
+                COL_DUREE: (
+                    f"{mission.duree_jours} jours" if mission.duree_jours else NA_VALUE
+                ),
+            }
+        )
 
     import pandas as pd
+
     df = pd.DataFrame(missions_data)
 
     # Configuration des colonnes
@@ -273,39 +359,27 @@ def show_consultant_info(consultant):
         st.error(MSG_CONSULTANT_NON_FOURNI)
         return
 
-    st.markdown("### 📋 Informations personnelles")
-
     try:
-        # Créer les onglets
-        tab_info, tab_missions_vsa, tab_actions = st.tabs([
-            "📋 Informations", "🎯 Missions VSA", "⚙️ Actions"
-        ])
+        # Informations de base
+        col1, col2 = st.columns(2)
 
-        with tab_info:
-            # Informations de base
-            col1, col2 = st.columns(2)
+        with col1:
+            _display_identity_info(consultant)
 
-            with col1:
-                _display_identity_info(consultant)
+        with col2:
+            _display_affectation_info(consultant)
 
-            with col2:
-                _display_affectation_info(consultant)
+        # Informations financières
+        _display_financial_info(consultant)
 
-            # Informations financières
-            _display_financial_info(consultant)
+        # Historique des salaires
+        show_salary_history(consultant.id)
 
-            # Historique des salaires
-            show_salary_history(consultant.id)
+        # Notes
+        _display_notes_section(consultant)
 
-            # Notes
-            _display_notes_section(consultant)
-
-        with tab_missions_vsa:
-            _display_vsa_missions(consultant)
-
-        with tab_actions:
-            # Actions
-            _display_action_buttons(consultant)
+        # Actions
+        _display_action_buttons(consultant)
 
         # Gestion des affichages conditionnels
         _handle_conditional_displays(consultant)
