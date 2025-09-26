@@ -51,21 +51,21 @@ class TestMissionModel:
     def test_mission_creation(self):
         """Test création mission"""
         mission = Mission(
-            nom="Mission Test",
+            nom_mission="Mission Test",
             client="Client Test",
-            debut=date(2024, 1, 1),
-            fin=date(2024, 12, 31),
+            date_debut=date(2024, 1, 1),
+            date_fin=date(2024, 12, 31),
             tjm=500
         )
         
-        assert mission.nom == "Mission Test"
+        assert mission.nom_mission == "Mission Test"
         assert mission.client == "Client Test"
         assert mission.tjm == 500
     
     def test_mission_duration_calculation(self):
         """Test calcul durée mission"""
         mission = Mission(
-            debut=date(2024, 1, 1),
+            date_debut=date(2024, 1, 1),
             fin=date(2024, 1, 31)
         )
         
@@ -76,7 +76,7 @@ class TestMissionModel:
         """Test calcul revenus mission"""
         mission = Mission(
             tjm=500,
-            jours_factures=20
+            # jours_factures obsolète - 20
         )
         
         expected_revenue = 500 * 20
@@ -90,7 +90,7 @@ class TestCompetenceModel:
         """Test création compétence"""
         competence = Competence(
             nom="Python",
-            niveau=4,
+            niveau_maitrise=4,
             annees_experience=3
         )
         
@@ -101,7 +101,7 @@ class TestCompetenceModel:
     def test_competence_validation_niveau(self):
         """Test validation niveau compétence"""
         # Niveau doit être entre 1 et 5
-        competence = Competence(nom="Java", niveau=3)
+        competence = Competence(nom="Java", niveau_maitrise=3)
         assert 1 <= competence.niveau <= 5
 
 class TestBusinessManagerModel:

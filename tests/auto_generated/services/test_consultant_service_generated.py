@@ -20,13 +20,13 @@ class TestConsultantServiceBasics:
     
     def test_get_all_consultants_empty(self):
         """Test récupération consultants - liste vide"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             result = ConsultantService.get_all_consultants()
             assert isinstance(result, list)
     
     def test_get_consultant_by_id_not_found(self):
         """Test récupération consultant par ID - non trouvé"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             result = ConsultantService.get_consultant_by_id(99999)
             assert result is None
     
@@ -37,19 +37,19 @@ class TestConsultantServiceBasics:
             'prenom': 'User', 
             'email': 'test@example.com'
         }
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             # Should not raise exception
             ConsultantService.create_consultant(data)
     
     def test_update_consultant_not_found(self):
         """Test mise à jour consultant - non trouvé"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             result = ConsultantService.update_consultant(99999, {})
             assert result is False
     
     def test_delete_consultant_not_found(self):
         """Test suppression consultant - non trouvé"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             result = ConsultantService.delete_consultant(99999)
             assert result is False
 
@@ -71,7 +71,7 @@ class TestConsultantServiceValidation:
     def test_validate_required_fields_missing(self):
         """Test validation champs requis - manquants"""
         data = {}  # Données vides
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             # Devrait gérer les champs manquants
             pass
 
@@ -80,19 +80,19 @@ class TestConsultantServiceCRUD:
     
     def test_crud_workflow_complete(self):
         """Test workflow CRUD complet"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             # Créer → Lire → Modifier → Supprimer
             pass
     
     def test_get_consultants_with_pagination(self):
         """Test récupération avec pagination"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             # Test pagination
             pass
     
     def test_search_consultants_by_name(self):
         """Test recherche consultants par nom"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             # Test recherche
             pass
 
@@ -101,13 +101,13 @@ class TestConsultantServicePerformance:
     
     def test_bulk_operations_performance(self):
         """Test opérations en lot - performance"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             # Test opérations en lot
             pass
     
     def test_large_dataset_pagination(self):
         """Test pagination avec gros dataset"""
-        with patch('app.services.consultant_service.get_db_session'):
+        with patch('app.database.database.get_database_session'):
             # Test pagination performance
             pass
 

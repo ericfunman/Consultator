@@ -62,7 +62,7 @@ class TestPractice:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_practice_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -178,7 +178,7 @@ class TestConsultant:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_consultant_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -224,7 +224,7 @@ class TestCompetence:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_competence_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -270,7 +270,7 @@ class TestConsultantCompetence:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_consultantcompetence_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -330,7 +330,7 @@ class TestMission:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_mission_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -376,7 +376,7 @@ class TestCV:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_cv_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -422,7 +422,7 @@ class TestCustomTechnology:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_customtechnology_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -468,7 +468,7 @@ class TestConsultantSalaire:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_consultantsalaire_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -514,7 +514,7 @@ class TestLangue:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_langue_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -574,7 +574,7 @@ class TestConsultantLangue:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_consultantlangue_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -662,7 +662,7 @@ class TestBusinessManager:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_businessmanager_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -750,7 +750,7 @@ class TestVSA_Mission:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_vsa_mission_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
@@ -824,7 +824,7 @@ class TestConsultantBusinessManager:
         # TODO: Vérifier le résultat
         pass
     
-    @patch('app.database.get_session')
+    @patch('app.database.database.get_database_session')
     def test_consultantbusinessmanager_database_integration(self, mock_session):
         """Test d'intégration avec la base de données"""
         # Given
