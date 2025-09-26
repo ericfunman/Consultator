@@ -1,0 +1,103 @@
+#!/bin/sh
+#
+# Hook pre-commit pour Consultator
+# Exécute automatiquement les tests de régression avant chaque commit
+#
+
+echo "🔍 Vérification pre-commit - Consultator"
+echo "========================================"
+
+# Couleurs pour l'affichage
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Fonction d'affichage coloré
+print_status() {
+    if [ "$2" = "success" ]; then
+        echo "${GREEN}✅ $1${NC}"
+    elif [ "$2" = "warning" ]; then
+        echo "${YELLOW}⚠️ $1${NC}"
+    else
+        echo "${RED}❌ $1${NC}"
+    fi
+}
+
+# 1. Vérifier que Python est disponible
+if ! command -v python &> /dev/null; then
+    print_status "Python n'est pas disponible" "error"
+    echo "   Installez Python pour continuer"
+    exit 1
+fi
+
+# 2. Vérifier la structure des tests
+if [ ! -d "tests/regression" ]; then
+    print_status "Dossier tests/regression manquant" "error"
+    echo "   Exécutez: python scripts/clean_test_environment.py"
+    exit 1
+fi
+
+# 3. Exécuter les tests de régression critiques
+echo ""
+echo "🛡️ Tests de régression..."
+python -m pytest tests/regression/test_vsa_import_regression.py -q
+
+if [ $? -ne 0 ]; then
+    print_status "ÉCHEC des tests de régression !" "error"
+    echo ""
+    echo "🚫 COMMIT BLOQUÉ"
+    echo "   Les tests de régression doivent passer avant le commit"
+    echo "   Corrigez les problèmes et recommencez"
+    exit 1
+fi
+
+print_status "Tests de régression OK" "success"
+
+# 4. Vérifier s'il y a de nouveaux fichiers Python sans tests
+echo ""
+echo "🔍 Vérification des nouveaux fichiers..."
+
+# Récupérer les fichiers Python modifiés/ajoutés
+new_py_files=$(git diff --cached --name-only --diff-filter=A | grep '\.py$' | grep -v test_ | grep -v __pycache__)
+
+if [ ! -z "$new_py_files" ]; then
+    print_status "Nouveaux fichiers Python détectés:" "warning"
+    for file in $new_py_files; do
+        echo "   📄 $file"
+    done
+    
+    echo ""
+    echo "💡 Recommandation:"
+    echo "   Après ce commit, exécutez:"
+    echo "   python scripts/develop_tests_systematically.py 1"
+    echo "   pour générer les tests associés"
+fi
+
+# 5. Vérifier la couverture si des tests ont été modifiés
+modified_tests=$(git diff --cached --name-only | grep test_ | grep '\.py$')
+
+if [ ! -z "$modified_tests" ]; then
+    echo ""
+    echo "🧪 Tests modifiés détectés..."
+    print_status "Exécution des tests modifiés" "success"
+    
+    # Exécuter uniquement les tests modifiés
+    python -m pytest $modified_tests -q
+    
+    if [ $? -ne 0 ]; then
+        print_status "ÉCHEC des tests modifiés !" "error"
+        echo ""
+        echo "🚫 COMMIT BLOQUÉ"
+        echo "   Les tests modifiés doivent passer avant le commit"
+        exit 1
+    fi
+fi
+
+# 6. Message de fin
+echo ""
+print_status "Pre-commit validé !" "success"
+echo "🚀 Le commit peut continuer..."
+echo ""
+
+exit 0

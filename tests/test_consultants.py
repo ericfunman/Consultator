@@ -4,6 +4,9 @@ from datetime import date
 from unittest.mock import patch
 
 # Ajouter le répertoire parent au path pour les imports
+# ⚠️  MISE À JOUR REQUISE - 2025-09-26 11:03:34
+# Le fichier source app/pages_modules/consultants.py a été modifié.
+# Veuillez réviser ce test pour s'assurer qu'il couvre les nouveaux changements.
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
