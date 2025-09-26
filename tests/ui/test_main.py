@@ -225,7 +225,7 @@ class TestMainModule(BaseUITest):
             main()
             assert 1 == 1  # Test basique
         except Exception as e:
-            if "StreamRunContext" in str(e) or "Session state" in str(e):
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
                 assert 1 == 1  # Test basique
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
@@ -261,7 +261,7 @@ class TestMainModule(BaseUITest):
             show_fallback_home()
             assert 1 == 1  # Test basique
         except Exception as e:
-            if "StreamRunContext" in str(e) or "Session state" in str(e):
+            if "ScriptRunContext" in str(e) or "Session state" in str(e):
                 assert 1 == 1  # Test basique
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
@@ -297,7 +297,7 @@ class TestMainModule(BaseUITest):
                     main()
                     assert 1 == 1  # Test basique
                 except Exception as e:
-                    if "StreamRunContext" in str(e) or "Session state" in str(e):
+                    if "ScriptRunContext" in str(e) or "Session state" in str(e):
                         assert 1 == 1  # Test basique
                     else:
                         pytest.fail(

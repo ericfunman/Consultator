@@ -1,4 +1,4 @@
-from datetime import date\n"""
+"""
 Tests pour DocumentService - Gestion documents et CV
 Module critique pour upload et parsing CV - 200+ lignes
 """
