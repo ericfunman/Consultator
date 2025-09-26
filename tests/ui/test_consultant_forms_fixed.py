@@ -38,14 +38,16 @@ class TestConsultantForms(BaseUITest):
     @patch("streamlit.text_input")
     @patch("streamlit.form_submit_button")
     @patch("streamlit.error")
+    @patch("app.pages_modules.consultants._load_practice_options")
     @patch("app.pages_modules.consultants.ConsultantService")
     def test_show_add_consultant_form_validation_error(
-        self, mock_service, mock_error, mock_submit, mock_text_input, mock_form
+        self, mock_service, mock_practices, mock_error, mock_submit, mock_text_input, mock_form
     ):
         """Test de validation d'erreur dans le formulaire"""
         # Mock Streamlit
         mock_submit.return_value = True
         mock_text_input.side_effect = ["", "Dupont", "invalid-email", "0123456789"]
+        mock_practices.return_value = {"Practice Test": 1}
 
         # Test
         show_add_consultant_form()

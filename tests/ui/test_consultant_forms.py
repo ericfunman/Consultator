@@ -46,12 +46,16 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
+    @patch("app.pages_modules.consultants._load_practice_options")
     @patch("app.pages_modules.consultants.ConsultantService")
-    def test_show_add_consultant_form_can_be_called(self, mock_service):
+    def test_show_add_consultant_form_can_be_called(self, mock_service, mock_practices):
         """Test que show_add_consultant_form peut être appelée sans erreur"""
         # Mock service
         mock_service.create_consultant.return_value = True
         mock_service.update_consultant.return_value = True
+        
+        # Mock practices pour éviter l'accès à la DB
+        mock_practices.return_value = {"Practice Test": 1, "Practice Demo": 2}
 
         # Test que la fonction peut être appelée
         try:
@@ -179,10 +183,12 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
+    @patch("app.pages_modules.consultants._load_practice_options")
     @patch("app.pages_modules.consultants.ConsultantService")
-    def test_show_add_consultant_form_with_service_error(self, mock_service):
+    def test_show_add_consultant_form_with_service_error(self, mock_service, mock_practices):
         """Test avec erreur du service"""
         mock_service.create_consultant.return_value = False
+        mock_practices.return_value = {"Practice Test": 1}
 
         try:
             show_add_consultant_form()
