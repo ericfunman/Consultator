@@ -501,7 +501,7 @@ class TestChatbotService80Percent(TestCase):
         mock_session.return_value.__exit__.return_value = None
 
         # Mock query result
-        mock_db.query.return_value.filter.return_value.first.return_value = (
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             self.mock_consultant
         )
 

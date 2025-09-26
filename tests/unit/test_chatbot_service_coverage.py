@@ -1,7 +1,7 @@
-"""
-Tests complets pour ChatbotService - Amélioration couverture
+﻿"""
+Tests complets pour ChatbotService - AmÃ©lioration couverture
 Le plus gros module de l'application (3162 lignes)
-29 méthodes principales à tester
+29 mÃ©thodes principales Ã  tester
 """
 
 from contextlib import contextmanager
@@ -13,10 +13,10 @@ import pytest
 
 
 class TestChatbotServiceCoverage:
-    """Tests de couverture pour ChatbotService - 29 méthodes"""
+    """Tests de couverture pour ChatbotService - 29 mÃ©thodes"""
 
     def _create_mock_consultant(self):
-        """Helper pour créer un mock consultant"""
+        """Helper pour crÃ©er un mock consultant"""
         mock_consultant = Mock()
         mock_consultant.id = 1
         mock_consultant.nom = "Dupont"
@@ -27,23 +27,23 @@ class TestChatbotServiceCoverage:
         mock_consultant.salaire_actuel = 50000.0
         mock_consultant.experience_annees = 5
         mock_consultant.practice_id = 1
-        mock_consultant.missions = []  # Liste vide pour éviter les erreurs len()
+        mock_consultant.missions = []  # Liste vide pour Ã©viter les erreurs len()
         # Mock langues avec niveaux pour les tests de langues
         mock_langue = Mock()
         mock_langue.nom = "Anglais"
         mock_langue.niveau = "C1"
-        mock_langue.commentaire = "Très bon niveau"
+        mock_langue.commentaire = "TrÃ¨s bon niveau"
         mock_consultant.langues = [mock_langue]  # Liste de langues
         return mock_consultant
 
     def _create_mock_mission(self):
-        """Helper pour créer un mock mission"""
+        """Helper pour crÃ©er un mock mission"""
         mock_mission = Mock()
         mock_mission.id = 1
         mock_mission.entreprise = "Test Corp"
         mock_mission.entreprise_client = "Test Corp"
-        mock_mission.poste = "Développeur"
-        mock_mission.titre = "Développeur Python"
+        mock_mission.poste = "DÃ©veloppeur"
+        mock_mission.titre = "DÃ©veloppeur Python"
         mock_mission.tjm = 400.0
         mock_mission.taux_journalier = 400.0
         mock_mission.consultant_id = 1
@@ -51,20 +51,20 @@ class TestChatbotServiceCoverage:
         return mock_mission
 
     def _create_mock_competence(self):
-        """Helper pour créer un mock compétence"""
+        """Helper pour crÃ©er un mock compÃ©tence"""
         mock_competence = Mock()
         mock_competence.nom = "Python"
         mock_competence.type_competence = "technique"
         return mock_competence
 
     def _create_mock_langue(self):
-        """Helper pour créer un mock langue"""
+        """Helper pour crÃ©er un mock langue"""
         mock_langue = Mock()
         mock_langue.nom = "Anglais"
         return mock_langue
 
     def _create_mock_practice(self):
-        """Helper pour créer un mock practice"""
+        """Helper pour crÃ©er un mock practice"""
         mock_practice = Mock()
         mock_practice.nom = "Data Science"
         mock_practice.actif = True
@@ -78,7 +78,7 @@ class TestChatbotServiceCoverage:
         # Execution
         chatbot = ChatbotService()
 
-        # Vérifications
+        # VÃ©rifications
         assert hasattr(chatbot, "conversation_history")
         assert hasattr(chatbot, "last_question")
         assert chatbot.conversation_history == []
@@ -86,7 +86,7 @@ class TestChatbotServiceCoverage:
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_get_session_method(self, mock_session):
-        """Test méthode _get_session"""
+        """Test mÃ©thode _get_session"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -98,13 +98,13 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._get_session()
 
-        # Vérifications
+        # VÃ©rifications
         mock_session.assert_called_once()
         assert result == mock_db
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_execute_with_fresh_session_success(self, mock_session):
-        """Test méthode _execute_with_fresh_session - succès"""
+        """Test mÃ©thode _execute_with_fresh_session - succÃ¨s"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session avec context manager
@@ -121,16 +121,16 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._execute_with_fresh_session(mock_query_func)
 
-        # Vérifications
+        # VÃ©rifications
         assert result == "success"
         mock_session.assert_called_once()
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_execute_with_fresh_session_error(self, mock_session):
-        """Test méthode _execute_with_fresh_session - erreur"""
+        """Test mÃ©thode _execute_with_fresh_session - erreur"""
         from app.services.chatbot_service import ChatbotService
 
-        # Mock session qui lève une exception
+        # Mock session qui lÃ¨ve une exception
         mock_session.side_effect = Exception("DB Error")
 
         # Mock fonction query
@@ -141,12 +141,12 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._execute_with_fresh_session(mock_query_func)
 
-        # Vérifications - doit retourner None en cas d'erreur
+        # VÃ©rifications - doit retourner None en cas d'erreur
         assert result is None
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_process_question_basic(self, mock_session):
-        """Test méthode process_question - fonctionnement de base"""
+        """Test mÃ©thode process_question - fonctionnement de base"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -159,14 +159,14 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot.process_question("Combien de consultants avons-nous?")
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
-        assert "intent" in result  # Correction: la clé est "intent" pas "type"
+        assert "intent" in result  # Correction: la clÃ© est "intent" pas "type"
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_clean_question_method(self, mock_session):
-        """Test méthode _clean_question"""
+        """Test mÃ©thode _clean_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Execution
@@ -175,15 +175,15 @@ class TestChatbotServiceCoverage:
             "  Bonjour, combien de CONSULTANTS avons-nous ?  "
         )
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, str)
         assert result.strip() != ""
-        # La méthode doit nettoyer les espaces et normaliser
+        # La mÃ©thode doit nettoyer les espaces et normaliser
         assert "consultants" in result.lower()
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_stats(self, mock_session):
-        """Test méthode _analyze_intent - statistiques"""
+        """Test mÃ©thode _analyze_intent - statistiques"""
         from app.services.chatbot_service import ChatbotService
 
         # Execution avec questions de stats
@@ -193,35 +193,35 @@ class TestChatbotServiceCoverage:
 
         for question in test_cases:
             result = chatbot._analyze_intent(question)
-            # L'une de ces questions devrait être reconnue
+            # L'une de ces questions devrait Ãªtre reconnue
             assert isinstance(result, str)
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_skills(self, mock_session):
-        """Test méthode _analyze_intent - compétences"""
+        """Test mÃ©thode _analyze_intent - compÃ©tences"""
         from app.services.chatbot_service import ChatbotService
 
         # Execution
         chatbot = ChatbotService()
-        result = chatbot._analyze_intent("Qui connaît Python?")
+        result = chatbot._analyze_intent("Qui connaÃ®t Python?")
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, str)
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_extract_entities_basic(self, mock_session):
-        """Test méthode _extract_entities"""
+        """Test mÃ©thode _extract_entities"""
         from app.services.chatbot_service import ChatbotService
 
         # Execution
         chatbot = ChatbotService()
         result = chatbot._extract_entities(
-            "Qui connaît Python et travaille chez Google?"
+            "Qui connaÃ®t Python et travaille chez Google?"
         )
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
-        # Doit contenir les clés attendues
+        # Doit contenir les clÃ©s attendues
         expected_keys = ["noms", "entreprises", "competences", "langues"]
         for key in expected_keys:
             assert key in result
@@ -229,7 +229,7 @@ class TestChatbotServiceCoverage:
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_salary_question_basic(self, mock_session):
-        """Test méthode _handle_salary_question"""
+        """Test mÃ©thode _handle_salary_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -238,8 +238,8 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
-        # Mock query results - consultant avec salaire numérique
-        mock_db.query.return_value.filter.return_value.first.return_value = (
+        # Mock query results - consultant avec salaire numÃ©rique
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             self._create_mock_consultant()
         )
 
@@ -255,14 +255,14 @@ class TestChatbotServiceCoverage:
         }
         result = chatbot._handle_salary_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
         assert "intent" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_experience_question_basic(self, mock_session):
-        """Test méthode _handle_experience_question"""
+        """Test mÃ©thode _handle_experience_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -289,13 +289,13 @@ class TestChatbotServiceCoverage:
         }
         result = chatbot._handle_experience_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_professional_profile_question(self, mock_session):
-        """Test méthode _handle_professional_profile_question"""
+        """Test mÃ©thode _handle_professional_profile_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -312,13 +312,13 @@ class TestChatbotServiceCoverage:
         entities = {"noms": ["Jean Dupont"]}
         result = chatbot._handle_professional_profile_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_skills_question_basic(self, mock_session):
-        """Test méthode _handle_skills_question"""
+        """Test mÃ©thode _handle_skills_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -327,7 +327,7 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
-        # Mock query results - retourner une liste de consultants avec la bonne chaîne de mocks
+        # Mock query results - retourner une liste de consultants avec la bonne chaÃ®ne de mocks
         mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value.all.return_value = [
             self._create_mock_consultant()
         ]
@@ -344,13 +344,13 @@ class TestChatbotServiceCoverage:
         }
         result = chatbot._handle_skills_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_languages_question_basic(self, mock_session):
-        """Test méthode _handle_languages_question"""
+        """Test mÃ©thode _handle_languages_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -359,7 +359,7 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
-        # Mock query results - retourner une liste de consultants avec la bonne chaîne de mocks
+        # Mock query results - retourner une liste de consultants avec la bonne chaÃ®ne de mocks
         mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value.all.return_value = [
             self._create_mock_consultant()
         ]
@@ -376,13 +376,13 @@ class TestChatbotServiceCoverage:
         }
         result = chatbot._handle_languages_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_missions_question_basic(self, mock_session):
-        """Test méthode _handle_missions_question"""
+        """Test mÃ©thode _handle_missions_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -408,13 +408,13 @@ class TestChatbotServiceCoverage:
         }
         result = chatbot._handle_missions_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_stats_question_basic(self, mock_session):
-        """Test méthode _handle_stats_question"""
+        """Test mÃ©thode _handle_stats_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -423,14 +423,14 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
-        # Mock query results pour stats - retourner des valeurs numériques
+        # Mock query results pour stats - retourner des valeurs numÃ©riques
         mock_db.query.return_value.count.return_value = 100
         mock_db.query.return_value.filter.return_value.count.return_value = 80
         mock_db.query.return_value.filter.return_value.scalar.return_value = (
-            45000.0  # Valeur numérique
+            45000.0  # Valeur numÃ©rique
         )
 
-        # Mock pour les stats détaillées
+        # Mock pour les stats dÃ©taillÃ©es
         mock_db.query.return_value.filter.return_value.all.return_value = [
             Mock(salaire_actuel=45000.0),
             Mock(salaire_actuel=50000.0),
@@ -440,7 +440,7 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._handle_stats_question()
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
         assert "data" in result
@@ -448,7 +448,7 @@ class TestChatbotServiceCoverage:
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_contact_question_basic(self, mock_session):
-        """Test méthode _handle_contact_question"""
+        """Test mÃ©thode _handle_contact_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -458,7 +458,7 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__exit__.return_value = None
 
         # Mock query results
-        mock_db.query.return_value.filter.return_value.first.return_value = (
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             self._create_mock_consultant()
         )
 
@@ -467,13 +467,13 @@ class TestChatbotServiceCoverage:
         entities = {"noms": ["Jean Dupont"]}
         result = chatbot._handle_contact_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_list_consultants_question(self, mock_session):
-        """Test méthode _handle_list_consultants_question"""
+        """Test mÃ©thode _handle_list_consultants_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -489,14 +489,14 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._handle_list_consultants_question()
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
-        assert "data" in result  # La clé est "data" pas "consultants"
+        assert "data" in result  # La clÃ© est "data" pas "consultants"
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_consultant_search_basic(self, mock_session):
-        """Test méthode _handle_consultant_search"""
+        """Test mÃ©thode _handle_consultant_search"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -507,7 +507,7 @@ class TestChatbotServiceCoverage:
 
         # Mock query results
         mock_consultant = self._create_mock_consultant()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_db.query.return_value.filter.return_value.all.return_value = [
@@ -519,27 +519,27 @@ class TestChatbotServiceCoverage:
         entities = {"noms": ["Jean"]}
         result = chatbot._handle_consultant_search(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_general_question(self, mock_session):
-        """Test méthode _handle_general_question"""
+        """Test mÃ©thode _handle_general_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Execution
         chatbot = ChatbotService()
         result = chatbot._handle_general_question()
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
-        assert "confidence" in result  # Correction: la clé est "confidence" pas "type"
+        assert "confidence" in result  # Correction: la clÃ© est "confidence" pas "type"
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_practices_question_basic(self, mock_session):
-        """Test méthode _handle_practices_question"""
+        """Test mÃ©thode _handle_practices_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -551,8 +551,8 @@ class TestChatbotServiceCoverage:
         # Mock practice avec consultants comme liste
         mock_practice = Mock()
         mock_practice.nom = "Data Science"
-        mock_practice.consultants = [self._create_mock_consultant()]  # Liste réelle
-        mock_db.query.return_value.filter.return_value.first.return_value = (
+        mock_practice.consultants = [self._create_mock_consultant()]  # Liste rÃ©elle
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_practice
         )
 
@@ -561,13 +561,13 @@ class TestChatbotServiceCoverage:
         entities = {"practices": ["Data Science"]}
         result = chatbot._handle_practices_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_cvs_question_basic(self, mock_session):
-        """Test méthode _handle_cvs_question"""
+        """Test mÃ©thode _handle_cvs_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -590,16 +590,16 @@ class TestChatbotServiceCoverage:
 
         # Execution
         chatbot = ChatbotService()
-        entities = {"noms": []}  # Test cas général sans nom spécifié
+        entities = {"noms": []}  # Test cas gÃ©nÃ©ral sans nom spÃ©cifiÃ©
         result = chatbot._handle_cvs_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_find_consultant_by_name_found(self, mock_session):
-        """Test méthode _find_consultant_by_name - trouvé"""
+        """Test mÃ©thode _find_consultant_by_name - trouvÃ©"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -609,7 +609,7 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__exit__.return_value = None
 
         # Mock query results
-        mock_db.query.return_value.filter.return_value.first.return_value = (
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             self._create_mock_consultant()
         )
 
@@ -617,12 +617,12 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._find_consultant_by_name("Jean Dupont")
 
-        # Vérifications
+        # VÃ©rifications
         assert result is not None  # Mock object returned
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_find_consultant_by_name_not_found(self, mock_session):
-        """Test méthode _find_consultant_by_name - non trouvé"""
+        """Test mÃ©thode _find_consultant_by_name - non trouvÃ©"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -632,18 +632,18 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__exit__.return_value = None
 
         # Mock query results
-        mock_db.query.return_value.filter.return_value.first.return_value = None
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = None
 
         # Execution
         chatbot = ChatbotService()
         result = chatbot._find_consultant_by_name("Inexistant")
 
-        # Vérifications
+        # VÃ©rifications
         assert result is None
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_find_consultants_by_language_success(self, mock_session):
-        """Test méthode _find_consultants_by_language"""
+        """Test mÃ©thode _find_consultants_by_language"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -652,7 +652,7 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
-        # Mock query results - avec la bonne chaîne de mocks pour _find_consultants_by_language
+        # Mock query results - avec la bonne chaÃ®ne de mocks pour _find_consultants_by_language
         mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.distinct.return_value.all.return_value = [
             self._create_mock_consultant()
         ]
@@ -661,12 +661,12 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._find_consultants_by_language("Anglais")
 
-        # Vérifications
+        # VÃ©rifications
         assert result is not None  # Mock object check
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_get_missions_by_company_success(self, mock_session):
-        """Test méthode _get_missions_by_company"""
+        """Test mÃ©thode _get_missions_by_company"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -684,13 +684,13 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._get_missions_by_company("Test Corp")
 
-        # Vérifications
+        # VÃ©rifications
         assert result is not None  # Mock object check
-        assert isinstance(result, list)  # Doit être une liste
+        assert isinstance(result, list)  # Doit Ãªtre une liste
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_get_missions_by_consultant_success(self, mock_session):
-        """Test méthode _get_missions_by_consultant"""
+        """Test mÃ©thode _get_missions_by_consultant"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -708,12 +708,12 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._get_missions_by_consultant(1)
 
-        # Vérifications
+        # VÃ©rifications
         assert result is not None  # Mock object check
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_get_salary_stats_success(self, mock_session):
-        """Test méthode _get_salary_stats"""
+        """Test mÃ©thode _get_salary_stats"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session avec stats
@@ -722,7 +722,7 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
-        # Mock consultants avec salaires pour itération
+        # Mock consultants avec salaires pour itÃ©ration
         mock_db.query.return_value.filter.return_value.all.return_value = [
             Mock(salaire_actuel=45000.0),
             Mock(salaire_actuel=50000.0),
@@ -732,12 +732,12 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._get_salary_stats()
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_get_general_stats_success(self, mock_session):
-        """Test méthode _get_general_stats"""
+        """Test mÃ©thode _get_general_stats"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -756,13 +756,13 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot._get_general_stats()
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "consultants_total" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_availability_question_basic(self, mock_session):
-        """Test méthode _handle_availability_question"""
+        """Test mÃ©thode _handle_availability_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -781,13 +781,13 @@ class TestChatbotServiceCoverage:
         entities = {"noms": ["disponible"]}
         result = chatbot._handle_availability_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_mission_tjm_question_basic(self, mock_session):
-        """Test méthode _handle_mission_tjm_question"""
+        """Test mÃ©thode _handle_mission_tjm_question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -806,13 +806,13 @@ class TestChatbotServiceCoverage:
         entities = {"entreprises": ["Test Corp"]}
         result = chatbot._handle_mission_tjm_question(entities)
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, dict)
         assert "response" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_get_response_method_basic(self, mock_session):
-        """Test méthode get_response - méthode publique principale"""
+        """Test mÃ©thode get_response - mÃ©thode publique principale"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -825,29 +825,29 @@ class TestChatbotServiceCoverage:
         chatbot = ChatbotService()
         result = chatbot.get_response("Bonjour")
 
-        # Vérifications
+        # VÃ©rifications
         assert isinstance(result, str)
         assert len(result) > 0
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_destructor_method(self, mock_session):
-        """Test méthode __del__"""
+        """Test mÃ©thode __del__"""
         from app.services.chatbot_service import ChatbotService
 
         # Execution
         chatbot = ChatbotService()
 
-        # Test que le destructeur peut être appelé sans erreur
+        # Test que le destructeur peut Ãªtre appelÃ© sans erreur
         try:
             chatbot.__del__()
             assert 1 == 1  # Test basique
         except Exception:
-            assert 1 == 1  # Test basique Le destructeur peut échouer silencieusement
+            assert 1 == 1  # Test basique Le destructeur peut Ã©chouer silencieusement
 
-    # Tests d'intégration et cas d'erreurs
+    # Tests d'intÃ©gration et cas d'erreurs
     @patch("app.services.chatbot_service.get_database_session")
     def test_integration_question_flow_complete(self, mock_session):
-        """Test intégration complète d'une question"""
+        """Test intÃ©gration complÃ¨te d'une question"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -863,10 +863,10 @@ class TestChatbotServiceCoverage:
         # Execution - flow complet
         chatbot = ChatbotService()
 
-        # Test différents types de questions
+        # Test diffÃ©rents types de questions
         questions = [
             "Combien de consultants avons-nous?",
-            "Qui connaît Python?",
+            "Qui connaÃ®t Python?",
             "Quelles sont les missions?",
             "Contact de Jean Dupont",
         ]
@@ -878,21 +878,21 @@ class TestChatbotServiceCoverage:
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_error_handling_database_failure(self, mock_session):
-        """Test gestion d'erreurs - échec de base de données"""
+        """Test gestion d'erreurs - Ã©chec de base de donnÃ©es"""
         from app.services.chatbot_service import ChatbotService
 
-        # Mock session qui échoue
+        # Mock session qui Ã©choue
         mock_session.side_effect = Exception("Database connection failed")
 
         # Execution
         chatbot = ChatbotService()
         result = chatbot.process_question("Test question")
 
-        # Vérifications - doit gérer l'erreur gracieusement
+        # VÃ©rifications - doit gÃ©rer l'erreur gracieusement
         assert isinstance(result, dict)
-        # Le service doit retourner une réponse d'erreur ou par défaut
+        # Le service doit retourner une rÃ©ponse d'erreur ou par dÃ©faut
 
-    # Tests supplémentaires pour atteindre 80% de couverture
+    # Tests supplÃ©mentaires pour atteindre 80% de couverture
     @patch("app.services.chatbot_service.get_database_session")
     def test_analyze_intent_comprehensive(self, mock_session):
         """Test complet de _analyze_intent avec tous les types d'intentions"""
@@ -905,27 +905,27 @@ class TestChatbotServiceCoverage:
             # Salaires
             ("Quel est le salaire de Jean?", "salaire"),
             ("Combien gagne Marie?", "salaire"),
-            # Expérience
-            ("Quelle expérience a Paul?", "experience"),
+            # ExpÃ©rience
+            ("Quelle expÃ©rience a Paul?", "experience"),
             ("Depuis combien de temps travaille Anne?", "experience"),
             # Profil professionnel
             ("Quel est le grade de Jean?", "profil_professionnel"),
-            ("Dans quelle société travaille Marie?", "profil_professionnel"),
-            # Compétences
-            ("Qui maîtrise Python?", "competences"),
-            ("Quelles compétences a Jean?", "competences"),
+            ("Dans quelle sociÃ©tÃ© travaille Marie?", "profil_professionnel"),
+            # CompÃ©tences
+            ("Qui maÃ®trise Python?", "competences"),
+            ("Quelles compÃ©tences a Jean?", "competences"),
             # Langues
             ("Qui parle anglais?", "langues"),
-            ("Quelles langues maîtrise Marie?", "langues"),
+            ("Quelles langues maÃ®trise Marie?", "langues"),
             # Missions
             ("Quelles missions chez Google?", "missions"),
             ("Missions de Jean Dupont?", "missions"),
             # Stats
             ("Combien de consultants?", "stats"),
-            ("Statistiques générales?", "stats"),
+            ("Statistiques gÃ©nÃ©rales?", "stats"),
             # Contact
             ("Email de Jean?", "contact"),
-            ("Téléphone de Marie?", "contact"),
+            ("TÃ©lÃ©phone de Marie?", "contact"),
             # Liste consultants
             ("Liste des consultants?", "liste_consultants"),
             ("Tous les consultants?", "liste_consultants"),
@@ -938,7 +938,7 @@ class TestChatbotServiceCoverage:
             # CVs
             ("CV de Jean?", "cvs"),
             ("Documents de Marie?", "cvs"),
-            # Disponibilité
+            # DisponibilitÃ©
             ("Qui est disponible?", "disponibilite"),
             ("Consultants libres?", "disponibilite"),
             # TJM
@@ -948,41 +948,41 @@ class TestChatbotServiceCoverage:
 
         for question, expected_intent in intent_patterns:
             result = chatbot._analyze_intent(question)
-            # Vérifier que l'intention est détectée (peut varier selon l'implémentation)
+            # VÃ©rifier que l'intention est dÃ©tectÃ©e (peut varier selon l'implÃ©mentation)
             assert isinstance(result, str)
             assert len(result) > 0
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_clean_question_various_inputs(self, mock_session):
-        """Test _clean_question avec différents types d'entrées"""
+        """Test _clean_question avec diffÃ©rents types d'entrÃ©es"""
         from app.services.chatbot_service import ChatbotService
 
         chatbot = ChatbotService()
 
-        # Test différents cas de nettoyage
+        # Test diffÃ©rents cas de nettoyage
         test_cases = [
             ("  Bonjour  ", "bonjour"),
-            ("QUI CONNAÎT PYTHON?", "qui connaît python"),
-            ("Salut, comment ça va?", "salut comment ça va"),
-            ("", ""),  # Chaîne vide
+            ("QUI CONNAÃŽT PYTHON?", "qui connaÃ®t python"),
+            ("Salut, comment Ã§a va?", "salut comment Ã§a va"),
+            ("", ""),  # ChaÃ®ne vide
             ("   ", ""),  # Espaces uniquement
             ("Marie-Claire", "marie-claire"),  # Trait d'union
-            ("Jean & Paul", "jean paul"),  # Caractères spéciaux
+            ("Jean & Paul", "jean paul"),  # CaractÃ¨res spÃ©ciaux
         ]
 
         for input_text, expected_pattern in test_cases:
             result = chatbot._clean_question(input_text)
             assert isinstance(result, str)
-            # Le nettoyage peut varier, vérifions juste la cohérence
+            # Le nettoyage peut varier, vÃ©rifions juste la cohÃ©rence
             if expected_pattern:
                 assert len(result) > 0
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_extract_entities_comprehensive(self, mock_session):
-        """Test complet de _extract_entities avec tous les types d'entités"""
+        """Test complet de _extract_entities avec tous les types d'entitÃ©s"""
         from app.services.chatbot_service import ChatbotService
 
-        # Mock session pour éviter les vraies requêtes DB
+        # Mock session pour Ã©viter les vraies requÃªtes DB
         mock_db = Mock()
         mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
@@ -991,7 +991,7 @@ class TestChatbotServiceCoverage:
         # Mock consultant pour la recherche de noms
         mock_db.query.return_value.all.return_value = [self._create_mock_consultant()]
 
-        # Mock practices pour éviter l'erreur d'itération
+        # Mock practices pour Ã©viter l'erreur d'itÃ©ration
         mock_practice = Mock()
         mock_practice.nom = "Data Science"
         mock_practice.actif = True
@@ -1001,7 +1001,7 @@ class TestChatbotServiceCoverage:
 
         chatbot = ChatbotService()
 
-        # Test avec différents types de questions
+        # Test avec diffÃ©rents types de questions
         test_questions = [
             "Jean Dupont travaille chez Google avec Python",
             "Marie parle anglais et espagnol",
@@ -1013,7 +1013,7 @@ class TestChatbotServiceCoverage:
         for question in test_questions:
             result = chatbot._extract_entities(question)
             assert isinstance(result, dict)
-            # Vérifier que toutes les clés attendues sont présentes
+            # VÃ©rifier que toutes les clÃ©s attendues sont prÃ©sentes
             expected_keys = [
                 "noms",
                 "entreprises",
@@ -1028,7 +1028,7 @@ class TestChatbotServiceCoverage:
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_salary_question_no_consultant(self, mock_session):
-        """Test _handle_salary_question quand aucun consultant trouvé"""
+        """Test _handle_salary_question quand aucun consultant trouvÃ©"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -1037,8 +1037,8 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
-        # Mock pas de consultant trouvé
-        mock_db.query.return_value.filter.return_value.first.return_value = None
+        # Mock pas de consultant trouvÃ©
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = None
         mock_db.query.return_value.filter.return_value.all.return_value = []
 
         chatbot = ChatbotService()
@@ -1066,7 +1066,7 @@ class TestChatbotServiceCoverage:
         consultant_no_salary.prenom = "Sans Salaire"
         consultant_no_salary.salaire_actuel = None
 
-        mock_db.query.return_value.filter.return_value.first.return_value = (
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             consultant_no_salary
         )
 
@@ -1089,7 +1089,7 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__exit__.return_value = None
 
         # Mock consultant avec salaire
-        mock_db.query.return_value.filter.return_value.first.return_value = (
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
             self._create_mock_consultant()
         )
 
@@ -1103,7 +1103,7 @@ class TestChatbotServiceCoverage:
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_experience_question_no_names(self, mock_session):
-        """Test _handle_experience_question sans nom spécifié"""
+        """Test _handle_experience_question sans nom spÃ©cifiÃ©"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -1126,7 +1126,7 @@ class TestChatbotServiceCoverage:
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_skills_question_technical_type(self, mock_session):
-        """Test _handle_skills_question avec type technique spécifié"""
+        """Test _handle_skills_question avec type technique spÃ©cifiÃ©"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -1139,13 +1139,13 @@ class TestChatbotServiceCoverage:
         mock_competence = Mock()
         mock_competence.nom = "Python"
         mock_competence.type_competence = "technique"
-        # Mock query results - retourner une liste de consultants avec la bonne chaîne de mocks (avec 2 filters pour type_competence)
+        # Mock query results - retourner une liste de consultants avec la bonne chaÃ®ne de mocks (avec 2 filters pour type_competence)
         mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.filter.return_value.distinct.return_value.all.return_value = [
             self._create_mock_consultant()
         ]
 
         chatbot = ChatbotService()
-        chatbot.last_question = "Quelles compétences techniques maîtrise Jean?"
+        chatbot.last_question = "Quelles compÃ©tences techniques maÃ®trise Jean?"
         entities = {"competences": ["Python"]}
         result = chatbot._handle_skills_question(entities)
 
@@ -1154,7 +1154,7 @@ class TestChatbotServiceCoverage:
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_skills_question_functional_type(self, mock_session):
-        """Test _handle_skills_question avec type fonctionnel spécifié"""
+        """Test _handle_skills_question avec type fonctionnel spÃ©cifiÃ©"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session
@@ -1167,13 +1167,13 @@ class TestChatbotServiceCoverage:
         mock_competence = Mock()
         mock_competence.nom = "Finance"
         mock_competence.type_competence = "fonctionnelle"
-        # Mock query results - retourner une liste de consultants avec la bonne chaîne de mocks
+        # Mock query results - retourner une liste de consultants avec la bonne chaÃ®ne de mocks
         mock_db.query.return_value.join.return_value.join.return_value.filter.return_value.filter.return_value.distinct.return_value.all.return_value = [
             self._create_mock_consultant()
         ]
 
         chatbot = ChatbotService()
-        chatbot.last_question = "Quelles compétences fonctionnelles en finance?"
+        chatbot.last_question = "Quelles compÃ©tences fonctionnelles en finance?"
         entities = {"competences": ["Finance"]}
         result = chatbot._handle_skills_question(entities)
 
@@ -1210,13 +1210,13 @@ class TestChatbotServiceCoverage:
         """Test get_response avec gestion d'erreur"""
         from app.services.chatbot_service import ChatbotService
 
-        # Mock session qui échoue
+        # Mock session qui Ã©choue
         mock_session.side_effect = Exception("DB Error")
 
         chatbot = ChatbotService()
         result = chatbot.get_response("Test question")
 
-        # Doit retourner une chaîne même en cas d'erreur
+        # Doit retourner une chaÃ®ne mÃªme en cas d'erreur
         assert isinstance(result, str)
         assert len(result) > 0
 
@@ -1233,17 +1233,17 @@ class TestChatbotServiceCoverage:
 
         chatbot = ChatbotService()
 
-        # Vérifier l'état initial
+        # VÃ©rifier l'Ã©tat initial
         assert chatbot.conversation_history == []
         assert chatbot.last_question == ""
 
-        # Test mise à jour last_question
+        # Test mise Ã  jour last_question
         chatbot.process_question("Test question")
         assert chatbot.last_question.lower() == "test question"
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_multiple_entity_extraction_patterns(self, mock_session):
-        """Test extraction d'entités avec patterns multiples"""
+        """Test extraction d'entitÃ©s avec patterns multiples"""
         from app.services.chatbot_service import ChatbotService
 
         # Mock session avec consultants multiples
@@ -1262,7 +1262,7 @@ class TestChatbotServiceCoverage:
             mock_consultant_2,
         ]
 
-        # Mock compétences pour _extract_skills
+        # Mock compÃ©tences pour _extract_skills
         mock_competence = Mock()
         mock_competence.nom = "Python"
         mock_db.query.return_value.filter.return_value.all.return_value = [
@@ -1272,27 +1272,27 @@ class TestChatbotServiceCoverage:
         # Mock langues pour _extract_languages
         mock_langue = Mock()
         mock_langue.nom = "Anglais"
-        # Pour les langues, nous devons mocker une requête différente, mais pour simplifier, utilisons le même mock
-        # Note: Dans un vrai test, il faudrait des mocks séparés pour chaque type de requête
+        # Pour les langues, nous devons mocker une requÃªte diffÃ©rente, mais pour simplifier, utilisons le mÃªme mock
+        # Note: Dans un vrai test, il faudrait des mocks sÃ©parÃ©s pour chaque type de requÃªte
 
         chatbot = ChatbotService()
 
-        # Test question avec plusieurs entités
+        # Test question avec plusieurs entitÃ©s
         question = "Jean Dupont et Marie Martin travaillent chez Google et BNP avec Python et Java"
         result = chatbot._extract_entities(question)
 
         assert isinstance(result, dict)
-        # Vérifier extraction de multiples entités
+        # VÃ©rifier extraction de multiples entitÃ©s
         assert "noms" in result
         assert "entreprises" in result
         assert "competences" in result
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_salary_stats_empty_results(self, mock_session):
-        """Test _get_salary_stats avec résultats vides"""
+        """Test _get_salary_stats avec rÃ©sultats vides"""
         from app.services.chatbot_service import ChatbotService
 
-        # Mock session avec résultats vides
+        # Mock session avec rÃ©sultats vides
         mock_db = Mock()
         mock_db.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_db
@@ -1319,7 +1319,7 @@ class TestChatbotServiceCoverage:
         mock_session.return_value.__enter__.return_value = mock_db
         mock_session.return_value.__exit__.return_value = None
 
-        # Mock consultants avec salaires variés
+        # Mock consultants avec salaires variÃ©s
         consultant1 = Mock()
         consultant1.salaire_actuel = 40000.0
         consultant2 = Mock()
@@ -1337,3 +1337,4 @@ class TestChatbotServiceCoverage:
         assert "moyenne" in result
         assert "total" in result
         assert result["total"] == 2
+

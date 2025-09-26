@@ -26,6 +26,7 @@ from database.models import ConsultantCompetence
 from database.models import ConsultantLangue
 from database.models import Langue
 from database.models import Mission
+from database.models import Practice
 
 # Import de la fonction de calcul de disponibilité
 try:
@@ -808,6 +809,7 @@ class ChatbotService:
             with get_database_session() as session:
                 consultant_db = (
                     session.query(Consultant)
+                    .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
                     .filter(Consultant.id == consultant.id)
                     .first()
                 )
@@ -2378,6 +2380,7 @@ class ChatbotService:
         with get_database_session() as session:
             practice = (
                 session.query(Practice)
+                .options(joinedload(Practice.consultants))
                 .filter(func.lower(Practice.nom) == practice_name.lower())
                 .first()
             )

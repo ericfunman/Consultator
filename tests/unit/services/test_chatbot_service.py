@@ -395,7 +395,7 @@ class TestChatbotService:
         mock_consultant.nom = "Dupont"
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -413,7 +413,7 @@ class TestChatbotService:
 
         mock_session = MagicMock()
         # Premier appel retourne None, deuxième retourne le consultant
-        mock_session.query.return_value.filter.return_value.first.side_effect = [
+        mock_session.query.return_value.options.return_value.filter.return_value.first.side_effect = [
             None,
             mock_consultant,
         ]
@@ -483,7 +483,7 @@ class TestChatbotService:
         mock_consultant.disponibilite = True
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -536,7 +536,7 @@ class TestChatbotService:
         mock_consultant.societe = "Quanteam"
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -575,7 +575,7 @@ class TestChatbotService:
         mock_consultant.nom = "Leroy"
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -615,7 +615,7 @@ class TestChatbotService:
         mock_consultant.langues = []
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -641,7 +641,7 @@ class TestChatbotService:
         mock_consultant.nom = "Moreau"
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -673,7 +673,7 @@ class TestChatbotService:
         mock_consultant.telephone = "0123456789"
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -739,7 +739,7 @@ class TestChatbotService:
         mock_practice.consultants = []
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_practice
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -759,7 +759,7 @@ class TestChatbotService:
         mock_consultant.cvs = []
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
@@ -770,28 +770,30 @@ class TestChatbotService:
         assert result["intent"] == "cvs"
         assert "Hugo Roux" in result["response"]
 
+    @patch("app.services.chatbot_service._calculate_availability_status")
     @patch("app.services.chatbot_service.get_database_session")
-    def test_handle_availability_question(self, mock_get_session):
+    def test_handle_availability_question(self, mock_get_session, mock_calc_availability):
         """Test du handler de disponibilité"""
         mock_consultant = MagicMock()
         mock_consultant.prenom = "Léo"
         mock_consultant.nom = "Garcia"
-        mock_consultant.disponibilite = True
-        mock_consultant.date_disponibilite = "ASAP"
         mock_consultant.missions = []
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
+        
+        # Mock the availability calculation function
+        mock_calc_availability.return_value = "✅ Disponible"
 
         entities = {"noms": ["Léo Garcia"]}
         result = self.chatbot._handle_availability_question(entities)
 
         assert result["intent"] == "disponibilite"
         assert "Léo Garcia" in result["response"]
-        assert "ASAP" in result["response"]
+        mock_calc_availability.assert_called_once()
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_mission_tjm_question(self, mock_get_session):
@@ -802,7 +804,7 @@ class TestChatbotService:
         mock_consultant.missions = []
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
+        mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
             mock_consultant
         )
         mock_get_session.return_value.__enter__.return_value = mock_session
