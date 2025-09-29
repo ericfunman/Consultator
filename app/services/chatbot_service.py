@@ -473,13 +473,15 @@ class ChatbotService:
         """Extrait les noms de consultants de la question"""
         noms = []
         question_lower = question.lower()
-        
+
         with get_database_session() as session:
             all_consultants = session.query(Consultant).all()
 
         for consultant in all_consultants:
             # Chercher le prénom dans la question (insensible à la casse)
-            if re.search(rf"\b{re.escape(consultant.prenom.lower())}\b", question_lower):
+            if re.search(
+                rf"\b{re.escape(consultant.prenom.lower())}\b", question_lower
+            ):
                 noms.append(consultant.prenom)
             # Chercher le nom de famille dans la question
             if re.search(rf"\b{re.escape(consultant.nom.lower())}\b", question_lower):
@@ -809,7 +811,11 @@ class ChatbotService:
             with get_database_session() as session:
                 consultant_db = (
                     session.query(Consultant)
-                    .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
+                    .options(
+                        joinedload(Consultant.langues).joinedload(
+                            ConsultantLangue.langue
+                        )
+                    )
                     .filter(Consultant.id == consultant.id)
                     .first()
                 )
@@ -2733,7 +2739,9 @@ class ChatbotService:
 
             consultant = (
                 session.query(Consultant)
-                .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
+                .options(
+                    joinedload(Consultant.langues).joinedload(ConsultantLangue.langue)
+                )
                 .filter(
                     or_(
                         func.lower(Consultant.nom) == nom_recherche.lower(),
@@ -2755,7 +2763,9 @@ class ChatbotService:
 
             consultant = (
                 session.query(Consultant)
-                .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
+                .options(
+                    joinedload(Consultant.langues).joinedload(ConsultantLangue.langue)
+                )
                 .filter(
                     or_(
                         func.lower(Consultant.nom).like(f"%{nom_recherche.lower()}%"),
@@ -3180,7 +3190,7 @@ class ChatbotService:
         """Formate le statut de disponibilité basé sur les missions"""
         # Utiliser la nouvelle logique de calcul dynamique
         status = _calculate_availability_status(consultant_db)
-        
+
         if "Disponible dans" in status:
             return f"{status}\n\n"
         elif "Non disponible" in status:

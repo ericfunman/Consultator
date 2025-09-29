@@ -39,41 +39,43 @@ parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
+
 def _calculate_availability_status(consultant) -> str:
     """
     Calcule le statut de disponibilité basé sur les missions du consultant
-    
+
     Args:
         consultant: Objet Consultant avec ses missions
-        
+
     Returns:
         str: Statut de disponibilité formaté
     """
     if not consultant.missions:
         return STATUS_DISPONIBLE
-        
+
     # Trouver la mission avec la date de fin la plus récente (future)
     today = datetime.now().date()
     latest_end_date = None
-    
+
     for mission in consultant.missions:
         if mission.date_fin and mission.date_fin >= today:
             if latest_end_date is None or mission.date_fin > latest_end_date:
                 latest_end_date = mission.date_fin
-    
+
     # Si aucune mission future trouvée, le consultant est disponible
     if latest_end_date is None:
         return STATUS_DISPONIBLE
-    
+
     # Calculer les jours jusqu'à la fin de la mission
     days_until_available = (latest_end_date - today).days
-    
+
     if days_until_available <= 0:
         return STATUS_DISPONIBLE
     elif days_until_available <= 90:
         return f"⏳ Disponible dans {days_until_available} jours"
     else:
         return "❌ Non disponible"
+
 
 # Variables pour les imports
 ConsultantService = None
@@ -211,7 +213,7 @@ def _display_vsa_missions(consultant) -> None:
     # Checkbox pour filtrer la facturation interne
     # Par défaut, décoché = affiche les missions qui ne commencent pas par INT
     # Si coché = affiche seulement les missions qui commencent par INT
-    
+
     # Utiliser l'ID du consultant pour une clé unique et stable
     checkbox_key = f"vsa_internal_checkbox_{consultant.id}"
 
