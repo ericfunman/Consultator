@@ -21,7 +21,7 @@ if parent_dir not in sys.path:
 from app.database.database import get_database_session
 from app.database.models import Consultant
 from app.database.models import Mission
-from app.database.models import VSA_Mission
+from app.database.models import VsaMission
 
 # Configuration
 EXCEL_FILE = r"C:\Users\b302gja\Documents\VSA Personnes.xlsx"
@@ -162,7 +162,7 @@ def create_classic_missions_from_vsa():
     with get_database_session() as session:
         # Récupérer toutes les missions VSA dont le code ne commence pas par INT
         vsa_missions = (
-            session.query(VSA_Mission).filter(~VSA_Mission.code.startswith("INT")).all()
+            session.query(VsaMission).filter(~VsaMission.code.startswith("INT")).all()
         )
 
         print(f"📊 {len(vsa_missions)} missions VSA externes trouvées")
@@ -341,11 +341,11 @@ def import_vsa_missions_complet():
 
                 # Vérifier si la mission existe déjà (par code + user_id + date_debut pour éviter les doublons)
                 existing_mission = (
-                    session.query(VSA_Mission)
+                    session.query(VsaMission)
                     .filter(
-                        VSA_Mission.code == mission_data["code"],
-                        VSA_Mission.user_id == mission_data["user_id"],
-                        VSA_Mission.date_debut == mission_data["date_debut"],
+                        VsaMission.code == mission_data["code"],
+                        VsaMission.user_id == mission_data["user_id"],
+                        VsaMission.date_debut == mission_data["date_debut"],
                     )
                     .first()
                 )
@@ -373,7 +373,7 @@ def import_vsa_missions_complet():
                     stats["updated"] += 1
                 else:
                     # Créer une nouvelle mission
-                    vsa_mission = VSA_Mission(**mission_data)
+                    vsa_mission = VsaMission(**mission_data)
                     session.add(vsa_mission)
 
                     consultant = (
