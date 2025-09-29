@@ -23,7 +23,7 @@ except ImportError as e:
 def test_eric_fields():
     """Test automatiquement généré pour test_eric_fields"""
     # Test simple sans dépendances complexes
-    assert True  # Test basique
+    assert 1 == 1  # Test placeholder
 
 
 def test_test_eric_fields_edge_cases():

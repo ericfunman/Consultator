@@ -420,7 +420,7 @@ class ChatbotService:
         # Si c'est une question de type "qui travaille chez", c'est du profil
         # professionnel
         if re.search(
-            r"qui\s+(?:\w+\s+){0,3}(?:travaille|est)\s+(?:\w+\s+){0,3}(?:chez|dans)\s+(?:\w+\s+){0,3}(?:quanteam|asigma)",
+            r"qui\s+\w*\s*(?:travaille|est)\s+\w*\s*(?:chez|dans)\s+\w*\s*(?:quanteam|asigma)",
             question,
         ):
             return "profil_professionnel"
@@ -3192,11 +3192,14 @@ class ChatbotService:
         status = _calculate_availability_status(consultant_db)
 
         if "Disponible dans" in status:
-            return f"{status}\n\n"
+            # Format pour disponibilité future avec délai
+            return f"⏳ {status}\n\n"
         elif "Non disponible" in status:
-            return f"{status}\n\n"
+            # Format pour indisponibilité avec alerte
+            return f"🚫 {status}\n\n"
         else:
-            return f"{status}\n\n"
+            # Format pour disponibilité immédiate
+            return f"✅ {status}\n\n"
 
     def _format_asap_availability(self, consultant_db) -> str:
         """Formate la disponibilité ASAP"""

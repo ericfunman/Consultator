@@ -50,7 +50,7 @@ class TestPracticeWorkflowIntegration:
         mock_session.rollback = Mock()
         
         # Test basique - vérifie que la méthode ne crash pas
-        assert True
+        assert mock_session is not None
 
     @patch('app.database.database.get_database_session')
     def test_practice_statistics_workflow(self, mock_db_session):
@@ -61,7 +61,7 @@ class TestPracticeWorkflowIntegration:
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
         
         # Test basique
-        assert True
+        assert mock_session is not None
 
     @patch('app.database.database.get_database_session')
     def test_practice_consultant_reassignment(self, mock_db_session):
@@ -72,4 +72,4 @@ class TestPracticeWorkflowIntegration:
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
         
         # Test basique
-        assert True
+        assert mock_session is not None

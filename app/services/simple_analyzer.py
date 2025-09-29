@@ -160,7 +160,6 @@ class SimpleDocumentAnalyzer:
     @staticmethod
     def analyze_cv_content(text: str, consultant_name: str = "") -> Dict[str, Any]:
         """Analyse simplifiée du contenu CV"""
-
         st.info(f"🔍 Analyse en cours pour {consultant_name}...")
 
         # Gérer le cas où text est None
@@ -178,52 +177,17 @@ class SimpleDocumentAnalyzer:
         }
 
         try:
-            # 1. Recherche des technologies
-            technologies_found = []
             text_upper = text.upper()
-
-            for tech in SimpleDocumentAnalyzer.TECHNOLOGIES:
-                if tech.upper() in text_upper:
-                    technologies_found.append(tech)
-
-            result["langages_techniques"] = technologies_found[:15]  # Top 15
-
-            # 2. Recherche des clients/missions
-            missions = []
-            for client in SimpleDocumentAnalyzer.CLIENTS:
-                if client.upper() in text_upper:
-                    # Créer une mission basique
-                    mission = {
-                        "client": client,
-                        "titre": f"Mission chez {client}",
-                        "description": f"Intervention chez {client}",
-                        "langages_techniques": list(technologies_found[:5]),
-                        "duree": "Non spécifiée",
-                    }
-                    missions.append(mission)
-
-            result["missions"] = missions[:10]  # Top 10 missions
-
-            # 3. Compétences fonctionnelles basiques
-            competences_func = []
-            if "BI" in text_upper or "BUSINESS INTELLIGENCE" in text_upper:
-                competences_func.append("Business Intelligence")
-            if "DATA" in text_upper:
-                competences_func.append("Analyse de données")
-            if "PROJET" in text_upper or "MANAGEMENT" in text_upper:
-                competences_func.append("Gestion de projet")
-            if "CONSEIL" in text_upper or "CONSULTING" in text_upper:
-                competences_func.append("Conseil")
-
+            
+            # Déléguer l'analyse à des méthodes plus simples
+            technologies_found = SimpleDocumentAnalyzer._extract_technologies(text_upper)
+            missions = SimpleDocumentAnalyzer._extract_missions(text_upper, technologies_found)
+            competences_func = SimpleDocumentAnalyzer._extract_functional_skills(text_upper)
+            
+            result["langages_techniques"] = technologies_found[:15]
+            result["missions"] = missions[:10]
             result["competences_fonctionnelles"] = competences_func
-
-            # 4. Informations générales
-            result["informations_generales"] = {
-                "longueur_texte": len(text),
-                "nombre_mots": len(text.split()),
-                "technologies_detectees": len(technologies_found),
-                "clients_detectes": len(missions),
-            }
+            result["informations_generales"] = SimpleDocumentAnalyzer._create_general_info(text, technologies_found, missions)
 
             st.success(
                 f"✅ Analyse terminée: {len(missions)} missions, {len(technologies_found)} technologies"
@@ -233,3 +197,52 @@ class SimpleDocumentAnalyzer:
             st.error(f"❌ Erreur pendant l'analyse: {str(e)}")
 
         return result
+
+    @staticmethod
+    def _extract_technologies(text_upper: str) -> list:
+        """Extrait les technologies du texte"""
+        technologies_found = []
+        for tech in SimpleDocumentAnalyzer.TECHNOLOGIES:
+            if tech.upper() in text_upper:
+                technologies_found.append(tech)
+        return technologies_found
+
+    @staticmethod
+    def _extract_missions(text_upper: str, technologies_found: list) -> list:
+        """Extrait les missions du texte"""
+        missions = []
+        for client in SimpleDocumentAnalyzer.CLIENTS:
+            if client.upper() in text_upper:
+                mission = {
+                    "client": client,
+                    "titre": f"Mission chez {client}",
+                    "description": f"Intervention chez {client}",
+                    "langages_techniques": list(technologies_found[:5]),
+                    "duree": "Non spécifiée",
+                }
+                missions.append(mission)
+        return missions
+
+    @staticmethod
+    def _extract_functional_skills(text_upper: str) -> list:
+        """Extrait les compétences fonctionnelles du texte"""
+        competences_func = []
+        if "BI" in text_upper or "BUSINESS INTELLIGENCE" in text_upper:
+            competences_func.append("Business Intelligence")
+        if "DATA" in text_upper:
+            competences_func.append("Analyse de données")
+        if "PROJET" in text_upper or "MANAGEMENT" in text_upper:
+            competences_func.append("Gestion de projet")
+        if "CONSEIL" in text_upper or "CONSULTING" in text_upper:
+            competences_func.append("Conseil")
+        return competences_func
+
+    @staticmethod
+    def _create_general_info(text: str, technologies_found: list, missions: list) -> dict:
+        """Crée les informations générales"""
+        return {
+            "longueur_texte": len(text),
+            "nombre_mots": len(text.split()),
+            "technologies_detectees": len(technologies_found),
+            "clients_detectes": len(missions),
+        }

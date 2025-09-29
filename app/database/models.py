@@ -596,7 +596,7 @@ class BusinessManager(Base):
         return len(self.consultants_actuels)
 
 
-class VSA_Mission(Base):
+class VsaMission(Base):
     """Modèle pour les missions VSA importées depuis Excel"""
 
     __tablename__ = "vsa_missions"
@@ -628,7 +628,7 @@ class VSA_Mission(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<VSA_Mission(id={self.id}, code='{self.code}', client='{self.client_name}', user_id={self.user_id})>"
+        return f"<VsaMission(id={self.id}, code='{self.code}', client='{self.client_name}', user_id={self.user_id})>"
 
     @property
     def duree_jours(self) -> Optional[int]:

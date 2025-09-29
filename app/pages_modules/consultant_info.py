@@ -125,12 +125,12 @@ def _display_affectation_info(consultant) -> None:
         if etat_pe:
             st.write(f"**Période d'essai :** {etat_pe}")
         else:
-            st.write(f"**Période d'essai :** N/A")
+            st.write("**Période d'essai :** N/A")
 
     # Date fin période d'essai si elle existe
     fin_pe = getattr(consultant, "fin_periode_essai", None)
     if fin_pe:
-        st.write(f"**Fin période d'essai :** {fin_pe.strftime('%d/%m/%Y')}")
+        st.write(f"**Fin période d'essai :** {fin_pe.strftime(DATE_FORMAT)}")
 
     # Statuts
     col3, col4 = st.columns(2)
@@ -155,7 +155,7 @@ def _display_affectation_info(consultant) -> None:
         st.info("📊 **Statut société :** En cours de calcul...")
 
     if consultant.date_creation:
-        st.write(f"**Membre depuis :** {consultant.date_creation.strftime('%d/%m/%Y')}")
+        st.write(f"**Membre depuis :** {consultant.date_creation.strftime(DATE_FORMAT)}")
 
 
 def _display_financial_info(consultant) -> None:
@@ -225,13 +225,13 @@ def _display_vsa_missions(consultant) -> None:
 
     try:
         with get_database_session() as session:
-            # Importer VSA_Mission ici pour éviter les dépendances circulaires
-            from database.models import VSA_Mission
+            # Importer VsaMission ici pour éviter les dépendances circulaires
+            from database.models import VsaMission
 
             missions_vsa = (
-                session.query(VSA_Mission)
-                .filter(VSA_Mission.user_id == consultant.id)
-                .order_by(VSA_Mission.date_debut.desc())
+                session.query(VsaMission)
+                .filter(VsaMission.user_id == consultant.id)
+                .order_by(VsaMission.date_debut.desc())
                 .all()
             )
 

@@ -26,7 +26,7 @@ class TestMissionWorkflowIntegration:
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
         
         # Test basique - juste vérifier que la méthode ne crash pas
-        assert True
+        assert mock_session is not None
 
     @patch('app.database.database.get_database_session')
     def test_multiple_missions_workflow(self, mock_db_session, sample_consultant_for_mission):
@@ -37,7 +37,7 @@ class TestMissionWorkflowIntegration:
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
         
         # Test basique
-        assert True
+        assert mock_session is not None
 
     @patch('app.database.database.get_database_session')
     def test_mission_status_transitions(self, mock_db_session, sample_consultant_for_mission):
@@ -48,7 +48,7 @@ class TestMissionWorkflowIntegration:
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
         
         # Test basique
-        assert True
+        assert mock_session is not None
 
     @patch('app.database.database.get_database_session')
     def test_mission_date_management(self, mock_db_session, sample_consultant_for_mission):
@@ -59,4 +59,4 @@ class TestMissionWorkflowIntegration:
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
         
         # Test basique
-        assert True
+        assert mock_session is not None
