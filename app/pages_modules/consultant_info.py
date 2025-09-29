@@ -452,7 +452,7 @@ def show_salary_history(consultant_id: int):
             for salary in salaries:
                 salary_data.append(
                     {
-                        "Date": salary.date_debut.strftime("%d/%m/%Y"),
+                        "Date": salary.date_debut.strftime(DATE_FORMAT),
                         "Salaire": f"{salary.salaire:,}€",
                         "Motif": salary.commentaire or DEFAULT_VALUE,
                     }
@@ -505,7 +505,7 @@ def show_detailed_salary_history(consultant_id: int):
         for salary in salaries:
             salary_data.append(
                 {
-                    "Date": salary.date_debut.strftime("%d/%m/%Y"),
+                    "Date": salary.date_debut.strftime(DATE_FORMAT),
                     "Salaire": salary.salaire,
                     "Motif": salary.commentaire or DEFAULT_VALUE,
                     "Évolution": DEFAULT_VALUE,  # Sera calculé après

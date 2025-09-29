@@ -297,109 +297,118 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
 
 def analyze_consultant_cv(consultant):
     """Analyse le CV du consultant avec choix de méthode"""
-
     st.markdown("### 🔍 Analyse du CV")
 
     try:
         with get_database_session() as session:
-            # Chercher le CV le plus récent
-            cv_document = (
-                session.query(Document)
-                .filter(
-                    Document.consultant_id == consultant.id,
-                    Document.type_document == "CV",
-                )
-                .order_by(Document.date_upload.desc())
-                .first()
-            )
-
+            cv_document = _find_latest_cv(session, consultant.id)
             if not cv_document:
                 st.warning("⚠️ Aucun CV trouvé pour ce consultant")
                 return
 
-            # Vérifier si Grok est disponible
             grok_available = is_grok_available()
+            selected_method = _display_analysis_method_selection(grok_available)
 
-            # Choix de la méthode d'analyse
-            st.markdown("#### 🎯 Méthode d'analyse")
-
-            if grok_available:
-                analysis_methods = ["🤖 IA avec GPT-4 (recommandé)"]
-                default_index = 0
-            else:
-                analysis_methods = ["🔍 Analyse classique"]
-                default_index = 0
-
-            selected_method = st.selectbox(
-                "Choisissez la méthode d'analyse :",
-                options=analysis_methods,
-                index=default_index,
-                help="OpenAI GPT-4 offre une analyse plus précise et détaillée",
+            _display_current_analysis_status(cv_document, consultant)
+            _handle_analysis_button(
+                cv_document, consultant, selected_method, grok_available
             )
-
-            # Afficher le statut de l'analyse actuelle
-            if cv_document.analyse_cv:
-                st.info("ℹ️ Une analyse existe déjà. Vous pouvez la régénérer.")
-
-                # Bouton pour voir l'analyse actuelle
-                if st.button("👁️ Voir analyse actuelle", key="view_current_analysis"):
-                    try:
-                        import json
-
-                        analysis = json.loads(cv_document.analyse_cv)
-                        show_full_cv_analysis(
-                            analysis, cv_document.nom_fichier, consultant
-                        )
-                    except Exception as e:
-                        st.error(f"❌ Erreur lors de l'affichage: {e}")
-            else:
-                st.info("ℹ️ Aucune analyse disponible. Lancez une nouvelle analyse.")
-
-            # Bouton d'analyse
-            button_text = (
-                "🚀 Analyser avec GPT-4"
-                if "Grok" in selected_method
-                else "🔍 Analyser classiquement"
-            )
-
-            if st.button(button_text, type="primary", key="start_analysis"):
-                with st.spinner("Analyse en cours..."):
-                    success = perform_cv_analysis(
-                        cv_document, consultant, selected_method
-                    )
-
-                if success:
-                    st.success("✅ Analyse terminée avec succès !")
-                    st.rerun()
-                else:
-                    st.error("❌ Échec de l'analyse")
-
-            # Configuration OpenAI (si disponible)
-            if grok_available:
-                with st.expander("⚙️ Configuration IA"):
-                    from services.ai_grok_service import (
-                        show_grok_config_interface,
-                    )
-
-                    show_grok_config_interface()
-            else:
-                with st.expander("⚙️ Configuration IA"):
-                    st.warning("⚠️ OpenAI GPT-4 non configuré")
-                    st.markdown(
-                        """
-                    Pour activer l'analyse IA :
-
-                    1. **Obtenez une clé API** sur [platform.openai.com](https://platform.openai.com)
-                    2. **Ajoutez la variable d'environnement** :
-                       ```bash
-                       export OPENAI_API_KEY="votre_clé_api_ici"
-                       ```
-                    3. **Redémarrez l'application**
-                    """
-                    )
+            _display_ai_configuration(grok_available)
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'analyse du CV: {e}")
+
+
+def _find_latest_cv(session, consultant_id):
+    """Trouve le CV le plus récent du consultant"""
+    return (
+        session.query(Document)
+        .filter(
+            Document.consultant_id == consultant_id,
+            Document.type_document == "CV",
+        )
+        .order_by(Document.date_upload.desc())
+        .first()
+    )
+
+
+def _display_analysis_method_selection(grok_available):
+    """Affiche le sélecteur de méthode d'analyse"""
+    st.markdown("#### 🎯 Méthode d'analyse")
+
+    if grok_available:
+        analysis_methods = ["🤖 IA avec GPT-4 (recommandé)"]
+        default_index = 0
+    else:
+        analysis_methods = ["🔍 Analyse classique"]
+        default_index = 0
+
+    return st.selectbox(
+        "Choisissez la méthode d'analyse :",
+        options=analysis_methods,
+        index=default_index,
+        help="OpenAI GPT-4 offre une analyse plus précise et détaillée",
+    )
+
+
+def _display_current_analysis_status(cv_document, consultant):
+    """Affiche le statut de l'analyse actuelle"""
+    if cv_document.analyse_cv:
+        st.info("ℹ️ Une analyse existe déjà. Vous pouvez la régénérer.")
+
+        if st.button("👁️ Voir analyse actuelle", key="view_current_analysis"):
+            try:
+                import json
+
+                analysis = json.loads(cv_document.analyse_cv)
+                show_full_cv_analysis(analysis, cv_document.nom_fichier, consultant)
+            except Exception as e:
+                st.error(f"❌ Erreur lors de l'affichage: {e}")
+    else:
+        st.info("ℹ️ Aucune analyse disponible. Lancez une nouvelle analyse.")
+
+
+def _handle_analysis_button(cv_document, consultant, selected_method, grok_available):
+    """Gère le bouton d'analyse et l'exécution"""
+    button_text = (
+        "🚀 Analyser avec GPT-4"
+        if "Grok" in selected_method
+        else "🔍 Analyser classiquement"
+    )
+
+    if st.button(button_text, type="primary", key="start_analysis"):
+        with st.spinner("Analyse en cours..."):
+            success = perform_cv_analysis(cv_document, consultant, selected_method)
+
+        if success:
+            st.success("✅ Analyse terminée avec succès !")
+            st.rerun()
+        else:
+            st.error("❌ Échec de l'analyse")
+
+
+def _display_ai_configuration(grok_available):
+    """Affiche la configuration IA"""
+    if grok_available:
+        with st.expander("⚙️ Configuration IA"):
+            from services.ai_grok_service import show_grok_config_interface
+
+            show_grok_config_interface()
+    else:
+        with st.expander("⚙️ Configuration IA"):
+            st.warning("⚠️ OpenAI GPT-4 non configuré")
+            st.markdown(
+                """
+            Pour activer l'analyse IA :
+
+            1. **Obtenez une clé API** sur [platform.openai.com](https://platform.openai.com)
+            2. **Ajoutez la variable d'environnement** :
+               ```bash
+               export OPENAI_API_KEY="votre_clé_api_ici"
+               ```
+            3. **Redémarrez l'application**
+            """
+            )
 
 
 def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:

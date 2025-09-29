@@ -387,38 +387,65 @@ class ChatbotService:
         self, question: str, intent_scores: Dict[str, int], has_consultant_name: bool
     ) -> Optional[str]:
         """Applique les règles spéciales pour déterminer l'intention"""
-        # Si un nom de consultant est mentionné et qu'on parle de salaire,
-        # c'est forcément une question de salaire spécifique
-        if has_consultant_name and intent_scores.get("salaire", 0) > 0:
+        
+        # Vérifier les règles pour consultants nommés
+        consultant_specific = self._check_consultant_specific_rules(
+            question, intent_scores, has_consultant_name
+        )
+        if consultant_specific:
+            return consultant_specific
+            
+        # Vérifier les règles générales basées sur les patterns
+        pattern_based = self._check_pattern_based_rules(question, intent_scores)
+        if pattern_based:
+            return pattern_based
+            
+        return None
+
+    def _check_consultant_specific_rules(
+        self, question: str, intent_scores: Dict[str, int], has_consultant_name: bool
+    ) -> Optional[str]:
+        """Vérifie les règles spécifiques aux consultants nommés"""
+        if not has_consultant_name:
+            return None
+            
+        # Si un nom de consultant est mentionné et qu'on parle de salaire
+        if intent_scores.get("salaire", 0) > 0:
             return "salaire"
 
-        # Si un nom de consultant est mentionné et qu'on demande des coordonnées,
-        # c'est forcément une question de contact
-        if has_consultant_name and intent_scores.get("contact", 0) > 0:
+        # Si un nom de consultant est mentionné et qu'on demande des coordonnées
+        if intent_scores.get("contact", 0) > 0:
             return "contact"
 
-        # NOUVELLE RÈGLE V1.2.2 : Prioriser tjm_mission sur missions si TJM est
-        # mentionné
+        # Si un nom de consultant est mentionné et qu'on parle de missions
+        if intent_scores.get("missions", 0) > 0:
+            return "missions"
+            
+        # Si le mot "combien" est utilisé avec un nom de consultant, c'est probablement un salaire
+        if re.search(r"combien", question):
+            return "salaire"
+            
+        return None
+
+    def _check_pattern_based_rules(
+        self, question: str, intent_scores: Dict[str, int]
+    ) -> Optional[str]:
+        """Vérifie les règles basées sur les patterns de texte"""
+        
+        # NOUVELLE RÈGLE V1.2.2 : Prioriser tjm_mission sur missions si TJM est mentionné
         if intent_scores.get("tjm_mission", 0) > 0 and re.search(
             r"tjm|taux|prix|coût|tarif", question
         ):
             return "tjm_mission"
 
-        # Si un nom de consultant est mentionné et qu'on parle de missions,
-        # c'est forcément une question de missions spécifique
-        if has_consultant_name and intent_scores.get("missions", 0) > 0:
-            return "missions"
-
-        # Si c'est une question de type "combien de consultants en CDI/CDD", c'est
-        # du profil professionnel
+        # Questions de type "combien de consultants en CDI/CDD"
         if re.search(
             r"combien\s+(?:[\w-]+\s+)*consultants?\s+(?:[\w-]+\s+)*(?:cdi|cdd|stagiaire|alternant|indépendant)",
             question,
         ):
             return "profil_professionnel"
 
-        # Si c'est une question de type "qui travaille chez", c'est du profil
-        # professionnel - utiliser des mots-clés simples pour éviter ReDoS
+        # Questions de type "qui travaille chez" - utiliser des mots-clés simples pour éviter ReDoS
         question_lower = question.lower()
         if ("qui" in question_lower and 
             ("travaille" in question_lower or "est" in question_lower) and
@@ -426,22 +453,17 @@ class ChatbotService:
             ("quanteam" in question_lower or "asigma" in question_lower)):
             return "profil_professionnel"
 
-        # Si c'est une question de type "combien de missions", c'est des missions
+        # Questions de type "combien de missions"
         if re.search(r"combien\s+(?:\w+\s+)*missions?", question):
             return "missions"
 
-        # Si le mot "combien" est utilisé avec un nom de consultant, c'est probablement un salaire
-        # MAIS seulement si ce n'est pas déjà traité par les règles ci-dessus
-        if has_consultant_name and re.search(r"combien", question):
-            return "salaire"
-
-        # Si c'est une question de type "combien de consultants", c'est des statistiques
+        # Questions de type "combien de consultants"
         if re.search(
             r"combien\s+(?:\w+\s+){0,3}(?:consultants?|dans\s+(?:\w+\s+){0,3}base)",
             question,
         ):
             return "statistiques"
-
+            
         return None
 
     def _analyze_intent(self, question: str) -> str:
