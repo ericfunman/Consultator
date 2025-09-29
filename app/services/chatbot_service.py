@@ -418,11 +418,12 @@ class ChatbotService:
             return "profil_professionnel"
 
         # Si c'est une question de type "qui travaille chez", c'est du profil
-        # professionnel
-        if re.search(
-            r"qui\s+\w*\s*(?:travaille|est)\s+\w*\s*(?:chez|dans)\s+\w*\s*(?:quanteam|asigma)",
-            question,
-        ):
+        # professionnel - utiliser des mots-clés simples pour éviter ReDoS
+        question_lower = question.lower()
+        if ("qui" in question_lower and 
+            ("travaille" in question_lower or "est" in question_lower) and
+            ("chez" in question_lower or "dans" in question_lower) and
+            ("quanteam" in question_lower or "asigma" in question_lower)):
             return "profil_professionnel"
 
         # Si c'est une question de type "combien de missions", c'est des missions

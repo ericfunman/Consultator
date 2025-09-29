@@ -155,7 +155,9 @@ def _display_affectation_info(consultant) -> None:
         st.info("📊 **Statut société :** En cours de calcul...")
 
     if consultant.date_creation:
-        st.write(f"**Membre depuis :** {consultant.date_creation.strftime(DATE_FORMAT)}")
+        st.write(
+            f"**Membre depuis :** {consultant.date_creation.strftime(DATE_FORMAT)}"
+        )
 
 
 def _display_financial_info(consultant) -> None:

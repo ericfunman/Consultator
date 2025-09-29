@@ -680,8 +680,8 @@ class TestBusinessManager:
     
 
 
-class TestVSA_Mission:
-    """Tests automatiquement générés pour VSA_Mission"""
+class TestVsaMission:
+    """Tests automatiquement générés pour VsaMission"""
     
     def setup_method(self):
         """Setup avant chaque test"""
@@ -689,15 +689,15 @@ class TestVSA_Mission:
         pass
     
     def test_vsa_mission_init(self):
-        """Test d'initialisation de VSA_Mission"""
+        """Test d'initialisation de VsaMission"""
         # TODO: Tester la création d'instance
-        instance = VSA_Mission()
+        instance = VsaMission()
         assert instance is not None
     
     def test___repr__(self):
         """Test de la méthode __repr__"""
         # Given
-        instance = VSA_Mission()
+        instance = VsaMission()
         # TODO: Préparer les données de test
         
         # When
@@ -711,7 +711,7 @@ class TestVSA_Mission:
     def test_duree_jours(self):
         """Test de la méthode duree_jours"""
         # Given
-        instance = VSA_Mission()
+        instance = VsaMission()
         # TODO: Préparer les données de test
         
         # When
@@ -725,7 +725,7 @@ class TestVSA_Mission:
     def test_consultant(self):
         """Test de la méthode consultant"""
         # Given
-        instance = VSA_Mission()
+        instance = VsaMission()
         # TODO: Préparer les données de test
         
         # When
@@ -739,7 +739,7 @@ class TestVSA_Mission:
     def test_est_active(self):
         """Test de la méthode est_active"""
         # Given
-        instance = VSA_Mission()
+        instance = VsaMission()
         # TODO: Préparer les données de test
         
         # When
@@ -756,7 +756,7 @@ class TestVSA_Mission:
         # Given
         mock_db = Mock()
         mock_session.return_value = mock_db
-        instance = VSA_Mission()
+        instance = VsaMission()
         
         # When
         # TODO: Tester les interactions DB
