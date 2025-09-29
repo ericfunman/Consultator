@@ -903,7 +903,6 @@ class ConsultantService:
             return []
 
     @staticmethod
-    @staticmethod
     def _save_mission_from_analysis(
         session: Session, consultant_id: int, mission_data: Dict
     ) -> bool:
@@ -1093,7 +1092,6 @@ class ConsultantService:
             print(f"Erreur sauvegarde compÃ©tence {competence_name}: {e}")
             return False
 
-    @staticmethod
     @staticmethod
     def _determine_skill_category(skill_name: str, type_competence: str) -> str:
         """
