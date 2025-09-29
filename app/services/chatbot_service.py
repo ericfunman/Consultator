@@ -387,19 +387,19 @@ class ChatbotService:
         self, question: str, intent_scores: Dict[str, int], has_consultant_name: bool
     ) -> Optional[str]:
         """Applique les règles spéciales pour déterminer l'intention"""
-        
+
         # Vérifier les règles pour consultants nommés
         consultant_specific = self._check_consultant_specific_rules(
             question, intent_scores, has_consultant_name
         )
         if consultant_specific:
             return consultant_specific
-            
+
         # Vérifier les règles générales basées sur les patterns
         pattern_based = self._check_pattern_based_rules(question, intent_scores)
         if pattern_based:
             return pattern_based
-            
+
         return None
 
     def _check_consultant_specific_rules(
@@ -408,7 +408,7 @@ class ChatbotService:
         """Vérifie les règles spécifiques aux consultants nommés"""
         if not has_consultant_name:
             return None
-            
+
         # Si un nom de consultant est mentionné et qu'on parle de salaire
         if intent_scores.get("salaire", 0) > 0:
             return "salaire"
@@ -420,18 +420,18 @@ class ChatbotService:
         # Si un nom de consultant est mentionné et qu'on parle de missions
         if intent_scores.get("missions", 0) > 0:
             return "missions"
-            
+
         # Si le mot "combien" est utilisé avec un nom de consultant, c'est probablement un salaire
         if re.search(r"combien", question):
             return "salaire"
-            
+
         return None
 
     def _check_pattern_based_rules(
         self, question: str, intent_scores: Dict[str, int]
     ) -> Optional[str]:
         """Vérifie les règles basées sur les patterns de texte"""
-        
+
         # NOUVELLE RÈGLE V1.2.2 : Prioriser tjm_mission sur missions si TJM est mentionné
         if intent_scores.get("tjm_mission", 0) > 0 and re.search(
             r"tjm|taux|prix|coût|tarif", question
@@ -447,10 +447,12 @@ class ChatbotService:
 
         # Questions de type "qui travaille chez" - utiliser des mots-clés simples pour éviter ReDoS
         question_lower = question.lower()
-        if ("qui" in question_lower and 
-            ("travaille" in question_lower or "est" in question_lower) and
-            ("chez" in question_lower or "dans" in question_lower) and
-            ("quanteam" in question_lower or "asigma" in question_lower)):
+        if (
+            "qui" in question_lower
+            and ("travaille" in question_lower or "est" in question_lower)
+            and ("chez" in question_lower or "dans" in question_lower)
+            and ("quanteam" in question_lower or "asigma" in question_lower)
+        ):
             return "profil_professionnel"
 
         # Questions de type "combien de missions"
@@ -463,7 +465,7 @@ class ChatbotService:
             question,
         ):
             return "statistiques"
-            
+
         return None
 
     def _analyze_intent(self, question: str) -> str:

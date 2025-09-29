@@ -310,9 +310,7 @@ def analyze_consultant_cv(consultant):
             selected_method = _display_analysis_method_selection(grok_available)
 
             _display_current_analysis_status(cv_document, consultant)
-            _handle_analysis_button(
-                cv_document, consultant, selected_method, grok_available
-            )
+            _handle_analysis_button(cv_document, consultant, selected_method)
             _display_ai_configuration(grok_available)
 
     except Exception as e:
@@ -368,7 +366,7 @@ def _display_current_analysis_status(cv_document, consultant):
         st.info("ℹ️ Aucune analyse disponible. Lancez une nouvelle analyse.")
 
 
-def _handle_analysis_button(cv_document, consultant, selected_method, grok_available):
+def _handle_analysis_button(cv_document, consultant, selected_method):
     """Gère le bouton d'analyse et l'exécution"""
     button_text = (
         "🚀 Analyser avec GPT-4"
