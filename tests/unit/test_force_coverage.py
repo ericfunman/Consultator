@@ -9,9 +9,9 @@ def test_force_code_execution():
     # Import et exécution forcée des modules principaux
     from app.database.database import get_database_info
     from app.database.database import get_database_session
-    from app.database.models import BusinessManager
-    from app.database.models import Consultant
-    from app.database.models import Practice
+    from app.database.models import BusinessManager, ConsultantCompetence
+    from app.database.models import Consultant, ConsultantCompetence
+    from app.database.models import Practice, ConsultantCompetence
     from app.utils.skill_categories import get_all_categories
     from app.utils.skill_categories import get_all_competences
     from app.utils.technologies_referentiel import get_all_technologies

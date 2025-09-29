@@ -9,8 +9,8 @@ import pytest
 import streamlit as st
 
 # Import des modèles pour les mocks
-from app.database.models import Consultant
-from app.database.models import Practice
+from app.database.models import Consultant, ConsultantCompetence
+from app.database.models import Practice, ConsultantCompetence
 
 # Import des fonctions à tester
 from app.pages_modules.consultant_forms import create_consultant

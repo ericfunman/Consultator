@@ -18,7 +18,7 @@ from app.database.database import get_session_factory
 from app.database.database import init_database
 from app.database.database import is_database_initialized
 from app.database.database import reset_database
-from app.database.models import Base
+from app.database.models import Base, ConsultantCompetence
 from tests.fixtures.base_test import BaseUnitTest
 
 

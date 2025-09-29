@@ -10,6 +10,7 @@ from unittest.mock import Mock
 from unittest.mock import patch
 
 import pytest
+from datetime import date
 
 
 class TestChatbotService80Percent(TestCase):

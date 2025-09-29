@@ -7,6 +7,7 @@ from typing import Dict
 from typing import List
 
 import pytest
+from datetime import date
 
 from app.utils.technologies_referentiel import TECHNOLOGIES_POPULAIRES
 from app.utils.technologies_referentiel import TECHNOLOGIES_REFERENTIEL

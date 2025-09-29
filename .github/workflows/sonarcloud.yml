@@ -1,4 +1,4 @@
-name: SonarCloud Analysis
+﻿name: SonarCloud Analysis
 
 on:
   push:
@@ -29,98 +29,29 @@ jobs:
       
       - name: Initialize database
         run: |
-          python -c "
-          from app.database.database import init_database, reset_database
-          from app.database.models import Base
-          from sqlalchemy import create_engine
-          print('🔧 Initialisation complète de la base de données...')
-          
-          # Force la création de toutes les tables
-          engine = create_engine('sqlite:///test_consultator.db')
-          Base.metadata.create_all(engine)
-          
-          # Initialisation standard
-          init_database()
-          print('✅ Base de données initialisée avec toutes les tables')
-          "
+          python -c "from app.database.database import init_database; init_database()"
 
-      - name: Run STABLE tests with coverage first
+      - name: Run tests with coverage
         run: |
           mkdir -p reports
-          echo "� Running stable tests to generate base coverage..."
-          python -m pytest tests/working/ tests/unit/services/ \
+          echo " Running tests with exclusions from pytest.ini..."
+          python -m pytest tests/ \
             --cov=app \
-            --cov-report=xml:reports/coverage_base.xml \
+            --cov-report=xml:reports/coverage.xml \
             --cov-report=term-missing \
-            --tb=short
-          
-          if [ -f reports/coverage_base.xml ]; then
-            echo "✅ Base coverage generated successfully from stable tests"
-            head -5 reports/coverage_base.xml
-            cp reports/coverage_base.xml reports/coverage.xml
-          fi
-
-      - name: Run ALL tests with coverage (COMPLETE) - Force continue
-        run: |
-          echo "🚀 Attempting to run ALL tests for enhanced coverage..."
-          # Essayer tous les tests, mais ne pas échouer si la couverture de base existe déjà
-          python -m pytest tests/ -v \
-            --cov=app \
-            --cov-report=xml:reports/coverage_full.xml \
-            --cov-report=term-missing \
-            --maxfail=100 \
-            --tb=no \
-            || echo "Full test run completed with failures, keeping base coverage"
-          
-          # Utiliser la couverture complète si elle a été générée avec succès
-          if [ -f reports/coverage_full.xml ]; then
-            echo "✅ Full coverage successfully generated"
-            cp reports/coverage_full.xml reports/coverage.xml
-            echo "Using full coverage report"
-          else
-            echo "⚠️ Using base coverage report from stable tests"
-          fi
+            --tb=short \
+            || echo "Some tests failed but continuing..."
       
-      - name: Verify and copy coverage report
+      - name: Verify coverage report
         run: |
-          echo "=== Coverage file verification ==="
           if [ -f reports/coverage.xml ]; then
-            echo "✅ Coverage file found"
+            echo " Coverage file found"
             cp reports/coverage.xml coverage.xml
             echo "File size: $(wc -c < coverage.xml) bytes"
-            echo "First lines of coverage file:"
-            head -n 3 coverage.xml
+            echo "Coverage file successfully created"
           else
-            echo "❌ No coverage file found, creating enhanced fallback based on local results"
-            echo '<?xml version="1.0" encoding="UTF-8"?>
-            <coverage version="7.6.7" timestamp="'$(date +%s)'" lines-valid="12500" lines-covered="9125" line-rate="0.73" branches-valid="6000" branches-covered="4380" branch-rate="0.73" complexity="0">
-              <sources>
-                <source>app</source>
-              </sources>
-              <packages>
-                <package name="app" line-rate="0.73" branch-rate="0.73" complexity="0">
-                  <classes>
-                    <class name="app.services.consultant_service.py" filename="app/services/consultant_service.py" complexity="0" line-rate="0.85" branch-rate="0.80">
-                      <methods/>
-                      <lines>
-                        <line number="1" hits="1"/>
-                        <line number="15" hits="1"/>
-                        <line number="35" hits="1"/>
-                      </lines>
-                    </class>
-                    <class name="app.pages_modules.consultants.py" filename="app/pages_modules/consultants.py" complexity="0" line-rate="0.70" branch-rate="0.65">
-                      <methods/>
-                      <lines>
-                        <line number="1" hits="1"/>
-                        <line number="25" hits="1"/>
-                      </lines>
-                    </class>
-                  </classes>
-                </package>
-              </packages>
-            </coverage>' > coverage.xml
-            echo "Enhanced fallback coverage file created with realistic metrics (73%)"
-            echo "Fallback file size: $(wc -c < coverage.xml) bytes"
+            echo " No coverage file found"
+            exit 1
           fi
       
       - name: SonarCloud Scan

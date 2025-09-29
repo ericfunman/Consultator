@@ -9,8 +9,8 @@ from unittest.mock import patch
 import pytest
 import streamlit as st
 
-from app.database.models import Consultant
-from app.database.models import Practice
+from app.database.models import Consultant, ConsultantCompetence
+from app.database.models import Practice, ConsultantCompetence
 from app.pages_modules.consultants import show_add_consultant_form
 from app.pages_modules.consultants import show_consultant_profile
 from app.pages_modules.consultants import show_consultants_list

@@ -124,7 +124,7 @@ class TestDatabaseModelsReal:
     def test_consultant_model_import(self):
         """Test d'import du modèle Consultant"""
         try:
-            from app.database.models import Consultant
+            from app.database.models import Consultant, ConsultantCompetence
 
             # Vérifier que la classe existe
             assert hasattr(Consultant, "__tablename__")
@@ -136,7 +136,7 @@ class TestDatabaseModelsReal:
     def test_mission_model_import(self):
         """Test d'import du modèle Mission"""
         try:
-            from app.database.models import Mission
+            from app.database.models import Mission, ConsultantCompetence
 
             # Vérifier que la classe existe
             assert hasattr(Mission, "__tablename__")
@@ -148,7 +148,7 @@ class TestDatabaseModelsReal:
     def test_competence_model_import(self):
         """Test d'import du modèle Competence"""
         try:
-            from app.database.models import Competence
+            from app.database.models import Competence, ConsultantCompetence
 
             # Vérifier que la classe existe
             assert hasattr(Competence, "__tablename__")
@@ -160,7 +160,7 @@ class TestDatabaseModelsReal:
     def test_consultant_creation_fields(self):
         """Test des champs du modèle Consultant"""
         try:
-            from app.database.models import Consultant
+            from app.database.models import Consultant, ConsultantCompetence
 
             # Vérifier que les champs importants existent
             consultant_fields = ["nom", "prenom", "email", "telephone"]

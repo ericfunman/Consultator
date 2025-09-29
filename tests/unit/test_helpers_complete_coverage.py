@@ -140,7 +140,7 @@ class TestDatabaseModelsAdvanced:
     def test_consultant_relationships(self):
         """Test des relations du modèle Consultant"""
         try:
-            from app.database.models import Consultant
+            from app.database.models import Consultant, ConsultantCompetence
 
             # Vérifier les relations
             consultant_attrs = dir(Consultant)
@@ -156,7 +156,7 @@ class TestDatabaseModelsAdvanced:
     def test_mission_fields(self):
         """Test des champs du modèle Mission"""
         try:
-            from app.database.models import Mission
+            from app.database.models import Mission, ConsultantCompetence
 
             # Vérifier les champs importants
             mission_fields = [
@@ -176,7 +176,7 @@ class TestDatabaseModelsAdvanced:
     def test_competence_model_methods(self):
         """Test des méthodes du modèle Competence"""
         try:
-            from app.database.models import Competence
+            from app.database.models import Competence, ConsultantCompetence
 
             # Vérifier que c'est bien une classe SQLAlchemy
             if hasattr(Competence, "__tablename__"):
@@ -192,9 +192,9 @@ class TestDatabaseModelsAdvanced:
     def test_model_repr_methods(self):
         """Test des méthodes __repr__ des modèles"""
         try:
-            from app.database.models import Competence
-            from app.database.models import Consultant
-            from app.database.models import Mission
+            from app.database.models import Competence, ConsultantCompetence
+            from app.database.models import Consultant, ConsultantCompetence
+            from app.database.models import Mission, ConsultantCompetence
 
             # Tester si les modèles ont des __repr__
             models = [Consultant, Mission, Competence]

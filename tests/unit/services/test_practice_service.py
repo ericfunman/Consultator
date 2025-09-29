@@ -10,8 +10,8 @@ from unittest.mock import patch
 
 import pytest
 
-from app.database.models import Consultant
-from app.database.models import Practice
+from app.database.models import Consultant, ConsultantCompetence
+from app.database.models import Practice, ConsultantCompetence
 from app.services.practice_service import PracticeService
 
 

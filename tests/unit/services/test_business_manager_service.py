@@ -10,8 +10,8 @@ from unittest.mock import patch
 
 import pytest
 
-from app.database.models import BusinessManager
-from app.database.models import ConsultantBusinessManager
+from app.database.models import BusinessManager, ConsultantCompetence
+from app.database.models import ConsultantBusinessManager, ConsultantCompetence
 from app.services.business_manager_service import BusinessManagerService
 from tests.fixtures.base_test import BaseServiceTest
 from tests.fixtures.base_test import TestDataFactory
