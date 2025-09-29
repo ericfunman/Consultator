@@ -67,9 +67,15 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
+    @patch("streamlit.session_state", new_callable=MagicMock)
     @patch("app.pages_modules.consultants.ConsultantService")
-    def test_show_consultant_profile_can_be_called(self, mock_service):
+    def test_show_consultant_profile_can_be_called(self, mock_service, mock_session_state):
         """Test que show_consultant_profile peut être appelée sans erreur"""
+        # Setup session state
+        mock_session_state.view_consultant_profile = 1
+        mock_session_state.__contains__ = lambda key: key == 'view_consultant_profile'
+        mock_session_state.__getitem__ = lambda key: 1 if key == 'view_consultant_profile' else None
+        
         # Mock service
         mock_service.get_consultant_with_stats.return_value = {
             "id": 1,
@@ -199,9 +205,15 @@ class TestConsultantForms(BaseUITest):
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
 
+    @patch("streamlit.session_state", new_callable=MagicMock)
     @patch("app.pages_modules.consultants.ConsultantService")
-    def test_show_consultant_profile_with_no_data(self, mock_service):
+    def test_show_consultant_profile_with_no_data(self, mock_service, mock_session_state):
         """Test du profil avec données manquantes"""
+        # Setup session state
+        mock_session_state.view_consultant_profile = 1
+        mock_session_state.__contains__ = lambda key: key == 'view_consultant_profile'
+        mock_session_state.__getitem__ = lambda key: 1 if key == 'view_consultant_profile' else None
+        
         mock_service.get_consultant_with_stats.return_value = None
 
         try:
