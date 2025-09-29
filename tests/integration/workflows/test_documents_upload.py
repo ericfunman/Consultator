@@ -45,8 +45,8 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         )
 
     @patch("app.pages_modules.documents_upload.imports_ok", True)
-    @patch("streamlit.subheader")
-    @patch("streamlit.file_uploader")
+    @patch("app.pages_modules.documents_upload.st.subheader")
+    @patch("app.pages_modules.documents_upload.st.file_uploader")
     def test_show_document_upload_section_no_file(self, mock_uploader, mock_subheader):
         """Test de show_document_upload_section() sans fichier uploadé"""
         mock_uploader.return_value = None
@@ -57,11 +57,11 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_uploader.assert_called_once()
 
     @patch("app.pages_modules.documents_upload.imports_ok", True)
-    @patch("streamlit.subheader")
-    @patch("streamlit.file_uploader")
-    @patch("streamlit.columns")
-    @patch("streamlit.metric")
-    @patch("streamlit.button")
+    @patch("app.pages_modules.documents_upload.st.subheader")
+    @patch("app.pages_modules.documents_upload.st.file_uploader")
+    @patch("app.pages_modules.documents_upload.st.columns")
+    @patch("app.pages_modules.documents_upload.st.metric")
+    @patch("app.pages_modules.documents_upload.st.button")
     def test_show_document_upload_section_with_file(
         self, mock_button, mock_metric, mock_columns, mock_uploader, mock_subheader
     ):
@@ -98,7 +98,7 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         )
 
     @patch("app.pages_modules.documents_upload.imports_ok", False)
-    @patch("streamlit.error")
+    @patch("app.pages_modules.documents_upload.st.error")
     def test_show_document_upload_section_imports_failed(self, mock_error):
         """Test de show_document_upload_section() avec imports échoués"""
         show_document_upload_section()
@@ -108,8 +108,8 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         )
 
     @patch("app.pages_modules.documents_upload.DocumentService")
-    @patch("streamlit.success")
-    @patch("streamlit.info")
+    @patch("app.pages_modules.documents_upload.st.success")
+    @patch("app.pages_modules.documents_upload.st.info")
     @patch("builtins.open", new_callable=MagicMock)
     def test_save_uploaded_document_success(
         self, mock_open, mock_info, mock_success, mock_doc_service
@@ -141,7 +141,7 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_info.assert_called()
 
     @patch("app.pages_modules.documents_upload.DocumentService")
-    @patch("streamlit.error")
+    @patch("app.pages_modules.documents_upload.st.error")
     def test_save_uploaded_document_error(self, mock_error, mock_doc_service):
         """Test de save_uploaded_document() avec erreur"""
         # Mock fichier
@@ -175,11 +175,11 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         assert hasattr(upload_module, "imports_ok")
 
     @patch("app.pages_modules.documents_upload.imports_ok", True)
-    @patch("streamlit.subheader")
-    @patch("streamlit.file_uploader")
-    @patch("streamlit.columns")
-    @patch("streamlit.metric")
-    @patch("streamlit.button")
+    @patch("app.pages_modules.documents_upload.st.subheader")
+    @patch("app.pages_modules.documents_upload.st.file_uploader")
+    @patch("app.pages_modules.documents_upload.st.columns")
+    @patch("app.pages_modules.documents_upload.st.metric")
+    @patch("app.pages_modules.documents_upload.st.button")
     @patch("app.pages_modules.documents_upload.save_uploaded_document")
     def test_show_document_upload_section_save_button_clicked(
         self,
@@ -216,10 +216,10 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_save_func.assert_called_once_with(mock_file)
 
     @patch("app.pages_modules.documents_upload.imports_ok", True)
-    @patch("streamlit.subheader")
-    @patch("streamlit.file_uploader")
-    @patch("streamlit.columns")
-    @patch("streamlit.metric")
+    @patch("app.pages_modules.documents_upload.st.subheader")
+    @patch("app.pages_modules.documents_upload.st.file_uploader")
+    @patch("app.pages_modules.documents_upload.st.columns")
+    @patch("app.pages_modules.documents_upload.st.metric")
     def test_show_document_upload_section_large_file(
         self, mock_metric, mock_columns, mock_uploader, mock_subheader
     ):
