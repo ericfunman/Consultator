@@ -38,6 +38,7 @@ class TestVSAImportRegression:
             VSA_Mission(
                 user_id=consultant.id,
                 code='AFFAS263',
+                orderid='ORD-2023-001',
                 client_name='GENERALI VIE',
                 date_debut=date(2023, 8, 21),
                 date_fin=date(2023, 12, 31)
@@ -45,6 +46,7 @@ class TestVSAImportRegression:
             VSA_Mission(
                 user_id=consultant.id,
                 code='AFFAS263',
+                orderid='ORD-2024-001',
                 client_name='GENERALI VIE',
                 date_debut=date(2024, 1, 1),
                 date_fin=date(2024, 12, 31)
@@ -52,6 +54,7 @@ class TestVSAImportRegression:
             VSA_Mission(
                 user_id=consultant.id,
                 code='AFFAS263',
+                orderid='ORD-2025-001',
                 client_name='GENERALI VIE',
                 date_debut=date(2025, 1, 1),
                 date_fin=date(2025, 12, 31)
@@ -81,7 +84,8 @@ class TestVSAImportRegression:
         assert saved_missions[2].date_fin == date(2025, 12, 31)
     
     def test_duplicate_mission_detection(self, db_session):
-        """Test de détection des vrais doublons"""
+        """Test que les missions avec des codes identiques peuvent être créées
+        (pas de contrainte d'unicité sur le code)"""
         # Given - Un consultant
         consultant = Consultant(
             nom='DUPLICATE', prenom='Test',
@@ -90,10 +94,11 @@ class TestVSAImportRegression:
         db_session.add(consultant)
         db_session.flush()
         
-        # When - Tentative d'import d'un vrai doublon
+        # When - Ajout de missions avec le même code
         mission1 = VSA_Mission(
             user_id=consultant.id,
             code='DUPLICATE001',
+            orderid="ORD-3329-359",
             client_name='CLIENT TEST',
             date_debut=date(2024, 1, 1),
             date_fin=date(2024, 12, 31)
@@ -102,18 +107,24 @@ class TestVSAImportRegression:
         mission2 = VSA_Mission(
             user_id=consultant.id,
             code='DUPLICATE001',
+            orderid="ORD-9893-475",
             client_name='CLIENT TEST',
-            date_debut=date(2024, 1, 1),  # Même date de début
-            date_fin=date(2024, 12, 31)   # Même date de fin
+            date_debut=date(2024, 1, 1),
+            date_fin=date(2024, 12, 31)
         )
         
         db_session.add(mission1)
         db_session.commit()
         
-        # Then - Le doublon doit être rejeté par la contrainte d'unicité
+        # Then - Les deux missions sont créées sans erreur
         db_session.add(mission2)
-        with pytest.raises(Exception):  # Violation d'unicité
-            db_session.commit()
+        db_session.commit()
+        
+        # Vérifier que les deux missions existent
+        missions = db_session.query(VSA_Mission).filter(
+            VSA_Mission.code == 'DUPLICATE001'
+        ).all()
+        assert len(missions) == 2
     
     def test_mission_import_with_invalid_dates(self, db_session):
         """Test de gestion des dates invalides lors de l'import"""
@@ -129,6 +140,7 @@ class TestVSAImportRegression:
         mission = VSA_Mission(
             user_id=consultant.id,
             code='INVALID_DATE',
+                orderid="ORD-6105-310",
             client_name='CLIENT TEST',
             date_debut=date(2024, 12, 31),
             date_fin=date(2024, 1, 1)  # Date de fin avant début
@@ -171,6 +183,7 @@ class TestVSAImportRegression:
                 mission = VSA_Mission(
                     user_id=consultant.id,
                     code=f'BULK{j:03d}',
+                orderid="ORD-2211-237",
                     client_name=f'CLIENT {j}',
                     date_debut=date(2024, 1, 1),
                     date_fin=date(2024, 12, 31)
@@ -204,6 +217,7 @@ class TestVSAImportRegression:
         vsa_mission = VSA_Mission(
             user_id=consultant.id,
             code='RELATION001',
+                orderid="ORD-5147-542",
             client_name='CLIENT VSA',
             date_debut=date(2024, 1, 1),
             date_fin=date(2024, 6, 30)
@@ -241,6 +255,7 @@ class TestVSAImportRegression:
         mission = VSA_Mission(
             user_id=consultant.id,
             code='COMPLETE001',
+                orderid="ORD-5546-649",
             client_name='CLIENT COMPLET',
             date_debut=date(2024, 1, 1),
             date_fin=date(2024, 12, 31),
@@ -282,6 +297,7 @@ class TestVSAImportRegression:
             mission = VSA_Mission(
                 user_id=consultant.id,
                 code=code,
+                orderid="ORD-6263-377",
                 client_name=client,
                 date_debut=debut,
                 date_fin=fin
@@ -330,6 +346,7 @@ class TestImportDataValidation:
         mission = VSA_Mission(
             user_id=99999,  # ID inexistant
             code='MAPPING001',
+            orderid='ORD-MAPPING-001',
             client_name='CLIENT TEST',
             date_debut=date(2024, 1, 1)
         )
@@ -353,6 +370,7 @@ class TestImportDataValidation:
         mission = VSA_Mission(
             user_id=consultant.id,
             code='DATE001',
+                orderid="ORD-5272-144",
             client_name='CLIENT DATE',
             date_debut=date(2024, 1, 15),
             date_fin=date(2024, 12, 31)

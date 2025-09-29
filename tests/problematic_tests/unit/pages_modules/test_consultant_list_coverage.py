@@ -174,7 +174,7 @@ class TestConsultantListCoverage:
         """Test de l'application des filtres avec terme de recherche"""
         from app.pages_modules.consultant_list import _apply_filters
 
-        filtered_df = _apply_filters(sample_dataframe, "Marie", "Tous", "Tous")
+        filtered_df = _apply_filters(sample_dataframe, "Marie", "Tous", "Tous", "Tous")
 
         assert len(filtered_df) == 1
         assert filtered_df.iloc[0]["Prénom"] == "Marie"
@@ -184,7 +184,7 @@ class TestConsultantListCoverage:
         """Test de l'application des filtres par practice"""
         from app.pages_modules.consultant_list import _apply_filters
 
-        filtered_df = _apply_filters(sample_dataframe, "", "Data Science", "Tous")
+        filtered_df = _apply_filters(sample_dataframe, "", "Data Science", "Tous", "Tous")
 
         assert len(filtered_df) == 1
         assert filtered_df.iloc[0]["Practice"] == "Data Science"
@@ -194,7 +194,7 @@ class TestConsultantListCoverage:
         """Test de l'application des filtres par disponibilité"""
         from app.pages_modules.consultant_list import _apply_filters
 
-        filtered_df = _apply_filters(sample_dataframe, "", "Tous", "Disponible")
+        filtered_df = _apply_filters(sample_dataframe, "", "Tous", "Tous", "Disponible")
 
         assert len(filtered_df) == 1
         assert filtered_df.iloc[0]["Disponibilité"] == "✅ Disponible"
@@ -232,6 +232,7 @@ class TestConsultantListCoverage:
             "Grade",
             "Type contrat",
             "Practice",
+            "Entité",
         ]
         assert columns == expected_columns
 

@@ -135,10 +135,11 @@ class TestConsultantDocumentsCoverage:
 
     @patch("app.pages_modules.consultant_documents.st")
     @patch("app.pages_modules.consultant_documents.os.makedirs")
-    @patch("app.pages_modules.consultant_documents.DocumentAnalyzer")
+    @patch("database.models.Document")
+    @patch("app.services.document_analyzer.DocumentAnalyzer")
     @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_upload_document_success(
-        self, mock_session, mock_analyzer, mock_makedirs, mock_st
+        self, mock_session, mock_analyzer, mock_document, mock_makedirs, mock_st
     ):
         """Test d'upload de document réussi"""
         # Mock file
@@ -147,31 +148,43 @@ class TestConsultantDocumentsCoverage:
         mock_file.getbuffer.return_value = b"test content"
         mock_file.type = "application/pdf"
 
-        # Mock analyzer
-        mock_analyzer.extract_text_from_file.return_value = "extracted text"
-        mock_analyzer.analyze_cv_content.return_value = {"test": "analysis"}
-
-        # Mock session
+        # Mock session context manager
         mock_session_instance = MagicMock()
         mock_session.return_value.__enter__.return_value = mock_session_instance
+        mock_session.return_value.__exit__.return_value = None
 
-        data = {"file": mock_file, "type_document": "CV", "description": "Test CV"}
+        # Mock document creation
+        mock_document_instance = MagicMock()
+        mock_document.return_value = mock_document_instance
 
-        with patch("builtins.open", mock_open()):
-            result = upload_document(1, data)
+        # Mock analyzer methods as class methods
+        with patch("app.services.document_analyzer.DocumentAnalyzer.extract_text_from_file") as mock_extract, \
+             patch("app.services.document_analyzer.DocumentAnalyzer.analyze_cv_content") as mock_analyze:
+            
+            mock_extract.return_value = "extracted text"
+            mock_analyze.return_value = {"test": "analysis"}
+
+            data = {"file": mock_file, "type_document": "CV", "description": "Test CV"}
+
+            with patch("builtins.open", mock_open()):
+                result = upload_document(1, data)
 
         assert result is True
-        mock_session_instance.add.assert_called_once()
+        mock_session_instance.add.assert_called_once_with(mock_document_instance)
         mock_session_instance.commit.assert_called_once()
 
     @patch("app.pages_modules.consultant_documents.st")
+    @patch("database.models.Document")
     @patch("app.pages_modules.consultant_documents.get_database_session")
-    def test_upload_document_error(self, mock_session, mock_st):
+    def test_upload_document_error(self, mock_session, mock_document, mock_st):
         """Test d'upload avec erreur"""
         # Mock session to raise exception
         mock_session.return_value.__enter__.side_effect = Exception("DB Error")
 
         mock_file = MagicMock()
+        mock_file.name = "test.pdf"
+        mock_file.getbuffer.return_value = b"test content"
+        mock_file.type = "application/pdf"
         data = {"file": mock_file, "type_document": "CV", "description": ""}
 
         result = upload_document(1, data)
@@ -201,7 +214,7 @@ class TestConsultantDocumentsCoverage:
         mock_st.warning.assert_called_with("⚠️ Aucun CV trouvé pour ce consultant")
 
     @patch("app.pages_modules.consultant_documents.st")
-    @patch("app.pages_modules.consultant_documents.is_grok_available")
+    @patch("app.services.ai_openai_service.is_grok_available")
     @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_analyze_consultant_cv_with_cv_no_grok(
         self, mock_session, mock_is_grok, mock_st
@@ -238,7 +251,7 @@ class TestConsultantDocumentsCoverage:
 
     @patch("app.pages_modules.consultant_documents.st")
     @patch("app.pages_modules.consultant_documents.perform_cv_analysis")
-    @patch("app.pages_modules.consultant_documents.is_grok_available")
+    @patch("app.services.ai_openai_service.is_grok_available")
     @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_analyze_consultant_cv_start_analysis(
         self, mock_session, mock_is_grok, mock_perform, mock_st
@@ -273,8 +286,8 @@ class TestConsultantDocumentsCoverage:
         mock_st.success.assert_called_with("✅ Analyse terminée avec succès !")
 
     @patch("app.pages_modules.consultant_documents.st")
-    @patch("app.pages_modules.consultant_documents.DocumentAnalyzer")
-    @patch("app.pages_modules.consultant_documents.get_grok_service")
+    @patch("app.services.document_analyzer.DocumentAnalyzer")
+    @patch("app.services.ai_openai_service.get_grok_service")
     @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_perform_cv_analysis_grok_method(
         self, mock_session, mock_grok, mock_analyzer, mock_st
@@ -312,7 +325,7 @@ class TestConsultantDocumentsCoverage:
             mock_session_instance.commit.assert_called_once()
 
     @patch("app.pages_modules.consultant_documents.st")
-    @patch("app.pages_modules.consultant_documents.DocumentAnalyzer")
+    @patch("app.services.document_analyzer.DocumentAnalyzer")
     @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_perform_cv_analysis_classic_method(
         self, mock_session, mock_analyzer, mock_st
@@ -457,7 +470,7 @@ class TestConsultantDocumentsCoverage:
         mock_st.error.assert_called_with("❌ Fichier introuvable sur le serveur")
 
     @patch("app.pages_modules.consultant_documents.st")
-    @patch("app.pages_modules.consultant_documents.DocumentAnalyzer")
+    @patch("app.services.document_analyzer.DocumentAnalyzer")
     @patch("app.pages_modules.consultant_documents.get_database_session")
     def test_reanalyze_document_success(self, mock_session, mock_analyzer, mock_st):
         """Test de réanalyse de document réussie"""
