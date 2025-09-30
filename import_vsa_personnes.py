@@ -33,6 +33,7 @@ def classify_person_by_job_title(job_title: str) -> str:
     bm_patterns = [
         "business manager",
         "senior business manager",
+        "responsable business unit",  # Pour Laurence Oziel
         # 'directeur' retiré car un Directeur de Practice est d'abord un consultant
     ]
 

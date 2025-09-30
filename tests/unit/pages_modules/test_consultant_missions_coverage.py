@@ -949,6 +949,9 @@ class TestConsultantMissionsCoverage:
         ]
         mock_build_revenue.return_value = (revenue_data, 10000)
 
+        # Configure mock_st.dataframe to avoid issues
+        mock_st.dataframe.return_value = None
+
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
         mock_col1.__enter__ = Mock(return_value=mock_col1)

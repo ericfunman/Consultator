@@ -3,7 +3,7 @@ Tests pour le module home - Version simplifiée qui fonctionne
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 import streamlit as st
 
 # Mock streamlit
@@ -26,11 +26,14 @@ class TestHomeModule(unittest.TestCase):
         with patch("app.pages_modules.home.get_database_info") as mock_get_db_info, \
              patch("streamlit.columns") as mock_columns:
             
+            # Configure mock as context manager
             mock_get_db_info.return_value = {
                 'consultants': 0,
                 'missions': 0,
                 'exists': True
             }
+            mock_get_db_info.__enter__ = Mock(return_value=mock_get_db_info.return_value)
+            mock_get_db_info.__exit__ = Mock(return_value=None)
             
             # Mock pour st.columns pour éviter l'erreur de unpacking
             mock_columns.return_value = [MagicMock(), MagicMock(), MagicMock()]

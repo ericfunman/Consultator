@@ -450,15 +450,15 @@ class TestMissionExport:
         df = pd.DataFrame(missions_data)
         csv_data = df.to_csv(index=False)
 
-        # Test du bouton de téléchargement
-        mock_download("Télécharger CSV", csv_data, "missions.csv", "text/csv")
-
-        # Vérifications
-        mock_download.assert_called_with(
-            "Télécharger CSV", csv_data, "missions.csv", "text/csv"
-        )
+        # Test du bouton de téléchargement - simuler l'appel
+        mock_download.return_value = None  # Bouton pas cliqué
+        
+        # Simuler l'appel de la fonction qui utiliserait download_button
+        # Ici on teste juste que le CSV est généré correctement
         assert "Mission 1" in csv_data
         assert "Client A" in csv_data
+        assert "Mission 2" in csv_data
+        assert "Client B" in csv_data
 
     def test_mission_export_data_preparation(self):
         """Test de préparation des données pour export"""

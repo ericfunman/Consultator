@@ -69,7 +69,7 @@ class TestBusinessManagerService(BaseServiceTest):
     def test_get_all_business_managers_database_error(self, mock_session, mock_st):
         """Test récupération Business Managers - erreur base de données"""
         # Mock streamlit cache
-        mock_st.cache_data = lambda ttl=300: lambda func: func
+        mock_st.cache_data = MagicMock(return_value=lambda func: func)
 
         # Mock session qui lève une exception SQLAlchemyError
         from sqlalchemy.exc import SQLAlchemyError
@@ -79,6 +79,7 @@ class TestBusinessManagerService(BaseServiceTest):
             "Database connection failed"
         )
         mock_session.return_value.__enter__.return_value = mock_session_instance
+        mock_session.return_value.__exit__.return_value = None
 
         # Test
         result = BusinessManagerService.get_all_business_managers()
