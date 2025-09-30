@@ -53,10 +53,8 @@ jobs:
             exit 1
           fi
 
-      # SonarCloud temporairement désactivé pour corriger l'erreur protobuf
-      # TODO: Mettre à jour vers la nouvelle action SonarQube quand elle sera disponible
-      # - name: SonarCloud Scan
-      #   uses: SonarSource/sonarqube-scan-action@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
