@@ -57,11 +57,11 @@ class TestConsultantMissionsCoverage:
         mock_show_stats,
         mock_consultant,
         mock_mission_active,
-        mocker,
     ):
         """Test de l'affichage des missions avec données"""
         # Set imports_ok to True
-        mocker.patch("app.pages_modules.consultant_missions.imports_ok", True)
+        import app.pages_modules.consultant_missions as cm_module
+        cm_module.imports_ok = True
 
         mock_session = Mock()
         mock_get_session.return_value.__enter__.return_value = mock_session
