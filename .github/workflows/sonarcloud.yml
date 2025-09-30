@@ -21,12 +21,6 @@ jobs:
         with:
           python-version: '3.11'
       
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-      
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -40,7 +34,7 @@ jobs:
       - name: Run tests with coverage
         run: |
           mkdir -p reports
-          echo "Running tests with coverage..."
+          echo " Running tests with exclusions from pytest.ini..."
           python -m pytest tests/ \
             --cov=app \
             --cov-report=xml:reports/coverage.xml \
@@ -51,18 +45,17 @@ jobs:
       - name: Verify coverage report
         run: |
           if [ -f reports/coverage.xml ]; then
-            echo "Coverage file found, size: $(wc -c < reports/coverage.xml) bytes"
+            echo " Coverage file found"
             cp reports/coverage.xml coverage.xml
+            echo "File size: $(wc -c < coverage.xml) bytes"
             echo "Coverage file successfully created"
           else
-            echo "No coverage file found"
+            echo " No coverage file found"
             exit 1
           fi
-
+      
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v5
-        with:
-          jdk: '17'
+        uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
