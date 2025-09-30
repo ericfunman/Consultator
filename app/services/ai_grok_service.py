@@ -158,7 +158,7 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
             response.raise_for_status()
             return response.json()
 
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             raise ConnectionError(f"Erreur API Grok: {str(e)}") from e
 
     def _parse_and_validate_response(

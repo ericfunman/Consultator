@@ -324,7 +324,7 @@ class TestConsultantDocuments:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock the query chain properly
-        with patch('app.pages_modules.consultant_documents.Document'):
+        with patch('app.pages_modules.consultant_documents.Document', create=True):
             mock_query = MagicMock()
             mock_session_instance.query.return_value = mock_query
             mock_query.filter.return_value.order_by.return_value.first.return_value = None
@@ -350,7 +350,7 @@ class TestConsultantDocuments:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock the query chain properly
-        with patch('app.pages_modules.consultant_documents.Document'):
+        with patch('app.pages_modules.consultant_documents.Document', create=True):
             mock_query = MagicMock()
             mock_session_instance.query.return_value = mock_query
             mock_query.filter.return_value.order_by.return_value.first.return_value = mock_cv
@@ -371,7 +371,7 @@ class TestConsultantDocuments:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock Document class
-        with patch('app.pages_modules.consultant_documents.Document'):
+        with patch('app.pages_modules.consultant_documents.Document', create=True):
             mock_session_instance.add = MagicMock()
             mock_session_instance.commit = MagicMock()
 
@@ -402,7 +402,7 @@ class TestConsultantDocuments:
         mock_session_instance = MagicMock()
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
-        with patch('app.pages_modules.consultant_documents.Document'):
+        with patch('app.pages_modules.consultant_documents.Document', create=True):
             mock_session_instance.query.return_value.get.return_value = mock_doc
 
             result = delete_document(1)
@@ -425,7 +425,7 @@ class TestConsultantDocuments:
         mock_session_instance = MagicMock()
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
-        with patch('app.pages_modules.consultant_documents.Document'):
+        with patch('app.pages_modules.consultant_documents.Document', create=True):
             mock_session_instance.query.return_value.get.return_value = mock_doc
 
             data = {'nom_fichier': 'new_name.pdf'}
@@ -456,8 +456,8 @@ class TestConsultantDocuments:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock services
-        with patch('app.pages_modules.consultant_documents.DocumentAnalyzer') as mock_analyzer_class, \
-             patch('app.pages_modules.consultant_documents.OpenAIChatGPTService') as mock_openai_class:
+        with patch('app.pages_modules.consultant_documents.DocumentAnalyzer', create=True) as mock_analyzer_class, \
+             patch('app.pages_modules.consultant_documents.OpenAIChatGPTService', create=True) as mock_openai_class:
 
             mock_analyzer = MagicMock()
             mock_analyzer.analyze_cv.return_value = {"competences": ["Python", "SQL"]}
@@ -487,7 +487,7 @@ class TestConsultantDocuments:
         mock_session_instance = MagicMock()
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
-        with patch('app.pages_modules.consultant_documents.Document'):
+        with patch('app.pages_modules.consultant_documents.Document', create=True):
             mock_session_instance.query.return_value.filter.return_value.order_by.return_value.first.return_value = None
 
             # Mock Streamlit
@@ -570,11 +570,15 @@ class TestConsultantDocuments:
         # Mock consultant
         mock_consultant = MagicMock()
 
-        # Mock Streamlit components - return exactly 2 columns
+        # Mock Streamlit components with proper column handling
         mock_st.markdown = MagicMock()
         mock_st.metric = MagicMock()
         mock_st.button = MagicMock(return_value=False)
-        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock()])
+        # Return different numbers of columns based on calls
+        mock_st.columns = MagicMock(side_effect=[
+            [MagicMock(), MagicMock()],  # First call: 2 columns
+            [MagicMock(), MagicMock(), MagicMock(), MagicMock()]  # Second call: 4 columns
+        ])
 
         show_document_details(mock_doc, mock_consultant)
 
