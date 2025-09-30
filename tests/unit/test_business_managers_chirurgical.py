@@ -59,7 +59,13 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
     def test_handle_assignment_selection_no_selection(self):
         """Test de _handle_assignment_selection sans sélection"""
         with patch('streamlit.dataframe') as mock_dataframe:
-            mock_dataframe.return_value = Mock()
+            # Simuler la structure de retour de st.dataframe avec sélection vide
+            mock_selection = Mock()
+            mock_selection.rows = []  # Liste vide pour simuler aucune sélection
+            mock_event = Mock()
+            mock_event.selection = mock_selection
+            mock_dataframe.return_value = mock_event
+            
             from app.pages_modules.business_managers import _handle_assignment_selection
             
             current_assignments = []
@@ -71,7 +77,8 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_handle_bm_form_actions(self):
         """Test de _handle_bm_form_actions"""
-        with patch('streamlit.columns') as mock_cols:
+        with patch('streamlit.columns') as mock_cols, \
+             patch('streamlit.button'):
             mock_cols.return_value = [Mock(), Mock()]
             mock_bm = Mock()
             mock_bm.id = 1
@@ -82,9 +89,12 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
     def test_handle_comment_form_display(self):
         """Test de _handle_comment_form - affichage"""
         with patch('streamlit.text_area') as mock_text, \
-             patch('streamlit.button'):
+             patch('streamlit.button'), \
+             patch('streamlit.form') as mock_form:
             
             mock_text.return_value = "Commentaire test"
+            mock_form.return_value.__enter__ = Mock(return_value=Mock())
+            mock_form.return_value.__exit__ = Mock(return_value=None)
             mock_session = Mock()
 
             from app.pages_modules.business_managers import _handle_comment_form
@@ -140,7 +150,15 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
              patch('streamlit.form_submit_button'), \
              patch('streamlit.columns') as mock_columns:
             
-            mock_columns.return_value = [Mock(), Mock()]
+            # Mock pour st.columns() qui retourne des objets context manager
+            mock_col1 = Mock()
+            mock_col1.__enter__ = Mock(return_value=mock_col1)
+            mock_col1.__exit__ = Mock(return_value=None)
+            mock_col2 = Mock()
+            mock_col2.__enter__ = Mock(return_value=mock_col2)
+            mock_col2.__exit__ = Mock(return_value=None)
+            mock_columns.return_value = [mock_col1, mock_col2]
+            
             mock_form.return_value.__enter__ = Mock(return_value=Mock())
             mock_form.return_value.__exit__ = Mock(return_value=None)
             
@@ -159,9 +177,27 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
         with patch('streamlit.title'), \
              patch('streamlit.tabs') as mock_tabs, \
              patch('streamlit.selectbox') as mock_select, \
+             patch('streamlit.form') as mock_form, \
              patch('app.services.business_manager_service.BusinessManagerService.get_all_business_managers') as mock_get:
             
-            mock_tabs.return_value = [Mock(), Mock(), Mock()]
+            # Mock pour st.tabs() qui retourne des objets context manager
+            mock_tab1 = Mock()
+            mock_tab1.__enter__ = Mock(return_value=mock_tab1)
+            mock_tab1.__exit__ = Mock(return_value=None)
+            mock_tab2 = Mock()
+            mock_tab2.__enter__ = Mock(return_value=mock_tab2)
+            mock_tab2.__exit__ = Mock(return_value=None)
+            mock_tab3 = Mock()
+            mock_tab3.__enter__ = Mock(return_value=mock_tab3)
+            mock_tab3.__exit__ = Mock(return_value=None)
+            mock_tabs.return_value = [mock_tab1, mock_tab2, mock_tab3]
+            
+            # Mock pour st.form() qui retourne un context manager
+            mock_form_cm = Mock()
+            mock_form_cm.__enter__ = Mock(return_value=mock_form_cm)
+            mock_form_cm.__exit__ = Mock(return_value=None)
+            mock_form.return_value = mock_form_cm
+            
             mock_select.return_value = "Tous"
             mock_get.return_value = []
 
