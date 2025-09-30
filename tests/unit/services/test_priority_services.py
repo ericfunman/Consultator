@@ -239,7 +239,7 @@ class TestCacheService:
         except (AttributeError, NotImplementedError):
             pytest.skip("Méthode clear non implémentée")
 
-    @patch("streamlit.cache_data")
+    @patch("streamlit.cache_data", new_callable=Mock)
     def test_streamlit_cache_integration(self, mock_cache_data):
         """Test d'intégration avec le cache Streamlit"""
         service = self.service_class()

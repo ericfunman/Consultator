@@ -44,6 +44,7 @@ class TestConsultantMissionsCoverage:
         mission.tjm = 450
         mission.salaire_mensuel = 0
         mission.description = "Développement d'un système d'analyse de données"
+        mission.competences_requises = "Python, SQL, Docker"
         return mission
 
     @patch("app.pages_modules.consultant_missions.show_missions_statistics")
@@ -263,6 +264,9 @@ class TestConsultantMissionsCoverage:
             col.__enter__ = Mock(return_value=col)
             col.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = mock_columns
+
+        # Mock st.dataframe to avoid issues with pandas
+        mock_st.dataframe.return_value = None
 
         from app.pages_modules.consultant_missions import (
             show_missions_revenues,
