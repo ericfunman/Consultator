@@ -58,14 +58,16 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_handle_assignment_selection_no_selection(self):
         """Test de _handle_assignment_selection sans sélection"""
-        from app.pages_modules.business_managers import _handle_assignment_selection
-        
-        current_assignments = []
-        data = pd.DataFrame()
-        mock_session = Mock()
-        
-        result = _handle_assignment_selection(current_assignments, data, mock_session)
-        self.assertIsNone(result)
+        with patch('streamlit.dataframe') as mock_dataframe:
+            mock_dataframe.return_value = Mock()
+            from app.pages_modules.business_managers import _handle_assignment_selection
+            
+            current_assignments = []
+            data = pd.DataFrame()
+            mock_session = Mock()
+            
+            result = _handle_assignment_selection(current_assignments, data, mock_session)
+            self.assertIsNone(result)
 
     def test_handle_bm_form_actions(self):
         """Test de _handle_bm_form_actions"""
@@ -135,8 +137,10 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
              patch('streamlit.form') as mock_form, \
              patch('streamlit.text_input'), \
              patch('streamlit.selectbox'), \
-             patch('streamlit.form_submit_button'):
+             patch('streamlit.form_submit_button'), \
+             patch('streamlit.columns') as mock_columns:
             
+            mock_columns.return_value = [Mock(), Mock()]
             mock_form.return_value.__enter__ = Mock(return_value=Mock())
             mock_form.return_value.__exit__ = Mock(return_value=None)
             
@@ -153,9 +157,11 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
     def test_show_main_page(self):
         """Test de show (page principale)"""
         with patch('streamlit.title'), \
+             patch('streamlit.tabs') as mock_tabs, \
              patch('streamlit.selectbox') as mock_select, \
              patch('app.services.business_manager_service.BusinessManagerService.get_all_business_managers') as mock_get:
             
+            mock_tabs.return_value = [Mock(), Mock(), Mock()]
             mock_select.return_value = "Tous"
             mock_get.return_value = []
 
