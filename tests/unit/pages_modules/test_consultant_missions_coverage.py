@@ -16,7 +16,7 @@ class TestConsultantMissionsCoverage:
     @pytest.fixture
     def mock_consultant(self):
         """Mock d'un consultant"""
-        consultant = Mock()
+        consultant = MagicMock()
         consultant.id = 1
         consultant.prenom = "Marie"
         consultant.nom = "Martin"
@@ -25,7 +25,7 @@ class TestConsultantMissionsCoverage:
     @pytest.fixture
     def mock_client(self):
         """Mock d'un client"""
-        client = Mock()
+        client = MagicMock()
         client.id = 1
         client.nom = "Société Générale"
         return client
@@ -33,7 +33,7 @@ class TestConsultantMissionsCoverage:
     @pytest.fixture
     def mock_mission_active(self, mock_client):
         """Mock d'une mission active"""
-        mission = Mock()
+        mission = MagicMock()
         mission.id = 1
         mission.titre = "Projet Data Analytics"
         mission.client = mock_client
@@ -64,14 +64,14 @@ class TestConsultantMissionsCoverage:
         import app.pages_modules.consultant_missions as cm_module
         cm_module.imports_ok = True
 
-        mock_session = Mock()
+        mock_session = MagicMock()
         mock_get_session.return_value.__enter__.return_value = mock_session
 
         # Mock the SQLAlchemy query chain properly
-        mock_query = Mock()
-        mock_options = Mock()
-        mock_filtered = Mock()
-        mock_ordered = Mock()
+        mock_query = MagicMock()
+        mock_options = MagicMock()
+        mock_filtered = MagicMock()
+        mock_ordered = MagicMock()
 
         mock_session.query.return_value = mock_query
         mock_query.options.return_value = mock_options
@@ -260,10 +260,10 @@ class TestConsultantMissionsCoverage:
     def test_show_missions_revenues(self, mock_st, mock_mission_active):
         """Test de l'analyse des revenus"""
         # Mock st.columns pour les statistiques
-        mock_columns = [Mock() for _ in range(3)]
+        mock_columns = [MagicMock() for _ in range(3)]
         for col in mock_columns:
-            col.__enter__ = Mock(return_value=col)
-            col.__exit__ = Mock(return_value=None)
+            col.__enter__ = MagicMock(return_value=col)
+            col.__exit__ = MagicMock(return_value=None)
         mock_st.columns.return_value = mock_columns
 
         # Mock st.dataframe to avoid issues with pandas - use MagicMock for Python 3.11 compatibility
