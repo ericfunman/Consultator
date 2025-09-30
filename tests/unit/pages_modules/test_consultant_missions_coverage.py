@@ -259,12 +259,18 @@ class TestConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_revenues(self, mock_st, mock_mission_active):
         """Test de l'analyse des revenus"""
-        # Mock st.columns pour les statistiques
-        mock_columns = [MagicMock() for _ in range(3)]
-        for col in mock_columns:
-            col.__enter__ = MagicMock(return_value=col)
-            col.__exit__ = MagicMock(return_value=None)
-        mock_st.columns.return_value = mock_columns
+        # Mock st.columns pour retourner des context managers
+        mock_col1 = MagicMock()
+        mock_col1.__enter__ = MagicMock(return_value=mock_col1)
+        mock_col1.__exit__ = MagicMock(return_value=None)
+        mock_col2 = MagicMock()
+        mock_col2.__enter__ = MagicMock(return_value=mock_col2)
+        mock_col2.__exit__ = MagicMock(return_value=None)
+        mock_col3 = MagicMock()
+        mock_col3.__enter__ = MagicMock(return_value=mock_col3)
+        mock_col3.__exit__ = MagicMock(return_value=None)
+
+        mock_st.columns.return_value = (mock_col1, mock_col2, mock_col3)
 
         # Mock st.dataframe to avoid issues with pandas - use MagicMock for Python 3.11 compatibility
         mock_st.dataframe = MagicMock(return_value=None)

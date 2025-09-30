@@ -68,8 +68,8 @@ class TestBusinessManagerService(BaseServiceTest):
     @patch("app.services.business_manager_service.get_database_session")
     def test_get_all_business_managers_database_error(self, mock_session, mock_st):
         """Test récupération Business Managers - erreur base de données"""
-        # Mock streamlit cache - use MagicMock to support decorator behavior
-        mock_st.cache_data = MagicMock(side_effect=lambda *args, **kwargs: lambda func: func)
+        # Mock streamlit cache - return the function itself for decorator behavior
+        mock_st.cache_data = MagicMock(return_value=lambda func: func)
 
         # Mock session qui lève une exception SQLAlchemyError
         from sqlalchemy.exc import SQLAlchemyError
