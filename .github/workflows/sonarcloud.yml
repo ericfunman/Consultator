@@ -31,31 +31,26 @@ jobs:
         run: |
           python -c "from app.database.database import init_database; init_database()"
 
-      - name: Clean coverage files
+      - name: Run tests with coverage
         run: |
-          rm -f coverage.xml reports/coverage.xml
           mkdir -p reports
-
-      - name: Run tests with coverage (clean)
-        run: |
-          echo "Running tests with clean coverage..."
+          echo "Running tests with coverage..."
           python -m pytest tests/ \
             --cov=app \
             --cov-report=xml:reports/coverage.xml \
             --cov-report=term-missing \
             --tb=short \
-            -x \
             || echo "Some tests failed but continuing..."
-
-      - name: Verify and prepare coverage
+      
+      - name: Verify coverage report
         run: |
           if [ -f reports/coverage.xml ]; then
-            echo "Coverage file exists, size: $(wc -c < reports/coverage.xml) bytes"
+            echo "Coverage file found, size: $(wc -c < reports/coverage.xml) bytes"
             cp reports/coverage.xml coverage.xml
-            echo "Coverage file prepared successfully"
+            echo "Coverage file successfully created"
           else
-            echo "No coverage file generated, creating minimal one"
-            echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage.xml
+            echo "No coverage file found"
+            exit 1
           fi
 
       # SonarCloud temporairement désactivé pour corriger l'erreur protobuf
