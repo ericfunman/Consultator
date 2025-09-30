@@ -60,11 +60,9 @@ jobs:
           fi
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v1
+        uses: SonarSource/sonarcloud-github-action@v5
         with:
           jdk: '17'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
-          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
