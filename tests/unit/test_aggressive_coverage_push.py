@@ -78,7 +78,7 @@ class TestAggressiveCoveragePush(unittest.TestCase):
                     ConsultantService.update_consultant(1, {})
                     ConsultantService.delete_consultant(1)
                 
-                self.assertTrue(True)  # Test réussi si pas d'exception
+                # Test réussi si pas d'exception - vérification implicite
                 
         except Exception as e:
             # Gérer les erreurs d'import sans faire échouer le test
