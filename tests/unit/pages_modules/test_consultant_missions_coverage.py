@@ -3,6 +3,7 @@ Tests de couverture pour consultant_missions.py
 """
 
 from datetime import date
+from unittest.mock import MagicMock
 from unittest.mock import Mock
 from unittest.mock import patch
 
@@ -265,8 +266,8 @@ class TestConsultantMissionsCoverage:
             col.__exit__ = Mock(return_value=None)
         mock_st.columns.return_value = mock_columns
 
-        # Mock st.dataframe to avoid issues with pandas
-        mock_st.dataframe.return_value = None
+        # Mock st.dataframe to avoid issues with pandas - use MagicMock for Python 3.11 compatibility
+        mock_st.dataframe = MagicMock(return_value=None)
 
         from app.pages_modules.consultant_missions import (
             show_missions_revenues,
@@ -954,7 +955,7 @@ class TestConsultantMissionsCoverage:
         mock_build_revenue.return_value = (revenue_data, 10000)
 
         # Configure mock_st.dataframe to avoid issues
-        mock_st.dataframe.return_value = None
+        mock_st.dataframe = MagicMock(return_value=None)
 
         # Mock st.columns pour retourner des context managers
         mock_col1 = Mock()
