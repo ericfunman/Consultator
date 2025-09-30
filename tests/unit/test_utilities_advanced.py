@@ -412,7 +412,7 @@ class TestFileUtilsAdvanced:
             # Test ensure_directory
             if callable(ensure_directory):
                 ensure_directory("/path/to/directory")
-                assert True
+                # Directory operation attempted
             
             # Test copy_file
             if callable(copy_file):
@@ -530,23 +530,23 @@ class TestLoggingUtilsAdvanced:
             
             if callable(log_info):
                 log_info(test_message)
-                assert True
+                # Info logging attempted
             
             if callable(log_warning):
                 log_warning(test_message)
-                assert True
+                # Warning logging attempted
             
             if callable(log_error):
                 log_error(test_message)
-                assert True
+                # Error logging attempted
             
             if callable(log_debug):
                 log_debug(test_message)
-                assert True
+                # Debug logging attempted
             
             if callable(log_critical):
                 log_critical(test_message)
-                assert True
+                # Critical logging attempted
             
         except Exception:
             # Coverage improved
@@ -573,7 +573,7 @@ class TestConfigurationUtilsAdvanced:
             # Test set_config
             if callable(set_config):
                 set_config("test_key", "test_value")
-                assert True
+                # Config setting attempted
             
             # Test load_config_file
             if callable(load_config_file):
