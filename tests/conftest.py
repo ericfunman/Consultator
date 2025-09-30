@@ -422,7 +422,7 @@ def mock_session_state():
         yield mock_session_state
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="function", autouse=True)
 def mock_streamlit_complete():
     """Mock complet de Streamlit avec tous les composants nécessaires - scope function pour isolation"""
     from datetime import date
@@ -469,8 +469,12 @@ def mock_streamlit_complete():
         patch_obj = patch(f"streamlit.{func}")
         patches.append(patch_obj)
 
-    # Ajouter des patches pour éviter DeltaGeneratorSingleton
-    # Supprimé car DeltaGeneratorSingleton n'existe pas dans cette version de Streamlit
+    # Ajouter un patch spécifique pour le module consultants qui pose problème
+    try:
+        patches.append(patch("app.pages_modules.consultants.st.tabs"))
+    except ImportError:
+        # Le module n'est pas encore importé, c'est normal
+        pass
 
     # Démarrer tous les patches
     started_patches = []
@@ -484,7 +488,21 @@ def mock_streamlit_complete():
     try:
         # Configuration des mocks
         mock_patches["columns"].return_value = [MagicMock(), MagicMock()]
-        mock_patches["tabs"].return_value = [MagicMock(), MagicMock(), MagicMock()]
+        
+        # Mock tabs pour retourner des context managers appropriés
+        class MockTabContextManager(MagicMock):
+            def __enter__(self):
+                return self
+            def __exit__(self, *exc):
+                pass
+        
+        mock_patches["tabs"].return_value = [MockTabContextManager(), MockTabContextManager(), MockTabContextManager()]
+        
+        # Configurer aussi le patch spécifique si disponible
+        if len(started_patches) > len(streamlit_functions):
+            specific_tabs_patch = started_patches[-1]
+            specific_tabs_patch.return_value = [MockTabContextManager(), MockTabContextManager(), MockTabContextManager()]
+        
         mock_patches["form"].return_value.__enter__ = MagicMock(return_value=None)
         mock_patches["form"].return_value.__exit__ = MagicMock(return_value=None)
         mock_patches["form_submit_button"].return_value = False

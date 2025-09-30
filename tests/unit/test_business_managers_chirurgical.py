@@ -9,6 +9,16 @@ from datetime import date, datetime
 from unittest.mock import Mock, patch, MagicMock
 import pandas as pd
 
+
+class MockSessionState(dict):
+    """Mock pour st.session_state qui supporte à la fois dict et attributs"""
+    def __getattr__(self, name):
+        return self.get(name)
+    
+    def __setattr__(self, name, value):
+        self[name] = value
+
+
 class TestBusinessManagersChirurgical(unittest.TestCase):
     """Tests chirurgicaux pour le module business_managers - Partie 1 SIMPLIFIÉE"""
 
@@ -58,11 +68,11 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_handle_assignment_selection_no_selection(self):
         """Test de _handle_assignment_selection sans sélection"""
-        with patch('streamlit.dataframe') as mock_dataframe:
+        with patch('app.pages_modules.business_managers.st.dataframe') as mock_dataframe:
             # Simuler la structure de retour de st.dataframe avec sélection vide
-            mock_selection = Mock()
-            mock_selection.rows = []  # Liste vide pour simuler aucune sélection
             mock_event = Mock()
+            mock_selection = Mock()
+            mock_selection.rows = []
             mock_event.selection = mock_selection
             mock_dataframe.return_value = mock_event
             
@@ -77,9 +87,25 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_handle_bm_form_actions(self):
         """Test de _handle_bm_form_actions"""
-        with patch('streamlit.columns') as mock_cols, \
-             patch('streamlit.button'):
-            mock_cols.return_value = [Mock(), Mock()]
+        with patch('app.pages_modules.business_managers.st.columns') as mock_cols, \
+             patch('app.pages_modules.business_managers.st.button'), \
+             patch('app.pages_modules.business_managers.st.form') as mock_form, \
+             patch('app.pages_modules.business_managers.st.session_state', MockSessionState()):
+            # Mock pour st.columns qui retourne des context managers
+            mock_col1 = Mock()
+            mock_col1.__enter__ = Mock(return_value=mock_col1)
+            mock_col1.__exit__ = Mock(return_value=None)
+            mock_col2 = Mock()
+            mock_col2.__enter__ = Mock(return_value=mock_col2)
+            mock_col2.__exit__ = Mock(return_value=None)
+            mock_cols.return_value = (mock_col1, mock_col2)
+            
+            # Mock pour st.form qui retourne un context manager
+            mock_form_cm = Mock()
+            mock_form_cm.__enter__ = Mock(return_value=mock_form_cm)
+            mock_form_cm.__exit__ = Mock(return_value=None)
+            mock_form.return_value = mock_form_cm
+            
             mock_bm = Mock()
             mock_bm.id = 1
 
@@ -88,13 +114,18 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_handle_comment_form_display(self):
         """Test de _handle_comment_form - affichage"""
-        with patch('streamlit.text_area') as mock_text, \
-             patch('streamlit.button'), \
-             patch('streamlit.form') as mock_form:
+        with patch('app.pages_modules.business_managers.st.text_area') as mock_text, \
+             patch('app.pages_modules.business_managers.st.button'), \
+             patch('app.pages_modules.business_managers.st.form') as mock_form, \
+             patch('app.pages_modules.business_managers.st.session_state', MockSessionState()):
             
             mock_text.return_value = "Commentaire test"
-            mock_form.return_value.__enter__ = Mock(return_value=Mock())
-            mock_form.return_value.__exit__ = Mock(return_value=None)
+            # Mock pour st.form qui retourne un context manager
+            mock_form_cm = Mock()
+            mock_form_cm.__enter__ = Mock(return_value=mock_form_cm)
+            mock_form_cm.__exit__ = Mock(return_value=None)
+            mock_form.return_value = mock_form_cm
+            
             mock_session = Mock()
 
             from app.pages_modules.business_managers import _handle_comment_form
@@ -133,7 +164,15 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
              patch('streamlit.columns') as mock_cols, \
              patch('streamlit.button'):
             
-            mock_cols.return_value = [Mock(), Mock()]
+            # Mock pour st.columns qui retourne des context managers
+            mock_col1 = Mock()
+            mock_col1.__enter__ = Mock(return_value=mock_col1)
+            mock_col1.__exit__ = Mock(return_value=None)
+            mock_col2 = Mock()
+            mock_col2.__enter__ = Mock(return_value=mock_col2)
+            mock_col2.__exit__ = Mock(return_value=None)
+            mock_cols.return_value = (mock_col1, mock_col2)
+            
             mock_bm = Mock()
             mock_bm.nom = "Dupont"
             mock_bm.prenom = "Jean"
@@ -143,24 +182,28 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_show_edit_bm_form_display(self):
         """Test de show_edit_bm_form - affichage"""
-        with patch('streamlit.subheader'), \
-             patch('streamlit.form') as mock_form, \
-             patch('streamlit.text_input'), \
-             patch('streamlit.selectbox'), \
-             patch('streamlit.form_submit_button'), \
-             patch('streamlit.columns') as mock_columns:
+        with patch('app.pages_modules.business_managers.st.subheader'), \
+             patch('app.pages_modules.business_managers.st.form') as mock_form, \
+             patch('app.pages_modules.business_managers.st.text_input'), \
+             patch('app.pages_modules.business_managers.st.selectbox'), \
+             patch('app.pages_modules.business_managers.st.form_submit_button'), \
+             patch('app.pages_modules.business_managers.st.columns') as mock_columns, \
+             patch('app.pages_modules.business_managers.st.session_state', MockSessionState()):
             
-            # Mock pour st.columns() qui retourne des objets context manager
+            # Mock pour st.columns() qui retourne un tuple d'objets context manager
             mock_col1 = Mock()
             mock_col1.__enter__ = Mock(return_value=mock_col1)
             mock_col1.__exit__ = Mock(return_value=None)
             mock_col2 = Mock()
             mock_col2.__enter__ = Mock(return_value=mock_col2)
             mock_col2.__exit__ = Mock(return_value=None)
-            mock_columns.return_value = [mock_col1, mock_col2]
+            mock_columns.return_value = (mock_col1, mock_col2)
             
-            mock_form.return_value.__enter__ = Mock(return_value=Mock())
-            mock_form.return_value.__exit__ = Mock(return_value=None)
+            # Mock pour st.form qui retourne un context manager
+            mock_form_cm = Mock()
+            mock_form_cm.__enter__ = Mock(return_value=mock_form_cm)
+            mock_form_cm.__exit__ = Mock(return_value=None)
+            mock_form.return_value = mock_form_cm
             
             mock_bm = Mock()
             mock_bm.nom = "Dupont"
@@ -174,11 +217,17 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_show_main_page(self):
         """Test de show (page principale)"""
-        with patch('streamlit.title'), \
-             patch('streamlit.tabs') as mock_tabs, \
-             patch('streamlit.selectbox') as mock_select, \
-             patch('streamlit.form') as mock_form, \
-             patch('app.services.business_manager_service.BusinessManagerService.get_all_business_managers') as mock_get:
+        with patch('app.pages_modules.business_managers.st.title'), \
+             patch('app.pages_modules.business_managers.st.tabs') as mock_tabs, \
+             patch('app.pages_modules.business_managers.st.selectbox') as mock_select, \
+             patch('app.pages_modules.business_managers.st.form') as mock_form, \
+             patch('app.pages_modules.business_managers.st.columns') as mock_columns, \
+             patch('app.pages_modules.business_managers.st.text_input') as mock_text_input, \
+             patch('app.pages_modules.business_managers.st.checkbox') as mock_checkbox, \
+             patch('app.pages_modules.business_managers.st.text_area') as mock_text_area, \
+             patch('app.pages_modules.business_managers.st.form_submit_button') as mock_submit_button, \
+             patch('app.services.business_manager_service.BusinessManagerService.get_all_business_managers') as mock_get, \
+             patch('app.pages_modules.business_managers.st.session_state', MockSessionState()):
             
             # Mock pour st.tabs() qui retourne des objets context manager
             mock_tab1 = Mock()
@@ -190,13 +239,28 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
             mock_tab3 = Mock()
             mock_tab3.__enter__ = Mock(return_value=mock_tab3)
             mock_tab3.__exit__ = Mock(return_value=None)
-            mock_tabs.return_value = [mock_tab1, mock_tab2, mock_tab3]
+            mock_tabs.return_value = (mock_tab1, mock_tab2, mock_tab3)
             
             # Mock pour st.form() qui retourne un context manager
             mock_form_cm = Mock()
             mock_form_cm.__enter__ = Mock(return_value=mock_form_cm)
             mock_form_cm.__exit__ = Mock(return_value=None)
             mock_form.return_value = mock_form_cm
+            
+            # Mock pour st.columns() qui retourne un tuple d'objets context manager
+            mock_col1 = Mock()
+            mock_col1.__enter__ = Mock(return_value=mock_col1)
+            mock_col1.__exit__ = Mock(return_value=None)
+            mock_col2 = Mock()
+            mock_col2.__enter__ = Mock(return_value=mock_col2)
+            mock_col2.__exit__ = Mock(return_value=None)
+            mock_columns.return_value = (mock_col1, mock_col2)
+            
+            # Mock pour les inputs qui retournent des valeurs
+            mock_text_input.side_effect = ["Dupont", "john.dupont@company.com", "Jean", "0123456789", "Notes"]
+            mock_checkbox.return_value = True
+            mock_text_area.return_value = "Notes"
+            mock_submit_button.return_value = False  # Ne pas soumettre le formulaire
             
             mock_select.return_value = "Tous"
             mock_get.return_value = []

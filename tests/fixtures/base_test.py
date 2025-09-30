@@ -128,15 +128,21 @@ class BaseUITest(BaseTest):
         columns_patch.start()
         self.streamlit_patches.append(columns_patch)
 
-        # Mock tabs pour retourner un nombre variable d'onglets
+        # Mock tabs pour retourner un nombre variable d'onglets (context managers)
         def mock_tabs(*args, **kwargs):
+            class MockTabContextManager(MagicMock):
+                def __enter__(self):
+                    return self
+                def __exit__(self, *exc):
+                    pass  # Méthode vide pour le context manager
+
             if not args:
-                return [MagicMock(), MagicMock(), MagicMock()]  # Default 3 tabs
+                return [MockTabContextManager(), MockTabContextManager(), MockTabContextManager()]  # Default 3 tabs
             arg = args[0]
             if isinstance(arg, list):
-                return [MagicMock() for _ in range(len(arg))]
+                return [MockTabContextManager() for _ in range(len(arg))]
             else:
-                return [MagicMock(), MagicMock(), MagicMock()]
+                return [MockTabContextManager(), MockTabContextManager(), MockTabContextManager()]
 
         tabs_patch = patch("streamlit.tabs", side_effect=mock_tabs)
         tabs_patch.start()
