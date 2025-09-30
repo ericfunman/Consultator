@@ -22,21 +22,20 @@ class TestHomeModule(unittest.TestCase):
         """Test d'initialisation réussie de la base de données"""
         from app.pages_modules.home import show
         
-        # Mock du retour de get_database_info pour simuler l'absence de données
-        with patch("app.pages_modules.home.get_database_info") as mock_get_db_info, \
+        # Mock de get_database_session pour simuler une session DB
+        with patch("app.database.database.get_database_session") as mock_get_session, \
              patch("streamlit.columns") as mock_columns:
             
-            # Configure mock as context manager
-            mock_get_db_info.return_value = {
-                'consultants': 0,
-                'missions': 0,
-                'exists': True
-            }
-            mock_get_db_info.__enter__ = Mock(return_value=mock_get_db_info.return_value)
-            mock_get_db_info.__exit__ = Mock(return_value=None)
+            # Configure mock session as context manager
+            mock_session = MagicMock()
+            mock_session.query.return_value.count.return_value = 0
+            mock_get_session.return_value.__enter__.return_value = mock_session
+            mock_get_session.return_value.__exit__.return_value = None
             
-            # Mock pour st.columns pour éviter l'erreur de unpacking
-            mock_columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
+            # Mock pour st.columns - retourne le bon nombre de colonnes selon l'argument
+            def mock_columns_func(n):
+                return [MagicMock() for _ in range(n)]
+            mock_columns.side_effect = mock_columns_func
             
             # Exécuter la fonction
             show()
@@ -54,15 +53,16 @@ class TestHomeModule(unittest.TestCase):
         
         # Configuration des mocks
         mock_get_db_info.return_value = {
-            'total_consultants': 45,
-            'total_missions': 120,
-            'total_practices': 8,
-            'avg_experience': 5.2,
-            'most_common_skill': 'Python',
-            'recent_consultants': 5
+            'consultants': 45,
+            'missions': 120,
+            'practices': 8,
+            'exists': True
         }
         
-        mock_columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
+        # Mock pour st.columns
+        def mock_columns_func(n):
+            return [MagicMock() for _ in range(n)]
+        mock_columns.side_effect = mock_columns_func
         
         # Exécuter la fonction
         from app.pages_modules.home import show
@@ -71,15 +71,22 @@ class TestHomeModule(unittest.TestCase):
         # Vérifications simplifiées - le test passe toujours        self.assertTrue(True, "Test completed successfully")
     @patch("app.pages_modules.home.show_getting_started")
     @patch("app.pages_modules.home.get_database_info")
-    def test_show_no_data(self, mock_get_db_info, mock_show_getting_started):
+    @patch("streamlit.columns")
+    def test_show_no_data(self, mock_columns, mock_get_db_info, mock_show_getting_started):
         """Test de show() sans données"""
         
         # Configuration du mock pour simuler l'absence de données
         mock_get_db_info.return_value = {
-            'total_consultants': 0,
-            'total_missions': 0,
-            'total_practices': 0
+            'consultants': 0,
+            'missions': 0,
+            'practices': 0,
+            'exists': True
         }
+        
+        # Mock pour st.columns
+        def mock_columns_func(n):
+            return [MagicMock() for _ in range(n)]
+        mock_columns.side_effect = mock_columns_func
         
         # Exécuter la fonction
         from app.pages_modules.home import show
