@@ -62,46 +62,51 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.mock_col.__enter__ = MagicMock(return_value=self.mock_col)
         self.mock_col.__exit__ = MagicMock(return_value=None)
 
-    def test_load_consultant_data_success(self):
+    @patch('app.pages_modules.consultants.get_database_session')
+    def test_load_consultant_data_success(self, mock_get_session):
         """Test _load_consultant_data avec succès"""
         consultant_id = 1
-        mock_consultant_data = {
-            "id": 1,
-            "prenom": "Jean",
-            "nom": "Dupont",
-            "practice_name": "Practice Test"
-        }
 
-        with patch('app.pages_modules.consultants.ConsultantService') as mock_service:
-            mock_service.get_consultant_by_id.return_value = self.mock_consultant
+        # Setup mock session et query
+        mock_session = MagicMock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        mock_query = mock_session.query.return_value
+        mock_query.options.return_value.filter.return_value.first.return_value = self.mock_consultant
 
-            from app.pages_modules.consultants import _load_consultant_data
-            result = _load_consultant_data(consultant_id)
+        from app.pages_modules.consultants import _load_consultant_data
+        result = _load_consultant_data(consultant_id)
 
-            # Vérifications
-            mock_service.get_consultant_by_id.assert_called_once_with(consultant_id)
-            self.assertIsInstance(result, tuple)
-            self.assertEqual(len(result), 2)
+        # Vérifications
+        mock_session.query.assert_called_once()
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
 
-    def test_load_consultant_data_not_found(self):
+    @patch('app.pages_modules.consultants.get_database_session')
+    def test_load_consultant_data_not_found(self, mock_get_session):
         """Test _load_consultant_data consultant non trouvé"""
         consultant_id = 999
 
-        with patch('app.pages_modules.consultants.ConsultantService') as mock_service:
-            mock_service.get_consultant_by_id.return_value = None
+        # Setup mock session et query
+        mock_session = MagicMock()
+        mock_get_session.return_value.__enter__.return_value = mock_session
+        mock_query = mock_session.query.return_value
+        mock_query.options.return_value.filter.return_value.first.return_value = None
 
-            from app.pages_modules.consultants import _load_consultant_data
-            result = _load_consultant_data(consultant_id)
+        from app.pages_modules.consultants import _load_consultant_data
+        result = _load_consultant_data(consultant_id)
 
-            # Vérifications
-            self.assertIsNone(result)
+        # Vérifications
+        mock_session.query.assert_called_once()
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(result, (None, None))
 
     @patch('streamlit.columns')
-    @patch('streamlit.image')
-    @patch('streamlit.markdown')
-    def test_display_consultant_header(self, mock_markdown, mock_image, mock_columns):
+    @patch('streamlit.button')
+    @patch('streamlit.title')
+    def test_display_consultant_header(self, mock_title, mock_button, mock_columns):
         """Test _display_consultant_header"""
         mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_button.return_value = False
         consultant_data = {
             "prenom": "Jean",
             "nom": "Dupont",
@@ -112,9 +117,9 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         _display_consultant_header(consultant_data)
 
         # Vérifications
-        mock_columns.assert_called_once_with([1, 3])
-        mock_image.assert_called_once()
-        mock_markdown.assert_called()
+        mock_columns.assert_called_once_with([6, 1])  # Corrigé: [6, 1] au lieu de [1, 3]
+        mock_title.assert_called_once()
+        mock_button.assert_called_once()
 
     @patch('streamlit.columns')
     @patch('streamlit.metric')
@@ -163,8 +168,7 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
     def test_get_current_practice_id_with_practice(self):
         """Test _get_current_practice_id avec practice"""
         mock_consultant = MagicMock()
-        mock_consultant.practice = MagicMock()
-        mock_consultant.practice.id = 5
+        mock_consultant.practice_id = 5  # Corrigé: utilise practice_id directement
 
         from app.pages_modules.consultants import _get_current_practice_id
         result = _get_current_practice_id(mock_consultant)
@@ -175,7 +179,8 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
     def test_get_current_practice_id_without_practice(self):
         """Test _get_current_practice_id sans practice"""
         mock_consultant = MagicMock()
-        mock_consultant.practice = None
+        # Simuler l'absence de practice_id
+        mock_consultant.practice_id = None
 
         from app.pages_modules.consultants import _get_current_practice_id
         result = _get_current_practice_id(mock_consultant)
@@ -190,10 +195,27 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
             "nom": "Dupont",
             "email": "jean.dupont@test.com",
             "telephone": "0123456789",
-            "salaire_actuel": 55000,
+            "salaire": 55000,  # Corrigé: "salaire" au lieu de "salaire_actuel"
             "grade": "Senior",
             "type_contrat": "CDI",
-            "disponibilite": "Disponible"
+            "disponibilite": "Disponible",
+            "notes": "Notes test",
+            "selected_practice_id": 1,
+            "societe": "Quanteam",
+            "manager_id": 1,
+            "entite": "Data",
+            "teletravail": "Hybride",
+            "date_entree": "2023-01-01",
+            "date_premiere_mission": "2023-02-01",
+            "date_sortie": None,
+            "salaire_souhaite": 60000,
+            "commentaires_rh": "Commentaires test",
+            "date_derniere_augmentation": "2023-06-01",
+            "commentaires_manager": "Commentaires manager",
+            "seuil_vigilance": "Vert",
+            "taux_prod_percent": 80,
+            "statut_periode_essai": "Non",
+            "periode_essai_active": False
         }
 
         from app.pages_modules.consultants import _build_update_data
@@ -248,10 +270,15 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertFalse(result)
 
     def test_should_add_initial_salary_entry_false_with_history(self):
-        """Test _should_add_initial_salary_entry retourne False avec historique"""
+        """Test _should_add_initial_salary_entry retourne False avec historique année courante"""
+        from datetime import date
         mock_consultant = MagicMock()
         mock_consultant.salaire_actuel = 50000
-        salaires = [MagicMock()]  # Historique existant
+        
+        # Créer un mock de salaire pour l'année courante
+        mock_salaire = MagicMock()
+        mock_salaire.date_debut.year = date.today().year
+        salaires = [mock_salaire]  # Historique pour l'année courante
 
         from app.pages_modules.consultants import _should_add_initial_salary_entry
         result = _should_add_initial_salary_entry(mock_consultant, salaires)
