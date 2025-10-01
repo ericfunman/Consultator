@@ -37,7 +37,7 @@ def show():
     # Informations sur la base de données
     db_info = get_database_info()
 
-    if not db_info.get("exists", False):
+    if not db_info or not db_info.get("exists", False):
         st.error("❌ Base de données non initialisée")
         if st.button("Initialiser la base de données"):
             from database.database import init_database
