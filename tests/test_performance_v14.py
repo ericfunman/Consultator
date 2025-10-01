@@ -1,6 +1,6 @@
 """
 Tests de performance pour Consultator
-Utilise pytest-benchmark pour mesurer les performances
+Tests simplifiés sans dépendance pytest-benchmark
 """
 
 import os
@@ -24,8 +24,7 @@ class TestPerformance:
         """Nettoyage après chaque test"""
         pass
 
-    @pytest.mark.benchmark
-    def test_database_connection_speed(self, benchmark):
+    def test_database_connection_speed(self):
         """Test de la vitesse de connexion à la base de données"""
 
         def db_operation():
@@ -36,11 +35,16 @@ class TestPerformance:
             except Exception:
                 return False
 
-        result = benchmark(db_operation)
+        start_time = time.time()
+        result = db_operation()
+        end_time = time.time()
+        
+        duration = end_time - start_time
         assert result is True
+        assert duration < 1.0  # Moins d'une seconde
+        print(f"DB operation took {duration:.4f} seconds")
 
-    @pytest.mark.benchmark
-    def test_data_processing_speed(self, benchmark):
+    def test_data_processing_speed(self):
         """Test de la vitesse de traitement des données"""
 
         def process_data():
@@ -49,11 +53,16 @@ class TestPerformance:
             processed = [x * 2 for x in data]
             return sum(processed)
 
-        result = benchmark(process_data)
-        assert result == 9900  # 2 * (0+1+...+99) = 2 * 4950 = 9900
+        start_time = time.time()
+        result = process_data()
+        end_time = time.time()
+        
+        duration = end_time - start_time
+        assert result == 9900  # Somme attendue
+        assert duration < 0.1  # Moins de 100ms
+        print(f"Data processing took {duration:.4f} seconds")
 
-    @pytest.mark.benchmark
-    def test_ui_rendering_simulation(self, benchmark):
+    def test_ui_rendering_simulation(self):
         """Test de simulation du rendu UI"""
 
         def render_ui():
@@ -63,25 +72,35 @@ class TestPerformance:
                 elements.append(f"Element {i}")
             return len(elements)
 
-        result = benchmark(render_ui)
+        start_time = time.time()
+        result = render_ui()
+        end_time = time.time()
+        
+        duration = end_time - start_time
         assert result == 50
+        assert duration < 0.1  # Moins de 100ms
+        print(f"UI rendering took {duration:.4f} seconds")
 
-    @pytest.mark.benchmark
-    def test_memory_usage_simulation(self, benchmark):
+    def test_memory_usage_simulation(self):
         """Test de simulation de l'usage mémoire"""
 
         def memory_operation():
             # Simuler des opérations qui utilisent de la mémoire
-            large_list = [i for i in range(1000)]
+            large_list = list(range(1000))
             result = sum(large_list)
             del large_list  # Libérer la mémoire
             return result
 
-        result = benchmark(memory_operation)
+        start_time = time.time()
+        result = memory_operation()
+        end_time = time.time()
+        
+        duration = end_time - start_time
         assert result == 499500  # Somme de 0 à 999 = 499500
+        assert duration < 0.1  # Moins de 100ms
+        print(f"Memory operation took {duration:.4f} seconds")
 
-    @pytest.mark.benchmark
-    def test_api_response_simulation(self, benchmark):
+    def test_api_response_simulation(self):
         """Test de simulation des réponses API"""
 
         def api_call():
@@ -89,5 +108,11 @@ class TestPerformance:
             time.sleep(0.005)  # Simuler latence réseau
             return {"status": "success", "data": "test"}
 
-        result = benchmark(api_call)
+        start_time = time.time()
+        result = api_call()
+        end_time = time.time()
+        
+        duration = end_time - start_time
         assert result["status"] == "success"
+        assert duration < 1.0  # Moins d'une seconde
+        print(f"API call took {duration:.4f} seconds")
