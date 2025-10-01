@@ -584,3 +584,75 @@ class TestConsultantDocuments:
 
         # Just check it runs without error
         assert mock_st.markdown.called
+
+    @patch('app.pages_modules.consultant_documents.st')
+    @patch('app.pages_modules.consultant_documents.upload_document')
+    def test_show_upload_document_form_complete_flow(self, mock_upload, mock_st):
+        """Test du formulaire d'upload complet avec tous les champs"""
+        # Setup mock for form context
+        mock_form_context = MagicMock()
+        mock_form_context.__enter__ = MagicMock(return_value=mock_form_context)
+        mock_form_context.__exit__ = MagicMock(return_value=None)
+        
+        # Mock uploaded file
+        mock_file = MagicMock()
+        mock_file.name = "test_cv.pdf"
+        mock_file.type = "application/pdf"
+        mock_file.size = 2048
+        mock_file.read.return_value = b"test file content"
+        
+        # Configure Streamlit mocks
+        mock_st.form.return_value = mock_form_context
+        mock_st.markdown = MagicMock()
+        mock_st.selectbox.return_value = "CV"
+        mock_st.text_area.return_value = "Description test"
+        mock_st.file_uploader.return_value = mock_file
+        mock_st.columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
+        mock_st.form_submit_button.side_effect = [True, False]  # Submit=True, Cancel=False
+        mock_st.error = MagicMock()
+        mock_st.success = MagicMock()
+        
+        mock_upload.return_value = True
+        
+        from app.pages_modules.consultant_documents import show_upload_document_form
+        show_upload_document_form(1)
+        
+        # Verify upload was called
+        mock_upload.assert_called_once()
+        mock_st.success.assert_called_once()
+
+    @patch('app.pages_modules.consultant_documents.st')
+    def test_show_upload_document_form_no_file_error(self, mock_st):
+        """Test du formulaire d'upload sans fichier - erreur"""
+        # Setup mock for form context
+        mock_form_context = MagicMock()
+        mock_form_context.__enter__ = MagicMock(return_value=mock_form_context)
+        mock_form_context.__exit__ = MagicMock(return_value=None)
+        
+        # Configure Streamlit mocks
+        mock_st.form.return_value = mock_form_context
+        mock_st.markdown = MagicMock()
+        mock_st.selectbox.return_value = "CV"
+        mock_st.text_area.return_value = "Description test"
+        mock_st.file_uploader.return_value = None  # No file uploaded
+        mock_st.columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
+        mock_st.form_submit_button.side_effect = [True, False]  # Submit=True, Cancel=False
+        mock_st.error = MagicMock()
+        
+        from app.pages_modules.consultant_documents import show_upload_document_form
+        show_upload_document_form(1)
+        
+        # Verify error was shown
+        mock_st.error.assert_called_with("❌ Veuillez sélectionner un fichier")
+
+    @patch('app.pages_modules.consultant_documents.st')
+    def test_show_rename_document_form_document_not_found(self, mock_st):
+        """Test show_rename_document_form avec document non trouvé"""
+        with patch('app.pages_modules.consultant_documents._load_document_for_rename') as mock_load:
+            mock_load.return_value = None
+            
+            from app.pages_modules.consultant_documents import show_rename_document_form
+            show_rename_document_form(1)
+            
+            # Just verify it doesn't crash when document not found
+            mock_load.assert_called_once_with(1)
