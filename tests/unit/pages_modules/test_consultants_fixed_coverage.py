@@ -258,7 +258,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         # Setup
         mock_form.return_value.__enter__ = Mock()
         mock_form.return_value.__exit__ = Mock()
-        mock_select.side_effect = ["Backend", "Python"]  # Catégorie puis compétence
+        mock_select.side_effect = ["Backend", "Python", "Expert"]  # Catégorie, compétence, niveau
         mock_slider.return_value = 3
         mock_submit.return_value = False
 
@@ -281,7 +281,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         # Setup
         mock_form.return_value.__enter__ = Mock()
         mock_form.return_value.__exit__ = Mock()
-        mock_select.side_effect = ["Backend", "Python"]  # Catégorie puis compétence
+        mock_select.side_effect = ["Backend", "Python", "Expert"]  # Catégorie, compétence, niveau
         mock_slider.return_value = 3
         mock_submit.return_value = True
 
@@ -307,7 +307,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         # Setup
         mock_form.return_value.__enter__ = Mock()
         mock_form.return_value.__exit__ = Mock()
-        mock_select.side_effect = ["Banque de Détail", "Conseil clientèle particuliers"]  # Catégorie puis compétence
+        mock_select.side_effect = ["Banque de Détail", "Conseil clientèle particuliers", "Expert"]  # Catégorie, compétence, niveau
         mock_slider.return_value = 4
         mock_submit.return_value = True
 

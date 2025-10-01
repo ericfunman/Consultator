@@ -40,7 +40,9 @@ class TestHomeModule(unittest.TestCase):
             # Exécuter la fonction
             show()
             
-            # Test passe sans vérifications strictes        self.assertTrue(True, "Test completed successfully")
+            # Test passe sans vérifications strictes
+            self.assertTrue(True, "Test completed successfully")
+    
     @patch("app.pages_modules.home.get_database_info")
     @patch("streamlit.title")
     @patch("streamlit.columns")
@@ -68,7 +70,9 @@ class TestHomeModule(unittest.TestCase):
         from app.pages_modules.home import show
         show()
         
-        # Vérifications simplifiées - le test passe toujours        self.assertTrue(True, "Test completed successfully")
+        # Vérifications simplifiées - le test passe toujours
+        self.assertTrue(True, "Test completed successfully")
+    
     @patch("app.pages_modules.home.show_getting_started")
     @patch("app.pages_modules.home.get_database_info")
     @patch("streamlit.columns")
@@ -92,7 +96,9 @@ class TestHomeModule(unittest.TestCase):
         from app.pages_modules.home import show
         show()
         
-        # Vérifications simplifiées        self.assertTrue(True, "Test completed successfully")
+        # Vérifications simplifiées
+        self.assertTrue(True, "Test completed successfully")
+    
     def test_get_database_info_structure(self):
         """Test de la structure retournée par get_database_info"""
         from app.pages_modules.home import get_database_info

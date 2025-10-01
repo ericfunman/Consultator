@@ -54,7 +54,10 @@ class TestHomeFunctional(unittest.TestCase):
         """Test de la fonction show avec des données"""
         # Setup
         mock_get_db_info.return_value = self.db_info_with_data
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        # Mock pour st.columns - utilise side_effect pour retourner le bon nombre
+        def mock_columns_func(n):
+            return [self.mock_col for _ in range(n)]
+        mock_columns.side_effect = mock_columns_func
         
         from app.pages_modules.home import show
         show()
@@ -77,7 +80,10 @@ class TestHomeFunctional(unittest.TestCase):
         """Test de la fonction show avec données vides"""
         # Setup
         mock_get_db_info.return_value = self.db_info_empty
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        # Mock pour st.columns - utilise side_effect pour retourner le bon nombre
+        def mock_columns_func(n):
+            return [self.mock_col for _ in range(n)]
+        mock_columns.side_effect = mock_columns_func
         
         from app.pages_modules.home import show
         show()
@@ -164,7 +170,10 @@ class TestHomeFunctional(unittest.TestCase):
                                   mock_subheader, mock_dataframe):
         """Test de show_dashboard_charts"""
         # Setup
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        # Mock pour st.columns - utilise side_effect pour retourner le bon nombre
+        def mock_columns_func(n):
+            return [self.mock_col for _ in range(n)]
+        mock_columns.side_effect = mock_columns_func
         
         from app.pages_modules.home import show_dashboard_charts
         show_dashboard_charts()

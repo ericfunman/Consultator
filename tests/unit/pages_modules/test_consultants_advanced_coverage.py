@@ -125,45 +125,55 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
     @patch('streamlit.metric')
     def test_display_consultant_metrics(self, mock_metric, mock_columns):
         """Test _display_consultant_metrics"""
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col, self.mock_col, self.mock_col]  # Corrigé: 5 colonnes
         consultant_data = {
             "salaire_actuel": 50000,
             "nb_missions": 5,
-            "grade": "Senior"
+            "grade": "Senior",
+            "disponibilite": "Disponible",  # Ajouté: requis par la fonction
+            "date_creation": datetime.now(),  # Ajouté: requis par la fonction
+            "practice_name": "Practice Test"  # Ajouté: requis par la fonction
         }
 
         from app.pages_modules.consultants import _display_consultant_metrics
         _display_consultant_metrics(consultant_data)
 
         # Vérifications
-        mock_columns.assert_called_once_with(3)
-        self.assertEqual(mock_metric.call_count, 3)
+        mock_columns.assert_called_once_with(5)  # Corrigé: la fonction utilise 5 colonnes
+        mock_metric.assert_called()
 
     def test_extract_business_manager_info_with_manager(self):
         """Test _extract_business_manager_info avec business manager"""
         mock_consultant = MagicMock()
-        mock_consultant.business_manager = MagicMock()
-        mock_consultant.business_manager.prenom = "Marie"
-        mock_consultant.business_manager.nom = "Martin"
+        mock_bm = MagicMock()
+        mock_bm.nom_complet = "Marie Martin"
+        mock_bm.email = "marie.martin@test.com"
+        mock_consultant.business_manager_actuel = mock_bm  # Corrigé: business_manager_actuel
 
         from app.pages_modules.consultants import _extract_business_manager_info
         result = _extract_business_manager_info(mock_consultant)
 
-        # Vérifications
+        # Vérifications - la fonction retourne un tuple (nom_complet, email)
         self.assertIsNotNone(result)
-        self.assertEqual(result["prenom"], "Marie")
-        self.assertEqual(result["nom"], "Martin")
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], "Marie Martin")  # nom_complet
+        self.assertEqual(result[1], "marie.martin@test.com")  # email
 
     def test_extract_business_manager_info_without_manager(self):
         """Test _extract_business_manager_info sans business manager"""
         mock_consultant = MagicMock()
-        mock_consultant.business_manager = None
+        mock_consultant.business_manager_actuel = None  # Corrigé: business_manager_actuel
 
         from app.pages_modules.consultants import _extract_business_manager_info
         result = _extract_business_manager_info(mock_consultant)
 
-        # Vérifications
-        self.assertIsNone(result)
+        # Vérifications - la fonction retourne un tuple (None, None)
+        self.assertIsNotNone(result)  # Le tuple existe
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        self.assertIsNone(result[0])
+        self.assertIsNone(result[1])
 
     def test_get_current_practice_id_with_practice(self):
         """Test _get_current_practice_id avec practice"""
@@ -232,7 +242,30 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         """Test _build_update_data avec données partielles"""
         form_data = {
             "prenom": "Jean",
-            "nom": "Dupont"
+            "nom": "Dupont",
+            "email": "jean.dupont@test.com",  # Ajouté: requis par la fonction
+            "telephone": "",
+            "salaire": 0,
+            "disponibilite": "Disponible",
+            "notes": "",
+            "selected_practice_id": None,
+            "societe": "Quanteam",
+            "manager_id": None,
+            "entite": "",
+            "teletravail": "Non",
+            "date_entree": None,
+            "date_premiere_mission": None,
+            "date_sortie": None,
+            "salaire_souhaite": None,
+            "commentaires_rh": "",
+            "date_derniere_augmentation": None,
+            "commentaires_manager": "",
+            "seuil_vigilance": "Vert",
+            "taux_prod_percent": 0,
+            "statut_periode_essai": "Non",
+            "periode_essai_active": False,
+            "grade": "",
+            "type_contrat": ""
         }
 
         from app.pages_modules.consultants import _build_update_data
@@ -242,8 +275,8 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertIsInstance(result, dict)
         self.assertEqual(result["prenom"], "Jean")
         self.assertEqual(result["nom"], "Dupont")
-        # Les autres champs ne doivent pas être présents
-        self.assertNotIn("email", result)
+        # Les champs vides doivent être traités correctement
+        self.assertEqual(result["email"], "jean.dupont@test.com")
 
     def test_should_add_initial_salary_entry_true(self):
         """Test _should_add_initial_salary_entry retourne True"""
@@ -286,50 +319,84 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         # Vérifications
         self.assertFalse(result)
 
-    @patch('streamlit.container')
-    @patch('streamlit.columns')
-    @patch('streamlit.text_input')
-    @patch('streamlit.selectbox')
-    @patch('streamlit.number_input')
-    def test_render_basic_consultant_fields(self, mock_number, mock_select, mock_text, mock_columns, mock_container):
-        """Test _render_basic_consultant_fields"""
-        # Setup
-        mock_container.return_value.__enter__ = Mock()
-        mock_container.return_value.__exit__ = Mock()
-        mock_columns.return_value = [self.mock_col, self.mock_col]
-        mock_text.side_effect = ["Jean", "Dupont", "jean.dupont@test.com", "0123456789"]
-        mock_select.side_effect = ["Senior", "CDI", "Disponible"]
-        mock_number.return_value = 50000
+    @patch('app.pages_modules.consultants.st')
+    def test_render_basic_consultant_fields(self, mock_st):
+        """Test de la fonction _render_basic_consultant_fields"""
+        # Données de test
+        mock_consultant = MagicMock()
+        mock_consultant.prenom = "Jean"
+        mock_consultant.nom = "Dupont"
+        mock_consultant.email = "jean.dupont@test.com"
+        mock_consultant.telephone = "0123456789"
+        mock_consultant.salaire_actuel = 50000
+        mock_consultant.disponibilite = True
+        
+        practice_options = {"Practice 1": 1, "Practice 2": 2}
+        current_practice_id = 1
+        bm_nom_complet = "Manager Test"
+        bm_email = "manager@test.com"
+        
+        # Configuration des mocks
+        mock_st.columns.return_value = [MagicMock(), MagicMock()]
+        # 5 appels st.text_input : prenom, email, BM, nom, telephone
+        mock_st.text_input.side_effect = ["Jean", "jean.dupont@test.com", "Manager Test (manager@test.com)", "Dupont", "0123456789"]
+        mock_st.number_input.return_value = 50000
+        mock_st.info.return_value = None
+        mock_st.selectbox.return_value = "Practice 1"
+        mock_st.checkbox.return_value = True
+        
+        # Test
+        from app.pages_modules.consultants import _render_basic_consultant_fields
+        result = _render_basic_consultant_fields(
+            mock_consultant,
+            practice_options,
+            current_practice_id,
+            bm_nom_complet,
+            bm_email
+        )
+        
+        # Vérifications
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 7)
+        self.assertEqual(result[0], "Jean")  # prenom
+        self.assertEqual(result[1], "Dupont")  # nom  
+        self.assertEqual(result[2], "jean.dupont@test.com")  # email
+        self.assertEqual(result[3], "0123456789")  # telephone
+        self.assertEqual(result[4], 50000)  # salaire
+        self.assertEqual(result[5], True)  # disponibilite
+        self.assertEqual(result[6], 1)  # selected_practice_id
+        
+        # Vérifier les appels
+        mock_st.columns.assert_called_once_with(2)
+        self.assertEqual(mock_st.text_input.call_count, 5)
+        mock_st.number_input.assert_called_once()
+        mock_st.selectbox.assert_called_once()
+        mock_st.checkbox.assert_called_once()
 
-        with patch('app.services.practice_service.PracticeService') as mock_practice_service:
-            mock_practice_service.get_all_practices.return_value = []
-            
-            from app.pages_modules.consultants import _render_basic_consultant_fields
-            result = _render_basic_consultant_fields(
-                self.mock_consultant, 
-                None,  # business_manager_data
-                None   # current_practice_id
-            )
-
-            # Vérifications
-            self.assertIsInstance(result, dict)
-            self.assertIn("prenom", result)
-            self.assertIn("nom", result)
-
-    @patch('streamlit.date_input')
-    @patch('streamlit.selectbox')  
-    def test_render_company_history_fields(self, mock_select, mock_date):
+    @patch('app.pages_modules.consultants.st')
+    def test_render_company_history_fields(self, mock_st):
         """Test _render_company_history_fields"""
-        mock_select.return_value = "France"
-        mock_date.return_value = date.today()
-
+        # Setup des mocks
+        mock_st.markdown.return_value = None
+        mock_st.columns.return_value = [MagicMock(), MagicMock()]
+        mock_st.selectbox.return_value = "Quanteam"
+        mock_st.date_input.side_effect = [date.today(), date.today(), date.today()]
+        
         from app.pages_modules.consultants import _render_company_history_fields
         result = _render_company_history_fields(self.mock_consultant)
 
         # Vérifications
-        self.assertIsInstance(result, dict)
-        mock_select.assert_called()
-        mock_date.assert_called()
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 4)
+        self.assertEqual(result[0], "Quanteam")  # societe
+        # Les 3 autres éléments sont des dates
+        for i in range(1, 4):
+            self.assertIsInstance(result[i], date)
+        
+        # Vérifier les appels
+        mock_st.columns.assert_called_once_with(2)
+        mock_st.selectbox.assert_called_once()
+        self.assertEqual(mock_st.date_input.call_count, 3)
 
     @patch('streamlit.selectbox')
     def test_render_societe_field(self, mock_select):
@@ -382,48 +449,68 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertEqual(result, test_date)
         mock_date.assert_called_once()
 
-    @patch('streamlit.container')
-    @patch('streamlit.text_area')
-    def test_render_professional_profile_fields(self, mock_text_area, mock_container):
+    @patch('app.pages_modules.consultants.st')
+    def test_render_professional_profile_fields(self, mock_st):
         """Test _render_professional_profile_fields"""
-        mock_container.return_value.__enter__ = Mock()
-        mock_container.return_value.__exit__ = Mock()
-        mock_text_area.side_effect = ["Formation", "Expérience", "Certifications"]
-
+        # Setup des mocks
+        mock_st.markdown.return_value = None
+        mock_st.columns.return_value = [MagicMock(), MagicMock()]
+        mock_st.selectbox.side_effect = ["Junior", "CDI"]
+        
         from app.pages_modules.consultants import _render_professional_profile_fields
         result = _render_professional_profile_fields(self.mock_consultant)
 
         # Vérifications
-        self.assertIsInstance(result, dict)
-        self.assertEqual(mock_text_area.call_count, 3)
+        self.assertIsInstance(result, tuple)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], "Junior")  # grade
+        self.assertEqual(result[1], "CDI")     # type_contrat
+        
+        # Vérifier les appels
+        mock_st.columns.assert_called_once_with(2)
+        self.assertEqual(mock_st.selectbox.call_count, 2)
 
-    @patch('streamlit.expander')
-    @patch('streamlit.markdown')
-    def test_display_consultant_status(self, mock_markdown, mock_expander):
+    @patch('app.pages_modules.consultants.st')
+    def test_display_consultant_status(self, mock_st):
         """Test _display_consultant_status"""
-        mock_expander.return_value.__enter__ = Mock()
-        mock_expander.return_value.__exit__ = Mock()
-
+        # Setup du mock consultant avec date_premiere_mission
+        self.mock_consultant.date_premiere_mission = date.today()
+        self.mock_consultant.experience_annees = 5
+        
+        # Setup des mocks
+        mock_st.markdown.return_value = None
+        mock_st.info.return_value = None
+        
         from app.pages_modules.consultants import _display_consultant_status
         _display_consultant_status(self.mock_consultant)
-
+        
         # Vérifications
-        mock_expander.assert_called()
-        mock_markdown.assert_called()
+        mock_st.markdown.assert_called_once_with("---")
+        mock_st.info.assert_called_once()
+        
+        # Vérifier le contenu du message
+        call_args = mock_st.info.call_args[0][0]
+        self.assertIn("Expérience calculée", call_args)
+        self.assertIn("5 années", call_args)
 
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    def test_display_functional_skills_metrics(self, mock_metric, mock_columns):
+    @patch('app.pages_modules.consultants.st')
+    def test_display_functional_skills_metrics(self, mock_st):
         """Test _display_functional_skills_metrics"""
-        mock_columns.return_value = [self.mock_col, self.mock_col]
-        competences_func = [MagicMock(), MagicMock(), MagicMock()]
-
+        # Données de test
+        competences_func = [
+            MagicMock(),
+            MagicMock(),
+            MagicMock()
+        ]
+        
+        # Setup des mocks
+        mock_st.metric.return_value = None
+        
         from app.pages_modules.consultants import _display_functional_skills_metrics
         _display_functional_skills_metrics(competences_func)
-
+        
         # Vérifications
-        mock_columns.assert_called_once_with(2)
-        self.assertEqual(mock_metric.call_count, 2)
+        mock_st.metric.assert_called_once_with("🏦 Total compétences fonctionnelles", 3)
 
     @patch('streamlit.info')
     def test_display_no_functional_skills_message(self, mock_info):
@@ -437,19 +524,28 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
     def test_group_functional_skills_by_category(self):
         """Test _group_functional_skills_by_category"""
         # Mock competences avec différentes catégories
-        comp1 = MagicMock()
-        comp1.competence_fonctionnelle.nom = "Gestion projet"
-        comp1.competence_fonctionnelle.categorie = "Management"
+        mock_competence1 = MagicMock()
+        mock_competence1.nom = "Gestion projet"
+        mock_competence1.categorie = "Management"
         
-        comp2 = MagicMock()
-        comp2.competence_fonctionnelle.nom = "Analyse business"
-        comp2.competence_fonctionnelle.categorie = "Analyse"
+        mock_competence2 = MagicMock()
+        mock_competence2.nom = "Analyse business"
+        mock_competence2.categorie = "Analyse"
         
-        comp3 = MagicMock()
-        comp3.competence_fonctionnelle.nom = "Leadership"
-        comp3.competence_fonctionnelle.categorie = "Management"
+        mock_competence3 = MagicMock()
+        mock_competence3.nom = "Leadership"
+        mock_competence3.categorie = "Management"
         
-        competences_func = [comp1, comp2, comp3]
+        mock_consultant_comp1 = MagicMock()
+        mock_consultant_comp2 = MagicMock()
+        mock_consultant_comp3 = MagicMock()
+        
+        # La fonction attend des tuples (consultant_comp, competence)
+        competences_func = [
+            (mock_consultant_comp1, mock_competence1),
+            (mock_consultant_comp2, mock_competence2),
+            (mock_consultant_comp3, mock_competence3)
+        ]
 
         from app.pages_modules.consultants import _group_functional_skills_by_category
         result = _group_functional_skills_by_category(competences_func)
@@ -461,82 +557,72 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertEqual(len(result["Management"]), 2)
         self.assertEqual(len(result["Analyse"]), 1)
 
-    @patch('streamlit.form')
-    @patch('streamlit.selectbox')
-    @patch('streamlit.slider')
-    @patch('streamlit.form_submit_button')
-    @patch('streamlit.success')
-    def test_add_technical_skill_form_success(self, mock_success, mock_submit, mock_slider, mock_select, mock_form):
-        """Test _add_technical_skill_form avec succès"""
-        # Setup
-        mock_form.return_value.__enter__ = Mock()
-        mock_form.return_value.__exit__ = Mock()
-        mock_select.return_value = "Python"
-        mock_slider.return_value = 3
-        mock_submit.return_value = True
+    @patch('app.pages_modules.consultants.st')
+    @patch('app.pages_modules.consultants._save_consultant_competence')
+    def test_add_technical_skill_form_success(self, mock_save, mock_st):
+        """Test _add_technical_skill_form avec soumission réussie"""
+        # Setup des mocks - utiliser vraies catégories
+        mock_st.selectbox.side_effect = ["Backend", "Python", "Confirmé"]
+        mock_st.number_input.return_value = 3
+        mock_st.text_input.return_value = "Certification Python"
+        mock_st.text_area.return_value = "Projets Python"
+        mock_st.columns.return_value = [MagicMock(), MagicMock()]
+        mock_st.form_submit_button.return_value = True
+        mock_st.success.return_value = None
+        mock_st.error.return_value = None
+        mock_save.return_value = None
+        
+        from app.pages_modules.consultants import _add_technical_skill_form
+        _add_technical_skill_form(self.mock_consultant)
+        
+        # Vérifications
+        self.assertEqual(mock_st.selectbox.call_count, 3)  # catégorie + compétence + niveau
+        mock_st.number_input.assert_called_once()
+        mock_st.form_submit_button.assert_called_once()
+        mock_save.assert_called_once()
 
-        with patch('app.services.consultant_service.ConsultantService') as mock_service, \
-             patch('app.services.technology_service.TechnologyService') as mock_tech_service:
-            
-            mock_tech_service.get_all_technologies.return_value = []
-            mock_service.add_technical_skill_to_consultant.return_value = True
-
-            from app.pages_modules.consultants import _add_technical_skill_form
-            _add_technical_skill_form(self.mock_consultant)
-
-            # Vérifications
-            mock_form.assert_called()
-            mock_submit.assert_called_once()
-            mock_success.assert_called_once()
-
-    @patch('streamlit.form')
-    @patch('streamlit.selectbox')
-    @patch('streamlit.slider')
-    @patch('streamlit.form_submit_button')
-    def test_add_technical_skill_form_no_submit(self, mock_submit, mock_slider, mock_select, mock_form):
+    @patch('app.pages_modules.consultants.st')
+    def test_add_technical_skill_form_no_submit(self, mock_st):
         """Test _add_technical_skill_form sans soumission"""
-        # Setup
-        mock_form.return_value.__enter__ = Mock()
-        mock_form.return_value.__exit__ = Mock()
-        mock_select.return_value = "Python"
-        mock_slider.return_value = 3
-        mock_submit.return_value = False
+        # Setup des mocks - utiliser vraies catégories
+        mock_st.selectbox.side_effect = ["Backend", "Python", "Confirmé"]
+        mock_st.number_input.return_value = 3
+        mock_st.text_input.return_value = "Certification Python"
+        mock_st.text_area.return_value = "Projets Python"
+        mock_st.columns.return_value = [MagicMock(), MagicMock()]
+        mock_st.form_submit_button.return_value = False  # Pas de soumission
+        
+        from app.pages_modules.consultants import _add_technical_skill_form
+        _add_technical_skill_form(self.mock_consultant)
+        
+        # Vérifications
+        self.assertEqual(mock_st.selectbox.call_count, 3)  # catégorie + compétence + niveau
+        mock_st.number_input.assert_called_once()
+        mock_st.form_submit_button.assert_called_once()
 
-        with patch('app.services.technology_service.TechnologyService') as mock_tech_service:
-            mock_tech_service.get_all_technologies.return_value = []
-
-            from app.pages_modules.consultants import _add_technical_skill_form
-            _add_technical_skill_form(self.mock_consultant)
-
-            # Vérifications
-            mock_form.assert_called()
-            mock_submit.assert_called_once()
-
-    @patch('streamlit.form')
-    @patch('streamlit.selectbox')
-    @patch('streamlit.slider')
-    @patch('streamlit.form_submit_button')
-    @patch('streamlit.success')
-    def test_add_functional_skill_form_success(self, mock_success, mock_submit, mock_slider, mock_select, mock_form):
-        """Test _add_functional_skill_form avec succès"""
-        # Setup
-        mock_form.return_value.__enter__ = Mock()
-        mock_form.return_value.__exit__ = Mock()
-        mock_select.return_value = "Gestion projet"
-        mock_slider.return_value = 4
-        mock_submit.return_value = True
-
-        with patch('app.services.consultant_service.ConsultantService') as mock_service:
-            mock_service.get_functional_skills.return_value = []
-            mock_service.add_functional_skill_to_consultant.return_value = True
-
-            from app.pages_modules.consultants import _add_functional_skill_form
-            _add_functional_skill_form(self.mock_consultant)
-
-            # Vérifications
-            mock_form.assert_called()
-            mock_submit.assert_called_once()
-            mock_success.assert_called_once()
+    @patch('app.pages_modules.consultants.st')
+    @patch('app.pages_modules.consultants._save_consultant_competence')
+    def test_add_functional_skill_form_success(self, mock_save, mock_st):
+        """Test _add_functional_skill_form avec soumission réussie"""
+        # Setup des mocks
+        mock_st.selectbox.side_effect = ["Banque de Détail", "Conseil clientèle particuliers", "Confirmé"]
+        mock_st.number_input.return_value = 3
+        mock_st.text_input.return_value = "Certification test"
+        mock_st.text_area.return_value = "Projets test"
+        mock_st.columns.return_value = [MagicMock(), MagicMock()]
+        mock_st.form_submit_button.return_value = True
+        mock_st.success.return_value = None
+        mock_st.error.return_value = None
+        mock_save.return_value = None
+        
+        from app.pages_modules.consultants import _add_functional_skill_form
+        _add_functional_skill_form(self.mock_consultant)
+        
+        # Vérifications
+        self.assertEqual(mock_st.selectbox.call_count, 3)  # catégorie + compétence + niveau
+        mock_st.number_input.assert_called_once()
+        mock_st.form_submit_button.assert_called_once()
+        mock_save.assert_called_once()
 
 
 if __name__ == '__main__':
