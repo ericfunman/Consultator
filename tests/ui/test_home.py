@@ -29,11 +29,12 @@ class TestHomeModule(unittest.TestCase):
     @patch("app.pages_modules.home.st.info")
     @patch("app.pages_modules.home.st.success")
     @patch("app.pages_modules.home.st.rerun")
+    @patch("app.pages_modules.home.get_database_info")
     @patch("app.database.database.init_database")
     @patch("app.database.database.get_database_session")
     def test_show_database_initialization_success(self, mock_get_session, mock_init_db, 
-                                                 mock_rerun, mock_success, mock_info, 
-                                                 mock_metric, mock_columns):
+                                                 mock_get_db_info, mock_rerun, mock_success, 
+                                                 mock_info, mock_metric, mock_columns):
         """Test d'initialisation réussie de la base de données"""
         from app.pages_modules.home import show
         
@@ -45,6 +46,15 @@ class TestHomeModule(unittest.TestCase):
         
         # Configure database initialization
         mock_init_db.return_value = True
+        
+        # Mock get_database_info pour retourner des vraies valeurs entières
+        mock_get_db_info.return_value = {
+            "exists": True,
+            "consultants": 5,
+            "missions": 3,
+            "practices": 2,
+            "competences": 10
+        }
         
         # Exécuter la fonction
         show()
@@ -106,11 +116,14 @@ class TestHomeModule(unittest.TestCase):
         # Vérifier que le résultat est un dictionnaire
         assert isinstance(result, dict)
         
-        # Les vraies clés retournées sont 'consultants', 'missions', 'practices'
-        # au lieu de 'total_consultants', etc.
-        expected_keys = ['consultants', 'missions', 'exists']
-        for key in expected_keys:
-            assert key in result
+        # Les vraies clés retournées par get_database_info
+        if result.get("exists", False):
+            expected_keys = ['consultants', 'missions', 'practices', 'competences', 'exists']
+            for key in expected_keys:
+                assert key in result
+        else:
+            # Si la DB n'existe pas, on a juste 'exists': False
+            assert 'exists' in result
 
 if __name__ == '__main__':
     unittest.main()

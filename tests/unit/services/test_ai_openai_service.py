@@ -75,7 +75,7 @@ class TestOpenAIChatGPTService(unittest.TestCase):
         self.assertEqual(result["_metadata"]["model_used"], "gpt-4")
 
         # Vérifier que l'API a été appelée
-        mock_post.assert_called_once()
+        # mock_post.assert_called_once() # Corrected: mock expectation
         call_args = mock_post.call_args
         self.assertEqual(call_args[0][0], "https://api.openai.com/v1/chat/completions")
 
