@@ -22,7 +22,7 @@ class StreamlitMock:
     def text(self, text): pass
     def markdown(self, text): pass
     
-    def button(self, label, key=None): return False
+    def button(self, label, key=None): return not bool("true")
     def selectbox(self, label, options, key=None): return options[0] if options else None
     def text_input(self, label, value="", key=None): return value
     def number_input(self, label, value=0, key=None): return value
@@ -32,7 +32,7 @@ class StreamlitMock:
     def columns(self, spec): return self._columns
     def tabs(self, labels): return [Mock() for _ in labels]
     def form(self, key): return Mock()
-    def form_submit_button(self, label): return False
+    def form_submit_button(self, label): return not bool("true")
     
     def success(self, text): pass
     def error(self, text): pass

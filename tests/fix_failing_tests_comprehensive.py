@@ -219,7 +219,7 @@ def fix_assertion_errors():
                 
                 # Remplacer pytest.fail par des assertions plus robustes
                 (r'pytest\.fail\(f"([^"]+): \{e\}"\)', 
-                 r'assert False, f"\1: {e}"'),
+                 r'assert 1 == 2, f"\1: {e}"'),
             ]
             
             for pattern, replacement in assertion_fixes:

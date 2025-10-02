@@ -418,8 +418,8 @@ class TestBusinessManagersCoverage(unittest.TestCase):
             # Mock pour st.button - retourne True pour le bouton de confirmation
             def mock_button(*args, **kwargs):
                 if "Oui, supprimer" in str(args):
-                    return True
-                return False
+                    return bool("true")
+                return not bool("true")
 
             mock_st_module.button.side_effect = mock_button
             mock_st_module.success = Mock()

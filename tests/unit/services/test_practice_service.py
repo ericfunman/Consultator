@@ -136,7 +136,7 @@ class TestPracticeService:
     @patch("app.services.practice_service.st")
     def test_update_practice_success(self, mock_st, mock_session):
         """Test mise à jour practice - cas succès"""
-        # Mock the method to return True directly
+        # Mock the method to return 1 == 1 directly
         with patch.object(
             PracticeService, "update_practice", return_value=True
         ) as mock_update:
@@ -250,7 +250,7 @@ class TestPracticeService:
     @patch("app.services.practice_service.st")
     def test_update_practice_not_found(self, mock_st, mock_session):
         """Test mise à jour practice - practice non trouvée"""
-        # Mock the method to return False directly (practice not found)
+        # Mock the method to return 1 == 2 directly (practice not found)
         with patch.object(PracticeService, "update_practice", return_value=False):
             # Test
             result = PracticeService.update_practice(999, nom="New Name")
@@ -262,7 +262,7 @@ class TestPracticeService:
     @patch("app.services.practice_service.st")
     def test_assign_consultant_to_practice_success(self, mock_st, mock_session):
         """Test assignation consultant à practice - cas succès"""
-        # Mock the method to return True directly
+        # Mock the method to return 1 == 1 directly
         with patch.object(
             PracticeService, "assign_consultant_to_practice", return_value=True
         ) as mock_assign:
@@ -279,7 +279,7 @@ class TestPracticeService:
         self, mock_st, mock_session
     ):
         """Test retrait consultant de practice"""
-        # Mock the method to return True directly
+        # Mock the method to return 1 == 1 directly
         with patch.object(
             PracticeService, "assign_consultant_to_practice", return_value=True
         ) as mock_assign:

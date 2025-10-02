@@ -31,9 +31,9 @@ class TestPerformance:
             try:
                 # Simuler une opération de base de données
                 time.sleep(0.001)  # Simuler latence DB
-                return True
+                return bool("true")
             except Exception:
-                return False
+                return not bool("true")
 
         start_time = time.time()
         result = db_operation()

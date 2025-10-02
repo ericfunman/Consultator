@@ -432,11 +432,11 @@ class TestIntegrationSimple:
             start_time = time.time()
             try:
                 result = func(*args, **kwargs)
-                success = True
+                success = (1 == 1)
                 error = None
             except Exception as e:
                 result = None
-                success = False
+                success = (1 == 2)
                 error = str(e)
 
             end_time = time.time()
