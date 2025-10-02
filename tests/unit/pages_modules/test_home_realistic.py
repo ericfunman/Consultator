@@ -5,6 +5,8 @@ Tests basés uniquement sur les fonctions qui existent réellement
 
 import unittest
 from unittest.mock import Mock, MagicMock, patch
+import pandas as pd
+import plotly.express as px
 import sys
 import os
 
@@ -175,8 +177,17 @@ class TestHomeFunctional(unittest.TestCase):
             return [self.mock_col for _ in range(n)]
         mock_columns.side_effect = mock_columns_func
         
-        from app.pages_modules.home import show_dashboard_charts
-        show_dashboard_charts()
+        with patch('app.pages_modules.home.pd.DataFrame') as mock_df, \
+             patch('app.pages_modules.home.pd.date_range') as mock_date_range, \
+             patch('app.pages_modules.home.px.line') as mock_px_line:
+            
+            # Mock pandas objects properly
+            mock_date_range.return_value = ["2024-01", "2024-02", "2024-03"]
+            mock_df.return_value = MagicMock()
+            mock_px_line.return_value = MagicMock()
+            
+            from app.pages_modules.home import show_dashboard_charts
+            show_dashboard_charts()
         
         # Vérifications
         mock_columns.assert_called_with(2)
