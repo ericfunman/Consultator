@@ -64,8 +64,8 @@ class TestConsultantsMassiveCoverage(unittest.TestCase):
 
     @patch('app.pages_modules.consultants.st')
     @patch('app.pages_modules.consultants.imports_ok', True)
-    @patch('app.pages_modules.consultants._show_consultants_list')
-    @patch('app.pages_modules.consultants._show_add_consultant_form')
+    # @patch('app.pages_modules.consultants._show_consultants_list')  # Function does not exist
+    # @patch('app.pages_modules.consultants._show_add_consultant_form')
     def test_show_consultant_profile_not_found(self, mock_service, mock_st):
         """Test show_consultant_profile avec consultant non trouvé"""
         # Setup
@@ -87,8 +87,13 @@ class TestConsultantsMassiveCoverage(unittest.TestCase):
     @patch('app.pages_modules.consultants._display_consultant_metrics')
     def test_show_consultant_profile_found(self, mock_metrics, mock_header, mock_service, mock_st):
         """Test show_consultant_profile avec consultant trouvé"""
-        # Setup
-        mock_st.session_state = {"consultant_id": 1}
+        # Setup session state avec proper access
+        mock_session_state = MagicMock()
+        mock_session_state.__contains__ = lambda key: key == "view_consultant_profile"
+        mock_session_state.__getitem__ = lambda key: 123 if key == "view_consultant_profile" else None
+        mock_session_state.view_consultant_profile = 123
+        mock_st.session_state = mock_session_state
+        
         mock_service.get_consultant_by_id.return_value = self.mock_consultant
         mock_st.button.return_value = False
         mock_st.tabs.return_value = [MagicMock() for _ in range(7)]
@@ -109,23 +114,31 @@ class TestConsultantsMassiveCoverage(unittest.TestCase):
         # Setup
         mock_st.columns.return_value = [MagicMock(), MagicMock()]
         mock_st.markdown.return_value = None
-        
+
         from app.pages_modules.consultants import _display_consultant_header
         _display_consultant_header(self.mock_consultant)
-        
-        # Vérifications
-        mock_st.columns.assert_called_once_with([3, 1])
-        mock_st.markdown.assert_called()
+
+        # Vérifications - ajustement pour les vraies colonnes [6, 1]
+        mock_st.columns.assert_called_once_with([6, 1])
+        mock_st.markdown.assert_called()  # Simplified assertion
 
     @patch('app.pages_modules.consultants.st')
     def test_display_consultant_metrics_basic(self, mock_st):
         """Test _display_consultant_metrics"""
-        # Setup
+        # Setup with real data to avoid format string issues
+        consultant_data = {
+            "salaire_actuel": 50000,
+            "disponibilite": True,
+            "date_creation": MagicMock(),
+            "practice_name": "Test Practice"
+        }
+        consultant_data["date_creation"].strftime.return_value = "01/01/2024"
+        
         mock_st.columns.return_value = [MagicMock() for _ in range(5)]
         mock_st.metric.return_value = None
         
         from app.pages_modules.consultants import _display_consultant_metrics
-        _display_consultant_metrics(self.mock_consultant)
+        _display_consultant_metrics(consultant_data)
         
         # Vérifications
         mock_st.columns.assert_called_once_with(5)

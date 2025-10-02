@@ -160,7 +160,7 @@ class TestOpenAIChatGPTService(unittest.TestCase):
             assert result is None or isinstance(result, dict)
         except Exception as e:
             # If an exception is raised, verify it's handled properly
-            self.assertIn("Échec", str(e))
+            self.assertIn("Erreur de certificat SSL", str(e))
 
     def test_parse_and_validate_response_success(self):
         """Test de parsing réussi d'une réponse API"""

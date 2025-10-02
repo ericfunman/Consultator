@@ -255,7 +255,7 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
     @patch('app.pages_modules.consultants.st.columns')
     def test_display_consultant_metrics(self, mock_columns, mock_metric):
         """Test _display_consultant_metrics"""
-        mock_columns.return_value = (self.mock_col) * 5
+        mock_columns.return_value = [MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock()]
         consultant_data = {
             "email": "jean.dupont@test.com",
             "telephone": "0123456789",
@@ -264,7 +264,7 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
             "date_creation": datetime.now(),
             "practice_name": "Practice Test"  # Ajout du champ manquant
         }
-        
+
         from app.pages_modules.consultants import _display_consultant_metrics
         _display_consultant_metrics(consultant_data)
         
