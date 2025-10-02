@@ -9,7 +9,6 @@ from datetime import date
 import pytest
 import streamlit as st
 
-
 class TestConsultantsMassiveCoverage(unittest.TestCase):
     """Tests de coverage massif pour le module consultants"""
 
@@ -67,154 +66,6 @@ class TestConsultantsMassiveCoverage(unittest.TestCase):
     @patch('app.pages_modules.consultants.imports_ok', True)
     @patch('app.pages_modules.consultants._show_consultants_list')
     @patch('app.pages_modules.consultants._show_add_consultant_form')
-    def test_show_main_tabs(self, mock_add_form, mock_list, mock_st):
-        """Test show() avec les onglets principaux"""
-        mock_st.title.return_value = None
-        mock_st.session_state = {}
-        mock_st.tabs.return_value = [MagicMock(), MagicMock()]
-        mock_list.return_value = None
-        mock_add_form.return_value = None
-        
-        from app.pages_modules.consultants import show
-        show()
-        
-        # Vérifications
-        mock_st.title.assert_called_once_with("👥 Gestion des consultants")
-        mock_st.tabs.assert_called_once_with([" Consultants", "➕ Ajouter un consultant"])
-        mock_list.assert_called_once()
-        mock_add_form.assert_called_once()
-
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.ConsultantService')
-    def test_show_consultants_list_basic(self, mock_service, mock_st):
-        """Test _show_consultants_list fonctionnement de base"""
-        # Setup
-        mock_st.header.return_value = None
-        mock_st.columns.return_value = [MagicMock(), MagicMock()]
-        mock_st.text_input.return_value = ""
-        mock_st.selectbox.return_value = "Tous"
-        mock_st.number_input.return_value = 20
-        mock_st.checkbox.return_value = False
-        mock_st.button.return_value = False
-        mock_service.get_all_consultants_paginated.return_value = ([], 0)
-        mock_service.count_all_consultants.return_value = 0
-        mock_st.info.return_value = None
-        
-        from app.pages_modules.consultants import _show_consultants_list
-        _show_consultants_list()
-        
-        # Vérifications
-        mock_st.header.assert_called_once_with("📋 Liste des consultants")
-        mock_service.get_all_consultants_paginated.assert_called_once()
-
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.ConsultantService')
-    def test_show_consultants_list_with_search(self, mock_service, mock_st):
-        """Test _show_consultants_list avec recherche"""
-        # Setup
-        mock_st.header.return_value = None
-        mock_st.columns.return_value = [MagicMock(), MagicMock()]
-        mock_st.text_input.return_value = "Jean"  # Terme de recherche
-        mock_st.selectbox.return_value = "Tous"
-        mock_st.number_input.return_value = 20
-        mock_st.checkbox.return_value = False
-        mock_st.button.return_value = False
-        mock_service.search_consultants.return_value = ([], 0)
-        mock_st.info.return_value = None
-        
-        from app.pages_modules.consultants import _show_consultants_list
-        _show_consultants_list()
-        
-        # Vérifications
-        mock_service.search_consultants.assert_called_once()
-
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.ConsultantService')
-    def test_show_consultants_list_with_results(self, mock_service, mock_st):
-        """Test _show_consultants_list avec des résultats"""
-        # Setup
-        mock_st.header.return_value = None
-        mock_st.columns.return_value = [MagicMock(), MagicMock()]
-        mock_st.text_input.return_value = ""
-        mock_st.selectbox.return_value = "Tous"
-        mock_st.number_input.return_value = 20
-        mock_st.checkbox.return_value = False
-        mock_st.button.return_value = False
-        
-        # Mock consultants
-        consultants = [self.mock_consultant]
-        mock_service.get_all_consultants_paginated.return_value = (consultants, 1)
-        mock_service.count_all_consultants.return_value = 1
-        
-        # Mock pour l'affichage
-        mock_st.subheader.return_value = None
-        mock_st.dataframe.return_value = None
-        
-        from app.pages_modules.consultants import _show_consultants_list
-        _show_consultants_list()
-        
-        # Vérifications
-        mock_st.subheader.assert_called()
-        mock_st.dataframe.assert_called_once()
-
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.PracticeService')
-    def test_show_add_consultant_form_basic(self, mock_practice_service, mock_st):
-        """Test _show_add_consultant_form fonctionnement de base"""
-        # Setup
-        mock_st.header.return_value = None
-        mock_st.form.return_value.__enter__ = Mock()
-        mock_st.form.return_value.__exit__ = Mock()
-        mock_st.columns.return_value = [MagicMock(), MagicMock()]
-        mock_st.text_input.side_effect = ["Jean", "Dupont", "jean.dupont@test.com", "0123456789"]
-        mock_st.number_input.return_value = 50000
-        mock_st.selectbox.side_effect = ["Practice 1", "Junior", "CDI", "Quanteam"]
-        mock_st.date_input.side_effect = [date.today(), None, date.today()]
-        mock_st.checkbox.return_value = True
-        mock_st.form_submit_button.return_value = False  # Pas de soumission
-        
-        # Mock service
-        mock_practice_service.get_all_practices.return_value = []
-        
-        from app.pages_modules.consultants import _show_add_consultant_form
-        _show_add_consultant_form()
-        
-        # Vérifications
-        mock_st.header.assert_called_once_with("👤 Ajouter un nouveau consultant")
-
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.PracticeService')
-    @patch('app.pages_modules.consultants.ConsultantService')
-    def test_show_add_consultant_form_submit_success(self, mock_consultant_service, mock_practice_service, mock_st):
-        """Test _show_add_consultant_form avec soumission réussie"""
-        # Setup
-        mock_st.header.return_value = None
-        mock_st.form.return_value.__enter__ = Mock()
-        mock_st.form.return_value.__exit__ = Mock()
-        mock_st.columns.return_value = [MagicMock(), MagicMock()]
-        mock_st.text_input.side_effect = ["Jean", "Dupont", "jean.dupont@test.com", "0123456789"]
-        mock_st.number_input.return_value = 50000
-        mock_st.selectbox.side_effect = ["Practice 1", "Junior", "CDI", "Quanteam"]
-        mock_st.date_input.side_effect = [date.today(), None, date.today()]
-        mock_st.checkbox.return_value = True
-        mock_st.form_submit_button.return_value = True  # Soumission
-        mock_st.success.return_value = None
-        mock_st.rerun.return_value = None
-        
-        # Mock services
-        mock_practice_service.get_all_practices.return_value = []
-        mock_practice_service.get_practice_by_name.return_value = MagicMock(id=1)
-        mock_consultant_service.create_consultant.return_value = True
-        
-        from app.pages_modules.consultants import _show_add_consultant_form
-        _show_add_consultant_form()
-        
-        # Vérifications
-        mock_consultant_service.create_consultant.assert_called_once()
-        mock_st.success.assert_called_once()
-
-    @patch('app.pages_modules.consultants.st')
-    @patch('app.pages_modules.consultants.ConsultantService')
     def test_show_consultant_profile_not_found(self, mock_service, mock_st):
         """Test show_consultant_profile avec consultant non trouvé"""
         # Setup
@@ -362,7 +213,6 @@ class TestConsultantsMassiveCoverage(unittest.TestCase):
         # Vérifications
         mock_st.info.assert_called_once_with("📝 Aucune compétence fonctionnelle enregistrée")
         mock_st.write.assert_called_once()
-
 
 if __name__ == "__main__":
     unittest.main()

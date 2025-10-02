@@ -50,6 +50,9 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         """Setup des mocks communs"""
         self.mock_session_state = MockSessionState()
         self.mock_consultant = MagicMock()
+        self.mock_consultant.date_entree = date(2022, 1, 1)
+        self.mock_consultant.date_sortie = date(2023, 12, 31)
+        self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
         self.mock_consultant.id = 1
         self.mock_consultant.prenom = "Jean"
         self.mock_consultant.nom = "Dupont"
@@ -106,12 +109,12 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
             self.assertIsNone(consultant_data)
             self.assertIsNone(consultant_db)
 
-    @patch('streamlit.columns')
-    @patch('streamlit.title')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.consultants.st.columns')
+    @patch('app.pages_modules.consultants.st.title')
+    @patch('app.pages_modules.consultants.st.markdown')
     def test_display_consultant_header(self, mock_markdown, mock_title, mock_columns):
         """Test _display_consultant_header"""
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         consultant_data = {
             "prenom": "Jean",
             "nom": "Dupont",
@@ -202,15 +205,15 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.assertEqual(result["email"], "jean.dupont@test.com")
         self.assertEqual(result["salaire_actuel"], 55000)
 
-    @patch('streamlit.columns')
-    @patch('streamlit.text_input')
-    @patch('streamlit.number_input')
-    @patch('streamlit.selectbox')
-    @patch('streamlit.info')
+    @patch('app.pages_modules.consultants.st.columns')
+    @patch('app.pages_modules.consultants.st.text_input')
+    @patch('app.pages_modules.consultants.st.number_input')
+    @patch('app.pages_modules.consultants.st.selectbox')
+    @patch('app.pages_modules.consultants.st.info')
     def test_render_basic_consultant_fields(self, mock_info, mock_select, mock_number, mock_text, mock_columns):
         """Test _render_basic_consultant_fields"""
         # Setup
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         mock_text.side_effect = ["Jean", "Dupont", "jean.dupont@test.com", "0123456789"]
         mock_select.side_effect = ["Senior", "CDI", "Disponible"]
         mock_number.return_value = 50000
@@ -234,7 +237,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
 
     @patch('app.pages_modules.consultants.get_database_session')
     @patch('streamlit.subheader')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.consultants.st.markdown')
     def test_manage_salary_history(self, mock_markdown, mock_subheader, mock_session):
         """Test _manage_salary_history"""
         # Setup mock session
@@ -249,10 +252,10 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_subheader.assert_called()
         mock_markdown.assert_called()
 
-    @patch('streamlit.form')
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.form')
+    @patch('app.pages_modules.consultants.st.selectbox')
     @patch('streamlit.slider')
-    @patch('streamlit.form_submit_button')
+    @patch('app.pages_modules.consultants.st.form_submit_button')
     def test_add_technical_skill_form_no_submit(self, mock_submit, mock_slider, mock_select, mock_form):
         """Test _add_technical_skill_form sans soumission"""
         # Setup
@@ -271,11 +274,11 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
             # Vérifications
             mock_submit.assert_called()
 
-    @patch('streamlit.form')
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.form')
+    @patch('app.pages_modules.consultants.st.selectbox')
     @patch('streamlit.slider')
-    @patch('streamlit.form_submit_button')
-    @patch('streamlit.success')
+    @patch('app.pages_modules.consultants.st.form_submit_button')
+    @patch('app.pages_modules.consultants.st.success')
     def test_add_technical_skill_form_success(self, mock_success, mock_submit, mock_slider, mock_select, mock_form):
         """Test _add_technical_skill_form avec succès"""
         # Setup
@@ -297,11 +300,11 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
             # Vérifications
             mock_success.assert_called()
 
-    @patch('streamlit.form')
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.form')
+    @patch('app.pages_modules.consultants.st.selectbox')
     @patch('streamlit.slider')
-    @patch('streamlit.form_submit_button')
-    @patch('streamlit.success')
+    @patch('app.pages_modules.consultants.st.form_submit_button')
+    @patch('app.pages_modules.consultants.st.success')
     def test_add_functional_skill_form_success(self, mock_success, mock_submit, mock_slider, mock_select, mock_form):
         """Test _add_functional_skill_form avec succès"""
         # Setup
@@ -345,11 +348,13 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         # Vérifications
         self.assertFalse(result)
 
-    @patch('streamlit.date_input')
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.date_input')
+    @patch('app.pages_modules.consultants.st.selectbox')
     def test_render_date_entree_field(self, mock_select, mock_date):
         """Test _render_date_entree_field"""
         mock_date.return_value = date.today()
+        # Mock consultant avec vraie date
+        self.mock_consultant.date_entree = date(2022, 1, 1)
 
         from app.pages_modules.consultants import _render_date_entree_field
         result = _render_date_entree_field(self.mock_consultant)
@@ -358,10 +363,12 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_sortie_field(self, mock_date):
         """Test _render_date_sortie_field"""
         mock_date.return_value = date.today()
+        # Mock consultant avec vraie date
+        self.mock_consultant.date_sortie = date(2023, 12, 31)
 
         from app.pages_modules.consultants import _render_date_sortie_field
         result = _render_date_sortie_field(self.mock_consultant)
@@ -370,10 +377,12 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_premiere_mission_field(self, mock_date):
         """Test _render_date_premiere_mission_field"""
         mock_date.return_value = date.today()
+        # Mock consultant avec vraie date
+        self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
 
         from app.pages_modules.consultants import _render_date_premiere_mission_field
         result = _render_date_premiere_mission_field(self.mock_consultant)
@@ -382,7 +391,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.selectbox')
     def test_render_societe_field(self, mock_select):
         """Test _render_societe_field"""
         mock_select.return_value = "France"
@@ -394,7 +403,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_select.assert_called()
         self.assertEqual(result, "France")
 
-    @patch('streamlit.warning')
+    @patch('app.pages_modules.consultants.st.warning')
     def test_display_no_functional_skills_message(self, mock_warning):
         """Test _display_no_functional_skills_message"""
         from app.pages_modules.consultants import _display_no_functional_skills_message

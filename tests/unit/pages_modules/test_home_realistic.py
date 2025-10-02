@@ -44,10 +44,10 @@ class TestHomeFunctional(unittest.TestCase):
         self.mock_col.__exit__ = MagicMock(return_value=None)
 
     @patch('app.pages_modules.home.show_dashboard_charts')
-    @patch('streamlit.markdown')
-    @patch('streamlit.metric')
-    @patch('streamlit.columns')
-    @patch('streamlit.title')
+    @patch('app.pages_modules.home.st.markdown')
+    @patch('app.pages_modules.home.st.metric')
+    @patch('app.pages_modules.home.st.columns')
+    @patch('app.pages_modules.home.st.title')
     @patch('app.pages_modules.home.get_database_info')
     def test_show_with_data(self, mock_get_db_info, mock_title, mock_columns, 
                            mock_metric, mock_markdown, mock_charts):
@@ -70,10 +70,10 @@ class TestHomeFunctional(unittest.TestCase):
         mock_charts.assert_called_once()
 
     @patch('app.pages_modules.home.show_getting_started')
-    @patch('streamlit.markdown')
-    @patch('streamlit.metric')
-    @patch('streamlit.columns')
-    @patch('streamlit.title')
+    @patch('app.pages_modules.home.st.markdown')
+    @patch('app.pages_modules.home.st.metric')
+    @patch('app.pages_modules.home.st.columns')
+    @patch('app.pages_modules.home.st.title')
     @patch('app.pages_modules.home.get_database_info')
     def test_show_with_empty_data(self, mock_get_db_info, mock_title, mock_columns, 
                                  mock_metric, mock_markdown, mock_getting_started):
@@ -92,9 +92,9 @@ class TestHomeFunctional(unittest.TestCase):
         mock_get_db_info.assert_called_once()
         mock_getting_started.assert_called_once()
 
-    @patch('streamlit.button')
-    @patch('streamlit.error')
-    @patch('streamlit.title')
+    @patch('app.pages_modules.home.st.button')
+    @patch('app.pages_modules.home.st.error')
+    @patch('app.pages_modules.home.st.title')
     @patch('app.pages_modules.home.get_database_info')
     def test_show_database_not_exists(self, mock_get_db_info, mock_title, mock_error, mock_button):
         """Test quand la base de données n'existe pas"""
@@ -111,10 +111,10 @@ class TestHomeFunctional(unittest.TestCase):
 
     @patch('streamlit.switch_page')
     @patch('streamlit.expander')
-    @patch('streamlit.button')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.home.st.button')
+    @patch('app.pages_modules.home.st.markdown')
     @patch('streamlit.container')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.columns')
     @patch('streamlit.subheader')
     def test_show_getting_started(self, mock_subheader, mock_columns, mock_container,
                                  mock_markdown, mock_button, mock_expander, mock_switch_page):
@@ -138,10 +138,10 @@ class TestHomeFunctional(unittest.TestCase):
 
     @patch('streamlit.switch_page')
     @patch('streamlit.expander')
-    @patch('streamlit.button')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.home.st.button')
+    @patch('app.pages_modules.home.st.markdown')
     @patch('streamlit.container')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.columns')
     @patch('streamlit.subheader')
     def test_show_getting_started_button_click(self, mock_subheader, mock_columns, 
                                               mock_container, mock_markdown, mock_button, 
@@ -164,8 +164,8 @@ class TestHomeFunctional(unittest.TestCase):
 
     @patch('streamlit.dataframe')
     @patch('streamlit.subheader')
-    @patch('streamlit.plotly_chart')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.plotly_chart')
+    @patch('app.pages_modules.home.st.columns')
     def test_show_dashboard_charts(self, mock_columns, mock_plotly_chart, 
                                   mock_subheader, mock_dataframe):
         """Test de show_dashboard_charts"""

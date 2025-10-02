@@ -77,9 +77,9 @@ class TestHomeMegaCoverage(unittest.TestCase):
     # ===================== MAIN SHOW FUNCTION TESTS =====================
     
     @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.error')
-    @patch('streamlit.button')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.error')
+    @patch('app.pages_modules.home.st.button')
     def test_show_database_not_exists(self, mock_button, mock_error, mock_title, mock_get_db_info):
         """Test show() avec base de données non existante"""
         # Setup
@@ -96,10 +96,10 @@ class TestHomeMegaCoverage(unittest.TestCase):
         mock_button.assert_called_once_with("Initialiser la base de données")
     
     @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.error')
-    @patch('streamlit.button')
-    @patch('streamlit.success')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.error')
+    @patch('app.pages_modules.home.st.button')
+    @patch('app.pages_modules.home.st.success')
     @patch('streamlit.rerun')
     def test_show_database_initialization_button_clicked(self, mock_rerun, mock_success, 
                                                         mock_button, mock_error, mock_title, mock_get_db_info):
@@ -118,9 +118,9 @@ class TestHomeMegaCoverage(unittest.TestCase):
         mock_rerun.assert_called_once()
     
     @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.error')
-    @patch('streamlit.button')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.error')
+    @patch('app.pages_modules.home.st.button')
     def test_show_database_initialization_failed(self, mock_button, mock_error, mock_title, mock_get_db_info):
         """Test show() avec échec d'initialisation de DB"""
         # Setup
@@ -137,16 +137,16 @@ class TestHomeMegaCoverage(unittest.TestCase):
     
     @patch('app.pages_modules.home.get_database_info')
     @patch('app.pages_modules.home.show_getting_started')
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.columns')
+    @patch('app.pages_modules.home.st.metric')
+    @patch('app.pages_modules.home.st.markdown')
     def test_show_with_empty_database(self, mock_markdown, mock_metric, mock_columns, 
                                      mock_title, mock_getting_started, mock_get_db_info):
         """Test show() avec base de données vide"""
         # Setup
         mock_get_db_info.return_value = self.db_info_empty
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col, self.mock_col)
         
         from app.pages_modules.home import show
         show()
@@ -161,16 +161,16 @@ class TestHomeMegaCoverage(unittest.TestCase):
     
     @patch('app.pages_modules.home.get_database_info')
     @patch('app.pages_modules.home.show_dashboard_charts')
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.columns')
+    @patch('app.pages_modules.home.st.metric')
+    @patch('app.pages_modules.home.st.markdown')
     def test_show_with_data(self, mock_markdown, mock_metric, mock_columns, 
                            mock_title, mock_dashboard_charts, mock_get_db_info):
         """Test show() avec des données existantes"""
         # Setup
         mock_get_db_info.return_value = self.db_info_exists
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col, self.mock_col)
         
         from app.pages_modules.home import show
         show()
@@ -185,14 +185,14 @@ class TestHomeMegaCoverage(unittest.TestCase):
     # ===================== METRICS DISPLAY TESTS =====================
     
     @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.columns')
+    @patch('app.pages_modules.home.st.metric')
     def test_metrics_values_display(self, mock_metric, mock_columns, mock_title, mock_get_db_info):
         """Test des valeurs affichées dans les métriques"""
         # Setup
         mock_get_db_info.return_value = self.db_info_exists
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col, self.mock_col)
         
         # Mock show_dashboard_charts pour éviter le problème de columns dans cette fonction
         with patch('app.pages_modules.home.show_dashboard_charts'):
@@ -222,15 +222,15 @@ class TestHomeMegaCoverage(unittest.TestCase):
     
     # ===================== DASHBOARD CHARTS TESTS =====================
     
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.columns')
     @patch('streamlit.subheader') 
-    @patch('streamlit.plotly_chart')
+    @patch('app.pages_modules.home.st.plotly_chart')
     @patch('streamlit.dataframe')
     def test_show_dashboard_charts_basic(self, mock_dataframe, mock_plotly_chart, 
                                         mock_subheader, mock_columns):
         """Test de show_dashboard_charts - structure de base"""
         # Setup
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         
         from app.pages_modules.home import show_dashboard_charts
         show_dashboard_charts()
@@ -241,15 +241,15 @@ class TestHomeMegaCoverage(unittest.TestCase):
         mock_plotly_chart.assert_called_once()
         mock_dataframe.assert_called_once()
     
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.columns')
     @patch('streamlit.subheader')
-    @patch('streamlit.plotly_chart')
+    @patch('app.pages_modules.home.st.plotly_chart')
     @patch('streamlit.dataframe')
     def test_show_dashboard_charts_data_generation(self, mock_dataframe, mock_plotly_chart,
                                                   mock_subheader, mock_columns):
         """Test de la génération de données dans show_dashboard_charts"""
         # Setup
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         
         from app.pages_modules.home import show_dashboard_charts
         show_dashboard_charts()
@@ -269,16 +269,16 @@ class TestHomeMegaCoverage(unittest.TestCase):
         # Vérifier le nombre de lignes d'activités
         self.assertEqual(len(df_arg), 4)
     
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.columns')
     @patch('streamlit.subheader')
-    @patch('streamlit.plotly_chart')
+    @patch('app.pages_modules.home.st.plotly_chart')
     @patch('plotly.express.line')
     @patch('streamlit.dataframe')
     def test_show_dashboard_charts_revenue_generation(self, mock_dataframe, mock_px_line,
                                                      mock_plotly_chart, mock_subheader, mock_columns):
         """Test de la génération du graphique de revenus"""
         # Setup
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         mock_fig = MagicMock()
         mock_px_line.return_value = mock_fig
         
@@ -306,10 +306,10 @@ class TestHomeMegaCoverage(unittest.TestCase):
     # ===================== GETTING STARTED TESTS =====================
     
     @patch('streamlit.subheader')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.columns')
     @patch('streamlit.container')
-    @patch('streamlit.markdown')
-    @patch('streamlit.button')
+    @patch('app.pages_modules.home.st.markdown')
+    @patch('app.pages_modules.home.st.button')
     @patch('streamlit.expander')
     def test_show_getting_started_structure(self, mock_expander, mock_button, mock_markdown,
                                           mock_container, mock_columns, mock_subheader):
@@ -335,10 +335,10 @@ class TestHomeMegaCoverage(unittest.TestCase):
         mock_expander.assert_called_once()
     
     @patch('streamlit.subheader')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.columns')
     @patch('streamlit.container')
-    @patch('streamlit.markdown')
-    @patch('streamlit.button')
+    @patch('app.pages_modules.home.st.markdown')
+    @patch('app.pages_modules.home.st.button')
     @patch('streamlit.switch_page')
     @patch('streamlit.expander')
     def test_show_getting_started_button_click(self, mock_expander, mock_switch_page, mock_button,
@@ -361,10 +361,10 @@ class TestHomeMegaCoverage(unittest.TestCase):
         mock_switch_page.assert_called_once_with("pages/consultants.py")
     
     @patch('streamlit.subheader')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.home.st.columns')
     @patch('streamlit.container')
-    @patch('streamlit.markdown')
-    @patch('streamlit.button')
+    @patch('app.pages_modules.home.st.markdown')
+    @patch('app.pages_modules.home.st.button')
     @patch('streamlit.expander')
     def test_show_getting_started_content_verification(self, mock_expander, mock_button, mock_markdown,
                                                       mock_container, mock_columns, mock_subheader):
@@ -399,7 +399,7 @@ class TestHomeMegaCoverage(unittest.TestCase):
     # ===================== EDGE CASES AND ERROR HANDLING =====================
     
     @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
+    @patch('app.pages_modules.home.st.title')
     def test_show_with_none_db_info(self, mock_title, mock_get_db_info):
         """Test show() avec get_database_info retournant None"""
         # Setup
@@ -415,15 +415,15 @@ class TestHomeMegaCoverage(unittest.TestCase):
             self.fail(f"show() a levé une exception avec db_info=None: {e}")
     
     @patch('app.pages_modules.home.get_database_info')
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.columns')
+    @patch('app.pages_modules.home.st.metric')
     def test_show_with_missing_db_keys(self, mock_metric, mock_columns, mock_title, mock_get_db_info):
         """Test show() avec des clés manquantes dans db_info"""
         # Setup - db_info incomplet
         incomplete_db_info = {"exists": True}  # Manque consultants, missions
         mock_get_db_info.return_value = incomplete_db_info
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col, self.mock_col)
         
         from app.pages_modules.home import show
         show()
@@ -435,16 +435,16 @@ class TestHomeMegaCoverage(unittest.TestCase):
     
     @patch('app.pages_modules.home.get_database_info')
     @patch('app.pages_modules.home.show_dashboard_charts')
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.columns')
+    @patch('app.pages_modules.home.st.metric')
+    @patch('app.pages_modules.home.st.markdown')
     def test_integration_flow_with_data(self, mock_markdown, mock_metric, mock_columns,
                                        mock_title, mock_dashboard_charts, mock_get_db_info):
         """Test d'intégration complet avec données"""
         # Setup
         mock_get_db_info.return_value = self.db_info_exists
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col, self.mock_col)
         
         from app.pages_modules.home import show
         show()
@@ -459,16 +459,16 @@ class TestHomeMegaCoverage(unittest.TestCase):
     
     @patch('app.pages_modules.home.get_database_info')
     @patch('app.pages_modules.home.show_getting_started')
-    @patch('streamlit.title')
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.home.st.title')
+    @patch('app.pages_modules.home.st.columns')
+    @patch('app.pages_modules.home.st.metric')
+    @patch('app.pages_modules.home.st.markdown')
     def test_integration_flow_without_data(self, mock_markdown, mock_metric, mock_columns,
                                           mock_title, mock_getting_started, mock_get_db_info):
         """Test d'intégration complet sans données"""
         # Setup
         mock_get_db_info.return_value = self.db_info_empty
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col, self.mock_col)
         
         from app.pages_modules.home import show
         show()

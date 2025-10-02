@@ -32,6 +32,9 @@ class TestConsultantsFinalCoverage(unittest.TestCase):
         """Setup des mocks communs"""
         self.mock_session_state = MockSessionState()
         self.mock_consultant = MagicMock()
+        self.mock_consultant.date_entree = date(2022, 1, 1)
+        self.mock_consultant.date_sortie = date(2023, 12, 31)
+        self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
         self.mock_consultant.id = 1
         self.mock_consultant.prenom = "Jean"
         self.mock_consultant.nom = "Dupont"
@@ -104,12 +107,12 @@ class TestConsultantsFinalCoverage(unittest.TestCase):
         self.assertEqual(result["prenom"], "Jean")
         self.assertEqual(result["nom"], "Dupont")
 
-    @patch('streamlit.columns')
-    @patch('streamlit.title')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.consultants.st.columns')
+    @patch('app.pages_modules.consultants.st.title')
+    @patch('app.pages_modules.consultants.st.markdown')
     def test_display_consultant_header(self, mock_markdown, mock_title, mock_columns):
         """Test _display_consultant_header"""
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         consultant_data = {
             "prenom": "Jean",
             "nom": "Dupont",
@@ -195,7 +198,7 @@ class TestConsultantsFinalCoverage(unittest.TestCase):
         # Vérifications
         self.assertFalse(result)
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_entree_field(self, mock_date):
         """Test _render_date_entree_field"""
         mock_date.return_value = date.today()
@@ -207,7 +210,7 @@ class TestConsultantsFinalCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_sortie_field(self, mock_date):
         """Test _render_date_sortie_field"""
         mock_date.return_value = date.today()
@@ -219,7 +222,7 @@ class TestConsultantsFinalCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_premiere_mission_field(self, mock_date):
         """Test _render_date_premiere_mission_field"""
         mock_date.return_value = date.today()
@@ -231,7 +234,7 @@ class TestConsultantsFinalCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.selectbox')
     def test_render_societe_field(self, mock_select):
         """Test _render_societe_field"""
         mock_select.return_value = "France"
@@ -244,7 +247,7 @@ class TestConsultantsFinalCoverage(unittest.TestCase):
         self.assertEqual(result, "France")
 
     @patch('streamlit.container')
-    @patch('streamlit.text_area')
+    @patch('app.pages_modules.consultants.st.text_area')
     def test_render_professional_profile_fields_basic(self, mock_text_area, mock_container):
         """Test _render_professional_profile_fields basique"""
         mock_container.return_value.__enter__ = Mock()
@@ -257,8 +260,8 @@ class TestConsultantsFinalCoverage(unittest.TestCase):
         # Vérifications - la fonction retourne un tuple
         self.assertIsInstance(result, tuple)
 
-    @patch('streamlit.date_input')
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.date_input')
+    @patch('app.pages_modules.consultants.st.selectbox')
     def test_render_company_history_fields_basic(self, mock_select, mock_date):
         """Test _render_company_history_fields basique"""
         mock_select.return_value = "France"

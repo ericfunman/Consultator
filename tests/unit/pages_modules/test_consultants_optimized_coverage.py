@@ -32,6 +32,9 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         """Setup des mocks communs"""
         self.mock_session_state = MockSessionState()
         self.mock_consultant = MagicMock()
+        self.mock_consultant.date_entree = date(2022, 1, 1)
+        self.mock_consultant.date_sortie = date(2023, 12, 31)
+        self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
         self.mock_consultant.id = 1
         self.mock_consultant.prenom = "Jean"
         self.mock_consultant.nom = "Dupont"
@@ -77,12 +80,12 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.assertEqual(result["email"], "jean.dupont@test.com")
         self.assertEqual(result["salaire_actuel"], 55000)
 
-    @patch('streamlit.columns')
-    @patch('streamlit.title')
-    @patch('streamlit.markdown')
+    @patch('app.pages_modules.consultants.st.columns')
+    @patch('app.pages_modules.consultants.st.title')
+    @patch('app.pages_modules.consultants.st.markdown')
     def test_display_consultant_header(self, mock_markdown, mock_title, mock_columns):
         """Test _display_consultant_header"""
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         consultant_data = {
             "prenom": "Jean",
             "nom": "Dupont",
@@ -168,10 +171,12 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         # Vérifications
         self.assertFalse(result)
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_entree_field(self, mock_date):
         """Test _render_date_entree_field"""
         mock_date.return_value = date.today()
+        # Mock consultant avec vraie date
+        self.mock_consultant.date_entree = date(2022, 1, 1)
 
         from app.pages_modules.consultants import _render_date_entree_field
         result = _render_date_entree_field(self.mock_consultant)
@@ -180,10 +185,12 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_sortie_field(self, mock_date):
         """Test _render_date_sortie_field"""
         mock_date.return_value = date.today()
+        # Mock consultant avec vraie date
+        self.mock_consultant.date_sortie = date(2023, 12, 31)
 
         from app.pages_modules.consultants import _render_date_sortie_field
         result = _render_date_sortie_field(self.mock_consultant)
@@ -192,10 +199,12 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_premiere_mission_field(self, mock_date):
         """Test _render_date_premiere_mission_field"""
         mock_date.return_value = date.today()
+        # Mock consultant avec vraie date
+        self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
 
         from app.pages_modules.consultants import _render_date_premiere_mission_field
         result = _render_date_premiere_mission_field(self.mock_consultant)
@@ -204,7 +213,7 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.selectbox')
     def test_render_societe_field(self, mock_select):
         """Test _render_societe_field"""
         mock_select.return_value = "France"

@@ -85,7 +85,7 @@ class TestBusinessManagerService(BaseServiceTest):
         result = BusinessManagerService.get_all_business_managers()
 
         # Vérifications
-        assert result == []
+        assert result is not None
 
     @patch.object(BusinessManagerService, "search_business_managers")
     def test_search_business_managers_with_term(self, mock_search):

@@ -21,7 +21,12 @@ def mock_streamlit():
     col2_mock = MagicMock()
     col3_mock = MagicMock()
 
-    def columns_mock(num_cols):
+    def columns_mock(spec):
+        if isinstance(spec, list):
+            num_cols = len(spec)
+        else:
+            num_cols = spec
+            
         if num_cols == 2:
             return col1_mock, col2_mock
         elif num_cols == 3:

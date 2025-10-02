@@ -51,6 +51,9 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
     def setUp(self):
         """Setup pour chaque test"""
         self.mock_consultant = MagicMock()
+        self.mock_consultant.date_entree = date(2022, 1, 1)
+        self.mock_consultant.date_sortie = date(2023, 12, 31)
+        self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
         self.mock_consultant.id = 1
         self.mock_consultant.prenom = "Jean"
         self.mock_consultant.nom = "Dupont"
@@ -100,12 +103,12 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertIsInstance(result, tuple)
         self.assertEqual(result, (None, None))
 
-    @patch('streamlit.columns')
-    @patch('streamlit.button')
-    @patch('streamlit.title')
+    @patch('app.pages_modules.consultants.st.columns')
+    @patch('app.pages_modules.consultants.st.button')
+    @patch('app.pages_modules.consultants.st.title')
     def test_display_consultant_header(self, mock_title, mock_button, mock_columns):
         """Test _display_consultant_header"""
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         mock_button.return_value = False
         consultant_data = {
             "prenom": "Jean",
@@ -121,11 +124,11 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         mock_title.assert_called_once()
         mock_button.assert_called_once()
 
-    @patch('streamlit.columns')
-    @patch('streamlit.metric')
+    @patch('app.pages_modules.consultants.st.columns')
+    @patch('app.pages_modules.consultants.st.metric')
     def test_display_consultant_metrics(self, mock_metric, mock_columns):
         """Test _display_consultant_metrics"""
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col, self.mock_col, self.mock_col]  # Corrigé: 5 colonnes
+        mock_columns.return_value = (self.mock_col, self.mock_col, self.mock_col, self.mock_col, self.mock_col)  # Corrigé: 5 colonnes
         consultant_data = {
             "salaire_actuel": 50000,
             "nb_missions": 5,
@@ -398,7 +401,7 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         mock_st.selectbox.assert_called_once()
         self.assertEqual(mock_st.date_input.call_count, 3)
 
-    @patch('streamlit.selectbox')
+    @patch('app.pages_modules.consultants.st.selectbox')
     def test_render_societe_field(self, mock_select):
         """Test _render_societe_field"""
         mock_select.return_value = "France"
@@ -410,7 +413,7 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertEqual(result, "France")
         mock_select.assert_called_once()
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_entree_field(self, mock_date):
         """Test _render_date_entree_field"""
         test_date = date.today()
@@ -423,7 +426,7 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertEqual(result, test_date)
         mock_date.assert_called_once()
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_sortie_field(self, mock_date):
         """Test _render_date_sortie_field"""
         test_date = date.today()
@@ -436,7 +439,7 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertEqual(result, test_date)
         mock_date.assert_called_once()
 
-    @patch('streamlit.date_input')
+    @patch('app.pages_modules.consultants.st.date_input')
     def test_render_date_premiere_mission_field(self, mock_date):
         """Test _render_date_premiere_mission_field"""
         test_date = date.today()
@@ -512,7 +515,7 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         # Vérifications
         mock_st.metric.assert_called_once_with("🏦 Total compétences fonctionnelles", 3)
 
-    @patch('streamlit.info')
+    @patch('app.pages_modules.consultants.st.info')
     def test_display_no_functional_skills_message(self, mock_info):
         """Test _display_no_functional_skills_message"""
         from app.pages_modules.consultants import _display_no_functional_skills_message

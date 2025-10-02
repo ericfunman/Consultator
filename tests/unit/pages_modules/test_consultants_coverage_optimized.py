@@ -70,6 +70,9 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
         
         # Mock consultant de base
         self.mock_consultant = MagicMock()
+        self.mock_consultant.date_entree = date(2022, 1, 1)
+        self.mock_consultant.date_sortie = date(2023, 12, 31)
+        self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
         self.mock_consultant.id = 1
         self.mock_consultant.prenom = "Jean"
         self.mock_consultant.nom = "Dupont"
@@ -81,8 +84,8 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
         self.mock_consultant.date_creation = datetime.now()
 
     @patch('streamlit.session_state', new_callable=lambda: MockSessionState())
-    @patch('streamlit.tabs')
-    @patch('streamlit.title')
+    @patch('app.pages_modules.consultants.st.tabs')
+    @patch('app.pages_modules.consultants.st.title')
     @patch('app.pages_modules.consultants.imports_ok', True)
     def test_show_function_main_path(self, mock_title, mock_tabs, mock_session_state):
         """Test du chemin principal de la fonction show"""
@@ -98,7 +101,7 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
             mock_tabs.assert_called_once()
 
     @patch('streamlit.session_state', new_callable=lambda: MockSessionState())
-    @patch('streamlit.title')
+    @patch('app.pages_modules.consultants.st.title')
     @patch('app.pages_modules.consultants.imports_ok', True)
     def test_show_with_consultant_profile_session(self, mock_title, mock_session_state):
         """Test show avec profil consultant dans la session"""
@@ -110,9 +113,9 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
             
             mock_profile.assert_called_once()
 
-    @patch('streamlit.info')
-    @patch('streamlit.error')
-    @patch('streamlit.title')
+    @patch('app.pages_modules.consultants.st.info')
+    @patch('app.pages_modules.consultants.st.error')
+    @patch('app.pages_modules.consultants.st.title')
     @patch('app.pages_modules.consultants.imports_ok', False)
     def test_show_imports_failed_path(self, mock_title, mock_error, mock_info):
         """Test show avec imports échoués"""
@@ -130,10 +133,10 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
         self.assertIsNone(result)
 
     @patch('streamlit.session_state', new_callable=lambda: MockSessionState())
-    @patch('streamlit.rerun')
-    @patch('streamlit.button')
-    @patch('streamlit.markdown')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.consultants.st.rerun')
+    @patch('app.pages_modules.consultants.st.button')
+    @patch('app.pages_modules.consultants.st.markdown')
+    @patch('app.pages_modules.consultants.st.columns')
     def test_show_cv_analysis_with_data_reanalyze(self, mock_columns, mock_markdown, 
                                                  mock_button, mock_rerun, mock_session_state):
         """Test show_cv_analysis_fullwidth avec réanalyse"""
@@ -144,7 +147,7 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
             "file_name": "test_cv.pdf"
         }
         
-        mock_columns.return_value = [self.mock_col, self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col, self.mock_col)
         mock_button.side_effect = [True, False]  # Réanalyser = True
         
         with patch('streamlit.container') as mock_container, \
@@ -232,11 +235,11 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
             
             self.assertEqual(consultant_data["practice_name"], "Non affecté")
 
-    @patch('streamlit.metric')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.consultants.st.metric')
+    @patch('app.pages_modules.consultants.st.columns')
     def test_display_consultant_header(self, mock_columns, mock_metric):
         """Test _display_consultant_header"""
-        mock_columns.return_value = [self.mock_col, self.mock_col]
+        mock_columns.return_value = (self.mock_col, self.mock_col)
         consultant_data = {
             "prenom": "Jean",
             "nom": "Dupont",
@@ -248,11 +251,11 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
         
         mock_columns.assert_called_once_with([6, 1])
 
-    @patch('streamlit.metric')
-    @patch('streamlit.columns')
+    @patch('app.pages_modules.consultants.st.metric')
+    @patch('app.pages_modules.consultants.st.columns')
     def test_display_consultant_metrics(self, mock_columns, mock_metric):
         """Test _display_consultant_metrics"""
-        mock_columns.return_value = [self.mock_col] * 5
+        mock_columns.return_value = (self.mock_col) * 5
         consultant_data = {
             "email": "jean.dupont@test.com",
             "telephone": "0123456789",
@@ -268,8 +271,8 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
         mock_columns.assert_called_once_with(5)
 
     @patch('streamlit.session_state', new_callable=lambda: MockSessionState())
-    @patch('streamlit.button')
-    @patch('streamlit.error')
+    @patch('app.pages_modules.consultants.st.button')
+    @patch('app.pages_modules.consultants.st.error')
     def test_show_consultant_not_found(self, mock_error, mock_button, mock_session_state):
         """Test _show_consultant_not_found"""
         mock_button.return_value = False
@@ -280,8 +283,8 @@ class TestConsultantsModuleCoverage(unittest.TestCase):
         mock_error.assert_called_once_with("❌ Consultant introuvable")
 
     @patch('streamlit.session_state', new_callable=lambda: MockSessionState())
-    @patch('streamlit.button')
-    @patch('streamlit.error')
+    @patch('app.pages_modules.consultants.st.button')
+    @patch('app.pages_modules.consultants.st.error')
     def test_show_consultant_not_found_with_return(self, mock_error, mock_button, mock_session_state):
         """Test _show_consultant_not_found avec retour à la liste"""
         mock_button.return_value = True
