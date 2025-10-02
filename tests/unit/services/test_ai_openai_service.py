@@ -280,7 +280,7 @@ class TestOpenAIChatGPTService(unittest.TestCase):
 
         # Vérifier les appels Streamlit
         mock_st.markdown.assert_called_with("### 🤖 Configuration OpenAI GPT-4")
-        self.assertTrue(mock_st.success.call_count >= 1)
+        self.assertGreaterEqual(mock_st.success.call_count, 1)
 
     @patch("app.services.ai_openai_service.st")
     @patch.dict(os.environ, {}, clear=True)

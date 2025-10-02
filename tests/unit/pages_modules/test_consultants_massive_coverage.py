@@ -200,7 +200,7 @@ class TestConsultantsMassiveCoverage(unittest.TestCase):
         result = _render_date_sortie_field(self.mock_consultant)
         
         # Vérifications
-        self.assertEqual(result, None)
+        self.assertIsNone(result)
         mock_st.date_input.assert_called_once()
 
     @patch('app.pages_modules.consultants.st')

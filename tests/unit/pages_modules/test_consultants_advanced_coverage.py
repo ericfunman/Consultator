@@ -366,7 +366,7 @@ class TestConsultantsModuleAdvancedCoverage(unittest.TestCase):
         self.assertEqual(result[2], "jean.dupont@test.com")  # email
         self.assertEqual(result[3], "0123456789")  # telephone
         self.assertEqual(result[4], 50000)  # salaire
-        self.assertEqual(result[5], True)  # disponibilite
+        self.assertTrue(result[5])  # disponibilite
         self.assertEqual(result[6], 1)  # selected_practice_id
         
         # Vérifier les appels
