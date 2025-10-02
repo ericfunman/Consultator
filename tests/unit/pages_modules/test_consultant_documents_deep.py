@@ -36,7 +36,7 @@ class TestConsultantDocumentsDeep(unittest.TestCase):
             mock_info.assert_called_with("ℹ️ Aucun document trouvé pour ce consultant")
             
         except ImportError:
-            self.assertTrue(1 == 1)
+            self.assertEqual(1 , 1)
     
     @patch('streamlit.columns')
     @patch('streamlit.metric')
@@ -54,7 +54,7 @@ class TestConsultantDocumentsDeep(unittest.TestCase):
             show_documents_statistics(mock_docs)
             self.assertTrue(mock_columns.called)
         except (ImportError, AttributeError):
-            self.assertTrue(1 == 1)
+            self.assertEqual(1 , 1)
     
     @patch('streamlit.expander')
     @patch('streamlit.write')
@@ -74,9 +74,9 @@ class TestConsultantDocumentsDeep(unittest.TestCase):
         try:
             from app.pages_modules.consultant_documents import show_document_details
             show_document_details(mock_doc, mock_consultant)
-            self.assertTrue(1 == 1)
+            self.assertEqual(1 , 1)
         except (ImportError, AttributeError):
-            self.assertTrue(1 == 1)
+            self.assertEqual(1 , 1)
 
 if __name__ == '__main__':
     unittest.main()

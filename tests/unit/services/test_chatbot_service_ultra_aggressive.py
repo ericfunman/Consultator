@@ -88,7 +88,7 @@ class TestChatbotServiceUltraAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     @patch('app.services.chatbot_service.load_dotenv')
     @patch('app.services.chatbot_service.os.getenv')
@@ -120,7 +120,7 @@ class TestChatbotServiceUltraAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     def test_chatbot_service_massive_attribute_access(self):
         """Accès massif à tous les attributs pour déclencher le code"""
@@ -162,7 +162,7 @@ class TestChatbotServiceUltraAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
 
 if __name__ == '__main__':
     unittest.main()

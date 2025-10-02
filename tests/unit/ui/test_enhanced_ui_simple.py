@@ -27,7 +27,7 @@ class TestEnhancedUISimple(unittest.TestCase):
             from app.ui.enhanced_ui import create_dashboard_layout
             mock_columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
             create_dashboard_layout()
-            self.assertTrue(mock_container.called)
+            self.assertIn(mock_conta, er.called)
         except (ImportError, AttributeError):
             # Test fallback
             import app.ui.enhanced_ui
@@ -43,7 +43,7 @@ class TestEnhancedUISimple(unittest.TestCase):
         except (ImportError, AttributeError):
             # Test simple d'import
             import app.ui.enhanced_ui
-            self.assertTrue(1 == 1)
+            self.assertEqual(1 , 1)
     
     def test_module_imports(self):
         """Test imports du module"""

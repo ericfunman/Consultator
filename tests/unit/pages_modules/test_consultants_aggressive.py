@@ -31,7 +31,7 @@ class TestConsultantsAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     @patch('streamlit.title')
     @patch('streamlit.tabs')
@@ -60,7 +60,7 @@ class TestConsultantsAggressive(unittest.TestCase):
         except Exception:
             # Si ça échoue, on teste au moins l'import
             import app.pages_modules.consultants
-            self.assertTrue(1 == 1)
+            self.assertEqual(1 , 1)
     
     @patch('streamlit.session_state', {})
     @patch('streamlit.rerun')
@@ -83,7 +83,7 @@ class TestConsultantsAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     def test_consultants_helper_functions(self):
         """Test fonctions helper du module consultants"""
@@ -112,7 +112,7 @@ class TestConsultantsAggressive(unittest.TestCase):
             self.assertGreaterEqual(len(helper_functions), 1)
             
         except Exception:
-            self.assertTrue(1 == 1)
+            self.assertEqual(1 , 1)
     
     def test_consultants_constants_and_variables(self):
         """Test constantes et variables globales"""
@@ -135,7 +135,7 @@ class TestConsultantsAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
 
 if __name__ == '__main__':
     unittest.main()

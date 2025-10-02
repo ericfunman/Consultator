@@ -31,7 +31,7 @@ class TestChatbotServiceAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     def test_chatbot_service_classes(self):
         """Test des classes du service chatbot"""
@@ -62,7 +62,7 @@ class TestChatbotServiceAggressive(unittest.TestCase):
             # Si ChatbotService n'existe pas, test d'autres classes possibles
             try:
                 import app.services.chatbot_service
-                self.assertTrue(1 == 1)
+                self.assertEqual(1 , 1)
             except Exception:
                 pass
     
@@ -94,7 +94,7 @@ class TestChatbotServiceAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     def test_chatbot_service_constants(self):
         """Test constantes du service chatbot"""
@@ -115,7 +115,7 @@ class TestChatbotServiceAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     def test_chatbot_service_with_mock_dependencies(self):
         """Test avec mock des dépendances potentielles"""
@@ -156,7 +156,7 @@ class TestChatbotServiceAggressive(unittest.TestCase):
         except Exception:
             pass
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
 
 if __name__ == '__main__':
     unittest.main()

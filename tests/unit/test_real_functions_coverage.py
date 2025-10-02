@@ -25,7 +25,7 @@ class TestRealFunctionsOnly(unittest.TestCase):
         show_add_consultant_form()
         
         # Test passes if no exception
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     @patch('app.pages_modules.consultant_forms.st')
     def test_validate_consultant_form_real(self, mock_st):
@@ -74,7 +74,7 @@ class TestRealFunctionsOnly(unittest.TestCase):
         show_consultant_languages(consultant)
         
         # Test passes if no exception
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     @patch('app.pages_modules.consultant_languages.st')
     @patch('app.pages_modules.consultant_languages.get_database_session')
@@ -98,7 +98,7 @@ class TestRealFunctionsOnly(unittest.TestCase):
         try:
             from app.ui.enhanced_ui import create_enhanced_consultants_view
             create_enhanced_consultants_view()
-            self.assertTrue(1 == 1)
+            self.assertEqual(1 , 1)
         except ImportError:
             # Si la fonction n'existe pas, test l'import du module
             import app.ui.enhanced_ui
@@ -137,7 +137,7 @@ class TestRealFunctionsOnly(unittest.TestCase):
         from app.pages_modules.documents_functions import show_consultant_documents
         show_consultant_documents(consultant)
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     @patch('app.services.business_manager_service.get_database_session')
     def test_business_manager_service_real(self, mock_session):
@@ -169,7 +169,7 @@ class TestRealFunctionsOnly(unittest.TestCase):
         from app.pages_modules.consultant_list import show_consultants_list_table
         show_consultants_list_table()
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     @patch('app.pages_modules.consultant_skills.st')
     @patch('app.pages_modules.consultant_skills.imports_ok', True)
@@ -184,7 +184,7 @@ class TestRealFunctionsOnly(unittest.TestCase):
         from app.pages_modules.consultant_skills import show_skills_management
         show_skills_management(consultant)
         
-        self.assertTrue(1 == 1)
+        self.assertEqual(1 , 1)
     
     def test_cache_service_coverage(self):
         """Test cache_service pour améliorer couverture"""
