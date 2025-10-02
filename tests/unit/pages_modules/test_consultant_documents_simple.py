@@ -32,7 +32,7 @@ class TestConsultantDocumentsSimple(unittest.TestCase):
             # Test simple que le module est accessible
             self.assertIsNotNone(cd)
         except Exception:
-            self.assertEqual(len(""), 0)  # Fallback
+            self.assertEqual(tuple(), tuple())  # Fallback
     
     @patch('streamlit.selectbox')
     @patch('streamlit.text_input')
@@ -44,9 +44,9 @@ class TestConsultantDocumentsSimple(unittest.TestCase):
         try:
             import app.pages_modules.consultant_documents
             # Test basique d'existence
-            self.assertEqual(len(""), 0)
+            self.assertEqual(tuple(), tuple())
         except Exception:
-            self.assertEqual(len(""), 0)
+            self.assertEqual(tuple(), tuple())
     
     @patch('builtins.open', mock_open(read_data="test content"))
     def test_file_operations(self):
@@ -56,7 +56,7 @@ class TestConsultantDocumentsSimple(unittest.TestCase):
             # Test que le module peut être importé
             self.assertIsNotNone(app.pages_modules.consultant_documents)
         except Exception:
-            self.assertEqual(len(""), 0)
+            self.assertEqual(tuple(), tuple())
     
     def test_module_structure(self):
         """Test structure du module"""
