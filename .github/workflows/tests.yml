@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# Workflow désactivé temporairement - utiliser tests-simplified.yml
+
 jobs:
   test:
     runs-on: ubuntu-latest
