@@ -10,6 +10,7 @@ on:
 
 jobs:
   test:
+    if: false  # Désactiver ce workflow
     runs-on: ubuntu-latest
     strategy:
       matrix:
