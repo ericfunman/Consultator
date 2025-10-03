@@ -1306,9 +1306,11 @@ class ChatbotService:
             match = re.search(pattern, question_lower)
             if match:
                 competence_found = match.group(1).strip()
-                # Nettoyer les articles et prépositions
-                competence_found = re.sub(r"^(le|la|les|du|de|des|en|une?)\s+", "", competence_found)
-                competence_found = re.sub(r"\s+(compétence|skill)s?$", "", competence_found)
+                # Nettoyer les articles et prépositions (protection ReDoS avec limites strictes)
+                # Limite la longueur de la chaîne pour éviter le backtracking excessif
+                if len(competence_found) <= 100:  # Protection ReDoS
+                    competence_found = re.sub(r"^(?:le|la|les|du|de|des|en|une?)\s+", "", competence_found, count=1)
+                    competence_found = re.sub(r"\s+(?:compétence|skill)s?\Z", "", competence_found, count=1)
                 return competence_found
         return None
 
