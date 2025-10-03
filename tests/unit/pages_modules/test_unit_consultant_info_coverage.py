@@ -21,9 +21,7 @@ except ImportError:
     consultant_info = None
 
 
-@pytest.mark.skipif(
-    consultant_info is None, reason="Module consultant_info not available"
-)
+@pytest.mark.skipif(consultant_info is None, reason="Module consultant_info not available")
 class TestConsultantInfo:
     """Tests pour le module consultant_info"""
 
@@ -50,9 +48,7 @@ class TestConsultantInfoSimple:
         # Test simple pour améliorer la couverture
         if consultant_info is not None:
             # Le module existe, on peut faire des tests basiques
-            assert hasattr(consultant_info, "__name__") or hasattr(
-                consultant_info, "__file__"
-            )
+            assert hasattr(consultant_info, "__name__") or hasattr(consultant_info, "__file__")
         else:
             # Le module n'existe pas, mais le test passe quand même
             assert 1 == 1  # Test basique
@@ -60,9 +56,9 @@ class TestConsultantInfoSimple:
     def test_streamlit_components(self):
         """Test des composants Streamlit"""
         # Mock des fonctions Streamlit de base
-        with patch("streamlit.title") as mock_title, patch(
-            "streamlit.error"
-        ) as mock_error, patch("streamlit.info") as mock_info:
+        with patch("streamlit.title") as mock_title, patch("streamlit.error") as mock_error, patch(
+            "streamlit.info"
+        ) as mock_info:
 
             # Ces mocks sont configurés mais pas forcément utilisés
             mock_title.return_value = None

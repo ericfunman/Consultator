@@ -25,12 +25,7 @@ class PracticeService:
         """Récupère toutes les practices actives"""
         session = get_session()
         try:
-            return (
-                session.query(Practice)
-                .filter(Practice.actif)
-                .order_by(Practice.nom)
-                .all()
-            )
+            return session.query(Practice).filter(Practice.actif).order_by(Practice.nom).all()
         except SQLAlchemyError as e:
             st.error(f"Erreur lors de la récupération des practices: {e}")
             return []
@@ -62,9 +57,7 @@ class PracticeService:
             session.close()
 
     @staticmethod
-    def create_practice(
-        nom: str, description: str = "", responsable: str = ""
-    ) -> Optional[Practice]:
+    def create_practice(nom: str, description: str = "", responsable: str = "") -> Optional[Practice]:
         """Crée une nouvelle practice"""
         session = get_session()
         try:
@@ -74,9 +67,7 @@ class PracticeService:
                 st.error(f"La practice '{nom}' existe déjà")
                 return None
 
-            practice = Practice(
-                nom=nom, description=description, responsable=responsable, actif=True
-            )
+            practice = Practice(nom=nom, description=description, responsable=responsable, actif=True)
 
             session.add(practice)
             session.commit()
@@ -96,9 +87,7 @@ class PracticeService:
         """Met à jour une practice"""
         session = get_session()
         try:
-            practice = (
-                session.query(Practice).filter(Practice.id == practice_id).first()
-            )
+            practice = session.query(Practice).filter(Practice.id == practice_id).first()
             if not practice:
                 st.error("Practice non trouvée")
                 return False
@@ -125,23 +114,17 @@ class PracticeService:
         session = get_session()
         try:
             if practice_id:
-                return PracticeService._get_consultants_for_specific_practice(
-                    session, practice_id
-                )
+                return PracticeService._get_consultants_for_specific_practice(session, practice_id)
             else:
                 return PracticeService._get_all_consultants_by_practice(session)
         except SQLAlchemyError as e:
-            st.error(
-                f"Erreur lors de la récupération des consultants par practice: {e}"
-            )
+            st.error(f"Erreur lors de la récupération des consultants par practice: {e}")
             return {}
         finally:
             session.close()
 
     @staticmethod
-    def _get_consultants_for_specific_practice(
-        session, practice_id: int
-    ) -> Dict[str, List[Consultant]]:
+    def _get_consultants_for_specific_practice(session, practice_id: int) -> Dict[str, List[Consultant]]:
         """Récupère les consultants d'une practice spécifique"""
         from sqlalchemy.orm import joinedload
 
@@ -173,15 +156,11 @@ class PracticeService:
 
         # Consultants par practice
         for practice in practices:
-            consultants = PracticeService._get_practice_consultants(
-                session, practice.id
-            )
+            consultants = PracticeService._get_practice_consultants(session, practice.id)
             result[practice.nom] = consultants
 
         # Consultants sans practice
-        consultants_sans_practice = PracticeService._get_consultants_without_practice(
-            session
-        )
+        consultants_sans_practice = PracticeService._get_consultants_without_practice(session)
         if consultants_sans_practice:
             result["Sans Practice"] = consultants_sans_practice
 
@@ -232,23 +211,17 @@ class PracticeService:
         return consultants
 
     @staticmethod
-    def assign_consultant_to_practice(
-        consultant_id: int, practice_id: Optional[int]
-    ) -> bool:
+    def assign_consultant_to_practice(consultant_id: int, practice_id: Optional[int]) -> bool:
         """Assigne un consultant à une practice"""
         session = get_session()
         try:
-            consultant = (
-                session.query(Consultant).filter(Consultant.id == consultant_id).first()
-            )
+            consultant = session.query(Consultant).filter(Consultant.id == consultant_id).first()
             if not consultant:
                 st.error("Consultant non trouvé")
                 return False
 
             if practice_id:
-                practice = (
-                    session.query(Practice).filter(Practice.id == practice_id).first()
-                )
+                practice = session.query(Practice).filter(Practice.id == practice_id).first()
                 if not practice:
                     st.error("Practice non trouvée")
                     return False
@@ -282,17 +255,11 @@ class PracticeService:
             }
 
             for practice in practices:
-                consultants_count = (
-                    session.query(Consultant)
-                    .filter(Consultant.practice_id == practice.id)
-                    .count()
-                )
+                consultants_count = session.query(Consultant).filter(Consultant.practice_id == practice.id).count()
 
                 consultants_actifs = (
                     session.query(Consultant)
-                    .filter(
-                        Consultant.practice_id == practice.id, Consultant.disponibilite
-                    )
+                    .filter(Consultant.practice_id == practice.id, Consultant.disponibilite)
                     .count()
                 )
 
@@ -308,11 +275,7 @@ class PracticeService:
                 stats["total_consultants"] += consultants_count
 
             # Consultants sans practice
-            sans_practice = (
-                session.query(Consultant)
-                .filter(Consultant.practice_id.is_(None))
-                .count()
-            )
+            sans_practice = session.query(Consultant).filter(Consultant.practice_id.is_(None)).count()
 
             if sans_practice > 0:
                 stats["practices_detail"].append(
@@ -320,9 +283,7 @@ class PracticeService:
                         "nom": "Sans Practice",
                         "total_consultants": sans_practice,
                         "consultants_actifs": session.query(Consultant)
-                        .filter(
-                            Consultant.practice_id.is_(None), Consultant.disponibilite
-                        )
+                        .filter(Consultant.practice_id.is_(None), Consultant.disponibilite)
                         .count(),
                         "responsable": "-",
                     }

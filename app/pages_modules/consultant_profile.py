@@ -81,9 +81,7 @@ def _load_consultant_data(consultant_id):
             return None, None
 
         # Charger toutes les données nécessaires dans la session
-        practice_name = (
-            consultant.practice.nom if consultant.practice else "Non affecté"
-        )
+        practice_name = consultant.practice.nom if consultant.practice else "Non affecté"
 
         # Créer un dictionnaire avec toutes les données nécessaires
         consultant_data = {
@@ -105,9 +103,7 @@ def _load_consultant_data(consultant_id):
 def _show_consultant_not_found(consultant_id):
     """Affiche une erreur si le consultant n'est pas trouvé."""
     st.error(f"❌ Consultant introuvable (ID: {consultant_id})")
-    st.warning(
-        "💡 Vérifiez que l'ID est correct et que le consultant existe dans la base de données"
-    )
+    st.warning("💡 Vérifiez que l'ID est correct et que le consultant existe dans la base de données")
 
     # Debug: Lister tous les consultants pour voir lesquels existent
     with get_database_session() as session:
@@ -128,9 +124,7 @@ def _display_consultant_header(consultant_data):
     col1, col2 = st.columns([6, 1])
 
     with col1:
-        st.title(
-            "👤 Profil de " + consultant_data["prenom"] + " " + consultant_data["nom"]
-        )
+        st.title("👤 Profil de " + consultant_data["prenom"] + " " + consultant_data["nom"])
 
     with col2:
         if st.button("← Retour", key="back_to_list"):
@@ -154,16 +148,12 @@ def _display_consultant_metrics(consultant_data):
         st.metric("📈 CJM", f"{cjm:,.0f}€")
 
     with col3:
-        status = (
-            "✅ Disponible" if consultant_data["disponibilite"] else "🔴 En mission"
-        )
+        status = "✅ Disponible" if consultant_data["disponibilite"] else "🔴 En mission"
         st.metric("📊 Statut", status)
 
     with col4:
         creation_date = (
-            consultant_data["date_creation"].strftime("%d/%m/%Y")
-            if consultant_data["date_creation"]
-            else "N/A"
+            consultant_data["date_creation"].strftime("%d/%m/%Y") if consultant_data["date_creation"] else "N/A"
         )
         st.metric("📅 Membre depuis", creation_date)
 
@@ -176,9 +166,7 @@ def _display_consultant_metrics(consultant_data):
 def _display_consultant_tabs(consultant_id):
     """Affiche les onglets de détail du consultant."""
     with get_database_session() as session:
-        consultant_obj = (
-            session.query(Consultant).filter(Consultant.id == consultant_id).first()
-        )
+        consultant_obj = session.query(Consultant).filter(Consultant.id == consultant_id).first()
 
         # Onglets de détail
         tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
@@ -314,9 +302,7 @@ def show_cv_analysis_fullwidth():
         st.markdown('<div class="cv-analysis-container">', unsafe_allow_html=True)
 
         # Onglets pour les résultats - mais EN PLEINE LARGEUR
-        tab1, tab2, tab3, tab4 = st.tabs(
-            ["📋 Missions", "🛠️ Compétences", "📊 Résumé", "💾 Actions"]
-        )
+        tab1, tab2, tab3, tab4 = st.tabs(["📋 Missions", "🛠️ Compétences", "📊 Résumé", "💾 Actions"])
 
         with tab1:
             show_cv_missions_tab(analysis.get("missions", []))
@@ -342,14 +328,10 @@ def show_cv_missions_tab(missions):
         return
 
     for i, mission in enumerate(missions, 1):
-        with st.expander(
-            f"Mission {i}: {mission.get('titre', 'Sans titre')}", expanded=False
-        ):
+        with st.expander(f"Mission {i}: {mission.get('titre', 'Sans titre')}", expanded=False):
             st.write(f"**Client:** {mission.get('client', 'Non spécifié')}")
             st.write(f"**Période:** {mission.get('periode', 'Non spécifiée')}")
-            st.write(
-                f"**Technologies:** {mission.get('technologies', 'Non spécifiées')}"
-            )
+            st.write(f"**Technologies:** {mission.get('technologies', 'Non spécifiées')}")
             if mission.get("description"):
                 st.write(f"**Description:** {mission.get('description')}")
 
@@ -399,9 +381,7 @@ def show_cv_summary_tab(analysis):
 
     with col3:
         contact = analysis.get("contact", {})
-        completeness = sum(
-            [1 for field in ["email", "phone", "linkedin"] if contact.get(field)]
-        )
+        completeness = sum([1 for field in ["email", "phone", "linkedin"] if contact.get(field)])
         st.metric("Complétude contact", f"{completeness}/3")
 
     # Résumé textuel
@@ -479,10 +459,7 @@ def categorize_skill(skill):
         ]
     ):
         return "☁️ Cloud & DevOps"
-    elif any(
-        keyword == skill_lower
-        for keyword in ["agile", "scrum", "kanban", "uml", "merise"]
-    ):
+    elif any(keyword == skill_lower for keyword in ["agile", "scrum", "kanban", "uml", "merise"]):
         return "📋 Méthodologies"
     # Then check for substrings
     elif any(
@@ -529,10 +506,7 @@ def categorize_skill(skill):
         ]
     ):
         return "☁️ Cloud & DevOps"
-    elif any(
-        keyword in skill_lower
-        for keyword in ["agile", "scrum", "kanban", "uml", "merise", "methodology"]
-    ):
+    elif any(keyword in skill_lower for keyword in ["agile", "scrum", "kanban", "uml", "merise", "methodology"]):
         return "📋 Méthodologies"
     else:
         return "🛠️ Autres technologies"

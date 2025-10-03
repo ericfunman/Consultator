@@ -126,9 +126,7 @@ class TestMainModule(BaseUITest):
     @patch("app.main.show_navigation")
     @patch("app.main.load_module_safe")
     @patch("streamlit.markdown")
-    def test_main_successful_page_load(
-        self, mock_markdown, mock_load_module, mock_show_nav
-    ):
+    def test_main_successful_page_load(self, mock_markdown, mock_load_module, mock_show_nav):
         """Test fonction main - chargement réussi d'une page"""
         # Mock navigation
         mock_show_nav.return_value = "home"
@@ -156,9 +154,7 @@ class TestMainModule(BaseUITest):
     @patch("app.main.load_module_safe")
     @patch("streamlit.markdown")
     @patch("streamlit.error")
-    def test_main_module_without_show(
-        self, mock_error, mock_markdown, mock_load_module, mock_show_nav
-    ):
+    def test_main_module_without_show(self, mock_error, mock_markdown, mock_load_module, mock_show_nav):
         """Test fonction main - module sans fonction show"""
         # Mock navigation
         mock_show_nav.return_value = "invalid"
@@ -188,9 +184,7 @@ class TestMainModule(BaseUITest):
     @patch("app.main.load_module_safe")
     @patch("streamlit.markdown")
     @patch("streamlit.error")
-    def test_main_module_load_failure(
-        self, mock_error, mock_markdown, mock_load_module, mock_show_nav
-    ):
+    def test_main_module_load_failure(self, mock_error, mock_markdown, mock_load_module, mock_show_nav):
         """Test fonction main - échec de chargement du module"""
         # Mock navigation
         mock_show_nav.return_value = "invalid"
@@ -220,9 +214,7 @@ class TestMainModule(BaseUITest):
     @patch("streamlit.markdown")
     @patch("streamlit.error")
     @patch("app.main.show_fallback_home")
-    def test_main_home_fallback(
-        self, mock_fallback, mock_error, mock_markdown, mock_load_module, mock_show_nav
-    ):
+    def test_main_home_fallback(self, mock_fallback, mock_error, mock_markdown, mock_load_module, mock_show_nav):
         """Test fonction main - fallback vers page home"""
         # Mock navigation
         mock_show_nav.return_value = "home"
@@ -249,9 +241,7 @@ class TestMainModule(BaseUITest):
     @patch("streamlit.columns")
     @patch("streamlit.metric")
     @patch("streamlit.info")
-    def test_show_fallback_home(
-        self, mock_info, mock_metric, mock_columns, mock_markdown, mock_title
-    ):
+    def test_show_fallback_home(self, mock_info, mock_metric, mock_columns, mock_markdown, mock_title):
         """Test page d'accueil de fallback"""
         # Mock colonnes avec support du context manager
         mock_col_obj1 = Mock()
@@ -347,13 +337,12 @@ class TestMainModule(BaseUITest):
 
         # Les options devraient être définies dans la fonction
         # Ce test passe si la fonction peut être appelée sans erreur de configuration
-        with patch("streamlit.sidebar") as mock_sidebar, \
-             patch("app.main.option_menu") as mock_option_menu:
-            
+        with patch("streamlit.sidebar") as mock_sidebar, patch("app.main.option_menu") as mock_option_menu:
+
             # Mock sidebar context manager
             mock_sidebar.return_value.__enter__ = Mock(return_value=mock_sidebar)
             mock_sidebar.return_value.__exit__ = Mock(return_value=None)
-            
+
             # Mock option_menu avec valeur par défaut
             mock_option_menu.return_value = "🏠 Accueil"
 

@@ -374,9 +374,7 @@ class TestUtilsModulesAdvanced:
             from app.utils import skill_categories
 
             # Lister les fonctions disponibles
-            functions = [
-                name for name in dir(skill_categories) if not name.startswith("_")
-            ]
+            functions = [name for name in dir(skill_categories) if not name.startswith("_")]
 
             # Tester quelques fonctions si elles existent
             for func_name in functions:

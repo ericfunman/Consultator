@@ -17,17 +17,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import map_societes_to_practices: {e}", allow_module_level=True)
 
 
-
-
 def test_get_societe_practice_mapping():
     """Test automatiquement généré pour get_societe_practice_mapping"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = get_societe_practice_mapping(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -39,30 +37,29 @@ def test_get_societe_practice_mapping_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_get_societe_practice_mapping_with_mocks(mock_request):
     """Test de get_societe_practice_mapping avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_apply_practice_mapping():
     """Test automatiquement généré pour apply_practice_mapping"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = apply_practice_mapping(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -74,30 +71,29 @@ def test_apply_practice_mapping_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_apply_practice_mapping_with_mocks(mock_request):
     """Test de apply_practice_mapping avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_show_unmapped_societes():
     """Test automatiquement généré pour show_unmapped_societes"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = show_unmapped_societes(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -109,16 +105,15 @@ def test_show_unmapped_societes_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_show_unmapped_societes_with_mocks(mock_request):
     """Test de show_unmapped_societes avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

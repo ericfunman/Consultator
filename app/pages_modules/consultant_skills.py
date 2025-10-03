@@ -46,9 +46,7 @@ MSG_COMPETENCE_DEJA_ASSOCIEE = "❌ Cette compétence est déjà associée au co
 MSG_COMPETENCE_INTROUVABLE = "❌ Compétence introuvable"
 MSG_COMPETENCE_MISE_A_JOUR = "✅ Compétence mise à jour avec succès !"
 MSG_ERREUR_MISE_A_JOUR = "❌ Erreur lors de la mise à jour"
-MSG_ERREUR_CHARGEMENT_MODIFICATION = (
-    "❌ Erreur lors du chargement du formulaire de modification:"
-)
+MSG_ERREUR_CHARGEMENT_MODIFICATION = "❌ Erreur lors du chargement du formulaire de modification:"
 
 # Emojis pour la certification
 EMOJI_CERTIFIE = "✅"
@@ -92,14 +90,8 @@ def _create_skill_data_row(skill):
     return {
         "Compétence": skill["nom"],
         "Niveau": get_niveau_label(skill["niveau"]),
-        "Expérience": (
-            f"{skill['annees_experience']} an(s)"
-            if skill["annees_experience"]
-            else "N/A"
-        ),
-        "Certification": (
-            EMOJI_CERTIFIE if skill["certification"] else EMOJI_NON_CERTIFIE
-        ),
+        "Expérience": (f"{skill['annees_experience']} an(s)" if skill["annees_experience"] else "N/A"),
+        "Certification": (EMOJI_CERTIFIE if skill["certification"] else EMOJI_NON_CERTIFIE),
         "Actions": f"edit_{skill['id']}",
     }
 
@@ -237,9 +229,7 @@ def show_skills_statistics(consultant_competences):
         st.metric("Total compétences", total_skills)
 
     with col2:
-        avg_level = sum(cc.niveau for cc in consultant_competences) / len(
-            consultant_competences
-        )
+        avg_level = sum(cc.niveau for cc in consultant_competences) / len(consultant_competences)
         st.metric("Niveau moyen", f"{avg_level:.1f}/5")
 
     with col3:
@@ -247,9 +237,7 @@ def show_skills_statistics(consultant_competences):
         st.metric("Certifiées", certified_count)
 
     with col4:
-        avg_experience = sum(
-            cc.annees_experience or 0 for cc in consultant_competences
-        ) / len(consultant_competences)
+        avg_experience = sum(cc.annees_experience or 0 for cc in consultant_competences) / len(consultant_competences)
         st.metric("Expérience moyenne", f"{avg_experience:.1f} ans")
 
 
@@ -262,30 +250,20 @@ def show_add_skill_form(consultant_id: int):
         # Récupérer les compétences disponibles
         with get_database_session() as session:
             existing_competences = (
-                session.query(ConsultantCompetence)
-                .filter(ConsultantCompetence.consultant_id == consultant_id)
-                .all()
+                session.query(ConsultantCompetence).filter(ConsultantCompetence.consultant_id == consultant_id).all()
             )
 
             existing_skill_ids = [cc.competence_id for cc in existing_competences]
 
-            available_competences = (
-                session.query(Competence)
-                .filter(~Competence.id.in_(existing_skill_ids))
-                .all()
-            )
+            available_competences = session.query(Competence).filter(~Competence.id.in_(existing_skill_ids)).all()
 
         if not available_competences:
-            st.warning(
-                "⚠️ Toutes les compétences existantes sont déjà associées à ce consultant"
-            )
+            st.warning("⚠️ Toutes les compétences existantes sont déjà associées à ce consultant")
             return
 
         with st.form(f"add_skill_form_{consultant_id}", clear_on_submit=True):
             # Sélection de la compétence
-            skill_options = {
-                c.id: f"{c.nom} ({c.categorie})" for c in available_competences
-            }
+            skill_options = {c.id: f"{c.nom} ({c.categorie})" for c in available_competences}
             selected_skill = st.selectbox(
                 "Compétence *",
                 options=list(skill_options.keys()),
@@ -414,9 +392,7 @@ def show_edit_skill_form(consultant_competence_id: int):
                 st.error(MSG_COMPETENCE_INTROUVABLE)
                 return
 
-        with st.form(
-            f"edit_skill_form_{consultant_competence_id}", clear_on_submit=False
-        ):
+        with st.form(f"edit_skill_form_{consultant_competence_id}", clear_on_submit=False):
             st.write(f"**Compétence :** {cc.competence.nom}")
 
             col1, col2 = st.columns(2)
@@ -481,18 +457,12 @@ def show_edit_skill_form(consultant_competence_id: int):
         st.error(f"❌ Erreur lors du chargement du formulaire de modification: {e}")
 
 
-def update_consultant_skill(
-    consultant_competence_id: int, data: Dict[str, Any]
-) -> bool:
+def update_consultant_skill(consultant_competence_id: int, data: Dict[str, Any]) -> bool:
     """Met à jour une compétence du consultant"""
 
     try:
         with get_database_session() as session:
-            cc = (
-                session.query(ConsultantCompetence)
-                .filter(ConsultantCompetence.id == consultant_competence_id)
-                .first()
-            )
+            cc = session.query(ConsultantCompetence).filter(ConsultantCompetence.id == consultant_competence_id).first()
 
             if not cc:
                 st.error(MSG_COMPETENCE_INTROUVABLE)
@@ -517,11 +487,7 @@ def delete_skill(consultant_competence_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            cc = (
-                session.query(ConsultantCompetence)
-                .filter(ConsultantCompetence.id == consultant_competence_id)
-                .first()
-            )
+            cc = session.query(ConsultantCompetence).filter(ConsultantCompetence.id == consultant_competence_id).first()
 
             if not cc:
                 st.error(MSG_COMPETENCE_INTROUVABLE)
@@ -581,9 +547,7 @@ def show_skills_analysis(consultant_competences):
     weak_skills = [cc for cc in consultant_competences if cc.niveau <= 2]
 
     if strong_skills:
-        st.success(
-            f"✅ **Points forts :** {len(strong_skills)} compétence(s) de haut niveau"
-        )
+        st.success(f"✅ **Points forts :** {len(strong_skills)} compétence(s) de haut niveau")
 
     if weak_skills:
         st.warning(f"⚠️ **À développer :** {len(weak_skills)} compétence(s) à renforcer")

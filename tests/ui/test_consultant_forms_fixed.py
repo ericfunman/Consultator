@@ -23,9 +23,7 @@ class TestConsultantForms(BaseUITest):
     def test_show_add_consultant_form_create_success(self):
         """Test de création réussie d'un consultant via formulaire"""
         # Mock complet de la fonction pour éviter les problèmes de mocking Streamlit
-        with patch(
-            "app.pages_modules.consultants.show_add_consultant_form"
-        ) as mock_form:
+        with patch("app.pages_modules.consultants.show_add_consultant_form") as mock_form:
             mock_form.return_value = None
 
             # Test
@@ -57,7 +55,7 @@ class TestConsultantForms(BaseUITest):
             mock_error.assert_called()
         except AssertionError:
             pass  # Error may not be called in test environment
-        
+
         try:
             mock_service.create_consultant.assert_not_called()
         except AssertionError:
@@ -90,9 +88,7 @@ class TestConsultantForms(BaseUITest):
     def test_show_consultant_profile_with_stats(self):
         """Test d'affichage du profil d'un consultant avec statistiques"""
         # Mock complet de la fonction pour éviter les problèmes de mocking Streamlit
-        with patch(
-            "app.pages_modules.consultants.show_consultant_profile"
-        ) as mock_profile:
+        with patch("app.pages_modules.consultants.show_consultant_profile") as mock_profile:
             mock_profile.return_value = None
 
             # Test
@@ -105,17 +101,15 @@ class TestConsultantForms(BaseUITest):
     @patch("streamlit.metric")
     @patch("streamlit.error")
     @patch("app.pages_modules.consultants.ConsultantService")
-    def test_show_consultant_profile_not_found(
-        self, mock_service, mock_error, mock_metric, mock_columns
-    ):
+    def test_show_consultant_profile_not_found(self, mock_service, mock_error, mock_metric, mock_columns):
         """Test d'affichage d'un consultant inexistant - version simplifiée"""
         # Mock complet de la fonction pour éviter les problèmes de mocking complexe
         with patch("app.pages_modules.consultants.show_consultant_profile") as mock_profile:
             mock_profile.return_value = None
-            
+
             # Test simplifié
             result = mock_profile()
-            
+
             # Vérifications
             assert mock_profile.called
             assert result is None
@@ -135,9 +129,7 @@ class TestConsultantForms(BaseUITest):
     def test_show_add_consultant_form_update_success(self):
         """Test de mise à jour réussie d'un consultant"""
         # Mock complet de la fonction pour éviter les problèmes de mocking Streamlit
-        with patch(
-            "app.pages_modules.consultants.show_add_consultant_form"
-        ) as mock_form:
+        with patch("app.pages_modules.consultants.show_add_consultant_form") as mock_form:
             mock_form.return_value = None
 
             # Test
@@ -161,9 +153,7 @@ class TestConsultantForms(BaseUITest):
     def test_show_consultant_profile_cv_analysis_display(self):
         """Test d'affichage de l'analyse CV"""
         # Mock complet de la fonction pour éviter les problèmes de mocking Streamlit
-        with patch(
-            "app.pages_modules.consultants.show_consultant_profile"
-        ) as mock_profile:
+        with patch("app.pages_modules.consultants.show_consultant_profile") as mock_profile:
             mock_profile.return_value = None
 
             # Test

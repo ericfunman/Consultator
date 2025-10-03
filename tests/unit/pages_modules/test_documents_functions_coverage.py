@@ -29,9 +29,7 @@ class TestShowConsultantDocuments:
     @patch("app.pages_modules.documents_functions.st")
     @patch("app.pages_modules.documents_functions.save_consultant_document")
     @patch("app.pages_modules.documents_functions.show_existing_documents")
-    def test_show_consultant_documents_complete_flow(
-        self, mock_show_existing, mock_save_doc, mock_st
-    ):
+    def test_show_consultant_documents_complete_flow(self, mock_show_existing, mock_save_doc, mock_st):
         """Test du flux complet d'affichage des documents"""
         # Mock consultant
         mock_consultant = MagicMock()
@@ -125,9 +123,7 @@ class TestSaveConsultantDocument:
     @patch("app.pages_modules.documents_functions.DocumentService")
     @patch("builtins.open", new_callable=mock_open)
     @patch("app.pages_modules.documents_functions.datetime")
-    def test_save_consultant_document_success(
-        self, mock_datetime, mock_file_open, mock_doc_service, mock_st
-    ):
+    def test_save_consultant_document_success(self, mock_datetime, mock_file_open, mock_doc_service, mock_st):
         """Test sauvegarde réussie"""
         # Setup mocks
         mock_datetime.now.return_value.strftime.return_value = "20240115_120000"
@@ -144,9 +140,7 @@ class TestSaveConsultantDocument:
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        save_consultant_document(
-            mock_uploaded_file, mock_consultant, "CV", "Description"
-        )
+        save_consultant_document(mock_uploaded_file, mock_consultant, "CV", "Description")
 
         # Verify success
         mock_st.success.assert_called_once()
@@ -167,9 +161,7 @@ class TestSaveConsultantDocument:
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        save_consultant_document(
-            mock_uploaded_file, mock_consultant, "CV", "Description"
-        )
+        save_consultant_document(mock_uploaded_file, mock_consultant, "CV", "Description")
 
         mock_st.error.assert_called_with(" Type de fichier non supporte")
 
@@ -182,9 +174,9 @@ class TestSaveConsultantDocument:
         mock_doc_service.is_allowed_file.return_value = True
         mock_doc_service.get_file_extension.return_value = "pdf"
 
-        with patch(
-            "app.pages_modules.documents_functions.datetime"
-        ) as mock_datetime, patch("builtins.open", mock_open()):
+        with patch("app.pages_modules.documents_functions.datetime") as mock_datetime, patch(
+            "builtins.open", mock_open()
+        ):
 
             mock_datetime.now.return_value.strftime.return_value = "20240115_120000"
             mock_st.button.return_value = True  # Analysis button clicked
@@ -197,9 +189,7 @@ class TestSaveConsultantDocument:
             mock_consultant.prenom = "Jean"
             mock_consultant.nom = "Dupont"
 
-            save_consultant_document(
-                mock_uploaded_file, mock_consultant, "CV", "Description"
-            )
+            save_consultant_document(mock_uploaded_file, mock_consultant, "CV", "Description")
 
             # Verify CV analysis button is shown and clicked
             mock_st.button.assert_called()
@@ -208,9 +198,7 @@ class TestSaveConsultantDocument:
     @patch("app.pages_modules.documents_functions.st")
     @patch("app.pages_modules.documents_functions.DocumentService")
     @patch("builtins.open", new_callable=mock_open)
-    def test_save_consultant_document_exception(
-        self, mock_file_open, mock_doc_service, mock_st
-    ):
+    def test_save_consultant_document_exception(self, mock_file_open, mock_doc_service, mock_st):
         """Test gestion d'exception"""
         mock_doc_service.init_upload_directory.return_value = Path("/fake/upload/dir")
         mock_doc_service.is_allowed_file.return_value = True
@@ -226,9 +214,7 @@ class TestSaveConsultantDocument:
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        save_consultant_document(
-            mock_uploaded_file, mock_consultant, "CV", "Description"
-        )
+        save_consultant_document(mock_uploaded_file, mock_consultant, "CV", "Description")
 
         # Should catch exception and show error
         mock_st.error.assert_called()
@@ -264,9 +250,7 @@ class TestExtractDocumentType:
 
     def test_extract_lettre_motivation_type(self):
         """Test extraction type lettre de motivation"""
-        result = _extract_document_type(
-            "Jean_Dupont_Lettre_de_motivation_20240115_120000.docx"
-        )
+        result = _extract_document_type("Jean_Dupont_Lettre_de_motivation_20240115_120000.docx")
         assert result == "Lettre de motivation"
 
     def test_extract_certificat_type(self):
@@ -352,9 +336,7 @@ class TestRenderDocumentActions:
 
         _render_document_actions(mock_file_path, "Contrat")
 
-        mock_st.info.assert_called_with(
-            "👁️ Previsualisation en cours de developpement..."
-        )
+        mock_st.info.assert_called_with("👁️ Previsualisation en cours de developpement...")
 
 
 class TestShowExistingDocuments:
@@ -425,9 +407,7 @@ class TestShowExistingDocuments:
     @patch("app.pages_modules.documents_functions.DocumentService")
     def test_show_existing_documents_exception(self, mock_doc_service, mock_st):
         """Test gestion d'exception"""
-        mock_doc_service.init_upload_directory.side_effect = Exception(
-            "Directory error"
-        )
+        mock_doc_service.init_upload_directory.side_effect = Exception("Directory error")
 
         mock_consultant = MagicMock()
         mock_consultant.prenom = "Jean"
@@ -542,9 +522,7 @@ class TestIntegrationScenarios:
         mock_doc_service.is_allowed_file.return_value = True
         mock_doc_service.get_file_extension.return_value = "pdf"
 
-        with patch("builtins.open", mock_open()), patch(
-            "app.pages_modules.documents_functions.datetime"
-        ) as mock_dt:
+        with patch("builtins.open", mock_open()), patch("app.pages_modules.documents_functions.datetime") as mock_dt:
 
             mock_dt.now.return_value.strftime.return_value = "20240115_120000"
 

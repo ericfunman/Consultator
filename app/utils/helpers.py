@@ -364,9 +364,7 @@ def normalize_text(text: str) -> str:
 
     # Supprimer les accents
     normalized = unicodedata.normalize("NFD", normalized)
-    normalized = "".join(
-        char for char in normalized if unicodedata.category(char) != "Mn"
-    )
+    normalized = "".join(char for char in normalized if unicodedata.category(char) != "Mn")
 
     return normalized
 

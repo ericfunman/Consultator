@@ -21,15 +21,10 @@ def sample_consultant_data():
     }
 
 
-@pytest.fixture  
+@pytest.fixture
 def sample_competence_data():
     """Données de test pour une compétence"""
-    return {
-        "nom": "Python",
-        "categorie": "Technique",
-        "annees_experience": 3,
-        "niveau": "Confirmé"
-    }
+    return {"nom": "Python", "categorie": "Technique", "annees_experience": 3, "niveau": "Confirmé"}
 
 
 @pytest.fixture
@@ -41,14 +36,14 @@ def sample_mission_data():
         "description": "Description de test",
         "date_debut": date.today(),
         "date_fin": date.today(),
-        "statut": "En cours"
+        "statut": "En cours",
     }
 
 
 class TestConsultantWorkflowIntegration:
     """Tests d'intégration pour le workflow consultant complet"""
 
-    @patch('app.database.database.get_database_session')
+    @patch("app.database.database.get_database_session")
     def test_complete_consultant_workflow(
         self, mock_db_session, sample_consultant_data, sample_competence_data, sample_mission_data
     ):
@@ -57,35 +52,35 @@ class TestConsultantWorkflowIntegration:
         mock_session = MagicMock()
         mock_db_session.return_value.__enter__ = Mock(return_value=mock_session)
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
-        
+
         # Mock des queries pour éviter les erreurs
         mock_session.query.return_value.filter.return_value.first.return_value = None
         mock_session.add = Mock()
         mock_session.commit = Mock()
         mock_session.rollback = Mock()
-        
+
         # Test que les mocks sont correctement configurés
         assert mock_session is not None
         assert mock_session.rollback.call_count == 0
 
-    @patch('app.database.database.get_database_session')
+    @patch("app.database.database.get_database_session")
     def test_consultant_search_and_filter_workflow(self, mock_db_session):
         """Test du workflow de recherche et filtrage des consultants"""
         # Configuration du mock pour supporter le context manager
         mock_session = MagicMock()
         mock_db_session.return_value.__enter__ = Mock(return_value=mock_session)
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
-        
+
         # Test que la session mock est bien configurée
         assert mock_session is not None
 
-    @patch('app.database.database.get_database_session')  
+    @patch("app.database.database.get_database_session")
     def test_consultant_pagination_workflow(self, mock_db_session):
         """Test du workflow de pagination des consultants"""
         # Configuration du mock pour supporter le context manager
         mock_session = MagicMock()
         mock_db_session.return_value.__enter__ = Mock(return_value=mock_session)
         mock_db_session.return_value.__exit__ = Mock(return_value=None)
-        
+
         # Test que la session mock est bien configurée
         assert mock_session is not None

@@ -402,9 +402,7 @@ class TestUtilsReal:
             from app.utils import helpers
 
             # Lister toutes les fonctions disponibles
-            helper_functions = [
-                name for name in dir(helpers) if not name.startswith("_")
-            ]
+            helper_functions = [name for name in dir(helpers) if not name.startswith("_")]
 
             # Vérifier qu'il y a au moins quelques fonctions
             assert len(helper_functions) > 5

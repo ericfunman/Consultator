@@ -53,14 +53,8 @@ class TestSkillCategoriesCoverage:
         assert "Réglementation Bancaire" in COMPETENCES_FONCTIONNELLES
 
         # Vérifier contenu catégories
-        assert (
-            "Conseil clientèle particuliers"
-            in COMPETENCES_FONCTIONNELLES["Banque de Détail"]
-        )
-        assert (
-            "Trading actions (equity)"
-            in COMPETENCES_FONCTIONNELLES["Marchés Financiers"]
-        )
+        assert "Conseil clientèle particuliers" in COMPETENCES_FONCTIONNELLES["Banque de Détail"]
+        assert "Trading actions (equity)" in COMPETENCES_FONCTIONNELLES["Marchés Financiers"]
         assert "Scoring crédit" in COMPETENCES_FONCTIONNELLES["Crédit & Risques"]
         assert "Bâle III" in COMPETENCES_FONCTIONNELLES["Réglementation Bancaire"]
 

@@ -34,9 +34,7 @@ class TestConsultantList:
         show_consultants_list()
 
         # Vérifier qu'une erreur est affichée
-        mock_st.error.assert_called_with(
-            "❌ Erreur lors du chargement de la liste des consultants: Erreur DB"
-        )
+        mock_st.error.assert_called_with("❌ Erreur lors du chargement de la liste des consultants: Erreur DB")
 
 
 class TestConsultantProfile:
@@ -55,9 +53,9 @@ class TestConsultantProfile:
         # Test que la fonction s'ex�cute sans erreur
         try:
             show_consultant_profile()
-            success = (1 == 1)
+            success = 1 == 1
         except Exception as exc:
-            success = (1 == 2)
+            success = 1 == 2
         assert success, "La fonction devrait s'ex�cuter sans erreur"
 
     @patch("app.pages_modules.consultant_profile.st")
@@ -74,9 +72,7 @@ class TestConsultantProfile:
         mock_query.filter.return_value = mock_query
         mock_query.first.return_value = None
 
-        with patch(
-            "app.pages_modules.consultant_profile.get_database_session"
-        ) as mock_get_session:
+        with patch("app.pages_modules.consultant_profile.get_database_session") as mock_get_session:
             mock_get_session.return_value.__enter__.return_value = mock_session
             mock_get_session.return_value.__exit__.return_value = None
 
@@ -96,9 +92,7 @@ class TestConsultantProfile:
         mock_st.session_state.view_consultant_profile = 1
 
         # Mock de la session qui l�ve une exception
-        with patch(
-            "app.pages_modules.consultant_profile.get_database_session"
-        ) as mock_get_session:
+        with patch("app.pages_modules.consultant_profile.get_database_session") as mock_get_session:
             mock_get_session.return_value.__enter__.side_effect = Exception("Erreur DB")
 
             from app.pages_modules.consultant_profile import (
@@ -108,6 +102,4 @@ class TestConsultantProfile:
             show_consultant_profile()
 
             # Vérifier qu'une erreur est affichée
-            mock_st.error.assert_called_with(
-                "❌ Erreur lors du chargement du profil consultant: Erreur DB"
-            )
+            mock_st.error.assert_called_with("❌ Erreur lors du chargement du profil consultant: Erreur DB")

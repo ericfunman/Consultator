@@ -10,12 +10,12 @@ from datetime import datetime, date
 # Import du module à tester
 from app.pages_modules.consultants import (
     _display_consultant_header,
-    _display_consultant_metrics, 
+    _display_consultant_metrics,
     _show_consultant_not_found,
     _extract_business_manager_info,
     _get_current_practice_id,
     _build_update_data,
-    _display_consultant_status
+    _display_consultant_status,
 )
 
 
@@ -68,22 +68,22 @@ class TestConsultants(unittest.TestCase):
             "notes": "Notes de test",
             "selected_practice_id": 1,
             "grade": "Senior",
-            "type_contrat": "CDI"
+            "type_contrat": "CDI",
         }
 
-    @patch('app.pages_modules.consultants.st')
+    @patch("app.pages_modules.consultants.st")
     def test_display_consultant_header(self, mock_st):
         """Test _display_consultant_header"""
         # Mock st.columns pour retourner 2 colonnes
         mock_col1 = MagicMock()
         mock_col2 = MagicMock()
         mock_st.columns.return_value = [mock_col1, mock_col2]
-        
+
         consultant_data = {
             "consultant": self.mock_consultant,
             "business_manager": self.mock_business_manager,
             "prenom": self.mock_consultant.prenom,
-            "nom": self.mock_consultant.nom
+            "nom": self.mock_consultant.nom,
         }
 
         _display_consultant_header(consultant_data)
@@ -92,7 +92,7 @@ class TestConsultants(unittest.TestCase):
         mock_st.title.assert_called()
         mock_st.columns.assert_called()
 
-    @patch('app.pages_modules.consultants.st')
+    @patch("app.pages_modules.consultants.st")
     def test_display_consultant_metrics(self, mock_st):
         """Test _display_consultant_metrics"""
         # Mock st.columns pour retourner 5 colonnes (comme attendu par la fonction)
@@ -112,7 +112,7 @@ class TestConsultants(unittest.TestCase):
             "tjm_moyen": 500,
             "disponibilite": True,
             "date_creation": datetime.now(),
-            "practice_name": "Data Science"
+            "practice_name": "Data Science",
         }
 
         _display_consultant_metrics(consultant_data)
@@ -120,7 +120,7 @@ class TestConsultants(unittest.TestCase):
         # Vérifier que st.columns est appelé et que les métriques sont affichées
         mock_st.columns.assert_called()
 
-    @patch('app.pages_modules.consultants.st')
+    @patch("app.pages_modules.consultants.st")
     def test_show_consultant_not_found(self, mock_st):
         """Test _show_consultant_not_found"""
         _show_consultant_not_found()
@@ -176,7 +176,7 @@ class TestConsultants(unittest.TestCase):
         self.assertEqual(result["nom"], "MARTIN")
         self.assertEqual(result["email"], "pierre.martin@test.com")
 
-    @patch('app.pages_modules.consultants.st')
+    @patch("app.pages_modules.consultants.st")
     def test_display_consultant_status_with_mission_date(self, mock_st):
         """Test _display_consultant_status avec date de première mission"""
         mock_consultant = MagicMock()
@@ -189,7 +189,7 @@ class TestConsultants(unittest.TestCase):
         mock_st.markdown.assert_called()
         mock_st.info.assert_called()
 
-    @patch('app.pages_modules.consultants.st')
+    @patch("app.pages_modules.consultants.st")
     def test_display_consultant_status_without_mission_date(self, mock_st):
         """Test _display_consultant_status sans date de première mission"""
         mock_consultant = MagicMock()
@@ -201,7 +201,7 @@ class TestConsultants(unittest.TestCase):
         mock_st.markdown.assert_called()
         mock_st.info.assert_called()
 
-    @patch('app.pages_modules.consultants.st')
+    @patch("app.pages_modules.consultants.st")
     def test_display_consultant_status_calculation_error(self, mock_st):
         """Test _display_consultant_status avec erreur de calcul d'expérience"""
         mock_consultant = MagicMock()
@@ -216,5 +216,5 @@ class TestConsultants(unittest.TestCase):
         mock_st.info.assert_called()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

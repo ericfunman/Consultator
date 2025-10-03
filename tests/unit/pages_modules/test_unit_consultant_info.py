@@ -85,9 +85,7 @@ class TestConsultantInfoUpdate:
         mock_consultant.salaire_actuel = 50000
 
         mock_session = MagicMock()
-        mock_session.query.return_value.filter.return_value.first.return_value = (
-            mock_consultant
-        )
+        mock_session.query.return_value.filter.return_value.first.return_value = mock_consultant
         # Pas de conflit d'email
         mock_session.query.return_value.filter.return_value.first.side_effect = [
             mock_consultant,
@@ -123,9 +121,7 @@ class TestConsultantInfoUpdate:
 
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")
-    def test_update_consultant_info_consultant_not_found(
-        self, mock_get_session, mock_st
-    ):
+    def test_update_consultant_info_consultant_not_found(self, mock_get_session, mock_st):
         """Test de mise à jour avec consultant introuvable"""
         mock_session = MagicMock()
         mock_session.query.return_value.filter.return_value.first.return_value = None
@@ -160,15 +156,11 @@ class TestConsultantInfoUpdate:
         result = update_consultant_info(1, data)
 
         assert result is False
-        mock_st.error.assert_called_with(
-            "❌ Cet email est déjà utilisé par un autre consultant"
-        )
+        mock_st.error.assert_called_with("❌ Cet email est déjà utilisé par un autre consultant")
 
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")
-    def test_update_consultant_info_salary_change_with_history(
-        self, mock_get_session, mock_st
-    ):
+    def test_update_consultant_info_salary_change_with_history(self, mock_get_session, mock_st):
         """Test de mise à jour avec changement de salaire et historique"""
         mock_consultant = MagicMock()
         mock_consultant.id = 1

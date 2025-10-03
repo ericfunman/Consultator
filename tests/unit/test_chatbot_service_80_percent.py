@@ -27,18 +27,10 @@ class TestChatbotService80Percent(TestCase):
         mock_session.query.return_value.all.return_value = []
         mock_session.query.return_value.first.return_value = None
         mock_session.query.return_value.count.return_value = 0
-        mock_session.query.return_value.filter.return_value = (
-            mock_session.query.return_value
-        )
-        mock_session.query.return_value.order_by.return_value = (
-            mock_session.query.return_value
-        )
-        mock_session.query.return_value.limit.return_value = (
-            mock_session.query.return_value
-        )
-        mock_session.query.return_value.offset.return_value = (
-            mock_session.query.return_value
-        )
+        mock_session.query.return_value.filter.return_value = mock_session.query.return_value
+        mock_session.query.return_value.order_by.return_value = mock_session.query.return_value
+        mock_session.query.return_value.limit.return_value = mock_session.query.return_value
+        mock_session.query.return_value.offset.return_value = mock_session.query.return_value
         mock_session.add = Mock()
         mock_session.commit = Mock()
         mock_session.rollback = Mock()
@@ -119,9 +111,7 @@ class TestChatbotService80Percent(TestCase):
                 "confidence": 1.0,
                 "data": None,
             },
-        ), patch.object(
-            chatbot, "_analyze_intent", return_value="general"
-        ), patch.object(
+        ), patch.object(chatbot, "_analyze_intent", return_value="general"), patch.object(
             chatbot, "_extract_entities", return_value=self.full_entities
         ):
             result = chatbot.process_question("Bonjour")
@@ -154,9 +144,7 @@ class TestChatbotService80Percent(TestCase):
 
             # Test toutes les intentions principales
             assert chatbot._analyze_intent("combien de consultants") == "statistiques"
-            assert (
-                chatbot._analyze_intent("qui est jean dupont") == "recherche_consultant"
-            )
+            assert chatbot._analyze_intent("qui est jean dupont") == "recherche_consultant"
             assert chatbot._analyze_intent("competences python") == "competences"
             assert chatbot._analyze_intent("missions chez google") == "missions"
             assert chatbot._analyze_intent("salaire moyen") == "salaire"
@@ -217,9 +205,7 @@ class TestChatbotService80Percent(TestCase):
         chatbot = ChatbotService()
 
         # Mock méthode pour éviter problèmes calculs
-        with patch.object(
-            chatbot, "_find_consultant_by_name", return_value=self.mock_consultant
-        ):
+        with patch.object(chatbot, "_find_consultant_by_name", return_value=self.mock_consultant):
             entities = {"noms": ["Jean Dupont"]}
             entities.update(self.full_entities)
 
@@ -236,9 +222,7 @@ class TestChatbotService80Percent(TestCase):
         chatbot = ChatbotService()
 
         # Mock find consultant pour éviter erreurs comparaison
-        with patch.object(
-            chatbot, "_find_consultant_by_name", return_value=self.mock_consultant
-        ), patch.object(
+        with patch.object(chatbot, "_find_consultant_by_name", return_value=self.mock_consultant), patch.object(
             chatbot,
             "_get_salary_stats",
             return_value={
@@ -265,9 +249,7 @@ class TestChatbotService80Percent(TestCase):
         chatbot = ChatbotService()
 
         # Mock find consultants pour retourner liste réelle
-        with patch.object(
-            chatbot, "_find_consultants_by_skill", return_value=[self.mock_consultant]
-        ):
+        with patch.object(chatbot, "_find_consultants_by_skill", return_value=[self.mock_consultant]):
             entities = {"competences": ["Python"]}
             entities.update(self.full_entities)
 
@@ -292,9 +274,7 @@ class TestChatbotService80Percent(TestCase):
         mock_db.query.return_value.filter.return_value.all.return_value = []
 
         # Mock find consultant pour éviter erreurs comparaison
-        with patch.object(
-            chatbot, "_find_consultant_by_name", return_value=self.mock_consultant
-        ):
+        with patch.object(chatbot, "_find_consultant_by_name", return_value=self.mock_consultant):
             entities = {"experience": ["5 ans"]}
             entities.update(self.full_entities)
 
@@ -333,9 +313,7 @@ class TestChatbotService80Percent(TestCase):
         chatbot.last_question = "missions chez google"  # pas une question de compte
 
         # Mock get missions pour retourner liste
-        with patch.object(
-            chatbot, "_get_missions_by_company", return_value=[self.mock_mission]
-        ):
+        with patch.object(chatbot, "_get_missions_by_company", return_value=[self.mock_mission]):
             entities = {"entreprises": ["Google"]}
             entities.update(self.full_entities)
 
@@ -366,10 +344,7 @@ class TestChatbotService80Percent(TestCase):
             assert isinstance(result, dict)
             assert "response" in result
             # Correction: vérifier le contenu exact de la réponse
-            assert (
-                "2 mission(s)" in result["response"]
-                or "2 missions" in result["response"]
-            )
+            assert "2 mission(s)" in result["response"] or "2 missions" in result["response"]
 
     @patch("app.services.chatbot_service.get_database_session")
     def test_handle_stats_question_with_mock(self, mock_session):
@@ -434,13 +409,9 @@ class TestChatbotService80Percent(TestCase):
         mock_practice.nom = "Data Science"
         mock_practice.consultants = [self.mock_consultant]  # Liste réelle
         mock_practice.responsable = "Jean Dupont"
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            mock_practice
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = mock_practice
         # Mock pour all() aussi
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            mock_practice
-        ]
+        mock_db.query.return_value.filter.return_value.all.return_value = [mock_practice]
 
         chatbot = ChatbotService()
         entities = {"practices": ["Data Science"]}
@@ -459,9 +430,7 @@ class TestChatbotService80Percent(TestCase):
         chatbot = ChatbotService()
 
         # Mock find consultant
-        with patch.object(
-            chatbot, "_find_consultant_by_name", return_value=self.mock_consultant
-        ):
+        with patch.object(chatbot, "_find_consultant_by_name", return_value=self.mock_consultant):
             entities = {"noms": ["Jean"]}
             entities.update(self.full_entities)
 
@@ -478,9 +447,7 @@ class TestChatbotService80Percent(TestCase):
         chatbot = ChatbotService()
 
         # Mock find consultant
-        with patch.object(
-            chatbot, "_find_consultant_by_name", return_value=self.mock_consultant
-        ):
+        with patch.object(chatbot, "_find_consultant_by_name", return_value=self.mock_consultant):
             entities = {"noms": ["Jean"]}
             entities.update(self.full_entities)
 
@@ -502,9 +469,7 @@ class TestChatbotService80Percent(TestCase):
         mock_session.return_value.__exit__.return_value = None
 
         # Mock query result
-        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
-            self.mock_consultant
-        )
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = self.mock_consultant
 
         chatbot = ChatbotService()
         result = chatbot._find_consultant_by_name("Jean Dupont")
@@ -566,9 +531,7 @@ class TestChatbotService80Percent(TestCase):
         mock_session.return_value.__exit__.return_value = None
 
         # Mock query result
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            self.mock_mission
-        ]
+        mock_db.query.return_value.filter.return_value.all.return_value = [self.mock_mission]
 
         chatbot = ChatbotService()
         result = chatbot._get_missions_by_company("Google")
@@ -616,9 +579,7 @@ class TestChatbotService80Percent(TestCase):
         # Mock tous les counts/scalars avec nombres réels
         mock_db.query.return_value.count.return_value = 100
         mock_db.query.return_value.filter.return_value.count.return_value = 80
-        mock_db.query.return_value.join.return_value.distinct.return_value.count.return_value = (
-            50
-        )
+        mock_db.query.return_value.join.return_value.distinct.return_value.count.return_value = 50
         mock_db.query.return_value.filter.return_value.scalar.return_value = 450.0
 
         chatbot = ChatbotService()
@@ -638,9 +599,7 @@ class TestChatbotService80Percent(TestCase):
         mock_session.return_value.__exit__.return_value = None
 
         # Mock consultants avec salaires réels
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            self.mock_consultant
-        ]
+        mock_db.query.return_value.filter.return_value.all.return_value = [self.mock_consultant]
 
         chatbot = ChatbotService()
         result = chatbot._get_salary_stats()

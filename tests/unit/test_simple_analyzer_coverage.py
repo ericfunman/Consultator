@@ -240,9 +240,7 @@ class TestSimpleDocumentAnalyzerCoverage:
     @patch("streamlit.success")
     def test_analyze_cv_content_success(self, mock_success, mock_info):
         """Test analyse CV avec succès"""
-        result = SimpleDocumentAnalyzer.analyze_cv_content(
-            self.sample_text, "Jean Dupont"
-        )
+        result = SimpleDocumentAnalyzer.analyze_cv_content(self.sample_text, "Jean Dupont")
 
         # Vérifications structure résultat
         assert result["consultant"] == "Jean Dupont"
@@ -292,9 +290,7 @@ class TestSimpleDocumentAnalyzerCoverage:
         assert result["langages_techniques"] == []
         assert result["missions"] == []
         assert result["informations_generales"]["longueur_texte"] == 0
-        assert (
-            result["informations_generales"]["nombre_mots"] == 0
-        )  # split() sur chaîne vide retourne [] donc len=0
+        assert result["informations_generales"]["nombre_mots"] == 0  # split() sur chaîne vide retourne [] donc len=0
 
     @patch("streamlit.info")
     @patch("streamlit.success")
@@ -324,9 +320,7 @@ class TestSimpleDocumentAnalyzerCoverage:
         """Test analyse CV avec beaucoup de clients"""
         clients_text = " ".join(SimpleDocumentAnalyzer.CLIENTS)
 
-        result = SimpleDocumentAnalyzer.analyze_cv_content(
-            clients_text, "Business Expert"
-        )
+        result = SimpleDocumentAnalyzer.analyze_cv_content(clients_text, "Business Expert")
 
         # Vérifier limitation à 10 missions max
         assert len(result["missions"]) == 10
@@ -361,29 +355,21 @@ class TestSimpleDocumentAnalyzerCoverage:
 
     @patch("streamlit.info")
     @patch("streamlit.success")
-    def test_analyze_cv_content_functional_skills_project(
-        self, mock_success, mock_info
-    ):
+    def test_analyze_cv_content_functional_skills_project(self, mock_success, mock_info):
         """Test détection compétences fonctionnelles PROJET"""
         project_text = "Chef de projet avec expérience en management"
 
-        result = SimpleDocumentAnalyzer.analyze_cv_content(
-            project_text, "Project Manager"
-        )
+        result = SimpleDocumentAnalyzer.analyze_cv_content(project_text, "Project Manager")
 
         assert "Gestion de projet" in result["competences_fonctionnelles"]
 
     @patch("streamlit.info")
     @patch("streamlit.success")
-    def test_analyze_cv_content_functional_skills_consulting(
-        self, mock_success, mock_info
-    ):
+    def test_analyze_cv_content_functional_skills_consulting(self, mock_success, mock_info):
         """Test détection compétences fonctionnelles CONSEIL"""
         consulting_text = "Consultant senior en consulting stratégique"
 
-        result = SimpleDocumentAnalyzer.analyze_cv_content(
-            consulting_text, "Senior Consultant"
-        )
+        result = SimpleDocumentAnalyzer.analyze_cv_content(consulting_text, "Senior Consultant")
 
         assert "Conseil" in result["competences_fonctionnelles"]
 
@@ -459,9 +445,7 @@ class TestSimpleDocumentAnalyzerCoverage:
         """Test création détaillée des missions"""
         client_tech_text = "Mission chez Société Générale avec Python et Docker"
 
-        result = SimpleDocumentAnalyzer.analyze_cv_content(
-            client_tech_text, "Mission Expert"
-        )
+        result = SimpleDocumentAnalyzer.analyze_cv_content(client_tech_text, "Mission Expert")
 
         # Vérifier mission créée
         assert len(result["missions"]) == 1

@@ -122,9 +122,7 @@ def show_consultant_missions(consultant):
         st.markdown("#### 📋 Liste des missions")
 
         for mission in missions:
-            with st.expander(
-                f"🎯 {mission.titre} - {mission.client.nom if mission.client else 'Client inconnu'}"
-            ):
+            with st.expander(f"🎯 {mission.titre} - {mission.client.nom if mission.client else 'Client inconnu'}"):
                 show_mission_details(mission)
 
         # Actions générales
@@ -138,9 +136,7 @@ def show_consultant_missions(consultant):
                 st.rerun()
 
         with col2:
-            if st.button(
-                "📊 Analyse missions", key=f"analyze_missions_{consultant.id}"
-            ):
+            if st.button("📊 Analyse missions", key=f"analyze_missions_{consultant.id}"):
                 show_missions_analysis(missions)
 
         with col3:
@@ -148,10 +144,7 @@ def show_consultant_missions(consultant):
                 show_missions_revenues(missions)
 
         # Formulaire d'ajout (si activé)
-        if (
-            "add_mission" in st.session_state
-            and st.session_state.add_mission == consultant.id
-        ):
+        if "add_mission" in st.session_state and st.session_state.add_mission == consultant.id:
             show_add_mission_form(consultant.id)
 
     except Exception as e:
@@ -255,17 +248,11 @@ def show_mission_details(mission):
     _display_mission_actions(mission)
 
     # Formulaire de modification (si activé)
-    if (
-        "edit_mission" in st.session_state
-        and st.session_state.edit_mission == mission.id
-    ):
+    if "edit_mission" in st.session_state and st.session_state.edit_mission == mission.id:
         show_edit_mission_form(mission.id)
 
     # Détails étendus (si activé)
-    if (
-        "view_mission_details" in st.session_state
-        and st.session_state.view_mission_details == mission.id
-    ):
+    if "view_mission_details" in st.session_state and st.session_state.view_mission_details == mission.id:
         show_mission_full_details(mission)
 
 
@@ -332,9 +319,7 @@ def _render_mission_general_info():
     """Rend les champs d'informations générales de la mission"""
     st.markdown("#### 📋 Informations générales")
 
-    titre = st.text_input(
-        "Titre de la mission *", help="Titre descriptif de la mission"
-    )
+    titre = st.text_input("Titre de la mission *", help="Titre descriptif de la mission")
 
     client_options = _load_clients_for_mission()
     if not client_options:
@@ -624,22 +609,12 @@ def create_mission(consultant_id: int, data: Dict[str, Any]) -> bool:
                 date_debut=data["date_debut"],
                 date_fin=data["date_fin"] if not data["en_cours"] else None,
                 en_cours=data["en_cours"],
-                taux_journalier=(
-                    data["taux_journalier"] if data["taux_journalier"] > 0 else None
-                ),
+                taux_journalier=(data["taux_journalier"] if data["taux_journalier"] > 0 else None),
                 # Nouveau champ TJM V1.2.2
                 tjm=data["tjm"] if data["tjm"] > 0 else None,
-                salaire_mensuel=(
-                    data["salaire_mensuel"] if data["salaire_mensuel"] > 0 else None
-                ),
-                description=(
-                    data["description"].strip() if data["description"] else None
-                ),
-                competences_requises=(
-                    data["competences_requises"].strip()
-                    if data["competences_requises"]
-                    else None
-                ),
+                salaire_mensuel=(data["salaire_mensuel"] if data["salaire_mensuel"] > 0 else None),
+                description=(data["description"].strip() if data["description"] else None),
+                competences_requises=(data["competences_requises"].strip() if data["competences_requises"] else None),
             )
 
             session.add(mission)
@@ -655,12 +630,7 @@ def create_mission(consultant_id: int, data: Dict[str, Any]) -> bool:
 def _load_mission_for_edit(mission_id: int):
     """Charge une mission pour modification."""
     with get_database_session() as session:
-        mission = (
-            session.query(Mission)
-            .options(joinedload(Mission.client))
-            .filter(Mission.id == mission_id)
-            .first()
-        )
+        mission = session.query(Mission).options(joinedload(Mission.client)).filter(Mission.id == mission_id).first()
         if not mission:
             return None, {}
 
@@ -683,11 +653,7 @@ def _render_edit_mission_general_info(mission, client_options):
         "Client *",
         options=list(client_options.keys()),
         format_func=lambda x: client_options[x],
-        index=(
-            list(client_options.keys()).index(mission.client_id)
-            if mission.client_id in client_options
-            else 0
-        ),
+        index=(list(client_options.keys()).index(mission.client_id) if mission.client_id in client_options else 0),
         help="Client pour lequel la mission est réalisée",
     )
 
@@ -768,9 +734,7 @@ def _handle_mission_update(mission_id, form_data):
     """Gère la mise à jour d'une mission."""
     titre, client_id, date_debut, en_cours, date_fin = form_data[:5]
     if validate_mission_form(titre, client_id, date_debut, en_cours, date_fin):
-        taux_journalier, salaire_mensuel, description, competences_requises = form_data[
-            5:
-        ]
+        taux_journalier, salaire_mensuel, description, competences_requises = form_data[5:]
         success = update_mission(
             mission_id,
             {
@@ -868,15 +832,11 @@ def show_edit_mission_form(mission_id: int):
 
         with st.form(f"edit_mission_form_{mission_id}", clear_on_submit=False):
             # Récupération des données du formulaire
-            titre, client_id, date_debut, en_cours, date_fin = (
-                _render_edit_mission_general_info(mission, client_options)
+            titre, client_id, date_debut, en_cours, date_fin = _render_edit_mission_general_info(
+                mission, client_options
             )
-            taux_journalier, salaire_mensuel = _render_edit_mission_remuneration(
-                mission
-            )
-            description, competences_requises = _render_edit_mission_description(
-                mission
-            )
+            taux_journalier, salaire_mensuel = _render_edit_mission_remuneration(mission)
+            description, competences_requises = _render_edit_mission_description(mission)
 
             # Gestion des boutons
             form_data = (
@@ -931,19 +891,11 @@ def update_mission(mission_id: int, data: Dict[str, Any]) -> bool:
             mission.date_debut = data["date_debut"]
             mission.date_fin = data["date_fin"] if not data["en_cours"] else None
             mission.en_cours = data["en_cours"]
-            mission.taux_journalier = (
-                data["taux_journalier"] if data["taux_journalier"] > 0 else None
-            )
-            mission.salaire_mensuel = (
-                data["salaire_mensuel"] if data["salaire_mensuel"] > 0 else None
-            )
-            mission.description = (
-                data["description"].strip() if data["description"] else None
-            )
+            mission.taux_journalier = data["taux_journalier"] if data["taux_journalier"] > 0 else None
+            mission.salaire_mensuel = data["salaire_mensuel"] if data["salaire_mensuel"] > 0 else None
+            mission.description = data["description"].strip() if data["description"] else None
             mission.competences_requises = (
-                data["competences_requises"].strip()
-                if data["competences_requises"]
-                else None
+                data["competences_requises"].strip() if data["competences_requises"] else None
             )
 
             session.commit()
@@ -1128,11 +1080,7 @@ def _calculate_mission_statistics(missions):
         STATUS_EN_COURS: sum(1 for m in missions if m.en_cours),
         "Terminées": sum(1 for m in missions if m.date_fin and not m.en_cours),
         "Planifiées": sum(
-            1
-            for m in missions
-            if not m.en_cours
-            and not m.date_fin
-            and m.date_debut > datetime.now().date()
+            1 for m in missions if not m.en_cours and not m.date_fin and m.date_debut > datetime.now().date()
         ),
     }
 
@@ -1145,9 +1093,7 @@ def _display_missions_by_client_and_status(client_counts, status_counts):
 
     with col1:
         st.markdown("#### 🏢 Répartition par client")
-        for client, count in sorted(
-            client_counts.items(), key=lambda x: x[1], reverse=True
-        ):
+        for client, count in sorted(client_counts.items(), key=lambda x: x[1], reverse=True):
             st.write(f"**{client} :** {count} mission(s)")
 
     with col2:
@@ -1177,11 +1123,7 @@ def _calculate_year_revenue(year_missions, year):
             # Revenus pour les missions terminées
             duration_days = (mission.date_fin - mission.date_debut).days
             year_revenue += mission.taux_journalier * (duration_days // 7 * 5)
-        elif (
-            mission.taux_journalier
-            and mission.en_cours
-            and mission.date_debut.year == year
-        ):
+        elif mission.taux_journalier and mission.en_cours and mission.date_debut.year == year:
             # Estimation pour les missions en cours de l'année
             today = date.today()
             if today.year == year:

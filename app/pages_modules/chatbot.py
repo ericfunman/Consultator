@@ -25,9 +25,7 @@ def show():
     """Affiche la page du chatbot"""
 
     st.title("🤖 Assistant IA Consultator")
-    st.markdown(
-        "### Interrogez vos données de consultant avec l'intelligence artificielle"
-    )
+    st.markdown("### Interrogez vos données de consultant avec l'intelligence artificielle")
 
     # Initialiser le service chatbot dans la session
     if "chatbot_service" not in st.session_state:
@@ -65,10 +63,7 @@ Que souhaitez-vous savoir ? 😊""",
                 st.markdown(message["content"])
 
                 # Afficher un timestamp pour les anciens messages
-                if (
-                    message["role"] == "assistant"
-                    and len(st.session_state.messages) > 1
-                ):
+                if message["role"] == "assistant" and len(st.session_state.messages) > 1:
                     timestamp = message.get("timestamp", datetime.now())
                     st.caption(f"⏰ {timestamp.strftime('%H:%M')}")
 
@@ -93,14 +88,10 @@ Que souhaitez-vous savoir ? 😊""",
             with st.spinner("🤔 Réflexion en cours..."):
                 try:
                     # Traiter la question
-                    response_data = st.session_state.chatbot_service.process_question(
-                        user_input
-                    )
+                    response_data = st.session_state.chatbot_service.process_question(user_input)
 
                     # Extraire la réponse
-                    response_content = response_data.get(
-                        "response", "❌ Erreur lors du traitement"
-                    )
+                    response_content = response_data.get("response", "❌ Erreur lors du traitement")
                     confidence = response_data.get("confidence", 0.0)
                     intent = response_data.get("intent", "unknown")
 
@@ -109,9 +100,7 @@ Que souhaitez-vous savoir ? 😊""",
 
                     # Afficher des métadonnées en mode debug (optionnel)
                     if st.session_state.get("debug_mode", False):
-                        st.caption(
-                            f"🎯 Intention: {intent} | 📊 Confiance: {confidence:.1%}"
-                        )
+                        st.caption(f"🎯 Intention: {intent} | 📊 Confiance: {confidence:.1%}")
 
                     # Si des données sont retournées, les afficher
                     if response_data.get("data"):
@@ -216,9 +205,7 @@ def show_sidebar():
         st.markdown("---")
 
         # Mode debug (optionnel)
-        debug_mode = st.checkbox(
-            "🔧 Mode debug", value=st.session_state.get("debug_mode", False)
-        )
+        debug_mode = st.checkbox("🔧 Mode debug", value=st.session_state.get("debug_mode", False))
         st.session_state.debug_mode = debug_mode
 
         st.markdown("---")

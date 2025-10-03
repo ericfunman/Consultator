@@ -35,9 +35,7 @@ class TechnologyService:
             return sorted(all_technologies)
 
         except SQLAlchemyError as e:
-            print(
-                f"Erreur lors de la récupération des technologies personnalisées: {e}"
-            )
+            print(f"Erreur lors de la récupération des technologies personnalisées: {e}")
             return ref_technologies
 
     @staticmethod
@@ -46,11 +44,7 @@ class TechnologyService:
         try:
             with get_database_session() as session:
                 # Vérifier si elle existe déj?
-                existing = (
-                    session.query(CustomTechnology)
-                    .filter(CustomTechnology.nom == name)
-                    .first()
-                )
+                existing = session.query(CustomTechnology).filter(CustomTechnology.nom == name).first()
 
                 if existing:
                     return False
@@ -88,9 +82,7 @@ class TechnologyService:
                 ]
 
         except SQLAlchemyError as e:
-            print(
-                f"Erreur lors de la récupération des technologies personnalisées: {e}"
-            )
+            print(f"Erreur lors de la récupération des technologies personnalisées: {e}")
             return []
 
     @staticmethod
@@ -98,11 +90,7 @@ class TechnologyService:
         """Supprime une technologie personnalisée"""
         try:
             with get_database_session() as session:
-                tech = (
-                    session.query(CustomTechnology)
-                    .filter(CustomTechnology.id == tech_id)
-                    .first()
-                )
+                tech = session.query(CustomTechnology).filter(CustomTechnology.id == tech_id).first()
 
                 if tech:
                     session.delete(tech)

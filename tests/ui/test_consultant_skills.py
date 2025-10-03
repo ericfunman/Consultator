@@ -155,9 +155,7 @@ class TestConsultantSkills(BaseUITest):
 
         # Mock service qui lève une exception
         mock_service_instance = Mock()
-        mock_service_instance.get_consultant_competences.side_effect = Exception(
-            "Service error"
-        )
+        mock_service_instance.get_consultant_competences.side_effect = Exception("Service error")
         mock_service.return_value = mock_service_instance
 
         try:
@@ -333,9 +331,7 @@ class TestConsultantSkills(BaseUITest):
 
         show_add_skill_form(consultant_id)
 
-        mock_warning.assert_called_once_with(
-            "⚠️ Toutes les compétences existantes sont déjà associées à ce consultant"
-        )
+        mock_warning.assert_called_once_with("⚠️ Toutes les compétences existantes sont déjà associées à ce consultant")
 
     @patch("app.pages_modules.consultant_skills.st.error")
     @patch("app.pages_modules.consultant_skills.get_database_session")
@@ -354,14 +350,10 @@ class TestConsultantSkills(BaseUITest):
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock no existing skill
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
 
         # Mock ConsultantCompetence class
-        with patch(
-            "app.pages_modules.consultant_skills.ConsultantCompetence"
-        ) as mock_cc_class:
+        with patch("app.pages_modules.consultant_skills.ConsultantCompetence") as mock_cc_class:
             mock_cc_instance = MagicMock()
             mock_cc_class.return_value = mock_cc_instance
 
@@ -392,16 +384,12 @@ class TestConsultantSkills(BaseUITest):
 
         # Mock existing skill
         mock_existing = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_existing
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_existing
 
         result = add_skill_to_consultant(consultant_id, data)
 
         assert result is False
-        mock_error.assert_called_with(
-            "❌ Cette compétence est déjà associée au consultant"
-        )
+        mock_error.assert_called_with("❌ Cette compétence est déjà associée au consultant")
 
     @patch("app.pages_modules.consultant_skills.st.markdown")
     @patch("app.pages_modules.consultant_skills.st.form")
@@ -439,9 +427,7 @@ class TestConsultantSkills(BaseUITest):
             annees_experience=4,
         )
 
-        mock_session_instance.query.return_value.join.return_value.filter.return_value.first.return_value = (
-            mock_cc
-        )
+        mock_session_instance.query.return_value.join.return_value.filter.return_value.first.return_value = mock_cc
 
         # Mock form components
         mock_form.return_value.__enter__.return_value = None
@@ -477,9 +463,7 @@ class TestConsultantSkills(BaseUITest):
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock competence not found
-        mock_session_instance.query.return_value.join.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.join.return_value.filter.return_value.first.return_value = None
 
         show_edit_skill_form(consultant_competence_id)
 
@@ -498,9 +482,7 @@ class TestConsultantSkills(BaseUITest):
 
         # Mock existing competence
         mock_cc = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_cc
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_cc
 
         result = update_consultant_skill(consultant_competence_id, data)
 
@@ -524,9 +506,7 @@ class TestConsultantSkills(BaseUITest):
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock competence not found
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
 
         result = update_consultant_skill(consultant_competence_id, data)
 
@@ -546,9 +526,7 @@ class TestConsultantSkills(BaseUITest):
 
         # Mock existing competence
         mock_cc = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_cc
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_cc
 
         result = delete_skill(consultant_competence_id)
 
@@ -570,9 +548,7 @@ class TestConsultantSkills(BaseUITest):
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock competence not found
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
 
         result = delete_skill(consultant_competence_id)
 
@@ -619,9 +595,7 @@ class TestConsultantSkills(BaseUITest):
     @patch("app.pages_modules.consultant_skills.st.columns")
     @patch("app.pages_modules.consultant_skills.st.write")
     @patch("app.pages_modules.consultant_skills.get_database_session")
-    def test_show_skills_evolution_with_data(
-        self, mock_session, mock_write, mock_cols, mock_md
-    ):
+    def test_show_skills_evolution_with_data(self, mock_session, mock_write, mock_cols, mock_md):
         """Test show_skills_evolution avec données"""
         consultant_id = 1
 
@@ -664,9 +638,7 @@ class TestConsultantSkills(BaseUITest):
     @patch("app.pages_modules.consultant_skills.st.info")
     @patch("app.pages_modules.consultant_skills.st.markdown")
     @patch("app.pages_modules.consultant_skills.get_database_session")
-    def test_show_skills_evolution_empty(
-        self, mock_session, mock_md, mock_info, mock_error
-    ):
+    def test_show_skills_evolution_empty(self, mock_session, mock_md, mock_info, mock_error):
         """Test show_skills_evolution avec aucune donnée"""
         consultant_id = 1
 
@@ -706,47 +678,33 @@ class TestConsultantSkills(BaseUITest):
 
         show_skills_evolution(consultant_id)
 
-        mock_error.assert_called_with(
-            "❌ Erreur lors de l'analyse de l'évolution: Database error"
-        )
+        mock_error.assert_called_with("❌ Erreur lors de l'analyse de l'évolution: Database error")
 
     def test_comprehensive_error_handling(self):
         """Test gestion d'erreurs complète pour toutes les fonctions"""
         # Test add_skill_to_consultant with invalid data
-        with patch(
-            "app.pages_modules.consultant_skills.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultant_skills.get_database_session") as mock_session:
             mock_session_instance = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_session_instance
-            mock_session_instance.query.return_value.filter.return_value.first.side_effect = Exception(
-                "DB Error"
-            )
+            mock_session_instance.query.return_value.filter.return_value.first.side_effect = Exception("DB Error")
 
             result = add_skill_to_consultant(1, {"competence_id": 1})
             assert result is False
 
         # Test update_consultant_skill with invalid data
-        with patch(
-            "app.pages_modules.consultant_skills.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultant_skills.get_database_session") as mock_session:
             mock_session_instance = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_session_instance
-            mock_session_instance.query.return_value.filter.return_value.first.side_effect = Exception(
-                "DB Error"
-            )
+            mock_session_instance.query.return_value.filter.return_value.first.side_effect = Exception("DB Error")
 
             result = update_consultant_skill(1, {"niveau": 3})
             assert result is False
 
         # Test delete_skill with invalid data
-        with patch(
-            "app.pages_modules.consultant_skills.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultant_skills.get_database_session") as mock_session:
             mock_session_instance = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_session_instance
-            mock_session_instance.query.return_value.filter.return_value.first.side_effect = Exception(
-                "DB Error"
-            )
+            mock_session_instance.query.return_value.filter.return_value.first.side_effect = Exception("DB Error")
 
             result = delete_skill(1)
             assert result is False
@@ -839,9 +797,9 @@ class TestConsultantSkills(BaseUITest):
 
         mock_button.return_value = False  # No button clicks
 
-        with patch(
-            "app.pages_modules.consultant_skills.st.session_state"
-        ) as mock_state, patch("pandas.DataFrame") as mock_df:
+        with patch("app.pages_modules.consultant_skills.st.session_state") as mock_state, patch(
+            "pandas.DataFrame"
+        ) as mock_df:
             mock_df_instance = MagicMock()
             mock_df.return_value = mock_df_instance
             mock_df_instance.iterrows.return_value = []
@@ -859,33 +817,25 @@ class TestConsultantSkills(BaseUITest):
     @patch("app.pages_modules.consultant_skills.st.error")
     @patch("app.pages_modules.consultant_skills.st.code")
     @patch("app.pages_modules.consultant_skills.get_database_session")
-    def test_show_consultant_skills_database_error(
-        self, mock_session, mock_code, mock_error
-    ):
+    def test_show_consultant_skills_database_error(self, mock_session, mock_code, mock_error):
         """Test show_consultant_skills avec erreur de base de données"""
         # Mock consultant
         mock_consultant = Mock()
         mock_consultant.id = 1
 
         # Mock database session that raises exception
-        mock_session.return_value.__enter__.side_effect = Exception(
-            "Database connection failed"
-        )
+        mock_session.return_value.__enter__.side_effect = Exception("Database connection failed")
 
         show_consultant_skills(mock_consultant)
 
         # Should display error
-        mock_error.assert_called_with(
-            "❌ Erreur lors de l'affichage des compétences: Database connection failed"
-        )
+        mock_error.assert_called_with("❌ Erreur lors de l'affichage des compétences: Database connection failed")
         mock_code.assert_called_with("Database connection failed")
 
     @patch("app.pages_modules.consultant_skills.imports_ok", True)
     @patch("app.pages_modules.consultant_skills.st.session_state")
     @patch("app.pages_modules.consultant_skills.get_database_session")
-    def test_show_consultant_skills_with_session_state_forms(
-        self, mock_session, mock_state
-    ):
+    def test_show_consultant_skills_with_session_state_forms(self, mock_session, mock_state):
         """Test show_consultant_skills avec formulaires activés via session state"""
         # Mock consultant
         mock_consultant = Mock()
@@ -894,17 +844,13 @@ class TestConsultantSkills(BaseUITest):
         # Mock database session
         mock_session_instance = MagicMock()
         mock_session.return_value.__enter__.return_value = mock_session_instance
-        mock_session_instance.query.return_value.join.return_value.filter.return_value.all.return_value = (
-            []
-        )
+        mock_session_instance.query.return_value.join.return_value.filter.return_value.all.return_value = []
 
         # Mock session state with forms active
         mock_state.add_skill = 1
         mock_state.edit_skill = None
 
-        with patch(
-            "app.pages_modules.consultant_skills.show_add_skill_form"
-        ) as mock_add_form:
+        with patch("app.pages_modules.consultant_skills.show_add_skill_form") as mock_add_form:
             show_consultant_skills(mock_consultant)
             mock_add_form.assert_called_with(1)
 
@@ -912,9 +858,7 @@ class TestConsultantSkills(BaseUITest):
         """Test show_consultant_skills avec différentes catégories de compétences"""
         # This test verifies that skills are properly grouped by category
         with patch("app.pages_modules.consultant_skills.imports_ok", True):
-            with patch(
-                "app.pages_modules.consultant_skills.get_database_session"
-            ) as mock_session:
+            with patch("app.pages_modules.consultant_skills.get_database_session") as mock_session:
                 # Mock consultant
                 mock_consultant = Mock()
                 mock_consultant.id = 1
@@ -964,9 +908,7 @@ class TestConsultantSkills(BaseUITest):
                             return_value=False,
                         ):
                             with patch("app.pages_modules.consultant_skills.st.metric"):
-                                with patch(
-                                    "app.pages_modules.consultant_skills.st.write"
-                                ):
+                                with patch("app.pages_modules.consultant_skills.st.write"):
                                     show_consultant_skills(mock_consultant)
 
                 # Test passed if no exceptions were raised
@@ -978,9 +920,7 @@ class TestConsultantSkills(BaseUITest):
 
         # Test that the function creates proper DataFrame structure
         with patch("app.pages_modules.consultant_skills.imports_ok", True):
-            with patch(
-                "app.pages_modules.consultant_skills.get_database_session"
-            ) as mock_session:
+            with patch("app.pages_modules.consultant_skills.get_database_session") as mock_session:
                 # Mock consultant
                 mock_consultant = Mock()
                 mock_consultant.id = 1
@@ -1010,18 +950,14 @@ class TestConsultantSkills(BaseUITest):
                             return_value=False,
                         ):
                             with patch("app.pages_modules.consultant_skills.st.metric"):
-                                with patch(
-                                    "app.pages_modules.consultant_skills.st.write"
-                                ):
+                                with patch("app.pages_modules.consultant_skills.st.write"):
                                     # Mock pandas DataFrame - patch at the function level
                                     with patch("pandas.DataFrame") as mock_df:
                                         show_consultant_skills(mock_consultant)
 
                                         # Verify DataFrame was created with correct structure
                                         mock_df.assert_called_once()
-                                        call_args = mock_df.call_args[0][
-                                            0
-                                        ]  # Get the data argument
+                                        call_args = mock_df.call_args[0][0]  # Get the data argument
                                         assert len(call_args) == 1  # One skill
                                         skill_data = call_args[0]
                                         expected_columns = [

@@ -113,7 +113,9 @@ class TestDocumentAnalyzer:
 
     def test_extract_functional_skills(self):
         """Test extraction des compétences fonctionnelles"""
-        text = "Management d'équipe de 5 développeurs. Gestion de projet Agile avec Scrum. Formation des équipes junior."
+        text = (
+            "Management d'équipe de 5 développeurs. Gestion de projet Agile avec Scrum. Formation des équipes junior."
+        )
 
         skills = DocumentAnalyzer._extract_functional_skills(text)
 
@@ -141,10 +143,7 @@ class TestDocumentAnalyzer:
     def test_clean_client_name(self):
         """Test nettoyage du nom de client"""
         assert DocumentAnalyzer._clean_client_name("BNP PARIBAS") == "Bnp Paribas"
-        assert (
-            DocumentAnalyzer._clean_client_name("société générale!")
-            == "Société Générale"
-        )
+        assert DocumentAnalyzer._clean_client_name("société générale!") == "Société Générale"
         assert DocumentAnalyzer._clean_client_name("ABC") == "Abc"
 
     def test_date_sort_key(self):
@@ -158,9 +157,7 @@ class TestDocumentAnalyzer:
     @patch("app.services.document_analyzer.DocumentAnalyzer._extract_technical_skills")
     @patch("app.services.document_analyzer.DocumentAnalyzer._extract_functional_skills")
     @patch("app.services.document_analyzer.DocumentAnalyzer._extract_general_info")
-    def test_analyze_cv_content(
-        self, mock_general_info, mock_functional, mock_technical, mock_missions
-    ):
+    def test_analyze_cv_content(self, mock_general_info, mock_functional, mock_technical, mock_missions):
         """Test analyse complète du contenu CV"""
         # Mocks
         mock_missions.return_value = [

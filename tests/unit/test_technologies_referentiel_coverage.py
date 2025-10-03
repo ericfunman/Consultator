@@ -231,9 +231,7 @@ class TestTechnologiesReferentiel:
             assert "TestLang" in TECHNOLOGIES_REFERENTIEL[category]
 
             # Vérifier que la liste est triée
-            assert TECHNOLOGIES_REFERENTIEL[category] == sorted(
-                TECHNOLOGIES_REFERENTIEL[category]
-            )
+            assert TECHNOLOGIES_REFERENTIEL[category] == sorted(TECHNOLOGIES_REFERENTIEL[category])
 
         finally:
             # Restaurer état original
@@ -296,9 +294,7 @@ class TestTechnologiesReferentiel:
 
             # Vérifier que toutes les technologies sont des strings non vides
             for tech in techs:
-                assert isinstance(
-                    tech, str
-                ), f"Technology '{tech}' in '{category}' is not a string"
+                assert isinstance(tech, str), f"Technology '{tech}' in '{category}' is not a string"
                 assert tech.strip() != "", f"Empty technology in '{category}'"
 
     def test_popular_technologies_subset(self):
@@ -306,9 +302,7 @@ class TestTechnologiesReferentiel:
         all_techs = get_all_technologies()
 
         for popular_tech in TECHNOLOGIES_POPULAIRES:
-            assert (
-                popular_tech in all_techs
-            ), f"Popular technology '{popular_tech}' not found in referentiel"
+            assert popular_tech in all_techs, f"Popular technology '{popular_tech}' not found in referentiel"
 
     def test_comprehensive_category_coverage(self):
         """Test couverture complète des catégories importantes"""
@@ -322,9 +316,7 @@ class TestTechnologiesReferentiel:
 
         for category in essential_categories:
             assert category in TECHNOLOGIES_REFERENTIEL
-            assert (
-                len(TECHNOLOGIES_REFERENTIEL[category]) >= 10
-            )  # Au moins 10 technologies
+            assert len(TECHNOLOGIES_REFERENTIEL[category]) >= 10  # Au moins 10 technologies
 
     def test_search_technologies_edge_cases(self):
         """Test cas limites de la recherche"""
@@ -394,9 +386,7 @@ class TestTechnologiesReferentiel:
     def test_specific_technology_categories_content(self):
         """Test contenu spécifique de certaines catégories"""
         # Test catégorie IA & Data Science
-        ai_category = TECHNOLOGIES_REFERENTIEL[
-            "Intelligence Artificielle & Data Science"
-        ]
+        ai_category = TECHNOLOGIES_REFERENTIEL["Intelligence Artificielle & Data Science"]
         expected_ai_techs = ["TensorFlow", "PyTorch", "Scikit-learn", "Pandas", "NumPy"]
         for tech in expected_ai_techs:
             assert tech in ai_category

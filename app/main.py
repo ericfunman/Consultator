@@ -108,9 +108,7 @@ def main():
     """Fonction principale de l'application"""
     try:
         # Header principal
-        st.markdown(
-            '<div class="main-header">🏢 Consultator</div>', unsafe_allow_html=True
-        )
+        st.markdown('<div class="main-header">🏢 Consultator</div>', unsafe_allow_html=True)
 
         # Navigation
         current_page = show_navigation()

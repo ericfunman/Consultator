@@ -72,9 +72,7 @@ def show_consultant_documents(consultant):
                     type="primary",
                     key=f"save_doc_{consultant.id}",
                 ):
-                    save_consultant_document(
-                        uploaded_file, consultant, document_type, description
-                    )
+                    save_consultant_document(uploaded_file, consultant, document_type, description)
 
             with col2:
                 if st.button(" Annuler", key=f"cancel_doc_{consultant.id}"):
@@ -169,9 +167,7 @@ def _render_document_actions(file_path, doc_type):
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if doc_type == "CV" and st.button(
-            "🔍 Analyser", key=f"analyze_existing_{file_path.name}"
-        ):
+        if doc_type == "CV" and st.button("🔍 Analyser", key=f"analyze_existing_{file_path.name}"):
             st.info("🔍 Analyse de CV en cours de developpement...")
 
     with col2:
@@ -199,9 +195,7 @@ def show_existing_documents(consultant):
         st.subheader(f"📁 Documents existants ({len(matching_files)})")
 
         # Afficher chaque document dans un expander
-        for file_path in sorted(
-            matching_files, key=lambda x: x.stat().st_mtime, reverse=True
-        ):
+        for file_path in sorted(matching_files, key=lambda x: x.stat().st_mtime, reverse=True):
             file_stats = file_path.stat()
             doc_type = _extract_document_type(file_path.name)
 

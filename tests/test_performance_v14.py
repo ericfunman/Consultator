@@ -38,7 +38,7 @@ class TestPerformance:
         start_time = time.time()
         result = db_operation()
         end_time = time.time()
-        
+
         duration = end_time - start_time
         assert result is True
         assert duration < 1.0  # Moins d'une seconde
@@ -56,7 +56,7 @@ class TestPerformance:
         start_time = time.time()
         result = process_data()
         end_time = time.time()
-        
+
         duration = end_time - start_time
         assert result == 9900  # Somme attendue
         assert duration < 0.1  # Moins de 100ms
@@ -75,7 +75,7 @@ class TestPerformance:
         start_time = time.time()
         result = render_ui()
         end_time = time.time()
-        
+
         duration = end_time - start_time
         assert result == 50
         assert duration < 0.1  # Moins de 100ms
@@ -94,7 +94,7 @@ class TestPerformance:
         start_time = time.time()
         result = memory_operation()
         end_time = time.time()
-        
+
         duration = end_time - start_time
         assert result == 499500  # Somme de 0 à 999 = 499500
         assert duration < 0.1  # Moins de 100ms
@@ -111,7 +111,7 @@ class TestPerformance:
         start_time = time.time()
         result = api_call()
         end_time = time.time()
-        
+
         duration = end_time - start_time
         assert result["status"] == "success"
         assert duration < 1.0  # Moins d'une seconde

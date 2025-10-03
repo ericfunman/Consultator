@@ -17,17 +17,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import create_base_practices: {e}", allow_module_level=True)
 
 
-
-
 def test_create_base_practices():
     """Test automatiquement généré pour create_base_practices"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = create_base_practices(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -39,16 +37,15 @@ def test_create_base_practices_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_create_base_practices_with_mocks(mock_request):
     """Test de create_base_practices avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

@@ -25,7 +25,7 @@ class TestConsultantCV:
                 "description": "Développement web",
             },
             {
-                "titre": "Mission 2", 
+                "titre": "Mission 2",
                 "client": "Client B",
                 "periode": "2023-07-01 à 2023-12-31",
                 "technologies": "Java, Spring",
@@ -40,7 +40,7 @@ class TestConsultantCV:
     def test_show_cv_skills_with_data(self):
         """Test affichage compétences CV avec données - simplifié"""
         analysis = {"competences": ["Python", "Java", "Agile", "Scrum", "Management"]}
-        
+
         # Test basique - vérifier la structure
         assert "competences" in analysis
         assert len(analysis["competences"]) == 5
@@ -54,7 +54,7 @@ class TestConsultantCV:
             "contact": {"email": "test@example.com"},
             "resume": "Test resume",
         }
-        
+
         # Test basique - vérifier la structure
         assert len(analysis["missions"]) == 2
         assert len(analysis["competences"]) == 2
@@ -64,7 +64,7 @@ class TestConsultantCV:
     def test_show_cv_actions(self):
         """Test affichage actions CV - simplifié"""
         analysis = {"missions": [], "competences": []}
-        
+
         # Test basique - vérifier la structure
         assert "missions" in analysis
         assert "competences" in analysis

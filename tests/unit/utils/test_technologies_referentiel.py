@@ -191,9 +191,7 @@ class TestTechnologiesReferentiel:
         all_techs = get_all_technologies()
 
         for popular_tech in TECHNOLOGIES_POPULAIRES:
-            assert (
-                popular_tech in all_techs
-            ), f"Technologie populaire '{popular_tech}' manquante du référentiel"
+            assert popular_tech in all_techs, f"Technologie populaire '{popular_tech}' manquante du référentiel"
 
     def test_search_technologies_special_characters(self):
         """Test de recherche avec caractères spéciaux"""

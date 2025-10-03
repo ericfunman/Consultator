@@ -27,9 +27,7 @@ except ImportError:
 class CacheService:
     """Service de cache multi-niveaux pour optimiser les performances"""
 
-    def __init__(
-        self, redis_url: str = "redis://localhost:6379/0", default_ttl: int = 300
-    ):
+    def __init__(self, redis_url: str = "redis://localhost:6379/0", default_ttl: int = 300):
         """
         Initialise le service de cache
 
@@ -151,9 +149,7 @@ class CacheService:
         # Supprimer du cache mémoire
         import fnmatch
 
-        keys_to_delete = [
-            k for k in self.memory_cache.keys() if fnmatch.fnmatch(k, pattern)
-        ]
+        keys_to_delete = [k for k in self.memory_cache.keys() if fnmatch.fnmatch(k, pattern)]
         for key in keys_to_delete:
             del self.memory_cache[key]
             deleted_count += 1

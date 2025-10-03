@@ -14,8 +14,9 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test des imports de base du module mission_analysis"""
         try:
             import app.pages_modules.mission_analysis as ma_module
+
             # Si l'import réussit, on vérifie qu'il a des attributs
-            self.assertTrue(hasattr(ma_module, '__name__'))
+            self.assertTrue(hasattr(ma_module, "__name__"))
             self.assertIsNotNone(ma_module.__name__)
         except ImportError:
             # Si le module n'existe pas, on teste une constante générique
@@ -25,7 +26,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour analytics.py"""
         try:
             import app.pages.analytics as analytics_module
-            self.assertTrue(hasattr(analytics_module, '__name__'))
+
+            self.assertTrue(hasattr(analytics_module, "__name__"))
             self.assertIsNotNone(analytics_module.__name__)
         except ImportError:
             self.assertGreater(len("analytics_test"), 5)
@@ -34,7 +36,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour dashboard.py"""
         try:
             import app.pages.dashboard as dashboard_module
-            self.assertTrue(hasattr(dashboard_module, '__name__'))
+
+            self.assertTrue(hasattr(dashboard_module, "__name__"))
             self.assertIsNotNone(dashboard_module.__name__)
         except ImportError:
             self.assertGreater(len("dashboard_test"), 6)
@@ -43,7 +46,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour practices.py"""
         try:
             import app.pages.practices as practices_module
-            self.assertTrue(hasattr(practices_module, '__name__'))
+
+            self.assertTrue(hasattr(practices_module, "__name__"))
             self.assertEqual(type(practices_module.__name__), str)
         except ImportError:
             self.assertEqual(len("practices"), 9)
@@ -52,7 +56,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour utils/skill_categories.py"""
         try:
             import app.utils.skill_categories as skill_cat_module
-            self.assertTrue(hasattr(skill_cat_module, '__name__'))
+
+            self.assertTrue(hasattr(skill_cat_module, "__name__"))
             self.assertEqual(type(skill_cat_module.__name__), str)
         except ImportError:
             self.assertEqual(len("skill_categories"), 15)
@@ -61,7 +66,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour utils/excel_helper.py"""
         try:
             import app.utils.excel_helper as excel_module
-            self.assertTrue(hasattr(excel_module, '__name__'))
+
+            self.assertTrue(hasattr(excel_module, "__name__"))
             self.assertEqual(type(excel_module.__name__), str)
         except ImportError:
             self.assertEqual(len("excel_helper"), 12)
@@ -70,9 +76,10 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour services/consultant_service.py"""
         try:
             import app.services.consultant_service as cs_module
-            self.assertTrue(hasattr(cs_module, '__name__'))
+
+            self.assertTrue(hasattr(cs_module, "__name__"))
             # Test basique d'import de classe
-            if hasattr(cs_module, 'ConsultantService'):
+            if hasattr(cs_module, "ConsultantService"):
                 self.assertEqual(type(cs_module.ConsultantService), type)
         except ImportError:
             self.assertEqual(len("consultant_service"), 18)
@@ -81,7 +88,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour services/business_manager_service.py"""
         try:
             import app.services.business_manager_service as bms_module
-            self.assertTrue(hasattr(bms_module, '__name__'))
+
+            self.assertTrue(hasattr(bms_module, "__name__"))
             self.assertEqual(type(bms_module.__name__), str)
         except ImportError:
             self.assertEqual(len("business_manager_service"), 24)
@@ -90,12 +98,13 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour database/models.py"""
         try:
             import app.database.models as models_module
-            self.assertTrue(hasattr(models_module, '__name__'))
+
+            self.assertTrue(hasattr(models_module, "__name__"))
             # Test de quelques modèles importants
-            if hasattr(models_module, 'Consultant'):
-                self.assertTrue(hasattr(models_module.Consultant, '__tablename__'))
-            if hasattr(models_module, 'Mission'):
-                self.assertTrue(hasattr(models_module.Mission, '__tablename__'))
+            if hasattr(models_module, "Consultant"):
+                self.assertTrue(hasattr(models_module.Consultant, "__tablename__"))
+            if hasattr(models_module, "Mission"):
+                self.assertTrue(hasattr(models_module.Mission, "__tablename__"))
         except ImportError:
             self.assertEqual(len("models"), 6)
 
@@ -103,7 +112,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour database/database.py"""
         try:
             import app.database.database as db_module
-            self.assertTrue(hasattr(db_module, '__name__'))
+
+            self.assertTrue(hasattr(db_module, "__name__"))
             self.assertEqual(type(db_module.__name__), str)
         except ImportError:
             self.assertEqual(len("database"), 8)
@@ -112,7 +122,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour app/main.py"""
         try:
             import app.main as main_module
-            self.assertTrue(hasattr(main_module, '__name__'))
+
+            self.assertTrue(hasattr(main_module, "__name__"))
             self.assertEqual(type(main_module.__name__), str)
         except ImportError:
             self.assertEqual(len("main"), 4)
@@ -121,7 +132,8 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         """Test pour config/settings.py"""
         try:
             import config.settings as settings_module
-            self.assertTrue(hasattr(settings_module, '__name__'))
+
+            self.assertTrue(hasattr(settings_module, "__name__"))
             self.assertEqual(type(settings_module.__name__), str)
         except ImportError:
             self.assertEqual(len("settings"), 8)
@@ -156,9 +168,9 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
     def test_generic_coverage_boost_5(self):
         """Test générique 5 pour augmenter le coverage"""
         # Test avec des dictionnaires
-        test_dict = {'a': 1, 'b': 2, 'c': 3}
+        test_dict = {"a": 1, "b": 2, "c": 3}
         self.assertEqual(len(test_dict), 3)
-        self.assertIn('a', test_dict)
+        self.assertIn("a", test_dict)
 
     def test_generic_coverage_boost_6(self):
         """Test générique 6 pour augmenter le coverage"""
@@ -182,5 +194,5 @@ class TestMissionAnalysisChirurgical(unittest.TestCase):
         self.assertEqual(square(5), 25)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

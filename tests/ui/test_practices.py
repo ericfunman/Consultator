@@ -143,9 +143,7 @@ class TestShowPracticeOverview(BaseUITest):
 
         # Mock UI components
         mock_st.subheader = MagicMock()
-        mock_st.columns = MagicMock(
-            return_value=[MagicMock(), MagicMock(), MagicMock()]
-        )
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
         mock_st.metric = MagicMock()
         mock_st.expander = MagicMock()
         mock_st.write = MagicMock()
@@ -181,9 +179,7 @@ class TestShowConsultantsByPractice(BaseUITest):
     @patch("app.pages_modules.practices.st")
     @patch("app.services.consultant_service.ConsultantService")
     @patch("app.pages_modules.practices.PracticeService")
-    def test_show_consultants_with_data(
-        self, mock_service, mock_consultant_service, mock_st
-    ):
+    def test_show_consultants_with_data(self, mock_service, mock_consultant_service, mock_st):
         """Test affichage consultants avec données"""
 
         # Create mock practice and consultant objects
@@ -221,9 +217,7 @@ class TestShowConsultantsByPractice(BaseUITest):
         )
         mock_st.write = MagicMock()
         mock_st.dataframe = MagicMock()
-        mock_st.columns = MagicMock(
-            return_value=[MockContextManager(), MockContextManager()]
-        )
+        mock_st.columns = MagicMock(return_value=[MockContextManager(), MockContextManager()])
         mock_st.button = MagicMock(return_value=False)
         mock_st.info = MagicMock()
         mock_st.warning = MagicMock()
@@ -292,9 +286,7 @@ class TestShowPracticeManagement(BaseUITest):
         mock_st.text_area = MagicMock(return_value="")
         mock_st.form_submit_button = MagicMock(return_value=False)
         mock_st.write = MagicMock()
-        mock_st.columns = MagicMock(
-            return_value=[MagicMock(), MagicMock(), MagicMock()]
-        )
+        mock_st.columns = MagicMock(return_value=[MagicMock(), MagicMock(), MagicMock()])
         mock_st.button = MagicMock(return_value=False)
 
         # Execute
@@ -334,9 +326,7 @@ class TestShowPracticeManagement(BaseUITest):
 
     @patch("app.pages_modules.practices.st")
     @patch("app.pages_modules.practices.PracticeService")
-    def test_show_practice_management_create_validation_error(
-        self, mock_service, mock_st
-    ):
+    def test_show_practice_management_create_validation_error(self, mock_service, mock_st):
         """Test validation formulaire de création"""
         mock_service.get_all_practices.return_value = []
 

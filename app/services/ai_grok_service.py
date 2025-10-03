@@ -161,9 +161,7 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         except Exception as e:
             raise ConnectionError(f"Erreur API Grok: {str(e)}") from e
 
-    def _parse_and_validate_response(
-        self, api_response: Dict[str, Any], original_text: str
-    ) -> Dict[str, Any]:
+    def _parse_and_validate_response(self, api_response: Dict[str, Any], original_text: str) -> Dict[str, Any]:
         """Parse et valide la réponse de Grok"""
 
         try:
@@ -249,9 +247,7 @@ def show_grok_config_interface():
 
     if api_key:
         # Clé configurée
-        masked_key = (
-            api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
-        )
+        masked_key = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
         st.success(f"✅ Clé API configurée: `{masked_key}`")
 
         # Tester la connexion
@@ -293,9 +289,7 @@ def show_grok_config_interface():
             try:
                 service = GrokAIService(temp_api_key)
                 service._call_grok_api("Bonjour, réponds simplement 'OK'")
-                st.success(
-                    "✅ Clé API valide ! Configurez-la dans vos variables d'environnement."
-                )
+                st.success("✅ Clé API valide ! Configurez-la dans vos variables d'environnement.")
             except Exception as e:
                 st.error(f"❌ Clé API invalide: {e}")
 

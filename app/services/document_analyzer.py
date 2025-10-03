@@ -309,13 +309,9 @@ class DocumentAnalyzer:
                     # Extraire aussi les tableaux
                     tables = page.extract_tables()
                     for table in tables:
-                        table_text = "\n".join(
-                            ["\t".join([cell or "" for cell in row]) for row in table]
-                        )
+                        table_text = "\n".join(["\t".join([cell or "" for cell in row]) for row in table])
                         if table_text.strip():
-                            text_parts.append(
-                                f"--- TABLEAU PAGE {page_num} ---\n{table_text}"
-                            )
+                            text_parts.append(f"--- TABLEAU PAGE {page_num} ---\n{table_text}")
 
                 except (ValueError, TypeError, AttributeError, KeyError) as e:
                     st.warning(f"⚠️ Erreur page {page_num}: {e}")
@@ -358,9 +354,7 @@ class DocumentAnalyzer:
             text_parts.extend(DocumentAnalyzer._extract_docx_tables(doc))
 
             result = "\n\n".join(text_parts)
-            st.success(
-                f"✅ {len(text_parts)} éléments extraits ({len(result)} caractères)"
-            )
+            st.success(f"✅ {len(text_parts)} éléments extraits ({len(result)} caractères)")
             return result
 
         except (OSError, ValueError, TypeError, AttributeError) as e:
@@ -397,9 +391,7 @@ class DocumentAnalyzer:
                 table_text.append("\t".join(row_text))
 
             if table_text:
-                text_parts.append(
-                    f"--- TABLEAU {table_num} ---\n" + "\n".join(table_text)
-                )
+                text_parts.append(f"--- TABLEAU {table_num} ---\n" + "\n".join(table_text))
 
         return text_parts
 
@@ -417,14 +409,10 @@ class DocumentAnalyzer:
                 slide_text = DocumentAnalyzer._extract_slide_content(slide)
 
                 if slide_text:
-                    text_parts.append(
-                        f"--- SLIDE {slide_num} ---\n" + "\n".join(slide_text)
-                    )
+                    text_parts.append(f"--- SLIDE {slide_num} ---\n" + "\n".join(slide_text))
 
             result = "\n\n".join(text_parts)
-            st.success(
-                f"✅ {len(text_parts)} slides traités ({len(result)} caractères)"
-            )
+            st.success(f"✅ {len(text_parts)} slides traités ({len(result)} caractères)")
             return result
 
         except (OSError, ValueError, TypeError, AttributeError) as e:
@@ -495,14 +483,10 @@ class DocumentAnalyzer:
             analysis["langages_techniques"] = list(all_skills)[:25]  # Top 25
 
             # Extraction des compétences fonctionnelles
-            analysis["competences_fonctionnelles"] = (
-                DocumentAnalyzer._extract_functional_skills(text)
-            )
+            analysis["competences_fonctionnelles"] = DocumentAnalyzer._extract_functional_skills(text)
 
             # Informations générales
-            analysis["informations_generales"] = DocumentAnalyzer._extract_general_info(
-                text
-            )
+            analysis["informations_generales"] = DocumentAnalyzer._extract_general_info(text)
 
             st.success(
                 f"✅ Analyse terminée: {len(missions)} missions, {len(analysis['langages_techniques'])} technologies"
@@ -526,9 +510,7 @@ class DocumentAnalyzer:
         experience_text = DocumentAnalyzer._extract_experience_section(prepared_text)
 
         # Extraction multi-méthodes
-        missions = DocumentAnalyzer._apply_multiple_extraction_methods(
-            experience_text, prepared_text
-        )
+        missions = DocumentAnalyzer._apply_multiple_extraction_methods(experience_text, prepared_text)
 
         # Nettoyage et tri final
         final_missions = DocumentAnalyzer._process_final_missions(missions)
@@ -571,9 +553,7 @@ class DocumentAnalyzer:
             match = re.search(keyword, text_lower)
             if match:
                 experience_start = match.end()
-                st.success(
-                    f"✅ Section '{keyword}' trouvée à la position {experience_start}"
-                )
+                st.success(f"✅ Section '{keyword}' trouvée à la position {experience_start}")
                 break
 
         experience_text = text[experience_start:] if experience_start > 0 else text
@@ -581,9 +561,7 @@ class DocumentAnalyzer:
         return experience_text
 
     @staticmethod
-    def _apply_multiple_extraction_methods(
-        experience_text: str, all_text: str
-    ) -> List[Dict]:
+    def _apply_multiple_extraction_methods(experience_text: str, all_text: str) -> List[Dict]:
         """Applique toutes les méthodes d'extraction de missions"""
         missions = []
 
@@ -594,25 +572,17 @@ class DocumentAnalyzer:
         missions.extend(DocumentAnalyzer._extract_missions_by_patterns(experience_text))
 
         # Méthode 3: Recherche par clients connus
-        missions.extend(
-            DocumentAnalyzer._extract_missions_by_known_clients(experience_text)
-        )
+        missions.extend(DocumentAnalyzer._extract_missions_by_known_clients(experience_text))
 
         # Méthode 4: Recherche format spécialisé "Entreprise\nDate\nPoste"
-        missions.extend(
-            DocumentAnalyzer._extract_missions_company_date_role_format(all_text)
-        )
+        missions.extend(DocumentAnalyzer._extract_missions_company_date_role_format(all_text))
 
         # Méthode 5: Extraction optimisée PowerPoint
-        missions_powerpoint = DocumentAnalyzer._extract_missions_powerpoint_optimized(
-            all_text
-        )
+        missions_powerpoint = DocumentAnalyzer._extract_missions_powerpoint_optimized(all_text)
         missions.extend(missions_powerpoint)
 
         # Méthode 6: Détection spécialisée Quanteam améliorée
-        missions_quanteam = DocumentAnalyzer._quanteam_specific_detection_improved(
-            all_text
-        )
+        missions_quanteam = DocumentAnalyzer._quanteam_specific_detection_improved(all_text)
         missions.extend(missions_quanteam)
 
         st.info(
@@ -629,16 +599,8 @@ class DocumentAnalyzer:
         unique_missions = DocumentAnalyzer._clean_and_deduplicate_missions(missions)
 
         # Séparer les missions PowerPoint optimisées des autres
-        powerpoint_missions = [
-            m
-            for m in unique_missions
-            if "powerpoint_optimized" in m.get("detection_source", "")
-        ]
-        other_missions = [
-            m
-            for m in unique_missions
-            if "powerpoint_optimized" not in m.get("detection_source", "")
-        ]
+        powerpoint_missions = [m for m in unique_missions if "powerpoint_optimized" in m.get("detection_source", "")]
+        other_missions = [m for m in unique_missions if "powerpoint_optimized" not in m.get("detection_source", "")]
 
         # Trier les missions PowerPoint par date (chronologique)
         sorted_powerpoint_missions = sorted(
@@ -673,16 +635,12 @@ class DocumentAnalyzer:
         blocks = re.split(r"\n\s*\n|\.\s*\n\s*\n|\.{2,}", text)
 
         # Filtrer les blocs significatifs (au moins 100 caractères)
-        significant_blocks = [
-            block.strip() for block in blocks if len(block.strip()) > 100
-        ]
+        significant_blocks = [block.strip() for block in blocks if len(block.strip()) > 100]
 
         st.info(f"📦 Analyse de {len(significant_blocks)} blocs significatifs")
 
         for i, block in enumerate(significant_blocks):
-            mission = DocumentAnalyzer._extract_mission_from_block(
-                block, block_num=i + 1
-            )
+            mission = DocumentAnalyzer._extract_mission_from_block(block, block_num=i + 1)
             if mission and mission.get("client") and len(mission["client"]) > 2:
                 missions.append(mission)
 
@@ -902,9 +860,7 @@ class DocumentAnalyzer:
         """Vérifie si les mots du client correspondent dans le bloc"""
         client_words = known_client.lower().split()
         if len(client_words) > 1:
-            pattern = (
-                r"\b" + r"\s+".join(re.escape(word) for word in client_words) + r"\b"
-            )
+            pattern = r"\b" + r"\s+".join(re.escape(word) for word in client_words) + r"\b"
             return bool(re.search(pattern, block, re.IGNORECASE))
         return False
 
@@ -1000,9 +956,7 @@ class DocumentAnalyzer:
         for sentence in sentences:
             sentence = sentence.strip()
             if 20 < len(sentence) < 500:
-                score = DocumentAnalyzer._score_sentence(
-                    sentence, mission_keywords, action_verbs
-                )
+                score = DocumentAnalyzer._score_sentence(sentence, mission_keywords, action_verbs)
                 if score > 0:
                     relevant_sentences.append((sentence, score))
 
@@ -1050,9 +1004,7 @@ class DocumentAnalyzer:
         ]
 
     @staticmethod
-    def _score_sentence(
-        sentence: str, mission_keywords: list, action_verbs: list
-    ) -> int:
+    def _score_sentence(sentence: str, mission_keywords: list, action_verbs: list) -> int:
         """Calcule le score d'une phrase pour la pertinence de mission"""
         sentence_lower = sentence.lower()
         score = 0
@@ -1136,11 +1088,8 @@ class DocumentAnalyzer:
                     else f"{end_year}-12-31"
                 ),
                 "client": DocumentAnalyzer._extract_client_from_text(description),
-                "resume": description.strip()[:800]
-                + ("..." if len(description) > 800 else ""),
-                "langages_techniques": DocumentAnalyzer._extract_technical_skills(
-                    description
-                ),
+                "resume": description.strip()[:800] + ("..." if len(description) > 800 else ""),
+                "langages_techniques": DocumentAnalyzer._extract_technical_skills(description),
             }
             if mission["client"]:
                 missions.append(mission)
@@ -1162,18 +1111,10 @@ class DocumentAnalyzer:
                 if dates:
                     mission = {
                         "date_debut": dates[0] if dates else "",
-                        "date_fin": (
-                            dates[1]
-                            if len(dates) > 1
-                            else DocumentAnalyzer.STATUS_EN_COURS
-                        ),
+                        "date_fin": (dates[1] if len(dates) > 1 else DocumentAnalyzer.STATUS_EN_COURS),
                         "client": client,
-                        "resume": DocumentAnalyzer._extract_long_mission_summary(
-                            context
-                        ),
-                        "langages_techniques": DocumentAnalyzer._extract_technical_skills(
-                            context
-                        ),
+                        "resume": DocumentAnalyzer._extract_long_mission_summary(context),
+                        "langages_techniques": DocumentAnalyzer._extract_technical_skills(context),
                     }
                     missions.append(mission)
 
@@ -1332,9 +1273,7 @@ class DocumentAnalyzer:
         info = {}
 
         # Recherche email
-        email_match = re.search(
-            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", text
-        )
+        email_match = re.search(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", text)
         if email_match:
             info["email"] = email_match.group()
 
@@ -1361,26 +1300,14 @@ class DocumentAnalyzer:
         """Génère un aperçu textuel de l'analyse pour la prévisualisation"""
         preview = []
 
-        preview.append(
-            f"📊 **Analyse du CV de {analysis_data.get('consultant', 'Consultant')}**\n"
-        )
+        preview.append(f"📊 **Analyse du CV de {analysis_data.get('consultant', 'Consultant')}**\n")
 
         # Ajouter chaque section
-        DocumentAnalyzer._add_missions_section(
-            preview, analysis_data.get("missions", [])
-        )
-        DocumentAnalyzer._add_technical_skills_section(
-            preview, analysis_data.get("langages_techniques", [])
-        )
-        DocumentAnalyzer._add_functional_skills_section(
-            preview, analysis_data.get("competences_fonctionnelles", [])
-        )
-        DocumentAnalyzer._add_general_info_section(
-            preview, analysis_data.get("informations_generales", {})
-        )
-        DocumentAnalyzer._add_text_preview_section(
-            preview, analysis_data.get("texte_brut", "")
-        )
+        DocumentAnalyzer._add_missions_section(preview, analysis_data.get("missions", []))
+        DocumentAnalyzer._add_technical_skills_section(preview, analysis_data.get("langages_techniques", []))
+        DocumentAnalyzer._add_functional_skills_section(preview, analysis_data.get("competences_fonctionnelles", []))
+        DocumentAnalyzer._add_general_info_section(preview, analysis_data.get("informations_generales", {}))
+        DocumentAnalyzer._add_text_preview_section(preview, analysis_data.get("texte_brut", ""))
 
         return "\n".join(preview)
 
@@ -1398,19 +1325,13 @@ class DocumentAnalyzer:
     @staticmethod
     def _add_mission_details(preview: list, index: int, mission: dict) -> None:
         """Ajoute les détails d'une mission"""
-        role_info = (
-            f" - {mission.get('role', 'Rôle non défini')}"
-            if mission.get("role")
-            else ""
-        )
+        role_info = f" - {mission.get('role', 'Rôle non défini')}" if mission.get("role") else ""
         preview.append(
             f"  {index}. **{mission['client']}**{role_info} ({mission['date_debut']} → {mission['date_fin']})"
         )
         preview.append(f"     {mission['resume'][:150]}...")
         if mission.get("langages_techniques"):
-            preview.append(
-                f"     💻 Technologies: {', '.join(mission['langages_techniques'][:5])}"
-            )
+            preview.append(f"     💻 Technologies: {', '.join(mission['langages_techniques'][:5])}")
 
     @staticmethod
     def _add_technical_skills_section(preview: list, langages: list) -> None:
@@ -1442,12 +1363,8 @@ class DocumentAnalyzer:
     def _add_text_preview_section(preview: list, texte_brut: str) -> None:
         """Ajoute la section aperçu du texte brut"""
         if texte_brut:
-            preview.append(
-                f"\n📄 **Aperçu du texte extrait ({len(texte_brut)} caractères):**"
-            )
-            preview.append(
-                f"```\n{texte_brut[:300]}{'...' if len(texte_brut) > 300 else ''}\n```"
-            )
+            preview.append(f"\n📄 **Aperçu du texte extrait ({len(texte_brut)} caractères):**")
+            preview.append(f"```\n{texte_brut[:300]}{'...' if len(texte_brut) > 300 else ''}\n```")
 
     @staticmethod
     def test_analysis(text_sample: str = None) -> Dict:
@@ -1502,15 +1419,11 @@ class DocumentAnalyzer:
 
         # Traitement spécial pour Quanteam
         if line1.lower() == "quanteam":
-            return DocumentAnalyzer._extract_quanteam_mission(
-                lines, index, line2, line3
-            )
+            return DocumentAnalyzer._extract_quanteam_mission(lines, index, line2, line3)
 
         # Autres entreprises
         if DocumentAnalyzer._is_known_company(line1):
-            return DocumentAnalyzer._extract_standard_mission(
-                lines, index, line1, line2, line3
-            )
+            return DocumentAnalyzer._extract_standard_mission(lines, index, line1, line2, line3)
 
         return None
 
@@ -1533,19 +1446,14 @@ class DocumentAnalyzer:
     def _is_known_company(company_name: str) -> bool:
         """Vérifie si l'entreprise est connue ou a un nom court probable"""
         # Entreprises connues
-        if any(
-            known_client.lower() in company_name.lower()
-            for known_client in DocumentAnalyzer.CLIENTS_CONNUS
-        ):
+        if any(known_client.lower() in company_name.lower() for known_client in DocumentAnalyzer.CLIENTS_CONNUS):
             return True
 
         # Nom court probable (3 mots ou moins)
         return len(company_name.split()) <= 3
 
     @staticmethod
-    def _extract_quanteam_mission(
-        lines: list, index: int, date_line: str, role_line: str
-    ) -> Dict:
+    def _extract_quanteam_mission(lines: list, index: int, date_line: str, role_line: str) -> Dict:
         """Traite spécifiquement les missions Quanteam"""
         st.success(f"🎯 Quanteam détecté! Date: '{date_line}', Poste: '{role_line}'")
 
@@ -1609,9 +1517,7 @@ class DocumentAnalyzer:
         return months.get(month_name.lower(), "01")
 
     @staticmethod
-    def _extract_standard_mission(
-        lines: list, index: int, company: str, date_line: str, role_line: str
-    ) -> Dict:
+    def _extract_standard_mission(lines: list, index: int, company: str, date_line: str, role_line: str) -> Dict:
         """Traite les missions d'entreprises standard"""
         st.info(f"🔍 Entreprise détectée: '{company}' | '{date_line}' | '{role_line}'")
 
@@ -1631,9 +1537,7 @@ class DocumentAnalyzer:
         }
 
         # Extraire les technologies de la description
-        mission["langages_techniques"] = DocumentAnalyzer._extract_technical_skills(
-            description
-        )
+        mission["langages_techniques"] = DocumentAnalyzer._extract_technical_skills(description)
 
         return mission
 

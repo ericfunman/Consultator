@@ -180,28 +180,18 @@ class SimpleDocumentAnalyzer:
             text_upper = text.upper()
 
             # Déléguer l'analyse à des méthodes plus simples
-            technologies_found = SimpleDocumentAnalyzer._extract_technologies(
-                text_upper
-            )
-            missions = SimpleDocumentAnalyzer._extract_missions(
-                text_upper, technologies_found
-            )
-            competences_func = SimpleDocumentAnalyzer._extract_functional_skills(
-                text_upper
-            )
+            technologies_found = SimpleDocumentAnalyzer._extract_technologies(text_upper)
+            missions = SimpleDocumentAnalyzer._extract_missions(text_upper, technologies_found)
+            competences_func = SimpleDocumentAnalyzer._extract_functional_skills(text_upper)
 
             result["langages_techniques"] = technologies_found[:15]
             result["missions"] = missions[:10]
             result["competences_fonctionnelles"] = competences_func
-            result["informations_generales"] = (
-                SimpleDocumentAnalyzer._create_general_info(
-                    text, technologies_found, missions
-                )
+            result["informations_generales"] = SimpleDocumentAnalyzer._create_general_info(
+                text, technologies_found, missions
             )
 
-            st.success(
-                f"✅ Analyse terminée: {len(missions)} missions, {len(technologies_found)} technologies"
-            )
+            st.success(f"✅ Analyse terminée: {len(missions)} missions, {len(technologies_found)} technologies")
 
         except (OSError, ValueError, TypeError, AttributeError, KeyError) as e:
             st.error(f"❌ Erreur pendant l'analyse: {str(e)}")
@@ -248,9 +238,7 @@ class SimpleDocumentAnalyzer:
         return competences_func
 
     @staticmethod
-    def _create_general_info(
-        text: str, technologies_found: list, missions: list
-    ) -> dict:
+    def _create_general_info(text: str, technologies_found: list, missions: list) -> dict:
         """Crée les informations générales"""
         return {
             "longueur_texte": len(text),

@@ -18,17 +18,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import app.pages_modules.consultant_list: {e}", allow_module_level=True)
 
 
-
-
 def test_show_consultants_list():
     """Test automatiquement généré pour show_consultants_list"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = show_consultants_list(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -40,30 +38,29 @@ def test_show_consultants_list_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_show_consultants_list_with_mocks(mock_request):
     """Test de show_consultants_list avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_export_to_excel():
     """Test automatiquement généré pour export_to_excel"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = export_to_excel(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -75,30 +72,29 @@ def test_export_to_excel_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_export_to_excel_with_mocks(mock_request):
     """Test de export_to_excel avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_generate_consultants_report():
     """Test automatiquement généré pour generate_consultants_report"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = generate_consultants_report(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -110,16 +106,15 @@ def test_generate_consultants_report_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_generate_consultants_report_with_mocks(mock_request):
     """Test de generate_consultants_report avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

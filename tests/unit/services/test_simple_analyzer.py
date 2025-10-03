@@ -182,9 +182,7 @@ class TestSimpleDocumentAnalyzer:
     def test_analyze_cv_content_with_error(self, mock_st):
         """Test gestion d'erreur pendant l'analyse"""
         # Simuler une erreur en patchant une partie du code
-        with patch.object(
-            SimpleDocumentAnalyzer, "TECHNOLOGIES", side_effect=Exception("Test error")
-        ):
+        with patch.object(SimpleDocumentAnalyzer, "TECHNOLOGIES", side_effect=Exception("Test error")):
             result = SimpleDocumentAnalyzer.analyze_cv_content("test", "Test")
 
         # Le résultat devrait quand même être retourné avec les valeurs par défaut

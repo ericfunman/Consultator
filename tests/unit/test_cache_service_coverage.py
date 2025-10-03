@@ -47,9 +47,7 @@ class TestCacheService:
         ) as mock_redis_module:
             mock_redis_module.from_url.return_value = mock_redis
 
-            service = CacheService(
-                redis_url="redis://localhost:6379/0", default_ttl=600
-            )
+            service = CacheService(redis_url="redis://localhost:6379/0", default_ttl=600)
 
             assert service.redis_client is mock_redis
             assert service.default_ttl == 600
@@ -86,9 +84,7 @@ class TestCacheService:
 
         # Test avec objets datetime et autres types complexes
         dt = datetime(2023, 1, 1)
-        key = service._generate_key(
-            "complex_func", (dt, [1, 2, 3]), {"nested": {"key": "value"}}
-        )
+        key = service._generate_key("complex_func", (dt, [1, 2, 3]), {"nested": {"key": "value"}})
 
         assert key.startswith("consultator:complex_func:")
         # Vérifier que c'est un hash SHA-256 (64 caractères hex)
@@ -273,9 +269,7 @@ class TestCacheService:
         assert deleted_count == 4  # 2 de Redis + 2 de mémoire
         assert "consultator:user:1" not in service.memory_cache
         assert "consultator:user:2" not in service.memory_cache
-        assert (
-            "consultator:post:1" in service.memory_cache
-        )  # Ne correspond pas au pattern
+        assert "consultator:post:1" in service.memory_cache  # Ne correspond pas au pattern
 
     def test_get_stats_without_redis(self):
         """Test des statistiques sans Redis"""
@@ -306,9 +300,7 @@ class TestCacheService:
         }
         service.redis_client = mock_redis
 
-        service.memory_cache = {
-            "key1": {"data": "value1", "expires_at": time.time() + 100}
-        }
+        service.memory_cache = {"key1": {"data": "value1", "expires_at": time.time() + 100}}
 
         stats = service.get_stats()
 
@@ -486,9 +478,7 @@ class TestCacheInvalidation:
 
         assert "consultator:get_consultant:1" not in service.memory_cache
         assert "consultator:get_consultant:2" not in service.memory_cache
-        assert (
-            "consultator:get_mission:1" in service.memory_cache
-        )  # Ne devrait pas être supprimé
+        assert "consultator:get_mission:1" in service.memory_cache  # Ne devrait pas être supprimé
 
     def test_invalidate_consultant_cache_specific(self):
         """Test d'invalidation du cache pour un consultant spécifique"""
@@ -678,9 +668,7 @@ class TestCachedFunctions:
         mock_results = [{"id": 1, "name": "John Doe"}]
         mock_service.get.return_value = None  # Cache miss
 
-        with patch(
-            "app.services.consultant_service.ConsultantService.search_consultants_optimized"
-        ) as mock_search:
+        with patch("app.services.consultant_service.ConsultantService.search_consultants_optimized") as mock_search:
             mock_search.return_value = mock_results
 
             result = get_cached_search_results("John", page=1, per_page=20)

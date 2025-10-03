@@ -75,9 +75,7 @@ class TestBusinessManagerService(BaseServiceTest):
         from sqlalchemy.exc import SQLAlchemyError
 
         mock_session_instance = MagicMock()
-        mock_session_instance.query.side_effect = SQLAlchemyError(
-            "Database connection failed"
-        )
+        mock_session_instance.query.side_effect = SQLAlchemyError("Database connection failed")
         mock_session.return_value.__enter__.return_value = mock_session_instance
         mock_session.return_value.__exit__.return_value = None
 
@@ -215,9 +213,7 @@ class TestBusinessManagerService(BaseServiceTest):
         from sqlalchemy.exc import SQLAlchemyError
 
         mock_session_instance = MagicMock()
-        mock_session_instance.query.side_effect = SQLAlchemyError(
-            "Database connection failed"
-        )
+        mock_session_instance.query.side_effect = SQLAlchemyError("Database connection failed")
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Test

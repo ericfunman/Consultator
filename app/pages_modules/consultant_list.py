@@ -89,9 +89,7 @@ def _convert_consultants_to_dataframe(consultants: List) -> pd.DataFrame:
     """Convertit une liste de consultants en DataFrame"""
     consultants_data = []
     for consultant in consultants:
-        practice_name = (
-            consultant.practice.nom if consultant.practice else DEFAULT_PRACTICE
-        )
+        practice_name = consultant.practice.nom if consultant.practice else DEFAULT_PRACTICE
 
         consultants_data.append(
             {
@@ -101,18 +99,14 @@ def _convert_consultants_to_dataframe(consultants: List) -> pd.DataFrame:
                 EMAIL_COL: consultant.email,
                 TELEPHONE_COL: consultant.telephone,
                 SALAIRE_COL: consultant.salaire_actuel or 0,
-                DISPONIBILITE_COL: (
-                    STATUS_DISPONIBLE if consultant.disponibilite else STATUS_EN_MISSION
-                ),
+                DISPONIBILITE_COL: (STATUS_DISPONIBLE if consultant.disponibilite else STATUS_EN_MISSION),
                 DATE_DISPONIBILITE_COL: consultant.date_disponibilite,
                 GRADE_COL: consultant.grade,
                 TYPE_CONTRAT_COL: consultant.type_contrat,
                 PRACTICE_COL: practice_name,
                 ENTITE_COL: consultant.entite or "N/A",
                 DATE_CREATION_COL: (
-                    consultant.date_creation.strftime("%d/%m/%Y")
-                    if consultant.date_creation
-                    else DEFAULT_DATE
+                    consultant.date_creation.strftime("%d/%m/%Y") if consultant.date_creation else DEFAULT_DATE
                 ),
             }
         )
@@ -183,9 +177,7 @@ def _apply_filters(
             FILTRE_DISPONIBLE: STATUS_DISPONIBLE,
             FILTRE_EN_MISSION: STATUS_EN_MISSION,
         }
-        filtered_df = filtered_df[
-            filtered_df[DISPONIBILITE_COL] == status_map[availability_filter]
-        ]
+        filtered_df = filtered_df[filtered_df[DISPONIBILITE_COL] == status_map[availability_filter]]
 
     return filtered_df
 
@@ -199,15 +191,11 @@ def _display_statistics(filtered_df: pd.DataFrame) -> None:
         st.metric("👥 Total consultants", total_consultants)
 
     with col2:
-        available_count = len(
-            filtered_df[filtered_df[DISPONIBILITE_COL] == STATUS_DISPONIBLE]
-        )
+        available_count = len(filtered_df[filtered_df[DISPONIBILITE_COL] == STATUS_DISPONIBLE])
         st.metric("✅ Disponibles", available_count)
 
     with col3:
-        busy_count = len(
-            filtered_df[filtered_df[DISPONIBILITE_COL] == STATUS_EN_MISSION]
-        )
+        busy_count = len(filtered_df[filtered_df[DISPONIBILITE_COL] == STATUS_EN_MISSION])
         st.metric("🔴 En mission", busy_count)
 
     with col4:
@@ -236,12 +224,8 @@ def _create_column_config() -> dict:
         PRENOM_COL: st.column_config.TextColumn(PRENOM_COL, width="small"),
         NOM_COL: st.column_config.TextColumn(NOM_COL, width="small"),
         EMAIL_COL: st.column_config.TextColumn(EMAIL_COL, width="large"),
-        DISPONIBILITE_COL: st.column_config.TextColumn(
-            DISPONIBILITE_COL, width="small"
-        ),
-        DATE_DISPONIBILITE_COL: st.column_config.TextColumn(
-            DATE_DISPONIBILITE_COL, width="small"
-        ),
+        DISPONIBILITE_COL: st.column_config.TextColumn(DISPONIBILITE_COL, width="small"),
+        DATE_DISPONIBILITE_COL: st.column_config.TextColumn(DATE_DISPONIBILITE_COL, width="small"),
         GRADE_COL: st.column_config.TextColumn(GRADE_COL, width="small"),
         TYPE_CONTRAT_COL: st.column_config.TextColumn(TYPE_CONTRAT_COL, width="small"),
         PRACTICE_COL: st.column_config.TextColumn(PRACTICE_COL, width="medium"),
@@ -257,9 +241,7 @@ def _handle_consultant_selection(event, filtered_df: pd.DataFrame) -> None:
         selected_id = int(selected_consultant_data[ID_COL])
         selected_name = f"{selected_consultant_data[PRENOM_COL]} {selected_consultant_data[NOM_COL]}"
 
-        st.success(
-            MSG_CONSULTANT_SELECTIONNE.format(name=selected_name, id=selected_id)
-        )
+        st.success(MSG_CONSULTANT_SELECTIONNE.format(name=selected_name, id=selected_id))
 
         col1, col2, col3 = st.columns(3)
 
@@ -301,11 +283,7 @@ def _handle_alternative_selection(filtered_df: pd.DataFrame) -> None:
 
     selected_consultant = st.selectbox(
         "👤 Ou sélectionner un consultant pour voir son profil détaillé",
-        options=[""]
-        + [
-            f"{row[PRENOM_COL]} {row[NOM_COL]} (ID: {row[ID_COL]})"
-            for _, row in filtered_df.iterrows()
-        ],
+        options=[""] + [f"{row[PRENOM_COL]} {row[NOM_COL]} (ID: {row[ID_COL]})" for _, row in filtered_df.iterrows()],
         help="Choisissez un consultant pour accéder à son profil complet",
     )
 
@@ -327,9 +305,7 @@ def _display_action_buttons(filtered_df: pd.DataFrame) -> None:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if st.button(
-            "📊 Exporter en Excel", help="Télécharger la liste au format Excel"
-        ):
+        if st.button("📊 Exporter en Excel", help="Télécharger la liste au format Excel"):
             export_to_excel(filtered_df)
 
     with col2:
@@ -353,9 +329,7 @@ def show_consultants_list():
     # Récupérer tous les consultants
     try:
         with get_database_session() as session:
-            consultants = (
-                session.query(Consultant).options(joinedload(Consultant.practice)).all()
-            )
+            consultants = session.query(Consultant).options(joinedload(Consultant.practice)).all()
 
         if not consultants:
             st.info(MSG_AUCUN_CONSULTANT)
@@ -365,14 +339,10 @@ def show_consultants_list():
         df = _convert_consultants_to_dataframe(consultants)
 
         # Filtres et recherche
-        search_term, practice_filter, entite_filter, availability_filter = (
-            _create_search_filters(df)
-        )
+        search_term, practice_filter, entite_filter, availability_filter = _create_search_filters(df)
 
         # Appliquer les filtres
-        filtered_df = _apply_filters(
-            df, search_term, practice_filter, entite_filter, availability_filter
-        )
+        filtered_df = _apply_filters(df, search_term, practice_filter, entite_filter, availability_filter)
 
         # Statistiques
         _display_statistics(filtered_df)
@@ -431,9 +401,7 @@ def export_to_excel(df: pd.DataFrame):
         for col_num, header in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col_num, value=header)
             cell.font = Font(bold=True)
-            cell.fill = PatternFill(
-                start_color="1f77b4", end_color="1f77b4", fill_type="solid"
-            )
+            cell.fill = PatternFill(start_color="1f77b4", end_color="1f77b4", fill_type="solid")
 
         # Données
         for row_num, row in enumerate(df.itertuples(index=False), 2):
@@ -469,9 +437,7 @@ def export_to_excel(df: pd.DataFrame):
         st.success(MSG_SUCCESS_EXPORT)
 
     except ImportError:
-        st.error(
-            "❌ Module openpyxl non installé. Installez-le avec : pip install openpyxl"
-        )
+        st.error("❌ Module openpyxl non installé. Installez-le avec : pip install openpyxl")
     except Exception as e:
         st.error(f"{MSG_ERREUR_EXPORT}: {e}")
 
@@ -514,9 +480,7 @@ def generate_consultants_report(df: pd.DataFrame):
         # Distribution des salaires
         if len(df) > 1:
             salary_data = df[[PRENOM_COL, NOM_COL, SALAIRE_COL]].copy()
-            salary_data["Nom complet"] = (
-                salary_data[PRENOM_COL] + " " + salary_data[NOM_COL]
-            )
+            salary_data["Nom complet"] = salary_data[PRENOM_COL] + " " + salary_data[NOM_COL]
             salary_data = salary_data.sort_values(SALAIRE_COL, ascending=False)
 
             st.bar_chart(

@@ -63,9 +63,7 @@ def main():
             result = test_func()
             # S'assurer que result est un booléen
             if result is None:
-                result = (
-                    True  # Si la fonction ne retourne rien, considérer comme succès
-                )
+                result = True  # Si la fonction ne retourne rien, considérer comme succès
             results.append(bool(result))
             status = "REUSSI" if result else "ECHEC"
             print(f"   Resultat: {status}")

@@ -5,6 +5,7 @@ Tests ultra-ciblés - Version simplifiée
 import unittest
 from unittest.mock import patch, MagicMock
 
+
 class TestConsultantDocumentsUltraTargeted(unittest.TestCase):
 
     def test_all_main_functions_exhaustive(self):
@@ -27,6 +28,7 @@ class TestConsultantDocumentsUltraTargeted(unittest.TestCase):
         self.assertEqual(len(documents), 3)
         self.assertIn("cv.pdf", documents)
 
+
 class TestBusinessManagersUltraTargeted(unittest.TestCase):
 
     def test_comprehensive_business_manager_functions(self):
@@ -42,6 +44,7 @@ class TestBusinessManagersUltraTargeted(unittest.TestCase):
         operations = {"create", "read", "update", "delete"}
         self.assertEqual(len(operations), 4)
         self.assertIn("create", operations)
+
 
 class TestCacheServiceUltraTargeted(unittest.TestCase):
 
@@ -59,5 +62,6 @@ class TestCacheServiceUltraTargeted(unittest.TestCase):
         self.assertEqual(result, 55)
         self.assertGreater(result, 50)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

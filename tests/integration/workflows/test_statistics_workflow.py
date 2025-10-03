@@ -63,11 +63,7 @@ def statistics_test_data(test_db, real_db_session):
     for practice_data in practices_data:
         with test_db() as session:
             # Vérifier si la practice existe déjà
-            existing_practice = (
-                session.query(Practice)
-                .filter(Practice.nom == practice_data["nom"])
-                .first()
-            )
+            existing_practice = session.query(Practice).filter(Practice.nom == practice_data["nom"]).first()
             if existing_practice:
                 practice_ids.append(existing_practice.id)
             else:
@@ -237,11 +233,7 @@ class TestStatisticsWorkflowIntegration:
         all_consultants = ConsultantService.get_all_consultants_with_stats()
 
         # Filtrer seulement les consultants créés dans ce test
-        test_consultants = [
-            c
-            for c in all_consultants
-            if c["id"] in statistics_test_data["consultant_ids"]
-        ]
+        test_consultants = [c for c in all_consultants if c["id"] in statistics_test_data["consultant_ids"]]
 
         assert len(test_consultants) == len(statistics_test_data["consultant_ids"])
 
@@ -249,11 +241,7 @@ class TestStatisticsWorkflowIntegration:
         total_consultants = len(test_consultants)
         available_consultants = sum(1 for c in test_consultants if c["disponibilite"])
         unavailable_consultants = total_consultants - available_consultants
-        availability_rate = (
-            (available_consultants / total_consultants) * 100
-            if total_consultants > 0
-            else 0
-        )
+        availability_rate = (available_consultants / total_consultants) * 100 if total_consultants > 0 else 0
 
         total_salary = sum(c["salaire_actuel"] for c in test_consultants)
         avg_salary = total_salary / total_consultants if total_consultants > 0 else 0
@@ -282,18 +270,12 @@ class TestStatisticsWorkflowIntegration:
         all_consultants = ConsultantService.get_all_consultants_with_stats()
 
         # Filtrer seulement les consultants créés dans ce test
-        test_consultants = [
-            c
-            for c in all_consultants
-            if c["id"] in statistics_test_data["consultant_ids"]
-        ]
+        test_consultants = [c for c in all_consultants if c["id"] in statistics_test_data["consultant_ids"]]
 
         # Statistiques par practice
         practice_stats = {}
         for practice_name in ["Data Science", "Frontend", "Backend"]:
-            practice_consultants = [
-                c for c in test_consultants if c.get("practice_name") == practice_name
-            ]
+            practice_consultants = [c for c in test_consultants if c.get("practice_name") == practice_name]
             if practice_consultants:
                 total = len(practice_consultants)
                 available = sum(1 for c in practice_consultants if c["disponibilite"])
@@ -342,11 +324,7 @@ class TestStatisticsWorkflowIntegration:
         all_consultants = ConsultantService.get_all_consultants_with_stats()
 
         # Filtrer seulement les consultants créés dans ce test
-        test_consultants = [
-            c
-            for c in all_consultants
-            if c["id"] in statistics_test_data["consultant_ids"]
-        ]
+        test_consultants = [c for c in all_consultants if c["id"] in statistics_test_data["consultant_ids"]]
 
         # Statistiques par grade
         grade_stats = {}
@@ -386,11 +364,7 @@ class TestStatisticsWorkflowIntegration:
         assert junior_stats["available"] == 3  # Tous disponibles
 
         # Vérifier la progression salariale
-        assert (
-            expert_stats["avg_salary"]
-            > senior_stats["avg_salary"]
-            > junior_stats["avg_salary"]
-        )
+        assert expert_stats["avg_salary"] > senior_stats["avg_salary"] > junior_stats["avg_salary"]
 
         print("✅ Statistiques par grade calculées correctement")
 
@@ -402,11 +376,7 @@ class TestStatisticsWorkflowIntegration:
         all_consultants = ConsultantService.get_all_consultants_with_stats()
 
         # Filtrer seulement les consultants créés dans ce test
-        test_consultants = [
-            c
-            for c in all_consultants
-            if c["id"] in statistics_test_data["consultant_ids"]
-        ]
+        test_consultants = [c for c in all_consultants if c["id"] in statistics_test_data["consultant_ids"]]
 
         salaries = [c["salaire_actuel"] for c in test_consultants]
 
@@ -461,52 +431,29 @@ class TestStatisticsWorkflowIntegration:
         all_consultants = ConsultantService.get_all_consultants_with_stats()
 
         # Filtrer seulement les consultants créés dans ce test
-        test_consultants = [
-            c
-            for c in all_consultants
-            if c["id"] in statistics_test_data["consultant_ids"]
-        ]
+        test_consultants = [c for c in all_consultants if c["id"] in statistics_test_data["consultant_ids"]]
 
         # Métriques clés pour le dashboard
         dashboard_metrics = {
             "total_consultants": len(test_consultants),
-            "available_consultants": sum(
-                1 for c in test_consultants if c["disponibilite"]
-            ),
-            "total_practices": len(
-                set(
-                    c.get("practice_name")
-                    for c in test_consultants
-                    if c.get("practice_name")
-                )
-            ),
+            "available_consultants": sum(1 for c in test_consultants if c["disponibilite"]),
+            "total_practices": len(set(c.get("practice_name") for c in test_consultants if c.get("practice_name"))),
             "total_salary_cost": sum(c["salaire_actuel"] for c in test_consultants),
-            "avg_salary": sum(c["salaire_actuel"] for c in test_consultants)
-            / len(test_consultants),
-            "availability_rate": (
-                sum(1 for c in test_consultants if c["disponibilite"])
-                / len(test_consultants)
-            )
-            * 100,
+            "avg_salary": sum(c["salaire_actuel"] for c in test_consultants) / len(test_consultants),
+            "availability_rate": (sum(1 for c in test_consultants if c["disponibilite"]) / len(test_consultants)) * 100,
         }
 
         # Métriques par practice pour le dashboard
         practice_dashboard = {}
         for practice_name in ["Data Science", "Frontend", "Backend"]:
-            practice_consultants = [
-                c for c in test_consultants if c.get("practice_name") == practice_name
-            ]
+            practice_consultants = [c for c in test_consultants if c.get("practice_name") == practice_name]
             if practice_consultants:
                 practice_dashboard[practice_name] = {
                     "count": len(practice_consultants),
-                    "available": sum(
-                        1 for c in practice_consultants if c["disponibilite"]
-                    ),
-                    "avg_salary": sum(c["salaire_actuel"] for c in practice_consultants)
-                    / len(practice_consultants),
+                    "available": sum(1 for c in practice_consultants if c["disponibilite"]),
+                    "avg_salary": sum(c["salaire_actuel"] for c in practice_consultants) / len(practice_consultants),
                     "availability_rate": (
-                        sum(1 for c in practice_consultants if c["disponibilite"])
-                        / len(practice_consultants)
+                        sum(1 for c in practice_consultants if c["disponibilite"]) / len(practice_consultants)
                     )
                     * 100,
                 }
@@ -518,17 +465,13 @@ class TestStatisticsWorkflowIntegration:
         print(f"   - 🏢 Practices: {dashboard_metrics['total_practices']}")
         print(f"   - 💰 Coût total: {dashboard_metrics['total_salary_cost']:,}€")
         print(f"   - 📈 Salaire moyen: {dashboard_metrics['avg_salary']:,.0f}€")
-        print(
-            f"   - 📊 Taux disponibilité: {dashboard_metrics['availability_rate']:.1f}%"
-        )
+        print(f"   - 📊 Taux disponibilité: {dashboard_metrics['availability_rate']:.1f}%")
 
         print("\n📊 MÉTRIQUES PAR PRACTICE:")
         for practice, metrics in practice_dashboard.items():
             print(f"   - {practice}:")
             print(f"     • Consultants: {metrics['count']}")
-            print(
-                f"     • Disponibles: {metrics['available']} ({metrics['availability_rate']:.1f}%)"
-            )
+            print(f"     • Disponibles: {metrics['available']} ({metrics['availability_rate']:.1f}%)")
             print(f"     • Salaire moyen: {metrics['avg_salary']:,.0f}€")
 
         # Vérifications des métriques
@@ -551,7 +494,7 @@ class TestStatisticsWorkflowIntegration:
         print(f"IDs attendus: {statistics_test_data['consultant_ids']}")
 
         # Convertir les objets en dictionnaires si nécessaire
-        if all_consultants and hasattr(all_consultants[0], 'id'):
+        if all_consultants and hasattr(all_consultants[0], "id"):
             # Si ce sont des objets SQLAlchemy, les convertir en dictionnaires
             all_consultants = [
                 {
@@ -559,28 +502,28 @@ class TestStatisticsWorkflowIntegration:
                     "prenom": c.prenom,
                     "nom": c.nom,
                     "salaire_actuel": c.salaire_actuel,
-                    "practice_name": getattr(c.practice, 'nom', 'Non affecté') if hasattr(c, 'practice') and c.practice else 'Non affecté',
+                    "practice_name": (
+                        getattr(c.practice, "nom", "Non affecté")
+                        if hasattr(c, "practice") and c.practice
+                        else "Non affecté"
+                    ),
                     "grade": c.grade,
-                    "disponibilite": c.disponibilite
+                    "disponibilite": c.disponibilite,
                 }
                 for c in all_consultants
             ]
 
         # Filtrer seulement les consultants créés dans ce test
-        test_consultants = [
-            c
-            for c in all_consultants
-            if c.get("id") in statistics_test_data["consultant_ids"]
-        ]
-        
+        test_consultants = [c for c in all_consultants if c.get("id") in statistics_test_data["consultant_ids"]]
+
         print(f"Nombre de consultants filtrés: {len(test_consultants)}")
-        
+
         # Vérifier qu'on a bien des données avant de créer le DataFrame
         if not test_consultants:
             # Si pas de consultants filtrés, récupérer tous les consultants pour le test
             print("Aucun consultant filtré trouvé, utilisation de tous les consultants")
             test_consultants = all_consultants[:12] if all_consultants else []
-        
+
         # Si toujours vide, créer des données factices pour le test
         if not test_consultants:
             print("Création de données factices pour le test")
@@ -592,7 +535,7 @@ class TestStatisticsWorkflowIntegration:
                     "salaire_actuel": 50000 + i * 1000,
                     "practice_name": "Test Practice",
                     "grade": "Junior",
-                    "disponibilite": True
+                    "disponibilite": True,
                 }
                 for i in range(1, 13)
             ]
@@ -601,24 +544,26 @@ class TestStatisticsWorkflowIntegration:
         # S'assurer qu'on a des données avant de créer le DataFrame
         if not test_consultants:
             # Créer un DataFrame vide avec les bonnes colonnes
-            df = pd.DataFrame(columns=["id", "prenom", "nom", "salaire_actuel", "practice_name", "grade", "disponibilite"])
+            df = pd.DataFrame(
+                columns=["id", "prenom", "nom", "salaire_actuel", "practice_name", "grade", "disponibilite"]
+            )
         else:
             df = pd.DataFrame(test_consultants)
 
         # Vérifications du DataFrame
         assert len(df) >= 0, f"DataFrame doit être valide: {len(df)} consultants"
-        
+
         # Si le DataFrame est vide, on ne peut pas faire les vérifications sur les données
         if len(df) == 0:
             print("⚠️ DataFrame vide - test d'export avec structure seulement")
             return
-            
+
         assert len(df) == len(test_consultants)
-        
+
         # Vérifications conditionnelles des colonnes (si elles existent)
         expected_columns = ["prenom", "nom", "salaire_actuel", "practice_name", "grade", "disponibilite"]
         missing_columns = [col for col in expected_columns if col not in df.columns]
-        
+
         if missing_columns:
             print(f"⚠️ Colonnes manquantes: {missing_columns}")
             print(f"Colonnes disponibles: {list(df.columns)}")
@@ -630,7 +575,7 @@ class TestStatisticsWorkflowIntegration:
                     df[col] = [f"test_{col}"] * len(df) if len(df) > 0 else []
                 elif col == "disponibilite":
                     df[col] = [True] * len(df) if len(df) > 0 else []
-        
+
         # Vérifier que toutes les colonnes attendues sont maintenant présentes
         for col in expected_columns:
             assert col in df.columns, f"Colonne {col} manquante dans le DataFrame"
@@ -673,9 +618,7 @@ class TestStatisticsWorkflowIntegration:
 
         # Groupement par grade seulement si on a des données
         if len(df) > 0:
-            grade_group = df.groupby("grade").agg(
-                {"salaire_actuel": ["count", "mean"], "disponibilite": "sum"}
-            )
+            grade_group = df.groupby("grade").agg({"salaire_actuel": ["count", "mean"], "disponibilite": "sum"})
 
             print(f"\n📊 Statistiques par grade (DataFrame):")
             for grade in grade_group.index:
@@ -683,9 +626,7 @@ class TestStatisticsWorkflowIntegration:
                 count = stats["salaire_actuel"]["count"]
                 mean_salary = stats["salaire_actuel"]["mean"]
                 available = stats["disponibilite"]["sum"]
-                print(
-                    f"   - {grade}: {count} consultants, {available} disponibles, salaire moyen: {mean_salary:,.0f}€"
-                )
+                print(f"   - {grade}: {count} consultants, {available} disponibles, salaire moyen: {mean_salary:,.0f}€")
         else:
             print("📊 Pas de données pour le groupement par grade")
 

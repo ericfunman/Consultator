@@ -22,9 +22,7 @@ except ImportError:
     consultant_missions = None
 
 
-@pytest.mark.skipif(
-    consultant_missions is None, reason="Module consultant_missions not available"
-)
+@pytest.mark.skipif(consultant_missions is None, reason="Module consultant_missions not available")
 class TestConsultantMissionsModule:
     """Tests pour le module consultant_missions"""
 
@@ -191,9 +189,7 @@ class TestMissionDisplay:
     @patch("streamlit.columns")
     @patch("streamlit.metric")
     @patch("streamlit.markdown")
-    def test_mission_metrics_display(
-        self, mock_markdown, mock_metric, mock_columns, mock_subheader
-    ):
+    def test_mission_metrics_display(self, mock_markdown, mock_metric, mock_columns, mock_subheader):
         """Test de l'affichage des métriques de mission"""
         # Configuration des mocks
         mock_columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
@@ -258,9 +254,7 @@ class TestMissionDisplay:
         """Test de l'affichage détaillé d'une mission"""
         # Configuration des mocks
         mock_expander_context = MagicMock()
-        mock_expander.return_value.__enter__ = MagicMock(
-            return_value=mock_expander_context
-        )
+        mock_expander.return_value.__enter__ = MagicMock(return_value=mock_expander_context)
         mock_expander.return_value.__exit__ = MagicMock()
 
         # Données de mission détaillée
@@ -422,9 +416,7 @@ class TestMissionAnalytics:
         # Calculs
         total_revenus = sum(m["revenus"] for m in missions)
         revenus_moyens = total_revenus / len(missions)
-        taux_journalier_moyen = sum(
-            m["revenus"] / m["duree_jours"] for m in missions
-        ) / len(missions)
+        taux_journalier_moyen = sum(m["revenus"] / m["duree_jours"] for m in missions) / len(missions)
 
         # Vérifications
         assert total_revenus == 450000
@@ -452,7 +444,7 @@ class TestMissionExport:
 
         # Test du bouton de téléchargement - simuler l'appel
         mock_download.return_value = None  # Bouton pas cliqué
-        
+
         # Simuler l'appel de la fonction qui utiliserait download_button
         # Ici on teste juste que le CSV est généré correctement
         assert "Mission 1" in csv_data
@@ -539,9 +531,7 @@ class TestPerformanceAndOptimization:
                 }
 
         # Traitement avec générateur
-        total_revenus = sum(
-            m["revenus"] for m in mission_generator(1000) if m["statut"] == "Terminée"
-        )
+        total_revenus = sum(m["revenus"] for m in mission_generator(1000) if m["statut"] == "Terminée")
 
         # Vérifications
         assert total_revenus > 0
@@ -608,13 +598,9 @@ class TestErrorHandlingAndValidation:
 
         for mission in missions_data:
             if mission["consultant_id"] is None:
-                integrity_errors.append(
-                    f"Mission {mission['id']}: consultant_id ne peut pas être null"
-                )
+                integrity_errors.append(f"Mission {mission['id']}: consultant_id ne peut pas être null")
             elif not isinstance(mission.get("revenus", 0), (int, float)):
-                integrity_errors.append(
-                    f"Mission {mission['id']}: revenus doivent être numériques"
-                )
+                integrity_errors.append(f"Mission {mission['id']}: revenus doivent être numériques")
 
         # Vérifications
         assert len(integrity_errors) >= 1

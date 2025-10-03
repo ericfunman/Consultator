@@ -83,9 +83,7 @@ class TestConsultantInfo:
         show_consultant_info(mock_consultant)
 
         # Vérifier qu'une erreur est affichée
-        mock_st.error.assert_called_with(
-            "❌ Les services de base ne sont pas disponibles"
-        )
+        mock_st.error.assert_called_with("❌ Les services de base ne sont pas disponibles")
 
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")
@@ -143,11 +141,7 @@ class TestConsultantInfo:
 
         # Vérifier que rien n'est affiché pour l'historique
         # (pas d'appel à markdown pour l'historique)
-        calls = [
-            call
-            for call in mock_st.markdown.call_args_list
-            if "Évolution salariale récente" in str(call)
-        ]
+        calls = [call for call in mock_st.markdown.call_args_list if "Évolution salariale récente" in str(call)]
         assert len(calls) == 0
 
     @patch("app.pages_modules.consultant_info.st")
@@ -285,9 +279,7 @@ class TestConsultantInfo:
     @patch("app.pages_modules.consultant_info.ConsultantSalaire")
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")
-    def test_update_consultant_info_success(
-        self, mock_session, mock_st, mock_salary_class
-    ):
+    def test_update_consultant_info_success(self, mock_session, mock_st, mock_salary_class):
         """Test mise à jour informations consultant avec succès"""
         from app.pages_modules.consultant_info import update_consultant_info
 
@@ -342,9 +334,7 @@ class TestConsultantInfo:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock query returns None
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
 
         test_data = {
             "prenom": "Jean",
@@ -393,9 +383,7 @@ class TestConsultantInfo:
         result = update_consultant_info(1, test_data)
 
         assert result is False
-        mock_st.error.assert_called_with(
-            "❌ Cet email est déjà utilisé par un autre consultant"
-        )
+        mock_st.error.assert_called_with("❌ Cet email est déjà utilisé par un autre consultant")
 
     @patch("app.pages_modules.consultant_info.st")
     @patch("app.pages_modules.consultant_info.get_database_session")

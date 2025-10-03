@@ -176,9 +176,7 @@ class TestConsultantLanguages(BaseUITest):
 
         # Mock service qui lève une exception
         mock_service_instance = Mock()
-        mock_service_instance.get_consultant_langues.side_effect = Exception(
-            "Service error"
-        )
+        mock_service_instance.get_consultant_langues.side_effect = Exception("Service error")
         mock_service.return_value = mock_service_instance
 
         try:
@@ -281,12 +279,8 @@ class TestConsultantLanguages(BaseUITest):
         mock_langue.nom = "Test Language"
 
         mock_session_instance = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.all.return_value = (
-            []
-        )
-        mock_session_instance.query.return_value.filter.return_value.all.return_value = [
-            mock_langue
-        ]
+        mock_session_instance.query.return_value.filter.return_value.all.return_value = []
+        mock_session_instance.query.return_value.filter.return_value.all.return_value = [mock_langue]
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock form elements
@@ -307,9 +301,7 @@ class TestConsultantLanguages(BaseUITest):
     @patch("app.pages_modules.consultant_languages.st")
     @patch("app.pages_modules.consultant_languages.get_database_session")
     @patch("app.pages_modules.consultant_languages.ConsultantLangue")
-    def test_add_language_to_consultant_success(
-        self, mock_consultant_langue, mock_session, mock_st
-    ):
+    def test_add_language_to_consultant_success(self, mock_consultant_langue, mock_session, mock_st):
         """Test ajout de langue réussie"""
         from app.pages_modules.consultant_languages import (
             add_language_to_consultant,
@@ -317,9 +309,7 @@ class TestConsultantLanguages(BaseUITest):
 
         # Mock session
         mock_session_instance = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None  # Pas de doublon
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None  # Pas de doublon
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock ConsultantLangue
@@ -352,9 +342,7 @@ class TestConsultantLanguages(BaseUITest):
         # Mock session avec doublon existant
         mock_session_instance = MagicMock()
         mock_existing = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_existing
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_existing
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         data = {
@@ -381,9 +369,7 @@ class TestConsultantLanguages(BaseUITest):
         # Mock session qui lève une exception
         mock_session_instance = MagicMock()
         mock_session_instance.commit.side_effect = Exception("DB Error")
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         data = {
@@ -421,9 +407,7 @@ class TestConsultantLanguages(BaseUITest):
         mock_cl.langue = mock_langue
 
         mock_session_instance = MagicMock()
-        mock_session_instance.query.return_value.join.return_value.filter.return_value.first.return_value = (
-            mock_cl
-        )
+        mock_session_instance.query.return_value.join.return_value.filter.return_value.first.return_value = mock_cl
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock form elements
@@ -451,9 +435,7 @@ class TestConsultantLanguages(BaseUITest):
         # Mock session et consultant_langue
         mock_session_instance = MagicMock()
         mock_cl = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_cl
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_cl
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         data = {
@@ -479,9 +461,7 @@ class TestConsultantLanguages(BaseUITest):
 
         # Mock session qui ne trouve pas la langue
         mock_session_instance = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         data = {
@@ -505,9 +485,7 @@ class TestConsultantLanguages(BaseUITest):
         # Mock session et consultant_langue
         mock_session_instance = MagicMock()
         mock_cl = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_cl
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_cl
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         result = delete_language(1)
@@ -524,9 +502,7 @@ class TestConsultantLanguages(BaseUITest):
 
         # Mock session qui ne trouve pas la langue
         mock_session_instance = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         result = delete_language(999)
@@ -570,9 +546,7 @@ class TestConsultantLanguages(BaseUITest):
         mock_dataframe.return_value = mock_df
 
         # Mock session avec données de comparaison
-        with patch(
-            "app.pages_modules.consultant_languages.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultant_languages.get_database_session") as mock_session:
             mock_session_instance = MagicMock()
 
             # Mock consultant languages
@@ -588,9 +562,7 @@ class TestConsultantLanguages(BaseUITest):
             mock_avg.avg_level = 3.5
             mock_avg.count = 5
 
-            mock_session_instance.query.return_value.join.return_value.filter.return_value.all.return_value = [
-                mock_cl
-            ]
+            mock_session_instance.query.return_value.join.return_value.filter.return_value.all.return_value = [mock_cl]
             mock_session_instance.query.return_value.join.return_value.group_by.return_value.having.return_value.all.return_value = [
                 mock_avg
             ]

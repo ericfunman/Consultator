@@ -41,9 +41,7 @@ class TestConsultantProfile(BaseUITest):
     @patch("app.pages_modules.consultant_profile.st.tabs")
     @patch("app.pages_modules.consultant_profile.st.title")
     @patch("app.pages_modules.consultant_profile.st.markdown")
-    def test_show_main_page_success(
-        self, mock_md, mock_title, mock_tabs, mock_session_state
-    ):
+    def test_show_main_page_success(self, mock_md, mock_title, mock_tabs, mock_session_state):
         """Test d'affichage de la page principale avec succès"""
         mock_tab1, mock_tab2 = Mock(), Mock()
         mock_tab1.__enter__ = Mock(return_value=mock_tab1)
@@ -60,9 +58,7 @@ class TestConsultantProfile(BaseUITest):
 
             mock_title.assert_called_once_with("👥 Gestion des consultants")
             mock_md.assert_called_once_with("### Gérez les profils de vos consultants")
-            mock_tabs.assert_called_once_with(
-                ["📋 Liste des consultants", "➕ Ajouter un consultant"]
-            )
+            mock_tabs.assert_called_once_with(["📋 Liste des consultants", "➕ Ajouter un consultant"])
 
     @patch("app.pages_modules.consultant_profile.imports_ok", False)
     @patch("app.pages_modules.consultant_profile.st.error")
@@ -71,12 +67,8 @@ class TestConsultantProfile(BaseUITest):
         """Test d'affichage avec erreur d'imports"""
         show()
 
-        mock_error.assert_called_once_with(
-            "❌ Les services de base ne sont pas disponibles"
-        )
-        mock_info.assert_called_once_with(
-            "Vérifiez que tous les modules sont correctement installés"
-        )
+        mock_error.assert_called_once_with("❌ Les services de base ne sont pas disponibles")
+        mock_info.assert_called_once_with("Vérifiez que tous les modules sont correctement installés")
 
     @patch(
         "app.pages_modules.consultant_profile.st.session_state",
@@ -95,9 +87,7 @@ class TestConsultantProfile(BaseUITest):
         mock_session_state.view_consultant_profile = 1
 
         mock_session_instance = Mock()
-        mock_session_instance.query.return_value.options.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.options.return_value.filter.return_value.first.return_value = None
         mock_session_instance.query.return_value.all.return_value = []
         mock_session.return_value.__enter__.return_value = mock_session_instance
         mock_session.return_value.__exit__.return_value = None
@@ -147,9 +137,7 @@ class TestConsultantProfile(BaseUITest):
 
         with patch("app.pages_modules.consultant_profile.st.title"), patch(
             "app.pages_modules.consultant_profile.st.button"
-        ) as mock_button, patch(
-            "app.pages_modules.consultant_profile.st.columns"
-        ), patch(
+        ) as mock_button, patch("app.pages_modules.consultant_profile.st.columns"), patch(
             "app.pages_modules.consultant_profile.st.metric"
         ), patch(
             "app.pages_modules.consultant_profile.st.markdown"
@@ -174,9 +162,7 @@ class TestConsultantProfile(BaseUITest):
 
     @patch("app.pages_modules.consultant_profile.get_database_session")
     @patch("app.pages_modules.consultant_profile.st.session_state")
-    def test_show_consultant_profile_database_error(
-        self, mock_session_state, mock_session
-    ):
+    def test_show_consultant_profile_database_error(self, mock_session_state, mock_session):
         """Test gestion d'erreur de base de données"""
         mock_session_state.view_consultant_profile = 1
         mock_session.side_effect = Exception("Database error")
@@ -506,9 +492,7 @@ class TestConsultantProfile(BaseUITest):
         ) as mock_session:
 
             mock_session_instance = Mock()
-            mock_session_instance.query.return_value.options.return_value.filter.return_value.first.return_value = (
-                None
-            )
+            mock_session_instance.query.return_value.options.return_value.filter.return_value.first.return_value = None
             mock_session.return_value.__enter__.return_value = mock_session_instance
             mock_session.return_value.__exit__.return_value = None
 
@@ -521,9 +505,7 @@ class TestConsultantProfile(BaseUITest):
         # Test avec session state manquant
         mock_session_state = Mock()
         mock_session_state.__contains__ = Mock(return_value=False)
-        with patch(
-            "app.pages_modules.consultant_profile.st.session_state", mock_session_state
-        ):
+        with patch("app.pages_modules.consultant_profile.st.session_state", mock_session_state):
             try:
                 show_consultant_profile()
                 assert 1 == 1  # Test basique
@@ -538,19 +520,19 @@ class TestConsultantProfile(BaseUITest):
             "consultant": Mock(),
             "file_name": "test.pdf",
         }
-        with patch(
-            "app.pages_modules.consultant_profile.st.session_state", mock_session_state
-        ), patch("app.pages_modules.consultant_profile.st.tabs") as mock_tabs, \
-          patch("app.pages_modules.consultant_profile.st.container"), \
-          patch("app.pages_modules.consultant_profile.st.markdown"):
-            
+        with patch("app.pages_modules.consultant_profile.st.session_state", mock_session_state), patch(
+            "app.pages_modules.consultant_profile.st.tabs"
+        ) as mock_tabs, patch("app.pages_modules.consultant_profile.st.container"), patch(
+            "app.pages_modules.consultant_profile.st.markdown"
+        ):
+
             # Mock 4 onglets pour st.tabs
             mock_tab1, mock_tab2, mock_tab3, mock_tab4 = Mock(), Mock(), Mock(), Mock()
             for tab in [mock_tab1, mock_tab2, mock_tab3, mock_tab4]:
                 tab.__enter__ = Mock(return_value=tab)
                 tab.__exit__ = Mock(return_value=None)
             mock_tabs.return_value = (mock_tab1, mock_tab2, mock_tab3, mock_tab4)
-            
+
             try:
                 show_cv_analysis_fullwidth()
                 assert 1 == 1  # Test basique

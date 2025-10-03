@@ -56,9 +56,7 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert (
-                result == expected
-            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_lettre_motivation(self):
         """Test de détection des lettres de motivation"""
@@ -70,9 +68,7 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert (
-                result == expected
-            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_certificats(self):
         """Test de détection des certificats"""
@@ -84,9 +80,7 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert (
-                result == expected
-            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_contrats(self):
         """Test de détection des contrats"""
@@ -98,9 +92,7 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert (
-                result == expected
-            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_presentations(self):
         """Test de détection des présentations"""
@@ -112,9 +104,7 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert (
-                result == expected
-            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_extensions(self):
         """Test de détection basée sur les extensions"""
@@ -126,9 +116,7 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert (
-                result == expected
-            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_powerpoint_extensions(self):
         """Test de détection des fichiers PowerPoint par extension"""
@@ -139,9 +127,7 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert (
-                result == expected
-            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
     def test_detect_document_type_unknown(self):
         """Test avec des fichiers inconnus"""
@@ -153,9 +139,7 @@ class TestDocumentTypeDetection:
 
         for filename, expected in test_cases:
             result = detect_document_type(filename)
-            assert (
-                result == expected
-            ), f"Échec pour {filename}: attendu {expected}, obtenu {result}"
+            assert result == expected, f"Échec pour {filename}: attendu {expected}, obtenu {result}"
 
 
 class TestMimeTypeDetection:
@@ -168,8 +152,7 @@ class TestMimeTypeDetection:
     def test_get_mime_type_word(self):
         """Test du type MIME pour Word"""
         assert (
-            get_mime_type("document.docx")
-            == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            get_mime_type("document.docx") == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
         assert get_mime_type("document.doc") == "application/msword"
 
@@ -276,16 +259,12 @@ class TestFilenameExtraction:
 
     def test_add_extension_to_original_name_with_dot(self):
         """Test d'ajout d'extension quand elle existe déjà"""
-        result = _add_extension_to_original_name(
-            "CV", ["20231201", "120000.pdf"], True, "full.pdf"
-        )
+        result = _add_extension_to_original_name("CV", ["20231201", "120000.pdf"], True, "full.pdf")
         assert result == "CV.pdf"
 
     def test_add_extension_to_original_name_without_dot(self):
         """Test d'ajout d'extension depuis le nom complet"""
-        result = _add_extension_to_original_name(
-            "CV", ["20231201", "120000"], True, "full.pdf"
-        )
+        result = _add_extension_to_original_name("CV", ["20231201", "120000"], True, "full.pdf")
         assert result == "CV.pdf"
 
     def test_handle_extension_in_last_part_timestamp(self):
@@ -394,9 +373,7 @@ class TestDataBuilding:
 
         notes = "Consultant expérimenté"
 
-        result = _build_consultant_data(
-            basic_data, company_data, professional_data, notes
-        )
+        result = _build_consultant_data(basic_data, company_data, professional_data, notes)
 
         assert result["prenom"] == "Jean"
         assert result["nom"] == "Dupont"
@@ -531,10 +508,7 @@ class TestConstants:
         assert LABEL_TAILLE == "📊 Taille"
         assert MSG_FICHIER_INTROUVABLE == "❌ Fichier introuvable"
         assert MSG_CHAMP_OBLIGATOIRE == "Ce champ est obligatoire"
-        assert (
-            MSG_CHAMPS_OBLIGATOIRES
-            == "❌ Veuillez remplir tous les champs obligatoires (*)"
-        )
+        assert MSG_CHAMPS_OBLIGATOIRES == "❌ Veuillez remplir tous les champs obligatoires (*)"
 
 
 @patch("app.pages_modules.consultants.st.markdown")

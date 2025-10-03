@@ -170,9 +170,7 @@ class TestCacheService:
         assert result is True
 
         # Vérifier l'appel Redis
-        mock_redis.setex.assert_called_once_with(
-            key, 120, json.dumps(value, default=str)
-        )
+        mock_redis.setex.assert_called_once_with(key, 120, json.dumps(value, default=str))
 
     def test_set_in_redis_with_error(self):
         """Test de stockage dans Redis avec erreur"""
@@ -496,9 +494,7 @@ class TestCachedFunctions:
         app.services.cache_service._cache_service = None
 
         with patch("app.services.consultant_service.ConsultantService") as mock_service:
-            mock_service.get_all_consultants_with_stats.return_value = [
-                {"id": 1, "name": "Test"}
-            ]
+            mock_service.get_all_consultants_with_stats.return_value = [{"id": 1, "name": "Test"}]
 
             # Test avec paramètres par défaut
             result = get_cached_consultants_list()
@@ -512,12 +508,8 @@ class TestCachedFunctions:
         app.services.cache_service._cache_service = None
 
         with patch("app.services.consultant_service.ConsultantService") as mock_service:
-            mock_service.search_consultants_optimized.return_value = [
-                {"id": 1, "name": "John"}
-            ]
+            mock_service.search_consultants_optimized.return_value = [{"id": 1, "name": "John"}]
 
             result = get_cached_search_results("John", page=2, per_page=10)
             assert result == [{"id": 1, "name": "John"}]
-            mock_service.search_consultants_optimized.assert_called_once_with(
-                "John", 2, 10
-            )
+            mock_service.search_consultants_optimized.assert_called_once_with("John", 2, 10)

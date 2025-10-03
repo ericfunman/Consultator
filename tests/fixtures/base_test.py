@@ -133,6 +133,7 @@ class BaseUITest(BaseTest):
             class MockTabContextManager(MagicMock):
                 def __enter__(self):
                     return self
+
                 def __exit__(self, *exc):
                     pass  # Méthode vide pour le context manager
 

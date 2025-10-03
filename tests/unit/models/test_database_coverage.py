@@ -102,9 +102,7 @@ class TestDatabaseFunctions(BaseUnitTest):
     @patch("app.database.database.Base.metadata.drop_all")
     @patch("app.database.database.Base.metadata.create_all")
     @patch("app.database.database.is_database_initialized")
-    def test_reset_database_success(
-        self, mock_is_init, mock_create_all, mock_drop_all, mock_engine
-    ):
+    def test_reset_database_success(self, mock_is_init, mock_create_all, mock_drop_all, mock_engine):
         """Test de remise à zéro réussie de la base de données"""
         # Mocks
         mock_engine_instance = Mock()

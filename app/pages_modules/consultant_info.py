@@ -155,9 +155,7 @@ def _display_affectation_info(consultant) -> None:
         st.info("📊 **Statut société :** En cours de calcul...")
 
     if consultant.date_creation:
-        st.write(
-            f"**Membre depuis :** {consultant.date_creation.strftime(DATE_FORMAT)}"
-        )
+        st.write(f"**Membre depuis :** {consultant.date_creation.strftime(DATE_FORMAT)}")
 
 
 def _display_financial_info(consultant) -> None:
@@ -248,15 +246,11 @@ def _display_vsa_missions(consultant) -> None:
             filter_info = "🏢 Missions de facturation interne (INT*)"
         else:
             # Afficher seulement les missions externes (codes ne commençant pas par INT)
-            missions_filtrees = [
-                m for m in missions_vsa if not m.code.startswith("INT")
-            ]
+            missions_filtrees = [m for m in missions_vsa if not m.code.startswith("INT")]
             filter_info = "🌍 Missions externes (hors INT*)"
 
         # Affichage du filtre actuel
-        st.info(
-            f"{filter_info} - {len(missions_filtrees)} mission(s) sur {len(missions_vsa)} total"
-        )
+        st.info(f"{filter_info} - {len(missions_filtrees)} mission(s) sur {len(missions_vsa)} total")
 
         if not missions_filtrees:
             type_missions = "internes" if facturation_interne else "externes"
@@ -287,11 +281,7 @@ def _display_vsa_missions_stats(missions_vsa) -> None:
 
     with col3:
         missions_with_tjm = [m for m in missions_vsa if m.tjm]
-        avg_tjm = (
-            sum(m.tjm for m in missions_with_tjm) / len(missions_with_tjm)
-            if missions_with_tjm
-            else 0
-        )
+        avg_tjm = sum(m.tjm for m in missions_with_tjm) / len(missions_with_tjm) if missions_with_tjm else 0
         st.metric("💰 TJM moyen", f"{avg_tjm:,.0f}€")
 
 
@@ -304,22 +294,12 @@ def _display_vsa_missions_table(missions_vsa, consultant) -> None:
                 COL_CODE: mission.code,
                 COL_ORDERID: mission.orderid,
                 COL_CLIENT: mission.client_name,
-                COL_DATE_DEBUT: (
-                    mission.date_debut.strftime(DATE_FORMAT)
-                    if mission.date_debut
-                    else NA_VALUE
-                ),
-                COL_DATE_FIN: (
-                    mission.date_fin.strftime(DATE_FORMAT)
-                    if mission.date_fin
-                    else NA_VALUE
-                ),
+                COL_DATE_DEBUT: (mission.date_debut.strftime(DATE_FORMAT) if mission.date_debut else NA_VALUE),
+                COL_DATE_FIN: (mission.date_fin.strftime(DATE_FORMAT) if mission.date_fin else NA_VALUE),
                 COL_TJM: f"{mission.tjm:,.0f}€" if mission.tjm else NA_VALUE,
                 COL_CJM: f"{mission.cjm:,.0f}€" if mission.cjm else NA_VALUE,
                 COL_STATUT: "✅ Active" if mission.est_active else "❌ Terminée",
-                COL_DUREE: (
-                    f"{mission.duree_jours} jours" if mission.duree_jours else NA_VALUE
-                ),
+                COL_DUREE: (f"{mission.duree_jours} jours" if mission.duree_jours else NA_VALUE),
             }
         )
 
@@ -376,17 +356,11 @@ def _display_action_buttons(consultant) -> None:
 def _handle_conditional_displays(consultant) -> None:
     """Gère l'affichage conditionnel des formulaires et historiques"""
     # Formulaire de modification (si activé)
-    if (
-        "edit_consultant_info" in st.session_state
-        and st.session_state.edit_consultant_info == consultant.id
-    ):
+    if "edit_consultant_info" in st.session_state and st.session_state.edit_consultant_info == consultant.id:
         show_edit_info_form(consultant)
 
     # Historique détaillé des salaires (si activé)
-    if (
-        "show_salary_history" in st.session_state
-        and st.session_state.show_salary_history == consultant.id
-    ):
+    if "show_salary_history" in st.session_state and st.session_state.show_salary_history == consultant.id:
         show_detailed_salary_history(consultant.id)
 
 
@@ -633,9 +607,7 @@ def update_consultant_info(consultant_id: int, data: dict) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = (
-                session.query(Consultant).filter(Consultant.id == consultant_id).first()
-            )
+            consultant = session.query(Consultant).filter(Consultant.id == consultant_id).first()
 
             if not consultant:
                 st.error("❌ Consultant introuvable")
@@ -644,9 +616,7 @@ def update_consultant_info(consultant_id: int, data: dict) -> bool:
             # Vérifier l'unicité de l'email
             existing = (
                 session.query(Consultant)
-                .filter(
-                    Consultant.email == data["email"], Consultant.id != consultant_id
-                )
+                .filter(Consultant.email == data["email"], Consultant.id != consultant_id)
                 .first()
             )
             if existing:
@@ -670,9 +640,7 @@ def update_consultant_info(consultant_id: int, data: dict) -> bool:
             consultant.prenom = data["prenom"].strip()
             consultant.nom = data["nom"].strip()
             consultant.email = data["email"].strip().lower()
-            consultant.telephone = (
-                data["telephone"].strip() if data["telephone"] else None
-            )
+            consultant.telephone = data["telephone"].strip() if data["telephone"] else None
             consultant.salaire_actuel = new_salary
             consultant.disponibilite = data["disponibilite"]
             consultant.notes = data["notes"].strip() if data["notes"] else None
@@ -696,12 +664,8 @@ def generate_consultant_report(consultant):
         # Informations de base
         st.write(f"**Nom complet :** {consultant.prenom} {consultant.nom}")
         st.write(f"**Email :** {consultant.email}")
-        st.write(
-            f"**Practice :** {consultant.practice.nom if consultant.practice else 'Non affecté'}"
-        )
-        st.write(
-            f"**Statut :** {'Disponible' if consultant.disponibilite else 'En mission'}"
-        )
+        st.write(f"**Practice :** {consultant.practice.nom if consultant.practice else 'Non affecté'}")
+        st.write(f"**Statut :** {'Disponible' if consultant.disponibilite else 'En mission'}")
 
         # Informations financières
         salaire = consultant.salaire_actuel or 0
@@ -718,11 +682,7 @@ def generate_consultant_report(consultant):
                     .count()
                 )
 
-                mission_count = (
-                    session.query(Mission)
-                    .filter(Mission.consultant_id == consultant.id)
-                    .count()
-                )
+                mission_count = session.query(Mission).filter(Mission.consultant_id == consultant.id).count()
 
             st.write(f"**Nombre de compétences :** {competence_count}")
             st.write(f"**Nombre de missions :** {mission_count}")

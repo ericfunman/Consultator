@@ -162,9 +162,7 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         except requests.exceptions.SSLError as ssl_error:
             # En cas d'erreur SSL, logger l'erreur mais ne pas désactiver la validation
             logger.warning(f"Erreur SSL lors de l'appel OpenAI: {ssl_error}")
-            logger.warning(
-                "Cela peut être dû à un proxy d'entreprise ou des certificats système manquants"
-            )
+            logger.warning("Cela peut être dû à un proxy d'entreprise ou des certificats système manquants")
 
             # Lever une erreur explicite plutôt que de désactiver SSL
             raise ConnectionError(
@@ -175,9 +173,7 @@ Réponds UNIQUEMENT avec du JSON valide, rien d'autre."""
         except requests.exceptions.RequestException as e:
             raise ConnectionError(f"Erreur API OpenAI: {str(e)}") from e
 
-    def _parse_and_validate_response(
-        self, api_response: Dict[str, Any], original_text: str
-    ) -> Dict[str, Any]:
+    def _parse_and_validate_response(self, api_response: Dict[str, Any], original_text: str) -> Dict[str, Any]:
         """Parse et valide la réponse de GPT-4"""
 
         try:
@@ -266,9 +262,7 @@ def show_grok_config_interface():
 
     if api_key:
         # Clé configurée
-        masked_key = (
-            api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
-        )
+        masked_key = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else api_key
         st.success(f"✅ Clé API OpenAI configurée: `{masked_key}`")
 
         # Tester la connexion
@@ -310,9 +304,7 @@ def show_grok_config_interface():
             try:
                 service = OpenAIChatGPTService(temp_api_key)
                 service._call_openai_api("Bonjour, réponds simplement 'OK'")
-                st.success(
-                    "✅ Clé API valide ! Configurez-la dans vos variables d'environnement."
-                )
+                st.success("✅ Clé API valide ! Configurez-la dans vos variables d'environnement.")
             except Exception as e:
                 st.error(f"❌ Clé API invalide: {e}")
 

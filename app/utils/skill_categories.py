@@ -370,16 +370,10 @@ def search_competences(query, category_type=None):
     for category, competences in competences_dict.items():
         # Chercher dans le nom de la catégorie
         if query_lower in category.lower():
-            results.extend(
-                _add_all_category_competences(category, competences, category_type)
-            )
+            results.extend(_add_all_category_competences(category, competences, category_type))
         else:
             # Chercher dans les compétences individuelles
-            results.extend(
-                _search_individual_competences(
-                    query_lower, category, competences, category_type
-                )
-            )
+            results.extend(_search_individual_competences(query_lower, category, competences, category_type))
 
     return results
 

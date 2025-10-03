@@ -17,17 +17,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import show_final_stats: {e}", allow_module_level=True)
 
 
-
-
 def test_show_final_statistics():
     """Test automatiquement généré pour show_final_statistics"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = show_final_statistics(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -39,16 +37,15 @@ def test_show_final_statistics_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_show_final_statistics_with_mocks(mock_request):
     """Test de show_final_statistics avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

@@ -142,9 +142,7 @@ def show_add_consultant_form():
         practice_options = _load_practices()
 
         if not practice_options:
-            st.warning(
-                "⚠️ Aucune practice trouvée. Veuillez créer des practices d'abord."
-            )
+            st.warning("⚠️ Aucune practice trouvée. Veuillez créer des practices d'abord.")
             return
 
         with st.form("add_consultant_form", clear_on_submit=True):
@@ -192,9 +190,7 @@ def show_add_consultant_form():
         st.code(str(e))
 
 
-def validate_consultant_form(
-    prenom: str, nom: str, email: str, practice_id: int
-) -> bool:
+def validate_consultant_form(prenom: str, nom: str, email: str, practice_id: int) -> bool:
     """Valide les données du formulaire consultant"""
 
     errors = []
@@ -227,11 +223,7 @@ def create_consultant(data: Dict[str, Any]) -> bool:
     try:
         with get_database_session() as session:
             # Vérifier si l'email existe déjà
-            existing = (
-                session.query(Consultant)
-                .filter(Consultant.email == data["email"])
-                .first()
-            )
+            existing = session.query(Consultant).filter(Consultant.email == data["email"]).first()
             if existing:
                 st.error("❌ Un consultant avec cet email existe déjà")
                 return False
@@ -252,9 +244,7 @@ def create_consultant(data: Dict[str, Any]) -> bool:
             session.add(consultant)
             session.commit()
 
-            st.info(
-                f"✅ Consultant {consultant.prenom} {consultant.nom} créé avec l'ID {consultant.id}"
-            )
+            st.info(f"✅ Consultant {consultant.prenom} {consultant.nom} créé avec l'ID {consultant.id}")
             return True
 
     except Exception as e:
@@ -293,14 +283,10 @@ def show_edit_consultant_form(consultant_id: int):
             st.markdown("#### 📋 Informations personnelles")
 
             # Champs d'informations personnelles
-            prenom, nom, email, telephone, salaire_actuel = (
-                _display_personal_info_fields(consultant)
-            )
+            prenom, nom, email, telephone, salaire_actuel = _display_personal_info_fields(consultant)
 
             # Practice et informations complémentaires
-            practice_id, disponibilite, notes = _display_practice_and_additional_fields(
-                consultant, practice_options
-            )
+            practice_id, disponibilite, notes = _display_practice_and_additional_fields(consultant, practice_options)
 
             # Boutons du formulaire
             submitted, delete, cancel = _display_form_buttons()
@@ -332,9 +318,7 @@ def update_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = (
-                session.query(Consultant).filter(Consultant.id == consultant_id).first()
-            )
+            consultant = session.query(Consultant).filter(Consultant.id == consultant_id).first()
 
             if not consultant:
                 st.error(ERROR_CONSULTANT_NOT_FOUND)
@@ -343,9 +327,7 @@ def update_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
             # Vérifier si l'email existe déjà pour un autre consultant
             existing = (
                 session.query(Consultant)
-                .filter(
-                    Consultant.email == data["email"], Consultant.id != consultant_id
-                )
+                .filter(Consultant.email == data["email"], Consultant.id != consultant_id)
                 .first()
             )
             if existing:
@@ -356,9 +338,7 @@ def update_consultant(consultant_id: int, data: Dict[str, Any]) -> bool:
             consultant.prenom = data["prenom"].strip()
             consultant.nom = data["nom"].strip()
             consultant.email = data["email"].strip().lower()
-            consultant.telephone = (
-                data["telephone"].strip() if data["telephone"] else None
-            )
+            consultant.telephone = data["telephone"].strip() if data["telephone"] else None
             consultant.salaire_actuel = data["salaire_actuel"]
             consultant.practice_id = data["practice_id"]
             consultant.disponibilite = data["disponibilite"]
@@ -379,9 +359,7 @@ def delete_consultant(consultant_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            consultant = (
-                session.query(Consultant).filter(Consultant.id == consultant_id).first()
-            )
+            consultant = session.query(Consultant).filter(Consultant.id == consultant_id).first()
 
             if not consultant:
                 st.error(ERROR_CONSULTANT_NOT_FOUND)
@@ -408,9 +386,7 @@ def _display_personal_info_fields(consultant):
     col1, col2 = st.columns(2)
 
     with col1:
-        prenom = st.text_input(
-            "Prénom *", value=consultant.prenom, help="Prénom du consultant"
-        )
+        prenom = st.text_input("Prénom *", value=consultant.prenom, help="Prénom du consultant")
 
         email = st.text_input(
             "Email *",
@@ -427,9 +403,7 @@ def _display_personal_info_fields(consultant):
         )
 
     with col2:
-        nom = st.text_input(
-            "Nom *", value=consultant.nom, help="Nom de famille du consultant"
-        )
+        nom = st.text_input("Nom *", value=consultant.nom, help="Nom de famille du consultant")
 
         telephone = st.text_input(
             "Téléphone",

@@ -128,11 +128,7 @@ class BusinessManagerService:
         """Récupère un Business Manager par son ID"""
         try:
             with get_database_session() as session:
-                return (
-                    session.query(BusinessManager)
-                    .filter(BusinessManager.id == bm_id)
-                    .first()
-                )
+                return session.query(BusinessManager).filter(BusinessManager.id == bm_id).first()
         except SQLAlchemyError as e:
             print(f"Erreur lors de la récupération du Business Manager {bm_id}: {e}")
             return None

@@ -63,7 +63,7 @@ class TestConsultantDocuments:
     def test_show_upload_document_form(self):
         """Test formulaire upload document - simplifié"""
         consultant_id = 1
-        
+
         # Test basique - vérifier que l'ID est un entier positif
         assert isinstance(consultant_id, int)
         assert consultant_id > 0

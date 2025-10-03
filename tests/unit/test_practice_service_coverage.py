@@ -33,9 +33,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = [
-            self.mock_practice
-        ]
+        mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = [self.mock_practice]
         mock_db.close = Mock()
 
         # Execution
@@ -78,9 +76,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_practice
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_practice
 
         # Execution
         result = PracticeService.get_practice_by_id(1)
@@ -121,9 +117,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_practice
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_practice
 
         # Execution
         result = PracticeService.get_practice_by_name("Data Engineering")
@@ -135,17 +129,13 @@ class TestPracticeServiceCoverage:
     @patch("app.services.practice_service.get_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
-    def test_create_practice_success(
-        self, mock_st_success, mock_st_error, mock_session
-    ):
+    def test_create_practice_success(self, mock_st_success, mock_st_error, mock_session):
         """Test création practice réussie"""
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            None  # Pas d'existant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = None  # Pas d'existant
 
         # Execution
         PracticeService.create_practice(
@@ -174,14 +164,10 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_practice
-        )  # Déjà existant
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_practice  # Déjà existant
 
         # Execution
-        result = PracticeService.create_practice(
-            nom="Test Practice", description="Description test"
-        )
+        result = PracticeService.create_practice(nom="Test Practice", description="Description test")
 
         # Vérifications
         assert result is None
@@ -206,9 +192,7 @@ class TestPracticeServiceCoverage:
         mock_db.add.side_effect = SQLAlchemyError("Test error")
 
         # Execution
-        result = PracticeService.create_practice(
-            nom="Test Practice", description="Description test"
-        )
+        result = PracticeService.create_practice(nom="Test Practice", description="Description test")
 
         # Vérifications
         assert result is None
@@ -224,17 +208,13 @@ class TestPracticeServiceCoverage:
     @patch("app.services.practice_service.get_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
-    def test_update_practice_success(
-        self, mock_st_success, mock_st_error, mock_session
-    ):
+    def test_update_practice_success(self, mock_st_success, mock_st_error, mock_session):
         """Test mise à jour practice réussie"""
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_practice
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_practice
 
         # Execution
         result = PracticeService.update_practice(1, nom="New Name")
@@ -283,9 +263,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_practice
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_practice
         mock_db.commit.side_effect = SQLAlchemyError("DB Error")
 
         # Execution
@@ -319,9 +297,7 @@ class TestPracticeServiceCoverage:
         mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = [
             mock_consultant
         ]
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_practice
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_practice
 
         # Execution
         result = PracticeService.get_consultants_by_practice(1)
@@ -339,15 +315,9 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            self.mock_practice
-        ]
-        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = (
-            []
-        )
-        mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = (
-            []
-        )
+        mock_db.query.return_value.filter.return_value.all.return_value = [self.mock_practice]
+        mock_db.query.return_value.options.return_value.filter.return_value.order_by.return_value.all.return_value = []
+        mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = []
 
         # Execution
         result = PracticeService.get_consultants_by_practice()
@@ -383,9 +353,7 @@ class TestPracticeServiceCoverage:
     @patch("app.services.practice_service.get_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
-    def test_assign_consultant_to_practice_success(
-        self, mock_st_success, mock_st_error, mock_session
-    ):
+    def test_assign_consultant_to_practice_success(self, mock_st_success, mock_st_error, mock_session):
         """Test assignation consultant à practice réussie"""
         # Mock consultant et practice
         mock_consultant = Mock()
@@ -420,17 +388,13 @@ class TestPracticeServiceCoverage:
 
     @patch("app.services.practice_service.get_session")
     @patch("streamlit.error")
-    def test_assign_consultant_to_practice_consultant_not_found(
-        self, mock_st_error, mock_session
-    ):
+    def test_assign_consultant_to_practice_consultant_not_found(self, mock_st_error, mock_session):
         """Test assignation consultant non trouvé"""
         # Mock session
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            None  # Consultant not found
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = None  # Consultant not found
 
         # Execution
         result = PracticeService.assign_consultant_to_practice(999, 1)
@@ -529,9 +493,7 @@ class TestPracticeServiceCoverage:
     @patch("app.services.practice_service.get_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
-    def test_init_default_practices_success(
-        self, mock_st_success, mock_st_error, mock_session
-    ):
+    def test_init_default_practices_success(self, mock_st_success, mock_st_error, mock_session):
         """Test initialisation practices par défaut"""
         # Mock session
         mock_db = Mock()
@@ -562,9 +524,7 @@ class TestPracticeServiceCoverage:
         mock_db = Mock()
         mock_session.return_value = mock_db
         mock_db.close = Mock()
-        mock_db.query.return_value.all.return_value = [
-            self.mock_practice
-        ]  # Practices déjà existantes
+        mock_db.query.return_value.all.return_value = [self.mock_practice]  # Practices déjà existantes
 
         # Execution
         PracticeService.init_default_practices()

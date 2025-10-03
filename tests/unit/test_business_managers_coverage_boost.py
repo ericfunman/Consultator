@@ -10,11 +10,11 @@ import os
 from datetime import datetime, date
 
 # Ajouter le répertoire parent au path pour les imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # Mock des modules Streamlit avant les imports
-sys.modules['streamlit'] = Mock()
-sys.modules['streamlit_option_menu'] = Mock()
+sys.modules["streamlit"] = Mock()
+sys.modules["streamlit_option_menu"] = Mock()
 
 
 class TestBusinessManagersCoverage(unittest.TestCase):
@@ -60,11 +60,13 @@ class TestBusinessManagersCoverage(unittest.TestCase):
             result = True if args and "Oui, supprimer" in args[0] else False
             print(f"Button called with args={args}, kwargs={kwargs}, returning {result}")
             return result
+
         self.mock_st.button.side_effect = mock_button
 
         # Mock session_state avec support des attributs
         class MockSessionState(dict):
             """Mock session_state qui supporte l'accès par attribut et la suppression"""
+
             def __getattr__(self, name):
                 try:
                     return self[name]
@@ -94,9 +96,9 @@ class TestBusinessManagersCoverage(unittest.TestCase):
 
         # Patcher les modules au niveau du système
         self.patches = [
-            patch('app.pages_modules.business_managers.st', self.mock_st),
-            patch('app.pages_modules.business_managers.get_database_session'),
-            patch('app.pages_modules.business_managers.datetime', mock_datetime_module),
+            patch("app.pages_modules.business_managers.st", self.mock_st),
+            patch("app.pages_modules.business_managers.get_database_session"),
+            patch("app.pages_modules.business_managers.datetime", mock_datetime_module),
         ]
 
         for p in self.patches:
@@ -110,18 +112,21 @@ class TestBusinessManagersCoverage(unittest.TestCase):
     def test_validate_and_convert_bm_id_valid_string(self):
         """Test de validation d'un ID valide sous forme de chaîne"""
         from app.pages_modules.business_managers import _validate_and_convert_bm_id
+
         result = _validate_and_convert_bm_id("123")
         self.assertEqual(result, 123)
 
     def test_validate_and_convert_bm_id_valid_int(self):
         """Test de validation d'un ID valide sous forme d'entier"""
         from app.pages_modules.business_managers import _validate_and_convert_bm_id
+
         result = _validate_and_convert_bm_id(456)
         self.assertEqual(result, 456)
 
     def test_validate_and_convert_bm_id_invalid_string(self):
         """Test de validation d'un ID invalide sous forme de chaîne"""
         from app.pages_modules.business_managers import _validate_and_convert_bm_id
+
         result = _validate_and_convert_bm_id("abc")
         self.assertIsNone(result)
         self.mock_st.error.assert_called_once()
@@ -129,6 +134,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
     def test_validate_and_convert_bm_id_none(self):
         """Test de validation d'un ID None"""
         from app.pages_modules.business_managers import _validate_and_convert_bm_id
+
         result = _validate_and_convert_bm_id(None)
         self.assertIsNone(result)
 
@@ -138,50 +144,52 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         self.mock_st.session_state = {}
 
         from app.pages_modules.business_managers import show
+
         show()
 
         # Vérifier que le titre est affiché
         self.mock_st.title.assert_called_with("👔 Gestion des Business Managers")
 
-    @patch('app.pages_modules.business_managers.show_bm_profile')
+    @patch("app.pages_modules.business_managers.show_bm_profile")
     def test_show_with_profile_view(self, mock_show_profile):
         """Test de l'interface principale avec un profil BM à afficher"""
         # Mock pour que view_bm_profile soit dans session_state
         self.mock_st.session_state = {"view_bm_profile": 123}
 
         from app.pages_modules.business_managers import show
+
         show()
 
         # Vérifier que show_bm_profile est appelée
         mock_show_profile.assert_called_once()
 
-    @patch('app.pages_modules.business_managers.show_business_managers_list')
-    @patch('app.pages_modules.business_managers.show_add_business_manager')
-    @patch('app.pages_modules.business_managers.show_statistics')
+    @patch("app.pages_modules.business_managers.show_business_managers_list")
+    @patch("app.pages_modules.business_managers.show_add_business_manager")
+    @patch("app.pages_modules.business_managers.show_statistics")
     def test_show_tabs_creation(self, mock_stats, mock_add, mock_list):
         """Test de la création des onglets dans l'interface principale"""
         self.mock_st.session_state = {}
 
         from app.pages_modules.business_managers import show
+
         show()
 
         # Vérifier que st.tabs est appelée avec les bons arguments
-        self.mock_st.tabs.assert_called_once_with(
-            ["📋 Liste des BMs", "➕ Nouveau BM", "📊 Statistiques"]
-        )
+        self.mock_st.tabs.assert_called_once_with(["📋 Liste des BMs", "➕ Nouveau BM", "📊 Statistiques"])
 
         # Vérifier que les fonctions d'onglets sont appelées
         mock_list.assert_called_once()
         mock_add.assert_called_once()
         mock_stats.assert_called_once()
 
-    @patch('app.pages_modules.business_managers._validate_and_convert_bm_id')
-    @patch('app.pages_modules.business_managers._display_bm_header_and_info')
-    @patch('app.pages_modules.business_managers._display_bm_general_info')
-    @patch('app.pages_modules.business_managers._handle_bm_form_actions')
-    @patch('app.pages_modules.business_managers.show_bm_consultants_management')
-    def test_show_bm_profile_success(self, mock_consultants_mgmt, mock_form_actions,
-                                   mock_display_info, mock_display_header, mock_validate):
+    @patch("app.pages_modules.business_managers._validate_and_convert_bm_id")
+    @patch("app.pages_modules.business_managers._display_bm_header_and_info")
+    @patch("app.pages_modules.business_managers._display_bm_general_info")
+    @patch("app.pages_modules.business_managers._handle_bm_form_actions")
+    @patch("app.pages_modules.business_managers.show_bm_consultants_management")
+    def test_show_bm_profile_success(
+        self, mock_consultants_mgmt, mock_form_actions, mock_display_info, mock_display_header, mock_validate
+    ):
         """Test de l'affichage réussi d'un profil BM"""
         mock_validate.return_value = 123
 
@@ -202,8 +210,9 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session_context.__enter__ = Mock(return_value=mock_session)
         mock_session_context.__exit__ = Mock(return_value=None)
 
-        with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+        with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
             from app.pages_modules.business_managers import show_bm_profile
+
             show_bm_profile()
 
             # Vérifier que les fonctions sont appelées
@@ -212,7 +221,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
             mock_form_actions.assert_called_once()
             mock_consultants_mgmt.assert_called_once()
 
-    @patch('app.pages_modules.business_managers._validate_and_convert_bm_id')
+    @patch("app.pages_modules.business_managers._validate_and_convert_bm_id")
     def test_show_bm_profile_invalid_id(self, mock_validate):
         """Test de l'affichage d'un profil BM avec ID invalide"""
         mock_validate.return_value = None
@@ -221,12 +230,13 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         self.mock_st.session_state["view_bm_profile"] = 123
 
         from app.pages_modules.business_managers import show_bm_profile
+
         show_bm_profile()
 
         # Vérifier que st.rerun est appelée
         self.mock_st.rerun.assert_called_once()
 
-    @patch('app.pages_modules.business_managers._validate_and_convert_bm_id')
+    @patch("app.pages_modules.business_managers._validate_and_convert_bm_id")
     def test_show_bm_profile_bm_not_found(self, mock_validate):
         """Test de l'affichage d'un profil BM introuvable"""
         mock_validate.return_value = 999
@@ -242,14 +252,15 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session_context.__enter__ = Mock(return_value=mock_session)
         mock_session_context.__exit__ = Mock(return_value=None)
 
-        with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+        with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
             from app.pages_modules.business_managers import show_bm_profile
+
             show_bm_profile()
 
             # Vérifier que l'erreur est affichée
             self.mock_st.error.assert_called_with("❌ Business Manager introuvable")
 
-    @patch('app.pages_modules.business_managers._validate_and_convert_bm_id')
+    @patch("app.pages_modules.business_managers._validate_and_convert_bm_id")
     def test_show_bm_profile_database_error(self, mock_validate):
         """Test de gestion d'erreur de base de données dans show_bm_profile"""
         mock_validate.return_value = 123
@@ -262,14 +273,15 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session_context.__enter__ = Mock(side_effect=Exception("DB Error"))
         mock_session_context.__exit__ = Mock(return_value=None)
 
-        with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+        with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
             from app.pages_modules.business_managers import show_bm_profile
+
             show_bm_profile()
 
             # Vérifier que l'erreur est affichée
             self.mock_st.error.assert_called_with("❌ Erreur lors du chargement du profil : DB Error")
 
-    @patch('app.pages_modules.business_managers.datetime')
+    @patch("app.pages_modules.business_managers.datetime")
     def test_show_edit_bm_form_success(self, mock_datetime):
         """Test de l'édition réussie d'un BM"""
         mock_datetime.now.return_value = datetime(2024, 1, 1, 12, 0, 0)
@@ -299,8 +311,9 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session_context.__enter__ = Mock(return_value=mock_session)
         mock_session_context.__exit__ = Mock(return_value=None)
 
-        with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+        with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
             from app.pages_modules.business_managers import show_edit_bm_form
+
             show_edit_bm_form(mock_bm)
 
             # Vérifier que commit est appelée
@@ -328,17 +341,20 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session_context.__enter__ = Mock(return_value=mock_session)
         mock_session_context.__exit__ = Mock(return_value=None)
 
-        with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+        with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
             from app.pages_modules.business_managers import show_delete_bm_confirmation
+
             show_delete_bm_confirmation(mock_bm)
 
             # Vérifier que l'avertissement est affiché
-            self.mock_st.warning.assert_called_with("⚠️ Ce Business Manager a **2** consultant(s) actuellement assigné(s).")
-            
+            self.mock_st.warning.assert_called_with(
+                "⚠️ Ce Business Manager a **2** consultant(s) actuellement assigné(s)."
+            )
+
             # Vérifier les appels à st.info dans l'ordre
             expected_calls = [
                 (("La suppression clôturera automatiquement ces assignations.",), {}),
-                (("📋 Historique total : **5** assignation(s)",), {})
+                (("📋 Historique total : **5** assignation(s)",), {}),
             ]
             self.mock_st.info.assert_has_calls(expected_calls)
 
@@ -378,10 +394,11 @@ class TestBusinessManagersCoverage(unittest.TestCase):
             else:
                 return mock_delete_session_context  # Deuxième session pour suppression
 
-        with patch('app.pages_modules.business_managers.get_database_session', side_effect=mock_get_session):
+        with patch("app.pages_modules.business_managers.get_database_session", side_effect=mock_get_session):
             # Patcher streamlit dans le module business_managers
             class MockSessionState(dict):
                 """Mock session_state qui supporte l'accès par attribut et la suppression"""
+
                 def __getattr__(self, name):
                     try:
                         return self[name]
@@ -430,8 +447,9 @@ class TestBusinessManagersCoverage(unittest.TestCase):
             mock_st_module.write = Mock()
             mock_st_module.rerun = Mock()
 
-            with patch('app.pages_modules.business_managers.st', mock_st_module):
+            with patch("app.pages_modules.business_managers.st", mock_st_module):
                 from app.pages_modules.business_managers import show_delete_bm_confirmation
+
                 show_delete_bm_confirmation(mock_bm)
 
                 # Vérifier que la suppression est appelée
@@ -442,18 +460,19 @@ class TestBusinessManagersCoverage(unittest.TestCase):
                 mock_st_module.success.assert_called_with("✅ Business Manager Jean Dupont supprimé avec succès !")
 
                 # Vérifier que les clés de session_state sont supprimées
-                self.assertNotIn('view_bm_profile', mock_st_module.session_state)
-                self.assertNotIn('delete_bm_mode', mock_st_module.session_state)
+                self.assertNotIn("view_bm_profile", mock_st_module.session_state)
+                self.assertNotIn("delete_bm_mode", mock_st_module.session_state)
 
-    @patch('app.pages_modules.business_managers.show_current_bm_consultants')
-    @patch('app.pages_modules.business_managers.show_add_bm_assignment')
-    @patch('app.pages_modules.business_managers.show_bm_assignments_history')
+    @patch("app.pages_modules.business_managers.show_current_bm_consultants")
+    @patch("app.pages_modules.business_managers.show_add_bm_assignment")
+    @patch("app.pages_modules.business_managers.show_bm_assignments_history")
     def test_show_bm_consultants_management_tabs(self, mock_history, mock_add, mock_current):
         """Test de la gestion des consultants avec onglets"""
         mock_bm = Mock()
         mock_session = Mock()
 
         from app.pages_modules.business_managers import show_bm_consultants_management
+
         show_bm_consultants_management(mock_bm, mock_session)
 
         # Vérifier que st.tabs est appelée avec les bons arguments
@@ -472,6 +491,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_bm_id = 123
 
         from app.pages_modules.business_managers import _get_current_assignments
+
         _get_current_assignments(mock_bm_id, mock_session)
 
         # Vérifier que la requête est construite correctement
@@ -493,6 +513,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session.query.return_value.filter.return_value.order_by.return_value.first.return_value = mock_mission
 
         from app.pages_modules.business_managers import _get_mission_data
+
         result = _get_mission_data(mock_consultant, mock_session)
 
         self.assertEqual(result["client"], "Test Client")
@@ -508,6 +529,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session.query.return_value.filter.return_value.order_by.return_value.first.return_value = None
 
         from app.pages_modules.business_managers import _get_mission_data
+
         result = _get_mission_data(mock_consultant, mock_session)
 
         self.assertEqual(result["client"], "N/A")
@@ -527,14 +549,10 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_consultant.disponibilite = True
         mock_consultant.salaire_actuel = 45000
 
-        mission_data = {
-            "client": "Test Client",
-            "role": "Developer",
-            "tjm": 500,
-            "date_debut": "01/01/2024"
-        }
+        mission_data = {"client": "Test Client", "role": "Developer", "tjm": 500, "date_debut": "01/01/2024"}
 
         from app.pages_modules.business_managers import _format_consultant_data
+
         result = _format_consultant_data(mock_assignment, mock_consultant, mission_data)
 
         self.assertEqual(result["Consultant"], "Jean Dupont")
@@ -542,7 +560,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         self.assertEqual(result["TJM"], "500€")
         self.assertEqual(result["Salaire"], "45000€")
 
-    @patch('app.pages_modules.business_managers.datetime')
+    @patch("app.pages_modules.business_managers.datetime")
     def test_end_assignment_success(self, mock_datetime):
         """Test de la terminaison réussie d'une assignation"""
         mock_datetime.now.return_value.date.return_value = date(2024, 1, 1)
@@ -552,6 +570,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session = Mock()
 
         from app.pages_modules.business_managers import _end_assignment
+
         _end_assignment(mock_assignment, mock_session)
 
         # Vérifier que date_fin est définie
@@ -568,12 +587,13 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session.commit.side_effect = Exception("DB Error")
 
         from app.pages_modules.business_managers import _end_assignment
+
         _end_assignment(mock_assignment, mock_session)
 
         # Vérifier que l'erreur est affichée
         self.mock_st.error.assert_called_with("❌ Erreur : DB Error")
 
-    @patch('app.pages_modules.business_managers.datetime')
+    @patch("app.pages_modules.business_managers.datetime")
     def test_add_comment_to_assignment_success(self, mock_datetime):
         """Test de l'ajout réussi d'un commentaire à une assignation"""
         mock_datetime.now.return_value.strftime.return_value = "01/01/2024"
@@ -584,6 +604,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session.query.return_value.get.return_value = mock_assignment
 
         from app.pages_modules.business_managers import _add_comment_to_assignment
+
         _add_comment_to_assignment(123, "Nouveau commentaire", mock_session)
 
         # Vérifier que le commentaire est ajouté
@@ -600,6 +621,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session.query.return_value.join.return_value.filter.return_value.all.return_value = []
 
         from app.pages_modules.business_managers import show_current_bm_consultants
+
         show_current_bm_consultants(mock_bm, mock_session)
 
         # Vérifier que le message d'info est affiché
@@ -625,17 +647,20 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_consultant.salaire_actuel = 45000
 
         # Mock mission data
-        with patch('app.pages_modules.business_managers._get_mission_data') as mock_get_mission:
+        with patch("app.pages_modules.business_managers._get_mission_data") as mock_get_mission:
             mock_get_mission.return_value = {
                 "client": "Test Client",
                 "role": "Developer",
                 "tjm": 500,
-                "date_debut": "01/01/2024"
+                "date_debut": "01/01/2024",
             }
 
-            mock_session.query.return_value.join.return_value.filter.return_value.all.return_value = [(mock_assignment, mock_consultant)]
+            mock_session.query.return_value.join.return_value.filter.return_value.all.return_value = [
+                (mock_assignment, mock_consultant)
+            ]
 
             from app.pages_modules.business_managers import show_current_bm_consultants
+
             show_current_bm_consultants(mock_bm, mock_session)
 
             # Vérifier que dataframe est appelée
@@ -643,10 +668,11 @@ class TestBusinessManagersCoverage(unittest.TestCase):
 
     def test_show_business_managers_list_empty(self):
         """Test de l'affichage de la liste vide de BMs"""
-        with patch('app.pages_modules.business_managers.BusinessManagerService') as mock_service:
+        with patch("app.pages_modules.business_managers.BusinessManagerService") as mock_service:
             mock_service.get_all_business_managers.return_value = []
 
             from app.pages_modules.business_managers import show_business_managers_list
+
             show_business_managers_list()
 
             # Vérifier que info est appelée (le message exact peut varier selon la logique)
@@ -662,10 +688,10 @@ class TestBusinessManagersCoverage(unittest.TestCase):
             "telephone": "0123456789",
             "consultants_count": 5,
             "actif": True,
-            "date_creation": datetime(2024, 1, 1)
+            "date_creation": datetime(2024, 1, 1),
         }
 
-        with patch('app.pages_modules.business_managers.BusinessManagerService') as mock_service:
+        with patch("app.pages_modules.business_managers.BusinessManagerService") as mock_service:
             mock_service.get_all_business_managers.return_value = [mock_bm_data]
 
             # Mock session pour le calcul des assignations
@@ -676,14 +702,15 @@ class TestBusinessManagersCoverage(unittest.TestCase):
             mock_session_context.__enter__ = Mock(return_value=mock_session)
             mock_session_context.__exit__ = Mock(return_value=None)
 
-            with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+            with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
                 from app.pages_modules.business_managers import show_business_managers_list
+
                 show_business_managers_list()
 
                 # Vérifier que le tableau est affiché
                 self.mock_st.markdown.assert_called()
 
-    @patch('app.pages_modules.business_managers.datetime')
+    @patch("app.pages_modules.business_managers.datetime")
     def test_show_add_business_manager_success(self, mock_datetime):
         """Test de l'ajout réussi d'un Business Manager"""
         mock_datetime.now.return_value = datetime(2024, 1, 1, 12, 0, 0)
@@ -702,15 +729,16 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session_context.__enter__ = Mock(return_value=mock_session)
         mock_session_context.__exit__ = Mock(return_value=None)
 
-        with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+        with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
             from app.pages_modules.business_managers import show_add_business_manager
+
             show_add_business_manager()
 
             # Vérifier que le BM est ajouté
             mock_session.add.assert_called()
             mock_session.commit.assert_called()
 
-    @patch('app.pages_modules.business_managers.datetime')
+    @patch("app.pages_modules.business_managers.datetime")
     def test_show_add_business_manager_duplicate_email(self, mock_datetime):
         """Test de l'ajout d'un BM avec email déjà existant"""
         mock_datetime.now.return_value = datetime(2024, 1, 1, 12, 0, 0)
@@ -730,8 +758,9 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session_context.__enter__ = Mock(return_value=mock_session)
         mock_session_context.__exit__ = Mock(return_value=None)
 
-        with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+        with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
             from app.pages_modules.business_managers import show_add_business_manager
+
             show_add_business_manager()
 
             # Vérifier que l'erreur est affichée
@@ -761,8 +790,9 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         mock_session_context.__enter__ = Mock(return_value=mock_session)
         mock_session_context.__exit__ = Mock(return_value=None)
 
-        with patch('app.pages_modules.business_managers.get_database_session', return_value=mock_session_context):
+        with patch("app.pages_modules.business_managers.get_database_session", return_value=mock_session_context):
             from app.pages_modules.business_managers import show_statistics
+
             show_statistics()
 
             # Vérifier que les métriques sont affichées
@@ -772,9 +802,14 @@ class TestBusinessManagersCoverage(unittest.TestCase):
     def test_constants_definition(self):
         """Test que les constantes sont correctement définies"""
         from app.pages_modules.business_managers import (
-            TELEPHONE_LABEL, DATE_FORMAT, DUREE_LABEL,
-            ERROR_INVALID_BM_ID, ERROR_GENERIC, ERROR_ASSIGNMENT
+            TELEPHONE_LABEL,
+            DATE_FORMAT,
+            DUREE_LABEL,
+            ERROR_INVALID_BM_ID,
+            ERROR_GENERIC,
+            ERROR_ASSIGNMENT,
         )
+
         self.assertEqual(TELEPHONE_LABEL, "Téléphone")
         self.assertEqual(DATE_FORMAT, "%d/%m/%Y")
         self.assertEqual(DUREE_LABEL, "Durée")
@@ -783,5 +818,5 @@ class TestBusinessManagersCoverage(unittest.TestCase):
         self.assertTrue(ERROR_ASSIGNMENT.startswith("❌ Erreur lors de"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

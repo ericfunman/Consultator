@@ -70,9 +70,7 @@ class TestDatabaseModule:
         result = get_session_factory()
 
         # Vérifier que sessionmaker a été appelé avec les bons paramètres
-        mock_sessionmaker.assert_called_once_with(
-            autocommit=False, autoflush=False, bind=mock_engine
-        )
+        mock_sessionmaker.assert_called_once_with(autocommit=False, autoflush=False, bind=mock_engine)
 
         assert result == mock_factory
 
@@ -145,9 +143,7 @@ class TestDatabaseModule:
     @patch("app.database.database.get_database_engine")
     @patch("app.database.database.Base")
     @patch("app.database.database.is_database_initialized")
-    def test_init_database_success(
-        self, mock_is_initialized, mock_base, mock_get_engine, mock_st
-    ):
+    def test_init_database_success(self, mock_is_initialized, mock_base, mock_get_engine, mock_st):
         """Test de l'initialisation réussie de la base de données"""
         from app.database.database import init_database
 
@@ -175,9 +171,7 @@ class TestDatabaseModule:
     @patch("app.database.database.get_database_engine")
     @patch("app.database.database.Base")
     @patch("app.database.database.is_database_initialized")
-    def test_init_database_error(
-        self, mock_is_initialized, mock_base, mock_get_engine, mock_st
-    ):
+    def test_init_database_error(self, mock_is_initialized, mock_base, mock_get_engine, mock_st):
         """Test de l'initialisation avec erreur"""
         from app.database.database import init_database
 

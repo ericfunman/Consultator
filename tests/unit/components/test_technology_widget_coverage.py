@@ -74,9 +74,7 @@ class TestAddCustomTechnology:
         mock_tech_service.add_custom_technology.return_value = True
         result = _add_custom_technology_if_needed("CustomTech")
         assert result is True
-        mock_tech_service.add_custom_technology.assert_called_once_with(
-            "CustomTech", "Personnalisés"
-        )
+        mock_tech_service.add_custom_technology.assert_called_once_with("CustomTech", "Personnalisés")
 
 
 class TestRenderAddTechnologyForm:
@@ -149,9 +147,7 @@ class TestHandleAddTechnology:
     def test_handle_add_empty_name(self, mock_st):
         """Test avec nom vide"""
         _handle_add_technology("", "Personnalisés", "test_key")
-        mock_st.error.assert_called_once_with(
-            "⚠️ Veuillez saisir le nom de la technologie"
-        )
+        mock_st.error.assert_called_once_with("⚠️ Veuillez saisir le nom de la technologie")
 
     @patch("app.components.technology_widget.st")
     @patch("app.components.technology_widget.TechnologyService")
@@ -162,9 +158,7 @@ class TestHandleAddTechnology:
 
         _handle_add_technology("NewTech", "Personnalisés", "test_key")
 
-        mock_tech_service.add_custom_technology.assert_called_once_with(
-            "NewTech", "Personnalisés"
-        )
+        mock_tech_service.add_custom_technology.assert_called_once_with("NewTech", "Personnalisés")
         mock_st.success.assert_called_once_with("✅ Technologie 'NewTech' ajoutée !")
         assert mock_st.session_state.get("show_add_tech_test_key") == False
         mock_st.rerun.assert_called_once()
@@ -199,9 +193,7 @@ class TestRenderMultiselectInterface:
         all_techs = ["Python", "Java", "JavaScript"]
         current_techs = ["Python"]
 
-        result = _render_multiselect_interface(
-            "Test Label", all_techs, current_techs, "test_key", "Help text"
-        )
+        result = _render_multiselect_interface("Test Label", all_techs, current_techs, "test_key", "Help text")
 
         assert result == ["Python", "Java"]
         mock_st.multiselect.assert_called_once()
@@ -224,9 +216,7 @@ class TestRenderMultiselectInterface:
         all_techs = ["Python", "Java"]
         current_techs = ["Python"]
 
-        result = _render_multiselect_interface(
-            "Test Label", all_techs, current_techs, "test_key", None
-        )
+        result = _render_multiselect_interface("Test Label", all_techs, current_techs, "test_key", None)
 
         assert result == ["Python"]
         assert mock_st.session_state.get("show_add_tech_test_key") == True
@@ -253,9 +243,7 @@ class TestRenderTechnologiesSearchTab:
     def test_search_without_query(self, mock_display_cat, mock_tech_service, mock_st):
         """Test sans query de recherche"""
         mock_st.text_input.return_value = ""
-        mock_tech_service.get_technologies_by_category.return_value = {
-            "Test": ["Python"]
-        }
+        mock_tech_service.get_technologies_by_category.return_value = {"Test": ["Python"]}
 
         _render_technologies_search_tab()
 
@@ -321,9 +309,7 @@ class TestRenderAddTechnologyTab:
     @patch("app.components.technology_widget.st")
     @patch("app.components.technology_widget._render_add_technology_form_main")
     @patch("app.components.technology_widget._display_custom_technologies_list")
-    def test_render_add_technology_tab(
-        self, mock_display_list, mock_render_form, mock_st
-    ):
+    def test_render_add_technology_tab(self, mock_display_list, mock_render_form, mock_st):
         """Test rendu onglet d'ajout"""
         _render_add_technology_tab()
 
@@ -367,9 +353,7 @@ class TestHandleFormSubmission:
     def test_handle_form_empty_name(self, mock_st):
         """Test soumission avec nom vide"""
         _handle_form_submission("", "Personnalisés")
-        mock_st.error.assert_called_once_with(
-            "⚠️ Veuillez saisir le nom de la technologie"
-        )
+        mock_st.error.assert_called_once_with("⚠️ Veuillez saisir le nom de la technologie")
 
     @patch("app.components.technology_widget.st")
     @patch("app.components.technology_widget.TechnologyService")
@@ -379,12 +363,8 @@ class TestHandleFormSubmission:
 
         _handle_form_submission("NewTech", "Personnalisés")
 
-        mock_tech_service.add_custom_technology.assert_called_once_with(
-            "NewTech", "Personnalisés"
-        )
-        mock_st.success.assert_called_once_with(
-            "✅ Technologie 'NewTech' ajoutée avec succès !"
-        )
+        mock_tech_service.add_custom_technology.assert_called_once_with("NewTech", "Personnalisés")
+        mock_st.success.assert_called_once_with("✅ Technologie 'NewTech' ajoutée avec succès !")
         mock_st.rerun.assert_called_once()
 
     @patch("app.components.technology_widget.st")
@@ -409,16 +389,12 @@ class TestDisplayCustomTechnologiesList:
 
         _display_custom_technologies_list()
 
-        mock_st.info.assert_called_once_with(
-            "ℹ️ Aucune technologie personnalisée ajoutée"
-        )
+        mock_st.info.assert_called_once_with("ℹ️ Aucune technologie personnalisée ajoutée")
 
     @patch("app.components.technology_widget.st")
     @patch("app.components.technology_widget.TechnologyService")
     @patch("app.components.technology_widget._handle_delete_technology")
-    def test_display_custom_list_with_items(
-        self, mock_handle_delete, mock_tech_service, mock_st
-    ):
+    def test_display_custom_list_with_items(self, mock_handle_delete, mock_tech_service, mock_st):
         """Test liste avec technologies personnalisées"""
         custom_techs = [
             {"id": 1, "nom": "CustomTech1", "categorie": "Personnalisés"},
@@ -474,9 +450,7 @@ class TestShowTechnologiesReferentiel:
     @patch("app.components.technology_widget.st")
     @patch("app.components.technology_widget._render_technologies_search_tab")
     @patch("app.components.technology_widget._render_add_technology_tab")
-    def test_show_technologies_referentiel(
-        self, mock_render_add_tab, mock_render_search_tab, mock_st
-    ):
+    def test_show_technologies_referentiel(self, mock_render_add_tab, mock_render_search_tab, mock_st):
         """Test affichage principal référentiel"""
         # Mock tabs
         mock_tab1, mock_tab2 = MagicMock(), MagicMock()

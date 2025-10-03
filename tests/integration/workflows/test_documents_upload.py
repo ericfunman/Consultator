@@ -40,9 +40,7 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
 
         mock_title.assert_called_once_with(" Gestion des documents")
         mock_markdown.assert_called_once_with("### Uploadez et gérez les documents")
-        mock_error.assert_called_once_with(
-            " Les services de documents ne sont pas disponibles"
-        )
+        mock_error.assert_called_once_with(" Les services de documents ne sont pas disponibles")
 
     @patch("app.pages_modules.documents_upload.imports_ok", True)
     @patch("app.pages_modules.documents_upload.st.subheader")
@@ -93,9 +91,7 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         mock_columns.assert_called_once_with(3)
         mock_metric.assert_any_call("📄 Nom du fichier", "test_document.pdf")
         mock_metric.assert_any_call(" Taille", "500.0 KB")
-        mock_button.assert_called_once_with(
-            " Sauvegarder document", type="primary", key="save_document"
-        )
+        mock_button.assert_called_once_with(" Sauvegarder document", type="primary", key="save_document")
 
     @patch("app.pages_modules.documents_upload.imports_ok", False)
     @patch("app.pages_modules.documents_upload.st.error")
@@ -103,17 +99,13 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
         """Test de show_document_upload_section() avec imports échoués"""
         show_document_upload_section()
 
-        mock_error.assert_called_once_with(
-            " Les services de documents ne sont pas disponibles"
-        )
+        mock_error.assert_called_once_with(" Les services de documents ne sont pas disponibles")
 
     @patch("app.pages_modules.documents_upload.DocumentService")
     @patch("app.pages_modules.documents_upload.st.success")
     @patch("app.pages_modules.documents_upload.st.info")
     @patch("builtins.open", new_callable=MagicMock)
-    def test_save_uploaded_document_success(
-        self, mock_open, mock_info, mock_success, mock_doc_service
-    ):
+    def test_save_uploaded_document_success(self, mock_open, mock_info, mock_success, mock_doc_service):
         """Test de save_uploaded_document() avec succès"""
         # Mock fichier
         mock_file = Mock()
@@ -220,9 +212,7 @@ class TestDocumentsUploadModule(BaseIntegrationTest):
     @patch("app.pages_modules.documents_upload.st.file_uploader")
     @patch("app.pages_modules.documents_upload.st.columns")
     @patch("app.pages_modules.documents_upload.st.metric")
-    def test_show_document_upload_section_large_file(
-        self, mock_metric, mock_columns, mock_uploader, mock_subheader
-    ):
+    def test_show_document_upload_section_large_file(self, mock_metric, mock_columns, mock_uploader, mock_subheader):
         """Test de show_document_upload_section() avec fichier volumineux"""
         # Mock fichier volumineux
         mock_file = Mock()

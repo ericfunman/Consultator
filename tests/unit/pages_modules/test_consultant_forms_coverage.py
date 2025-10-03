@@ -56,9 +56,7 @@ class TestConsultantForms:
     @patch("app.pages_modules.consultant_forms.st")
     def test_show_add_consultant_form_no_practices(self, mock_st):
         """Test affichage formulaire quand aucune practice"""
-        with patch(
-            "app.pages_modules.consultant_forms.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultant_forms.get_database_session") as mock_session:
             mock_session_instance = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_session_instance
             mock_session_instance.query.return_value.all.return_value = []
@@ -69,9 +67,7 @@ class TestConsultantForms:
 
             show_add_consultant_form()
 
-            mock_st.warning.assert_called_with(
-                "⚠️ Aucune practice trouvée. Veuillez créer des practices d'abord."
-            )
+            mock_st.warning.assert_called_with("⚠️ Aucune practice trouvée. Veuillez créer des practices d'abord.")
 
     def test_validate_consultant_form_valid(self):
         """Test validation formulaire avec données valides"""
@@ -134,9 +130,7 @@ class TestConsultantForms:
         mock_session.return_value.__exit__.return_value = None
 
         # Mock existing check (no existing consultant)
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
 
         # Mock consultant creation
         mock_consultant = MagicMock()
@@ -173,9 +167,7 @@ class TestConsultantForms:
 
         # Mock existing consultant with same email
         mock_existing = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_existing
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_existing
 
         test_data = {
             "prenom": "Jean",
@@ -282,9 +274,7 @@ class TestConsultantForms:
 
         # Setup query
         mock_query = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_consultant
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_consultant
 
         # Mock email check (no conflict)
         mock_session_instance.query.return_value.filter.return_value.first.side_effect = [
@@ -319,9 +309,7 @@ class TestConsultantForms:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock query returns None
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
 
         test_data = {
             "prenom": "Jean",
@@ -350,9 +338,7 @@ class TestConsultantForms:
         mock_consultant.id = 1
 
         # Setup query
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_consultant
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_consultant
 
         result = delete_consultant(1)
 
@@ -371,9 +357,7 @@ class TestConsultantForms:
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         # Mock query returns None
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
 
         result = delete_consultant(999)
 

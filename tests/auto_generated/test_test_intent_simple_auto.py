@@ -17,17 +17,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import test_intent_simple: {e}", allow_module_level=True)
 
 
-
-
 def test_setup_mock():
     """Test automatiquement généré pour setup_mock"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = setup_mock(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -39,16 +37,15 @@ def test_setup_mock_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_setup_mock_with_mocks(mock_request):
     """Test de setup_mock avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

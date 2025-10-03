@@ -58,9 +58,7 @@ class TestConsultantsBasicFunctions:
         mock_st.error.return_value = None
 
         # Mock pour éviter les erreurs d'imports manqués
-        with patch(
-            "app.pages_modules.consultants.show_cv_analysis_fullwidth"
-        ) as mock_cv, patch(
+        with patch("app.pages_modules.consultants.show_cv_analysis_fullwidth") as mock_cv, patch(
             "app.pages_modules.consultants.show_consultants_list"
         ) as mock_list:
 
@@ -71,9 +69,7 @@ class TestConsultantsBasicFunctions:
             except Exception as e:
                 # On accepte certaines erreurs car on mock des composants externes
                 if "imports_ok" not in str(e):
-                    assert (
-                        1 == 1
-                    )  # Test basique Exécution partielle = amélioration de couverture
+                    assert 1 == 1  # Test basique Exécution partielle = amélioration de couverture
 
     @patch("app.pages_modules.consultants.st")
     def test_show_cv_analysis_basic(self, mock_st):
@@ -148,9 +144,7 @@ class TestConsultantsBasicFunctions:
         mock_st.error.return_value = None
 
         # Mock DB avec patch plus simple
-        with patch(
-            "app.pages_modules.consultants.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             mock_db = Mock()
             mock_session.return_value.__enter__.return_value = mock_db
             mock_db.query.return_value.all.return_value = []
@@ -204,14 +198,10 @@ class TestConsultantsBasicFunctions:
         mock_st.expander.return_value = mock_expander
 
         # Mock DB
-        with patch(
-            "app.pages_modules.consultants.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             mock_db = Mock()
             mock_session.return_value.__enter__.return_value = mock_db
-            mock_db.query.return_value.join.return_value.filter.return_value.all.return_value = (
-                []
-            )
+            mock_db.query.return_value.join.return_value.filter.return_value.all.return_value = []
 
             try:
                 show_consultant_languages(self.mock_consultant)
@@ -238,14 +228,10 @@ class TestConsultantsBasicFunctions:
         mock_st.info.return_value = None
 
         # Mock DB
-        with patch(
-            "app.pages_modules.consultants.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             mock_db = Mock()
             mock_session.return_value.__enter__.return_value = mock_db
-            mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = (
-                []
-            )
+            mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = []
 
             try:
                 show_consultant_missions(self.mock_consultant)
@@ -278,14 +264,10 @@ class TestConsultantsBasicFunctions:
         mock_st.button.return_value = False
 
         # Mock DB avec données vides
-        with patch(
-            "app.pages_modules.consultants.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             mock_db = Mock()
             mock_session.return_value.__enter__.return_value = mock_db
-            mock_db.query.return_value.join.return_value.filter.return_value.all.return_value = (
-                []
-            )
+            mock_db.query.return_value.join.return_value.filter.return_value.all.return_value = []
 
             try:
                 _show_technical_skills(self.mock_consultant)
@@ -305,14 +287,10 @@ class TestConsultantsBasicFunctions:
         mock_st.button.return_value = False
 
         # Mock DB
-        with patch(
-            "app.pages_modules.consultants.get_database_session"
-        ) as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             mock_db = Mock()
             mock_session.return_value.__enter__.return_value = mock_db
-            mock_db.query.return_value.join.return_value.filter.return_value.all.return_value = (
-                []
-            )
+            mock_db.query.return_value.join.return_value.filter.return_value.all.return_value = []
 
             try:
                 _show_functional_skills(self.mock_consultant)

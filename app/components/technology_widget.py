@@ -35,9 +35,7 @@ def _parse_current_technologies(current_technologies: str, all_techs: list) -> l
         return []
 
     current_techs = []
-    current_techs_raw = [
-        tech.strip() for tech in current_technologies.split(",") if tech.strip()
-    ]
+    current_techs_raw = [tech.strip() for tech in current_technologies.split(",") if tech.strip()]
 
     # Matcher les technologies actuelles avec celles disponibles (insensible à la casse)
     all_techs_lower = {tech.lower(): tech for tech in all_techs}
@@ -68,9 +66,7 @@ def _render_add_technology_form(key: str) -> None:
         return
 
     with st.expander("⚡ Ajouter une technologie personnalisée", expanded=True):
-        new_tech_name = st.text_input(
-            "Nom de la technologie", key=f"{key}_new_tech_name"
-        )
+        new_tech_name = st.text_input("Nom de la technologie", key=f"{key}_new_tech_name")
         new_tech_category = st.selectbox(
             "Catégorie",
             TECHNOLOGY_CATEGORIES,
@@ -102,9 +98,7 @@ def _handle_add_technology(tech_name: str, category: str, key: str) -> None:
         st.error("❌ Cette technologie existe déjà")
 
 
-def technology_multiselect(
-    label: str, current_technologies: str = "", key: str = None, help_text: str = None
-) -> str:
+def technology_multiselect(label: str, current_technologies: str = "", key: str = None, help_text: str = None) -> str:
     """
     Widget de sélection multiple de technologies avec possibilité d'ajout
 
@@ -128,9 +122,7 @@ def technology_multiselect(
         all_techs = TechnologyService.get_all_available_technologies()
 
     # Interface utilisateur
-    selected_techs = _render_multiselect_interface(
-        label, all_techs, current_techs, key, help_text
-    )
+    selected_techs = _render_multiselect_interface(label, all_techs, current_techs, key, help_text)
 
     # Formulaire d'ajout si activé
     _render_add_technology_form(key)
@@ -139,9 +131,7 @@ def technology_multiselect(
     return ", ".join(selected_techs)
 
 
-def _render_multiselect_interface(
-    label: str, all_techs: list, current_techs: list, key: str, help_text: str
-) -> list:
+def _render_multiselect_interface(label: str, all_techs: list, current_techs: list, key: str, help_text: str) -> list:
     """Affiche l'interface de sélection multiple"""
     # Colonnes pour le layout
     col_main, _ = st.columns([4, 1])
@@ -170,9 +160,7 @@ def _render_multiselect_interface(
 def _render_technologies_search_tab():
     """Affiche l'onglet de recherche de technologies"""
     technologies_by_cat = TechnologyService.get_technologies_by_category()
-    search_query = st.text_input(
-        "🔍 Rechercher une technologie", placeholder="Ex: Python, React, Docker..."
-    )
+    search_query = st.text_input("🔍 Rechercher une technologie", placeholder="Ex: Python, React, Docker...")
 
     if search_query:
         _display_search_results(search_query)
@@ -268,9 +256,7 @@ def show_technologies_referentiel():
     """Page de gestion du référentiel de technologies"""
     st.subheader("📚 Référentiel des Technologies")
 
-    tab1, tab2 = st.tabs(
-        ["📖 Technologies disponibles", "⚙️ Gérer les technologies personnalisées"]
-    )
+    tab1, tab2 = st.tabs(["📖 Technologies disponibles", "⚙️ Gérer les technologies personnalisées"])
 
     with tab1:
         _render_technologies_search_tab()

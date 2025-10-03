@@ -17,17 +17,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import migrate_add_periode_essai_actif: {e}", allow_module_level=True)
 
 
-
-
 def test_migrate_add_periode_essai_and_actif():
     """Test automatiquement généré pour migrate_add_periode_essai_and_actif"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = migrate_add_periode_essai_and_actif(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -39,16 +37,15 @@ def test_migrate_add_periode_essai_and_actif_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_migrate_add_periode_essai_and_actif_with_mocks(mock_request):
     """Test de migrate_add_periode_essai_and_actif avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

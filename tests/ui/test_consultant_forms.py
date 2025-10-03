@@ -53,7 +53,7 @@ class TestConsultantForms(BaseUITest):
         # Mock service
         mock_service.create_consultant.return_value = True
         mock_service.update_consultant.return_value = True
-        
+
         # Mock practices pour éviter l'accès à la DB
         mock_practices.return_value = {"Practice Test": 1, "Practice Demo": 2}
 
@@ -73,9 +73,9 @@ class TestConsultantForms(BaseUITest):
         """Test que show_consultant_profile peut être appelée sans erreur"""
         # Setup session state
         mock_session_state.view_consultant_profile = 1
-        mock_session_state.__contains__ = lambda key: key == 'view_consultant_profile'
-        mock_session_state.__getitem__ = lambda key: 1 if key == 'view_consultant_profile' else None
-        
+        mock_session_state.__contains__ = lambda key: key == "view_consultant_profile"
+        mock_session_state.__getitem__ = lambda key: 1 if key == "view_consultant_profile" else None
+
         # Mock service
         mock_service.get_consultant_with_stats.return_value = {
             "id": 1,
@@ -114,9 +114,7 @@ class TestConsultantForms(BaseUITest):
     @patch("app.pages_modules.consultants.st")
     @patch("app.pages_modules.consultants.pd")
     @patch("app.pages_modules.consultants.show_consultants_list_enhanced")
-    def test_show_consultants_list_with_data(
-        self, mock_enhanced_func, mock_pd, mock_st, mock_service
-    ):
+    def test_show_consultants_list_with_data(self, mock_enhanced_func, mock_pd, mock_st, mock_service):
         """Test avec données présentes"""
         # Forcer l'utilisation de la version classique en faisant échouer l'import des composants UI
         mock_enhanced_func.side_effect = ImportError("UI components not available")
@@ -180,11 +178,7 @@ class TestConsultantForms(BaseUITest):
             show_consultants_list()
             assert 1 == 1  # Test basique
         except Exception as e:
-            if (
-                "ScriptRunContext" in str(e)
-                or "Session state" in str(e)
-                or "UI components not available" in str(e)
-            ):
+            if "ScriptRunContext" in str(e) or "Session state" in str(e) or "UI components not available" in str(e):
                 assert 1 == 1  # Test basique Erreur attendue en mode test
             else:
                 pytest.fail(f"Fonction a échoué avec une erreur inattendue: {e}")
@@ -211,9 +205,9 @@ class TestConsultantForms(BaseUITest):
         """Test du profil avec données manquantes"""
         # Setup session state
         mock_session_state.view_consultant_profile = 1
-        mock_session_state.__contains__ = lambda key: key == 'view_consultant_profile'
-        mock_session_state.__getitem__ = lambda key: 1 if key == 'view_consultant_profile' else None
-        
+        mock_session_state.__contains__ = lambda key: key == "view_consultant_profile"
+        mock_session_state.__getitem__ = lambda key: 1 if key == "view_consultant_profile" else None
+
         mock_service.get_consultant_with_stats.return_value = None
 
         try:

@@ -149,9 +149,7 @@ class TestConsultantInfo(BaseUITest):
 
         # Mock service qui lève une exception
         mock_service_instance = Mock()
-        mock_service_instance.get_consultant_info.side_effect = Exception(
-            "Service error"
-        )
+        mock_service_instance.get_consultant_info.side_effect = Exception("Service error")
         mock_service.return_value = mock_service_instance
 
         try:

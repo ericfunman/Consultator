@@ -15,17 +15,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import verify_db_setup: {e}", allow_module_level=True)
 
 
-
-
 def test_verify_database_setup():
     """Test automatiquement généré pour verify_database_setup"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = verify_database_setup(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -35,4 +33,3 @@ def test_verify_database_setup_edge_cases():
     """Test des cas limites pour verify_database_setup"""
     # TODO: Tester les cas d'erreur et cas limites
     pass
-

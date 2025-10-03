@@ -20,9 +20,7 @@ def show():
     st.title("🏢 Gestion des Practices")
 
     # Onglets pour organiser les fonctionnalités
-    tab1, tab2, tab3 = st.tabs(
-        ["📊 Vue d'ensemble", "👥 Consultants par Practice", "⚙️ Gestion des Practices"]
-    )
+    tab1, tab2, tab3 = st.tabs(["📊 Vue d'ensemble", "👥 Consultants par Practice", "⚙️ Gestion des Practices"])
 
     with tab1:
         show_practice_overview()
@@ -61,13 +59,9 @@ def show_practice_overview():
             st.subheader("Liste des Practices")
             for practice in practices:
                 with st.expander(f"🏢 {practice.nom}"):
-                    st.write(
-                        f"**Description:** {practice.description or 'Aucune description'}"
-                    )
+                    st.write(f"**Description:** {practice.description or 'Aucune description'}")
                     st.write(f"**Responsable:** {practice.responsable or 'Non défini'}")
-                    st.write(
-                        f"**Statut:** {'✅ Actif' if practice.actif else '❌ Inactif'}"
-                    )
+                    st.write(f"**Statut:** {'✅ Actif' if practice.actif else '❌ Inactif'}")
 
     except Exception as e:
         st.error(f"Erreur lors du chargement de la vue d'ensemble: {e}")
@@ -115,9 +109,7 @@ def _render_practice_selector(practices):
 
 def _display_practice_tabs(selected_practice):
     """Affiche les onglets de gestion de la practice"""
-    tab1, tab2, tab3 = st.tabs(
-        ["📋 Liste des consultants", "➕ Affecter consultant", "⚙️ Actions"]
-    )
+    tab1, tab2, tab3 = st.tabs(["📋 Liste des consultants", "➕ Affecter consultant", "⚙️ Actions"])
 
     with tab1:
         _display_consultants_list_tab(selected_practice)
@@ -145,9 +137,7 @@ def _render_consultants_table(consultants_dict, selected_practice):
     consultants = consultants_dict[practice_name]
 
     if consultants:
-        st.write(
-            f"**{len(consultants)} consultant(s) dans la practice {selected_practice.nom}**"
-        )
+        st.write(f"**{len(consultants)} consultant(s) dans la practice {selected_practice.nom}**")
 
         consultant_data = _prepare_consultants_table_data(consultants)
         _display_consultants_dataframe(consultant_data)
@@ -167,9 +157,7 @@ def _prepare_consultants_table_data(consultants):
                 PRENOM_COLUMN: consultant.prenom,
                 "Email": consultant.email,
                 "Grade": getattr(consultant, "grade", "Non défini"),
-                "Disponible": (
-                    "✅" if getattr(consultant, "disponibilite", False) else "❌"
-                ),
+                "Disponible": ("✅" if getattr(consultant, "disponibilite", False) else "❌"),
                 "Salaire": _format_consultant_salary(consultant),
             }
         )
@@ -217,9 +205,7 @@ def _get_column_config():
 def _display_consultants_simple_list(consultant_data):
     """Affiche la liste simple des consultants sans pandas"""
     for data in consultant_data:
-        st.write(
-            f"**{data[PRENOM_COLUMN]} {data['Nom']}** - {data['Grade']} - {data['Email']} - {data['Salaire']}"
-        )
+        st.write(f"**{data[PRENOM_COLUMN]} {data['Nom']}** - {data['Grade']} - {data['Email']} - {data['Salaire']}")
 
 
 def _display_remove_consultant_section(consultants, selected_practice):
@@ -239,9 +225,7 @@ def _display_remove_consultant_section(consultants, selected_practice):
 def _handle_remove_consultant(consultant_to_remove, selected_practice):
     """Gère la suppression d'un consultant de la practice"""
     try:
-        success = PracticeService.assign_consultant_to_practice(
-            consultant_to_remove.id, None
-        )
+        success = PracticeService.assign_consultant_to_practice(consultant_to_remove.id, None)
         if success:
             st.success(
                 f"✅ {consultant_to_remove.prenom} {consultant_to_remove.nom} a été retiré de la practice {selected_practice.nom}"
@@ -260,9 +244,7 @@ def _display_assign_consultant_tab(selected_practice):
     available_consultants = _get_available_consultants(selected_practice)
 
     if available_consultants:
-        _display_consultant_assignment_interface(
-            available_consultants, selected_practice
-        )
+        _display_consultant_assignment_interface(available_consultants, selected_practice)
     else:
         st.info("Tous les consultants sont déjà affectés à cette practice.")
 
@@ -271,15 +253,9 @@ def _get_available_consultants(selected_practice):
     """Récupère les consultants disponibles pour affectation"""
     from app.services.consultant_service import ConsultantService
 
-    all_consultants = ConsultantService.get_all_consultants_objects(
-        page=1, per_page=10000
-    )
+    all_consultants = ConsultantService.get_all_consultants_objects(page=1, per_page=10000)
 
-    return [
-        c
-        for c in all_consultants
-        if not c.practice_id or c.practice_id != selected_practice.id
-    ]
+    return [c for c in all_consultants if not c.practice_id or c.practice_id != selected_practice.id]
 
 
 def _display_consultant_assignment_interface(available_consultants, selected_practice):
@@ -324,9 +300,7 @@ def _get_consultant_current_practice(consultant):
 def _handle_assign_consultant(consultant_to_add, selected_practice):
     """Gère l'affectation d'un consultant à la practice"""
     try:
-        success = PracticeService.assign_consultant_to_practice(
-            consultant_to_add.id, selected_practice.id
-        )
+        success = PracticeService.assign_consultant_to_practice(consultant_to_add.id, selected_practice.id)
         if success:
             st.success(
                 f"✅ {consultant_to_add.prenom} {consultant_to_add.nom} a été affecté à la practice {selected_practice.nom}"
@@ -357,11 +331,7 @@ def _display_practice_statistics(selected_practice):
     try:
         stats = PracticeService.get_practice_statistics()
         practice_stats = next(
-            (
-                p
-                for p in stats.get("practices_detail", [])
-                if p["nom"] == selected_practice.nom
-            ),
+            (p for p in stats.get("practices_detail", []) if p["nom"] == selected_practice.nom),
             None,
         )
         if practice_stats:
@@ -382,9 +352,7 @@ def _display_practice_export_options(selected_practice):
 def _handle_csv_export(selected_practice):
     """Gère l'export CSV de la practice"""
     try:
-        consultants_dict = PracticeService.get_consultants_by_practice(
-            selected_practice.id
-        )
+        consultants_dict = PracticeService.get_consultants_by_practice(selected_practice.id)
         if consultants_dict and pd is not None:
             _process_csv_export(consultants_dict, selected_practice)
     except Exception as e:
@@ -470,9 +438,7 @@ def _handle_practice_creation(nom, description, responsable):
 def _create_new_practice(nom, description, responsable):
     """Crée une nouvelle practice avec gestion d'erreur"""
     try:
-        success = PracticeService.create_practice(
-            nom=nom, description=description, responsable=responsable
-        )
+        success = PracticeService.create_practice(nom=nom, description=description, responsable=responsable)
         if success:
             st.success(f"✅ Practice '{nom}' créée avec succès !")
             st.rerun()

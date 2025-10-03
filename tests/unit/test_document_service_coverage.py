@@ -129,9 +129,7 @@ class TestDocumentServiceCoverage:
         assert result["type"] == "application/pdf"
         assert result["extension"] == "pdf"
         assert result["consultant_id"] == 123
-        assert (
-            "consultant_123" in result["file_path"]
-        )  # Vérifier que le répertoire consultant est créé
+        assert "consultant_123" in result["file_path"]  # Vérifier que le répertoire consultant est créé
 
     @patch("builtins.open", side_effect=OSError("Disk full"))
     def test_save_uploaded_file_os_error(self, mock_file):
@@ -325,15 +323,9 @@ class TestDocumentServiceCoverage:
         extensions = DocumentService.ALLOWED_EXTENSIONS
 
         assert extensions["pdf"] == "application/pdf"
-        assert (
-            extensions["docx"]
-            == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+        assert extensions["docx"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         assert extensions["doc"] == "application/msword"
-        assert (
-            extensions["pptx"]
-            == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-        )
+        assert extensions["pptx"] == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
         assert extensions["ppt"] == "application/vnd.ms-powerpoint"
 
     def test_upload_dir_default_path(self):
@@ -355,9 +347,7 @@ class TestDocumentServiceCoverage:
         mock_uploaded_file.type = "application/pdf"
         mock_uploaded_file.getbuffer.return_value = b"content"
 
-        with patch.object(DocumentService, "init_upload_directory"), patch(
-            "builtins.open", mock_open()
-        ):
+        with patch.object(DocumentService, "init_upload_directory"), patch("builtins.open", mock_open()):
             result = DocumentService.save_uploaded_file(mock_uploaded_file, 999)
 
         # Vérifier que le filename contient le nom du fichier et a le bon format
@@ -389,9 +379,7 @@ class TestDocumentServiceCoverage:
         test_upload_dir = self.temp_dir / "uploads"
         test_upload_dir.mkdir(parents=True, exist_ok=True)
 
-        with patch.object(DocumentService, "init_upload_directory") as mock_init, patch(
-            "builtins.open", mock_open()
-        ):
+        with patch.object(DocumentService, "init_upload_directory") as mock_init, patch("builtins.open", mock_open()):
             mock_init.return_value = test_upload_dir
 
             result = DocumentService.save_uploaded_file(mock_uploaded_file, 789)

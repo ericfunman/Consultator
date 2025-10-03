@@ -347,9 +347,7 @@ class DocumentService:
 
         # Créer un résumé basique
         lines = text.split("\n")[:10]  # Premières lignes
-        analysis["summary"] = (
-            " ".join([line.strip() for line in lines if line.strip()])[:300] + "..."
-        )
+        analysis["summary"] = " ".join([line.strip() for line in lines if line.strip()])[:300] + "..."
 
         return analysis
 

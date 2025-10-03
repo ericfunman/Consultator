@@ -50,10 +50,7 @@ def _get_consultant_languages_data(consultant_id: int):
     """Récupère les données des langues du consultant depuis la base de données."""
     with get_database_session() as session:
         consultant_langues = (
-            session.query(ConsultantLangue)
-            .join(Langue)
-            .filter(ConsultantLangue.consultant_id == consultant_id)
-            .all()
+            session.query(ConsultantLangue).join(Langue).filter(ConsultantLangue.consultant_id == consultant_id).all()
         )
     return consultant_langues
 
@@ -67,12 +64,8 @@ def _create_language_data_table(consultant_langues):
                 "id": cl.id,
                 "Langue": cl.langue.nom,
                 "Niveau": get_niveau_label(cl.niveau),
-                NIVEAU_ECRIT_LABEL: (
-                    get_niveau_label(cl.niveau_ecrit) if cl.niveau_ecrit else "N/A"
-                ),
-                NIVEAU_PARLE_LABEL: (
-                    get_niveau_label(cl.niveau_parle) if cl.niveau_parle else "N/A"
-                ),
+                NIVEAU_ECRIT_LABEL: (get_niveau_label(cl.niveau_ecrit) if cl.niveau_ecrit else "N/A"),
+                NIVEAU_PARLE_LABEL: (get_niveau_label(cl.niveau_parle) if cl.niveau_parle else "N/A"),
                 "Certification": "✅" if cl.certification else "❌",
                 LANGUE_MATERNELLE_LABEL: "✅" if cl.langue_maternelle else "❌",
             }
@@ -154,10 +147,7 @@ def _display_general_actions(consultant):
 def _handle_form_display(consultant):
     """Gère l'affichage des formulaires d'ajout et de modification."""
     # Formulaire d'ajout (si activé)
-    if (
-        "add_language" in st.session_state
-        and st.session_state.add_language == consultant.id
-    ):
+    if "add_language" in st.session_state and st.session_state.add_language == consultant.id:
         show_add_language_form(consultant.id)
 
     # Formulaire de modification (si activé)
@@ -296,9 +286,7 @@ def show_languages_statistics(consultant_langues):
         st.metric("Certifiées", certified_count)
 
     with col4:
-        avg_level = sum(cl.niveau for cl in consultant_langues) / len(
-            consultant_langues
-        )
+        avg_level = sum(cl.niveau for cl in consultant_langues) / len(consultant_langues)
         st.metric("Niveau moyen", f"{avg_level:.1f}/6")
 
 
@@ -331,21 +319,15 @@ def show_add_language_form(consultant_id: int):
         # Récupérer les langues disponibles
         with get_database_session() as session:
             existing_langues = (
-                session.query(ConsultantLangue)
-                .filter(ConsultantLangue.consultant_id == consultant_id)
-                .all()
+                session.query(ConsultantLangue).filter(ConsultantLangue.consultant_id == consultant_id).all()
             )
 
             existing_lang_ids = [cl.langue_id for cl in existing_langues]
 
-            available_langues = (
-                session.query(Langue).filter(~Langue.id.in_(existing_lang_ids)).all()
-            )
+            available_langues = session.query(Langue).filter(~Langue.id.in_(existing_lang_ids)).all()
 
         if not available_langues:
-            st.warning(
-                "⚠️ Toutes les langues existantes sont déjà associées à ce consultant"
-            )
+            st.warning("⚠️ Toutes les langues existantes sont déjà associées à ce consultant")
             return
 
         with st.form(f"add_language_form_{consultant_id}", clear_on_submit=True):
@@ -536,19 +518,14 @@ def show_edit_language_form(consultant_langue_id: int):
     try:
         with get_database_session() as session:
             cl = (
-                session.query(ConsultantLangue)
-                .join(Langue)
-                .filter(ConsultantLangue.id == consultant_langue_id)
-                .first()
+                session.query(ConsultantLangue).join(Langue).filter(ConsultantLangue.id == consultant_langue_id).first()
             )
 
             if not cl:
                 st.error(LANGUE_INTROUVABLE_ERROR)
                 return
 
-        with st.form(
-            f"edit_language_form_{consultant_langue_id}", clear_on_submit=False
-        ):
+        with st.form(f"edit_language_form_{consultant_langue_id}", clear_on_submit=False):
             st.write(f"**Langue :** {cl.langue.nom}")
 
             col1, col2 = st.columns(2)
@@ -652,11 +629,7 @@ def update_consultant_language(consultant_langue_id: int, data: Dict[str, Any]) 
 
     try:
         with get_database_session() as session:
-            cl = (
-                session.query(ConsultantLangue)
-                .filter(ConsultantLangue.id == consultant_langue_id)
-                .first()
-            )
+            cl = session.query(ConsultantLangue).filter(ConsultantLangue.id == consultant_langue_id).first()
 
             if not cl:
                 st.error(LANGUE_INTROUVABLE_ERROR)
@@ -703,11 +676,7 @@ def delete_language(consultant_langue_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            cl = (
-                session.query(ConsultantLangue)
-                .filter(ConsultantLangue.id == consultant_langue_id)
-                .first()
-            )
+            cl = session.query(ConsultantLangue).filter(ConsultantLangue.id == consultant_langue_id).first()
 
             if not cl:
                 st.error(LANGUE_INTROUVABLE_ERROR)
@@ -767,9 +736,7 @@ def show_languages_analysis(consultant_langues):
     with col2:
         st.markdown("#### 🏆 Points forts")
         # Identifier les langues les plus maîtrisées
-        best_languages = sorted(
-            consultant_langues, key=lambda x: x.niveau, reverse=True
-        )[:3]
+        best_languages = sorted(consultant_langues, key=lambda x: x.niveau, reverse=True)[:3]
         for cl in best_languages:
             st.write(f"**{cl.langue.nom} :** {get_niveau_label(cl.niveau)}")
 
@@ -784,16 +751,12 @@ def show_languages_analysis(consultant_langues):
     # Langues maternelles
     native_languages = [cl for cl in consultant_langues if cl.langue_maternelle]
     if native_languages:
-        st.info(
-            f"🏠 **Langues maternelles :** {', '.join([cl.langue.nom for cl in native_languages])}"
-        )
+        st.info(f"🏠 **Langues maternelles :** {', '.join([cl.langue.nom for cl in native_languages])}")
 
     # Certifications
     certified_languages = [cl for cl in consultant_langues if cl.certification]
     if certified_languages:
-        st.success(
-            f"📜 **Certifications :** {len(certified_languages)} langue(s) certifiée(s)"
-        )
+        st.success(f"📜 **Certifications :** {len(certified_languages)} langue(s) certifiée(s)")
 
 
 def show_languages_comparison(consultant_id: int):
@@ -850,9 +813,7 @@ def show_languages_comparison(consultant_id: int):
             )
 
             # Créer un dictionnaire des moyennes
-            avg_dict = {
-                lang.nom: (lang.avg_level, lang.count) for lang in language_averages
-            }
+            avg_dict = {lang.nom: (lang.avg_level, lang.count) for lang in language_averages}
 
             # Comparer
             comparison_data = []
@@ -880,12 +841,8 @@ def show_languages_comparison(consultant_id: int):
                 st.dataframe(df, width="stretch", hide_index=True)
 
                 # Résumé
-                above_avg = sum(
-                    1 for item in comparison_data if float(item[ECART_LABEL]) > 0
-                )
-                below_avg = sum(
-                    1 for item in comparison_data if float(item[ECART_LABEL]) < 0
-                )
+                above_avg = sum(1 for item in comparison_data if float(item[ECART_LABEL]) > 0)
+                below_avg = sum(1 for item in comparison_data if float(item[ECART_LABEL]) < 0)
 
                 col1, col2 = st.columns(2)
 

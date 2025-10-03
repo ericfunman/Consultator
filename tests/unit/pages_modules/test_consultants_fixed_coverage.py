@@ -2,43 +2,46 @@
 Tests unitaires pour consultants.py - Version corrigée
 Tests des fonctions internes avec mocking approprié
 """
+
 import unittest
 from unittest.mock import Mock, patch, MagicMock
 from datetime import date, datetime
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 
 
 class MockSessionState:
     """Mock de st.session_state avec structure complète"""
+
     def __init__(self):
         self.data = {
-            'consultant_id': 1,
-            'consultants_filter': '',
-            'consultants_search': '',
-            'practice_filter': 'Tous',
-            'entite_filter': 'Toutes',
-            'availability_filter': 'Tous',
-            'selected_consultant_ids': [],
-            'consultant_selection_method': 'table',
-            'show_export_options': False,
-            'show_analysis_options': False,
-            'edit_mode': False,
-            'consultant_data': None,
-            'consultant_db': None,
-            'form_data': {}
+            "consultant_id": 1,
+            "consultants_filter": "",
+            "consultants_search": "",
+            "practice_filter": "Tous",
+            "entite_filter": "Toutes",
+            "availability_filter": "Tous",
+            "selected_consultant_ids": [],
+            "consultant_selection_method": "table",
+            "show_export_options": False,
+            "show_analysis_options": False,
+            "edit_mode": False,
+            "consultant_data": None,
+            "consultant_db": None,
+            "form_data": {},
         }
-    
+
     def get(self, key, default=None):
         return self.data.get(key, default)
-    
+
     def __getitem__(self, key):
         return self.data.get(key)
-    
+
     def __setitem__(self, key, value):
         self.data[key] = value
-    
+
     def __contains__(self, key):
         return key in self.data
 
@@ -64,7 +67,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.mock_consultant.notes = "Notes test"
         self.mock_consultant.practice_id = 1
         self.mock_consultant.business_manager_actuel = None
-        
+
         # Mock column
         self.mock_col = MagicMock()
         self.mock_col.__enter__ = Mock(return_value=self.mock_col)
@@ -77,12 +80,15 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_practice.nom = "Practice Test"
         self.mock_consultant.practice = mock_practice
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_get_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_get_session:
             mock_session = MagicMock()
-            mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = self.mock_consultant
+            mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
+                self.mock_consultant
+            )
             mock_get_session.return_value.__enter__.return_value = mock_session
 
             from app.pages_modules.consultants import _load_consultant_data
+
             result = _load_consultant_data(consultant_id)
 
             # Vérifications
@@ -96,15 +102,16 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         """Test _load_consultant_data consultant non trouvé"""
         consultant_id = 999
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_get_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_get_session:
             mock_session = MagicMock()
             mock_session.query.return_value.options.return_value.filter.return_value.first.return_value = None
             mock_get_session.return_value.__enter__.return_value = mock_session
 
             from app.pages_modules.consultants import _load_consultant_data
+
             result = _load_consultant_data(consultant_id)
 
-            # Vérifications  
+            # Vérifications
             self.assertIsNotNone(result)
             consultant_data, consultant_db = result
             self.assertIsNone(consultant_data)
@@ -112,19 +119,16 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
             self.assertIsNone(consultant_data)
             self.assertIsNone(consultant_db)
 
-    @patch('app.pages_modules.consultants.st.columns')
-    @patch('app.pages_modules.consultants.st.title')
-    @patch('app.pages_modules.consultants.st.markdown')
+    @patch("app.pages_modules.consultants.st.columns")
+    @patch("app.pages_modules.consultants.st.title")
+    @patch("app.pages_modules.consultants.st.markdown")
     def test_display_consultant_header(self, mock_markdown, mock_title, mock_columns):
         """Test _display_consultant_header"""
         mock_columns.return_value = (self.mock_col, self.mock_col)
-        consultant_data = {
-            "prenom": "Jean",
-            "nom": "Dupont",
-            "practice_name": "Practice Test"
-        }
+        consultant_data = {"prenom": "Jean", "nom": "Dupont", "practice_name": "Practice Test"}
 
         from app.pages_modules.consultants import _display_consultant_header
+
         _display_consultant_header(consultant_data)
 
         # Vérifications
@@ -139,6 +143,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.mock_consultant.business_manager_actuel = mock_bm
 
         from app.pages_modules.consultants import _extract_business_manager_info
+
         result = _extract_business_manager_info(self.mock_consultant)
 
         # Vérifications
@@ -152,6 +157,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.mock_consultant.business_manager_actuel = None
 
         from app.pages_modules.consultants import _extract_business_manager_info
+
         result = _extract_business_manager_info(self.mock_consultant)
 
         # Vérifications
@@ -164,6 +170,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.mock_consultant.practice_id = 5
 
         from app.pages_modules.consultants import _get_current_practice_id
+
         result = _get_current_practice_id(self.mock_consultant)
 
         # Vérifications
@@ -171,9 +178,10 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
 
     def test_get_current_practice_id_without_practice(self):
         """Test _get_current_practice_id sans practice"""
-        delattr(self.mock_consultant, 'practice_id')
+        delattr(self.mock_consultant, "practice_id")
 
         from app.pages_modules.consultants import _get_current_practice_id
+
         result = _get_current_practice_id(self.mock_consultant)
 
         # Vérifications
@@ -195,10 +203,11 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
             "date_sortie": None,
             "date_premiere_mission": None,
             "grade": "Senior",
-            "type_contrat": "CDI"
+            "type_contrat": "CDI",
         }
 
         from app.pages_modules.consultants import _build_update_data
+
         result = _build_update_data(form_data)
 
         # Vérifications
@@ -208,11 +217,11 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.assertEqual(result["email"], "jean.dupont@test.com")
         self.assertEqual(result["salaire_actuel"], 55000)
 
-    @patch('app.pages_modules.consultants.st.columns')
-    @patch('app.pages_modules.consultants.st.text_input')
-    @patch('app.pages_modules.consultants.st.number_input')
-    @patch('app.pages_modules.consultants.st.selectbox')
-    @patch('app.pages_modules.consultants.st.info')
+    @patch("app.pages_modules.consultants.st.columns")
+    @patch("app.pages_modules.consultants.st.text_input")
+    @patch("app.pages_modules.consultants.st.number_input")
+    @patch("app.pages_modules.consultants.st.selectbox")
+    @patch("app.pages_modules.consultants.st.info")
     def test_render_basic_consultant_fields(self, mock_info, mock_select, mock_number, mock_text, mock_columns):
         """Test _render_basic_consultant_fields"""
         # Setup
@@ -221,32 +230,33 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_select.side_effect = ["Senior", "CDI", "Disponible"]
         mock_number.return_value = 50000
 
-        with patch('app.services.practice_service.PracticeService') as mock_practice_service:
+        with patch("app.services.practice_service.PracticeService") as mock_practice_service:
             mock_practice_service.get_all_practices.return_value = []
 
             from app.pages_modules.consultants import _render_basic_consultant_fields
+
             # Signature correcte de la fonction
             result = _render_basic_consultant_fields(
-                self.mock_consultant, 
-                {"Practice Test": 1}, # practice_options comme dictionnaire
+                self.mock_consultant,
+                {"Practice Test": 1},  # practice_options comme dictionnaire
                 1,  # current_practice_id
                 "Marie Martin",  # bm_nom_complet
-                "marie.martin@test.com"  # bm_email
+                "marie.martin@test.com",  # bm_email
             )
 
             # Vérifications
             mock_columns.assert_called()
             mock_text.assert_called()
 
-    @patch('app.pages_modules.consultants.get_database_session')
-    @patch('app.pages_modules.consultants.st.subheader')
-    @patch('app.pages_modules.consultants.st.markdown')
+    @patch("app.pages_modules.consultants.get_database_session")
+    @patch("app.pages_modules.consultants.st.subheader")
+    @patch("app.pages_modules.consultants.st.markdown")
     def test_manage_salary_history(self, mock_markdown, mock_subheader, mock_session):
         """Test _manage_salary_history"""
         # Setup mock consultant avec attributs nécessaires
         self.mock_consultant.id = 1
         self.mock_consultant.salaire_actuel = None  # Pas de salaire actuel
-        
+
         # Setup mock session context manager
         mock_context = MagicMock()
         mock_session.return_value = mock_context
@@ -254,9 +264,9 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_context.query.return_value.filter.return_value.order_by.return_value.all.return_value = []
 
         from app.pages_modules.consultants import _manage_salary_history
-        
+
         # Mock st.info car il sera appelé quand salaires est vide
-        with patch('app.pages_modules.consultants.st.info') as mock_info:
+        with patch("app.pages_modules.consultants.st.info") as mock_info:
             _manage_salary_history(self.mock_consultant)
             mock_info.assert_called_with("📊 Aucun historique de salaire disponible")
 
@@ -264,10 +274,10 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_subheader.assert_called()
         mock_markdown.assert_called()
 
-    @patch('app.pages_modules.consultants.st.form')
-    @patch('app.pages_modules.consultants.st.selectbox')
-    @patch('streamlit.slider')
-    @patch('app.pages_modules.consultants.st.form_submit_button')
+    @patch("app.pages_modules.consultants.st.form")
+    @patch("app.pages_modules.consultants.st.selectbox")
+    @patch("streamlit.slider")
+    @patch("app.pages_modules.consultants.st.form_submit_button")
     def test_add_technical_skill_form_no_submit(self, mock_submit, mock_slider, mock_select, mock_form):
         """Test _add_technical_skill_form sans soumission"""
         # Setup
@@ -277,19 +287,20 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_slider.return_value = 3
         mock_submit.return_value = False
 
-        with patch('app.services.technology_service.TechnologyService') as mock_tech_service:
+        with patch("app.services.technology_service.TechnologyService") as mock_tech_service:
             mock_tech_service.get_all_technologies.return_value = []
 
             from app.pages_modules.consultants import _add_technical_skill_form
+
             _add_technical_skill_form(self.mock_consultant)
 
             # Vérifications
             mock_submit.assert_called()
 
-    @patch('app.pages_modules.consultants.st.selectbox')
-    @patch('app.pages_modules.consultants.st.slider')
-    @patch('app.pages_modules.consultants.st.form_submit_button')
-    @patch('app.pages_modules.consultants.st.success')
+    @patch("app.pages_modules.consultants.st.selectbox")
+    @patch("app.pages_modules.consultants.st.slider")
+    @patch("app.pages_modules.consultants.st.form_submit_button")
+    @patch("app.pages_modules.consultants.st.success")
     def test_add_technical_skill_form_success(self, mock_success, mock_form_submit_button, mock_slider, mock_selectbox):
         """Test _add_technical_skill_form avec succès"""
         # Setup - Enlever les références à mock_form
@@ -297,12 +308,13 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         mock_slider.return_value = 3
         mock_form_submit_button.return_value = True
 
-        with patch('app.services.consultant_service.ConsultantService') as mock_service, \
-             patch('app.services.technology_service.TechnologyService') as mock_tech_service, \
-             patch('app.pages_modules.consultants.get_database_session') as mock_get_session, \
-             patch('app.pages_modules.consultants.st.rerun'):
-            
-            # Mock session  
+        with patch("app.services.consultant_service.ConsultantService") as mock_service, patch(
+            "app.services.technology_service.TechnologyService"
+        ) as mock_tech_service, patch("app.pages_modules.consultants.get_database_session") as mock_get_session, patch(
+            "app.pages_modules.consultants.st.rerun"
+        ):
+
+            # Mock session
             mock_session = MagicMock()
             mock_get_session.return_value.__enter__.return_value = mock_session
             mock_session.query.return_value.filter.return_value.first.return_value = None  # Pas de compétence existante
@@ -311,35 +323,43 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
             mock_service.add_technical_skill_to_consultant.return_value = True
 
             from app.pages_modules.consultants import _add_technical_skill_form
+
             _add_technical_skill_form(self.mock_consultant)
 
             # Vérifications
             mock_success.assert_called()
 
-    @patch('app.pages_modules.consultants.st.selectbox')
-    @patch('app.pages_modules.consultants.st.slider')
-    @patch('app.pages_modules.consultants.st.form_submit_button')
-    @patch('app.pages_modules.consultants.st.success')
-    def test_add_functional_skill_form_success(self, mock_success, mock_form_submit_button, mock_slider, mock_selectbox):
+    @patch("app.pages_modules.consultants.st.selectbox")
+    @patch("app.pages_modules.consultants.st.slider")
+    @patch("app.pages_modules.consultants.st.form_submit_button")
+    @patch("app.pages_modules.consultants.st.success")
+    def test_add_functional_skill_form_success(
+        self, mock_success, mock_form_submit_button, mock_slider, mock_selectbox
+    ):
         """Test _add_functional_skill_form avec succès"""
         # Setup - Enlever les références à mock_form
-        mock_selectbox.side_effect = ["Banque de Détail", "Conseil clientèle particuliers", "Expert"]  # Catégorie, compétence, niveau
+        mock_selectbox.side_effect = [
+            "Banque de Détail",
+            "Conseil clientèle particuliers",
+            "Expert",
+        ]  # Catégorie, compétence, niveau
         mock_slider.return_value = 4
         mock_form_submit_button.return_value = True
 
-        with patch('app.services.consultant_service.ConsultantService') as mock_service, \
-             patch('app.pages_modules.consultants.get_database_session') as mock_get_session, \
-             patch('app.pages_modules.consultants.st.rerun') as mock_rerun:
-            
+        with patch("app.services.consultant_service.ConsultantService") as mock_service, patch(
+            "app.pages_modules.consultants.get_database_session"
+        ) as mock_get_session, patch("app.pages_modules.consultants.st.rerun") as mock_rerun:
+
             # Mock session
             mock_session = MagicMock()
             mock_get_session.return_value.__enter__.return_value = mock_session
             mock_session.query.return_value.filter.return_value.first.return_value = None  # Pas de compétence existante
-            
+
             mock_service.get_functional_skills.return_value = []
             mock_service.add_functional_skill_to_consultant.return_value = True
 
             from app.pages_modules.consultants import _add_functional_skill_form
+
             _add_functional_skill_form(self.mock_consultant)
 
             # Vérifications
@@ -352,6 +372,7 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         salaires = []  # Pas d'historique
 
         from app.pages_modules.consultants import _should_add_initial_salary_entry
+
         result = _should_add_initial_salary_entry(mock_consultant, salaires)
 
         # Vérifications
@@ -364,13 +385,14 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         salaires = []
 
         from app.pages_modules.consultants import _should_add_initial_salary_entry
+
         result = _should_add_initial_salary_entry(mock_consultant, salaires)
 
         # Vérifications
         self.assertFalse(result)
 
-    @patch('app.pages_modules.consultants.st.date_input')
-    @patch('app.pages_modules.consultants.st.selectbox')
+    @patch("app.pages_modules.consultants.st.date_input")
+    @patch("app.pages_modules.consultants.st.selectbox")
     def test_render_date_entree_field(self, mock_select, mock_date):
         """Test _render_date_entree_field"""
         mock_date.return_value = date.today()
@@ -378,13 +400,14 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.mock_consultant.date_entree = date(2022, 1, 1)
 
         from app.pages_modules.consultants import _render_date_entree_field
+
         result = _render_date_entree_field(self.mock_consultant)
 
         # Vérifications
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('app.pages_modules.consultants.st.date_input')
+    @patch("app.pages_modules.consultants.st.date_input")
     def test_render_date_sortie_field(self, mock_date):
         """Test _render_date_sortie_field"""
         mock_date.return_value = date.today()
@@ -392,13 +415,14 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.mock_consultant.date_sortie = date(2023, 12, 31)
 
         from app.pages_modules.consultants import _render_date_sortie_field
+
         result = _render_date_sortie_field(self.mock_consultant)
 
         # Vérifications
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('app.pages_modules.consultants.st.date_input')
+    @patch("app.pages_modules.consultants.st.date_input")
     def test_render_date_premiere_mission_field(self, mock_date):
         """Test _render_date_premiere_mission_field"""
         mock_date.return_value = date.today()
@@ -406,34 +430,37 @@ class TestConsultantsFixedCoverage(unittest.TestCase):
         self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
 
         from app.pages_modules.consultants import _render_date_premiere_mission_field
+
         result = _render_date_premiere_mission_field(self.mock_consultant)
 
         # Vérifications
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('app.pages_modules.consultants.st.selectbox')
+    @patch("app.pages_modules.consultants.st.selectbox")
     def test_render_societe_field(self, mock_select):
         """Test _render_societe_field"""
         mock_select.return_value = "France"
 
         from app.pages_modules.consultants import _render_societe_field
+
         result = _render_societe_field(self.mock_consultant)
 
         # Vérifications
         mock_select.assert_called()
         self.assertEqual(result, "France")
 
-    @patch('app.pages_modules.consultants.st.write')
-    @patch('app.pages_modules.consultants.st.info')
+    @patch("app.pages_modules.consultants.st.write")
+    @patch("app.pages_modules.consultants.st.info")
     def test_display_no_functional_skills_message(self, mock_info, mock_write):
         """Test _display_no_functional_skills_message"""
         from app.pages_modules.consultants import _display_no_functional_skills_message
+
         _display_no_functional_skills_message()
 
         # Vérifications
         mock_info.assert_called()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

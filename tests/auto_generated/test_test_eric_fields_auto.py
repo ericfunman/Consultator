@@ -18,8 +18,6 @@ except ImportError as e:
     pytest.skip(f"Cannot import test_eric_fields: {e}", allow_module_level=True)
 
 
-
-
 def test_eric_fields():
     """Test automatiquement généré pour test_eric_fields"""
     # Test simple sans dépendances complexes
@@ -32,12 +30,11 @@ def test_test_eric_fields_edge_cases():
     assert 1 == 1
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_test_eric_fields_with_mocks(mock_request):
     """Test de test_eric_fields avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # Test simple avec mock
     assert mock_request is not None
-

@@ -16,15 +16,10 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 # Mock des modules externes avant les imports
-sys.modules['streamlit'] = MagicMock()
-sys.modules['requests'] = MagicMock()
+sys.modules["streamlit"] = MagicMock()
+sys.modules["requests"] = MagicMock()
 
-from app.services.ai_grok_service import (
-    GrokAIService,
-    get_grok_service,
-    is_grok_available,
-    show_grok_config_interface
-)
+from app.services.ai_grok_service import GrokAIService, get_grok_service, is_grok_available, show_grok_config_interface
 
 
 class TestGrokAIService(unittest.TestCase):
@@ -35,7 +30,7 @@ class TestGrokAIService(unittest.TestCase):
         self.test_api_key = "test_grok_api_key"
         self.test_cv_text = "Jean DUPONT\nDéveloppeur Python\nExpérience: 5 ans"
 
-    @patch.dict('os.environ', {"GROK_API_KEY": "test_key"})
+    @patch.dict("os.environ", {"GROK_API_KEY": "test_key"})
     def test_init_with_env_var(self):
         """Test initialisation avec variable d'environnement"""
         service = GrokAIService()
@@ -58,17 +53,13 @@ class TestGrokAIService(unittest.TestCase):
 
             self.assertIn("Clé API Grok manquante", str(context.exception))
 
-    @patch('app.services.ai_grok_service.requests.post')
+    @patch("app.services.ai_grok_service.requests.post")
     def test_analyze_cv_success(self, mock_post):
         """Test analyze_cv avec succès"""
         # Mock de la réponse API
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "choices": [{
-                "message": {
-                    "content": '{"consultant_info": {"nom": "DUPONT", "prenom": "Jean"}}'
-                }
-            }]
+            "choices": [{"message": {"content": '{"consultant_info": {"nom": "DUPONT", "prenom": "Jean"}}'}}]
         }
         mock_post.return_value = mock_response
 
@@ -80,7 +71,7 @@ class TestGrokAIService(unittest.TestCase):
         self.assertIn("_metadata", result)
         self.assertEqual(result["_metadata"]["analyzed_by"], "grok_ai")
 
-    @patch('app.services.ai_grok_service.requests.post')
+    @patch("app.services.ai_grok_service.requests.post")
     def test_analyze_cv_api_error(self, mock_post):
         """Test analyze_cv avec erreur API"""
         mock_post.side_effect = Exception("API Error")
@@ -117,7 +108,7 @@ class TestGrokAIService(unittest.TestCase):
         text_in_prompt = prompt.split("CV à analyser :\n")[1].split("\n\nINSTRUCTIONS")[0]
         self.assertLess(len(text_in_prompt), 9000)  # Moins de 9000 chars (8000 + "...[texte tronqué]")
 
-    @patch('app.services.ai_grok_service.requests.post')
+    @patch("app.services.ai_grok_service.requests.post")
     def test_call_grok_api_success(self, mock_post):
         """Test _call_grok_api avec succès"""
         mock_response = MagicMock()
@@ -144,7 +135,7 @@ class TestGrokAIService(unittest.TestCase):
         self.assertEqual(payload["model"], "grok-beta")
         self.assertEqual(payload["messages"][0]["content"], "test prompt")
 
-    @patch('app.services.ai_grok_service.requests.post')
+    @patch("app.services.ai_grok_service.requests.post")
     def test_call_grok_api_error(self, mock_post):
         """Test _call_grok_api avec erreur"""
         mock_post.side_effect = Exception("Connection failed")
@@ -158,13 +149,7 @@ class TestGrokAIService(unittest.TestCase):
 
     def test_parse_and_validate_response_success(self):
         """Test _parse_and_validate_response avec succès"""
-        api_response = {
-            "choices": [{
-                "message": {
-                    "content": '{"test": "data"}'
-                }
-            }]
-        }
+        api_response = {"choices": [{"message": {"content": '{"test": "data"}'}}]}
 
         service = GrokAIService(self.test_api_key)
         result = service._parse_and_validate_response(api_response, "original text")
@@ -176,13 +161,7 @@ class TestGrokAIService(unittest.TestCase):
 
     def test_parse_and_validate_response_json_error(self):
         """Test _parse_and_validate_response avec JSON invalide"""
-        api_response = {
-            "choices": [{
-                "message": {
-                    "content": "invalid json"
-                }
-            }]
-        }
+        api_response = {"choices": [{"message": {"content": "invalid json"}}]}
 
         service = GrokAIService(self.test_api_key)
 
@@ -204,13 +183,7 @@ class TestGrokAIService(unittest.TestCase):
 
     def test_parse_and_validate_response_with_markdown(self):
         """Test _parse_and_validate_response avec markdown JSON"""
-        api_response = {
-            "choices": [{
-                "message": {
-                    "content": "```json\n{\"test\": \"data\"}\n```"
-                }
-            }]
-        }
+        api_response = {"choices": [{"message": {"content": '```json\n{"test": "data"}\n```'}}]}
 
         service = GrokAIService(self.test_api_key)
         result = service._parse_and_validate_response(api_response, "original text")
@@ -228,21 +201,21 @@ class TestGrokAIService(unittest.TestCase):
         # 1000 tokens / 1000 * 0.001 = 0.001
         self.assertAlmostEqual(cost, 0.001, places=5)
 
-    @patch.dict('os.environ', {"GROK_API_KEY": "test_key"})
+    @patch.dict("os.environ", {"GROK_API_KEY": "test_key"})
     def test_get_grok_service_success(self):
         """Test get_grok_service avec succès"""
         service = get_grok_service()
 
         self.assertIsInstance(service, GrokAIService)
 
-    @patch.dict('os.environ', {}, clear=True)
+    @patch.dict("os.environ", {}, clear=True)
     def test_get_grok_service_no_key(self):
         """Test get_grok_service sans clé API"""
         service = get_grok_service()
 
         self.assertIsNone(service)
 
-    @patch('app.services.ai_grok_service.get_grok_service')
+    @patch("app.services.ai_grok_service.get_grok_service")
     def test_is_grok_available_true(self, mock_get_service):
         """Test is_grok_available retourne True"""
         mock_get_service.return_value = GrokAIService(self.test_api_key)
@@ -251,7 +224,7 @@ class TestGrokAIService(unittest.TestCase):
 
         self.assertTrue(result)
 
-    @patch('app.services.ai_grok_service.get_grok_service')
+    @patch("app.services.ai_grok_service.get_grok_service")
     def test_is_grok_available_false(self, mock_get_service):
         """Test is_grok_available retourne False"""
         mock_get_service.return_value = None
@@ -260,8 +233,8 @@ class TestGrokAIService(unittest.TestCase):
 
         self.assertFalse(result)
 
-    @patch('app.services.ai_grok_service.st')
-    @patch.dict('os.environ', {"GROK_API_KEY": "test_key"})
+    @patch("app.services.ai_grok_service.st")
+    @patch.dict("os.environ", {"GROK_API_KEY": "test_key"})
     def test_show_grok_config_interface_with_key(self, mock_st):
         """Test show_grok_config_interface avec clé configurée"""
         show_grok_config_interface()
@@ -269,8 +242,8 @@ class TestGrokAIService(unittest.TestCase):
         # Vérifier que success est appelé
         mock_st.success.assert_called()
 
-    @patch('app.services.ai_grok_service.st')
-    @patch.dict('os.environ', {}, clear=True)
+    @patch("app.services.ai_grok_service.st")
+    @patch.dict("os.environ", {}, clear=True)
     def test_show_grok_config_interface_no_key(self, mock_st):
         """Test show_grok_config_interface sans clé"""
         show_grok_config_interface()
@@ -278,14 +251,14 @@ class TestGrokAIService(unittest.TestCase):
         # Vérifier que warning est appelé
         mock_st.warning.assert_called()
 
-    @patch('app.services.ai_grok_service.st')
-    @patch.dict('os.environ', {"GROK_API_KEY": "test_key"})
+    @patch("app.services.ai_grok_service.st")
+    @patch.dict("os.environ", {"GROK_API_KEY": "test_key"})
     def test_show_grok_config_interface_test_connection(self, mock_st):
         """Test show_grok_config_interface avec test de connexion"""
         # Simuler le clic sur le bouton de test
         mock_st.button.return_value = True
 
-        with patch('app.services.ai_grok_service.GrokAIService') as mock_service_class:
+        with patch("app.services.ai_grok_service.GrokAIService") as mock_service_class:
             mock_service = MagicMock()
             mock_service_class.return_value = mock_service
 
@@ -296,5 +269,5 @@ class TestGrokAIService(unittest.TestCase):
             mock_service._call_grok_api.assert_called()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

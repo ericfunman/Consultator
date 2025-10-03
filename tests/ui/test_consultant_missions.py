@@ -183,9 +183,7 @@ class TestConsultantMissions(BaseUITest):
 
         # Mock service qui lève une exception
         mock_service_instance = Mock()
-        mock_service_instance.get_consultant_missions.side_effect = Exception(
-            "Service error"
-        )
+        mock_service_instance.get_consultant_missions.side_effect = Exception("Service error")
         mock_service.return_value = mock_service_instance
 
         try:
@@ -335,9 +333,7 @@ class TestConsultantMissions(BaseUITest):
         # Mock session et mission
         mock_session_instance = MagicMock()
         mock_mission = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            mock_mission
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = mock_mission
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         result = delete_mission(1)
@@ -353,9 +349,7 @@ class TestConsultantMissions(BaseUITest):
 
         # Mock session qui ne trouve pas la mission
         mock_session_instance = MagicMock()
-        mock_session_instance.query.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_session_instance.query.return_value.filter.return_value.first.return_value = None
         mock_session.return_value.__enter__.return_value = mock_session_instance
 
         result = delete_mission(999)
@@ -431,9 +425,7 @@ class TestConsultantMissions(BaseUITest):
         mock_st.form_submit_button.return_value = True
 
         # Mock create_mission
-        with patch(
-            "app.pages_modules.consultant_missions.create_mission", return_value=True
-        ):
+        with patch("app.pages_modules.consultant_missions.create_mission", return_value=True):
             show_add_mission_form(1)
 
     @patch("app.pages_modules.consultant_missions.st")
@@ -482,9 +474,7 @@ class TestConsultantMissions(BaseUITest):
         mock_today = MagicMock()
         mock_today.today.return_value = date(2024, 12, 31)
         mock_date_class.today = mock_today.today
-        mock_date_class.side_effect = lambda *args, **kwargs: (
-            date(*args, **kwargs) if args else mock_today
-        )
+        mock_date_class.side_effect = lambda *args, **kwargs: (date(*args, **kwargs) if args else mock_today)
 
         # Mock missions
         mock_missions = []

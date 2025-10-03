@@ -51,15 +51,9 @@ class TestPracticeModel:
         practice = Practice()
 
         # Créer des objets Consultant réels pour le test
-        consultant1 = Consultant(
-            nom="Dupont", prenom="Jean", email="jean@test.com", disponibilite=True
-        )
-        consultant2 = Consultant(
-            nom="Martin", prenom="Marie", email="marie@test.com", disponibilite=False
-        )
-        consultant3 = Consultant(
-            nom="Bernard", prenom="Pierre", email="pierre@test.com", disponibilite=True
-        )
+        consultant1 = Consultant(nom="Dupont", prenom="Jean", email="jean@test.com", disponibilite=True)
+        consultant2 = Consultant(nom="Martin", prenom="Marie", email="marie@test.com", disponibilite=False)
+        consultant3 = Consultant(nom="Bernard", prenom="Pierre", email="pierre@test.com", disponibilite=True)
 
         # Simuler la relation
         practice.consultants = [consultant1, consultant2, consultant3]
@@ -183,9 +177,7 @@ class TestConsultantModel:
         gestion2._sa_instance_state.parents = {}
 
         # Patcher directement la propriété business_manager_gestions
-        with patch.object(
-            consultant, "business_manager_gestions", [gestion1, gestion2]
-        ):
+        with patch.object(consultant, "business_manager_gestions", [gestion1, gestion2]):
             assert consultant.business_manager_actuel == "BM Actuel"
 
 
@@ -210,9 +202,7 @@ class TestCompetenceModel:
     def test_competence_repr(self):
         """Test de la représentation string"""
         competence = Competence(id=1, nom="Python", categorie="Backend")
-        assert (
-            repr(competence) == "<Competence(id=1, nom='Python', categorie='Backend')>"
-        )
+        assert repr(competence) == "<Competence(id=1, nom='Python', categorie='Backend')>"
 
 
 class TestMissionModel:
@@ -316,9 +306,7 @@ class TestConsultantSalaireModel:
 
     def test_consultant_salaire_repr(self):
         """Test de la représentation string"""
-        salaire = ConsultantSalaire(
-            id=1, consultant_id=1, salaire=45000.0, date_debut=date(2024, 1, 1)
-        )
+        salaire = ConsultantSalaire(id=1, consultant_id=1, salaire=45000.0, date_debut=date(2024, 1, 1))
         expected = "<ConsultantSalaire(id=1, consultant_id=1, salaire=45000.0, date_debut=2024-01-01)>"
         assert repr(salaire) == expected
 
@@ -344,9 +332,7 @@ class TestConsultantLangueModel:
 
     def test_consultant_langue_creation(self):
         """Test de création d'une langue consultant"""
-        consultant_langue = ConsultantLangue(
-            consultant_id=1, langue_id=1, niveau=4, commentaire="Certification TOEIC"
-        )
+        consultant_langue = ConsultantLangue(consultant_id=1, langue_id=1, niveau=4, commentaire="Certification TOEIC")
 
         assert consultant_langue.niveau == 4
         assert consultant_langue.commentaire == "Certification TOEIC"
@@ -354,10 +340,7 @@ class TestConsultantLangueModel:
     def test_consultant_langue_repr(self):
         """Test de la représentation string"""
         consultant_langue = ConsultantLangue(consultant_id=1, langue_id=1, niveau=3)
-        assert (
-            repr(consultant_langue)
-            == "<ConsultantLangue(consultant_id=1, langue_id=1, niveau=3)>"
-        )
+        assert repr(consultant_langue) == "<ConsultantLangue(consultant_id=1, langue_id=1, niveau=3)>"
 
     def test_consultant_langue_niveau_label(self):
         """Test de la propriété niveau_label"""
@@ -470,12 +453,8 @@ class TestConsultantBusinessManagerModel:
 
     def test_consultant_business_manager_repr(self):
         """Test de la représentation string"""
-        gestion = ConsultantBusinessManager(
-            consultant_id=1, business_manager_id=1, date_debut=date(2024, 1, 1)
-        )
-        expected = (
-            "<ConsultantBusinessManager(consultant_id=1, bm_id=1, debut=2024-01-01)>"
-        )
+        gestion = ConsultantBusinessManager(consultant_id=1, business_manager_id=1, date_debut=date(2024, 1, 1))
+        expected = "<ConsultantBusinessManager(consultant_id=1, bm_id=1, debut=2024-01-01)>"
         assert repr(gestion) == expected
 
     def test_consultant_business_manager_est_actuel(self):
@@ -497,9 +476,7 @@ class TestConsultantBusinessManagerModel:
     def test_consultant_business_manager_duree_jours_active(self):
         """Test de duree_jours pour une gestion active"""
         gestion = ConsultantBusinessManager()
-        gestion.date_debut = date.today() - timedelta(
-            days=10
-        )  # Utiliser timedelta pour éviter les erreurs de date
+        gestion.date_debut = date.today() - timedelta(days=10)  # Utiliser timedelta pour éviter les erreurs de date
         gestion.date_fin = None  # Gestion active
 
         # Devrait utiliser la date actuelle

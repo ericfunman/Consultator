@@ -56,9 +56,7 @@ class TestConsultantServiceCoverage:
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
-    def test_get_all_consultants_objects_with_filters(
-        self, mock_st_error, mock_session
-    ):
+    def test_get_all_consultants_objects_with_filters(self, mock_st_error, mock_session):
         """Test récupération objets consultants avec filtres"""
         # Mock session
         mock_db = Mock()
@@ -129,9 +127,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
-            self.mock_consultant
-        )
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = self.mock_consultant
 
         # Execution
         result = ConsultantService.get_consultant_by_id(1)
@@ -150,9 +146,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = None
 
         # Execution
         result = ConsultantService.get_consultant_by_id(999)
@@ -171,9 +165,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_consultant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_consultant
 
         # Execution
         result = ConsultantService.get_consultant_by_email("jean.dupont@example.com")
@@ -184,9 +176,7 @@ class TestConsultantServiceCoverage:
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
-    def test_create_consultant_success(
-        self, mock_st_success, mock_st_error, mock_session
-    ):
+    def test_create_consultant_success(self, mock_st_success, mock_st_error, mock_session):
         """Test création consultant - succès"""
         # Mock session
         mock_db = Mock()
@@ -195,9 +185,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            None  # Email unique
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = None  # Email unique
 
         # Mock data
         data = {
@@ -228,9 +216,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_consultant
-        )  # Email existe
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_consultant  # Email existe
 
         # Mock data
         data = {"nom": "Test", "prenom": "User", "email": "existing@example.com"}
@@ -244,9 +230,7 @@ class TestConsultantServiceCoverage:
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
-    def test_update_consultant_success(
-        self, mock_st_success, mock_st_error, mock_session
-    ):
+    def test_update_consultant_success(self, mock_st_success, mock_st_error, mock_session):
         """Test mise à jour consultant - succès"""
         # Mock session
         mock_db = Mock()
@@ -255,9 +239,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_consultant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_consultant
 
         # Mock data
         data = {"nom": "Nouveau Nom"}
@@ -295,9 +277,7 @@ class TestConsultantServiceCoverage:
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
-    def test_delete_consultant_success(
-        self, mock_st_success, mock_st_error, mock_session
-    ):
+    def test_delete_consultant_success(self, mock_st_success, mock_st_error, mock_session):
         """Test suppression consultant - succès"""
         # Mock session
         mock_db = Mock()
@@ -306,9 +286,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_consultant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_consultant
 
         # Execution
         result = ConsultantService.delete_consultant(1)
@@ -349,9 +327,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            self.mock_consultant
-        ]
+        mock_db.query.return_value.filter.return_value.all.return_value = [self.mock_consultant]
 
         # Execution
         result = ConsultantService.search_consultants("jean")
@@ -370,9 +346,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            self.mock_consultant
-        ]
+        mock_db.query.return_value.filter.return_value.all.return_value = [self.mock_consultant]
 
         # Execution
         result = ConsultantService.get_available_consultants()
@@ -404,9 +378,7 @@ class TestConsultantServiceCoverage:
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
-    def test_get_consultants_by_availability_available(
-        self, mock_st_error, mock_session
-    ):
+    def test_get_consultants_by_availability_available(self, mock_st_error, mock_session):
         """Test récupération consultants par disponibilité - disponibles"""
         # Mock session
         mock_db = Mock()
@@ -415,9 +387,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.options.return_value.filter.return_value.all.return_value = [
-            self.mock_consultant
-        ]
+        mock_db.query.return_value.options.return_value.filter.return_value.all.return_value = [self.mock_consultant]
 
         # Execution
         result = ConsultantService.get_consultants_by_availability(available=True)
@@ -427,9 +397,7 @@ class TestConsultantServiceCoverage:
 
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
-    def test_get_consultants_by_availability_unavailable(
-        self, mock_st_error, mock_session
-    ):
+    def test_get_consultants_by_availability_unavailable(self, mock_st_error, mock_session):
         """Test récupération consultants par disponibilité - non disponibles"""
         # Mock session
         mock_db = Mock()
@@ -438,9 +406,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.options.return_value.filter.return_value.all.return_value = (
-            []
-        )
+        mock_db.query.return_value.options.return_value.filter.return_value.all.return_value = []
 
         # Execution
         result = ConsultantService.get_consultants_by_availability(available=False)
@@ -459,9 +425,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.options.return_value.all.return_value = [
-            self.mock_consultant
-        ]
+        mock_db.query.return_value.options.return_value.all.return_value = [self.mock_consultant]
 
         # Execution
         result = ConsultantService.get_all_consultants_with_stats()
@@ -487,9 +451,7 @@ class TestConsultantServiceCoverage:
     @patch("app.services.consultant_service.get_database_session")
     @patch("streamlit.error")
     @patch("streamlit.success")
-    def test_save_cv_analysis_success(
-        self, mock_st_success, mock_st_error, mock_session
-    ):
+    def test_save_cv_analysis_success(self, mock_st_success, mock_st_error, mock_session):
         """Test sauvegarde analyse CV - succès"""
         # Mock session
         mock_db = Mock()
@@ -498,9 +460,7 @@ class TestConsultantServiceCoverage:
         mock_session.return_value.__enter__ = Mock(return_value=mock_db)
         mock_session.return_value.__exit__ = Mock(return_value=None)
         mock_db.expunge = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            self.mock_consultant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = self.mock_consultant
 
         # Mock analysis data
         analysis_data = {

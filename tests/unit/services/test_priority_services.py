@@ -57,9 +57,7 @@ class TestAiOpenaiService:
         """Test de gestion des appels API OpenAI"""
         # Given
         service = self.service_class()
-        mock_openai.return_value.choices = [
-            Mock(message=Mock(content='{"competences": ["Python"]}'))
-        ]
+        mock_openai.return_value.choices = [Mock(message=Mock(content='{"competences": ["Python"]}'))]
 
         # When
         try:
@@ -111,7 +109,7 @@ class TestBusinessManagerService:
             }
         ]
 
-        with patch.object(service, 'get_all_business_managers', return_value=expected_result) as mock_method:
+        with patch.object(service, "get_all_business_managers", return_value=expected_result) as mock_method:
             # When
             result = service.get_all_business_managers()
 
@@ -316,13 +314,8 @@ class TestTechnologyService:
 
                 if isinstance(result, list):
                     # Vérifier que certaines technologies sont détectées
-                    tech_names = [
-                        t if isinstance(t, str) else t.get("name", "") for t in result
-                    ]
-                    assert (
-                        any("python" in tech.lower() for tech in tech_names)
-                        or len(result) == 0
-                    )
+                    tech_names = [t if isinstance(t, str) else t.get("name", "") for t in result]
+                    assert any("python" in tech.lower() for tech in tech_names) or len(result) == 0
 
         except (AttributeError, NotImplementedError):
             pytest.skip("Méthode extract_technologies non implémentée")

@@ -120,11 +120,7 @@ class TestUtilsModules:
             if not birth_date:
                 return None
             today = date.today()
-            return (
-                today.year
-                - birth_date.year
-                - ((today.month, today.day) < (birth_date.month, birth_date.day))
-            )
+            return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
         # Test
         birth_date = date(1990, 5, 15)
@@ -319,9 +315,7 @@ class TestDatabaseModules:
             required_fields = ["nom", "prenom", "email"]
             optional_fields = ["telephone", "date_naissance", "salaire"]
 
-            missing_required = [
-                field for field in required_fields if not data.get(field)
-            ]
+            missing_required = [field for field in required_fields if not data.get(field)]
             return len(missing_required) == 0
 
         # Test
@@ -345,12 +339,8 @@ class TestDatabaseModules:
 
             # Join avec compétences si filtrage
             if skill_filter:
-                query_parts.append(
-                    "JOIN consultant_competences cc ON c.id = cc.consultant_id"
-                )
-                query_parts.append(
-                    "JOIN competences comp ON cc.competence_id = comp.id"
-                )
+                query_parts.append("JOIN consultant_competences cc ON c.id = cc.consultant_id")
+                query_parts.append("JOIN competences comp ON cc.competence_id = comp.id")
                 query_parts.append(f"WHERE comp.nom = '{skill_filter}'")
 
             return " ".join(query_parts)
@@ -432,11 +422,11 @@ class TestIntegrationSimple:
             start_time = time.time()
             try:
                 result = func(*args, **kwargs)
-                success = (1 == 1)
+                success = 1 == 1
                 error = None
             except Exception as e:
                 result = None
-                success = (1 == 2)
+                success = 1 == 2
                 error = str(e)
 
             end_time = time.time()

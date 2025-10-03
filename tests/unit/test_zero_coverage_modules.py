@@ -9,19 +9,20 @@ import tempfile
 import os
 
 # Configuration pour les imports problématiques
-if 'streamlit' not in sys.modules:
-    sys.modules['streamlit'] = MagicMock()
+if "streamlit" not in sys.modules:
+    sys.modules["streamlit"] = MagicMock()
 
 
 class TestMainModule:
     """Tests pour le module main.py"""
 
-    @patch('sys.argv', ['main.py'])
+    @patch("sys.argv", ["main.py"])
     def test_main_module_import(self):
         """Test import du module main"""
         try:
             import app.main
-            assert hasattr(app.main, '__name__')
+
+            assert hasattr(app.main, "__name__")
         except Exception:
             # Si l'import échoue, c'est toujours mieux que 0% de couverture
             module_name = "main"
@@ -35,7 +36,8 @@ class TestChatbotModule:
         """Test import du module chatbot"""
         try:
             from app.pages_modules import chatbot
-            assert hasattr(chatbot, '__name__')
+
+            assert hasattr(chatbot, "__name__")
         except Exception:
             module_name = "chatbot"
             assert len(module_name) > 6
@@ -48,7 +50,8 @@ class TestConsultantFormsModule:
         """Test import du module consultant_forms"""
         try:
             from app.pages_modules import consultant_forms
-            assert hasattr(consultant_forms, '__name__')
+
+            assert hasattr(consultant_forms, "__name__")
         except Exception:
             module_name = "consultant_forms"
             assert len(module_name) > 14
@@ -61,7 +64,8 @@ class TestConsultantInfoModule:
         """Test import du module consultant_info"""
         try:
             from app.pages_modules import consultant_info
-            assert hasattr(consultant_info, '__name__')
+
+            assert hasattr(consultant_info, "__name__")
         except Exception:
             module_name = "consultant_info"
             assert len(module_name) > 13
@@ -74,7 +78,8 @@ class TestConsultantLanguagesModule:
         """Test import du module consultant_languages"""
         try:
             from app.pages_modules import consultant_languages
-            assert hasattr(consultant_languages, '__name__')
+
+            assert hasattr(consultant_languages, "__name__")
         except Exception:
             module_name = "consultant_languages"
             assert len(module_name) > 19
@@ -87,7 +92,8 @@ class TestConsultantListModule:
         """Test import du module consultant_list"""
         try:
             from app.pages_modules import consultant_list
-            assert hasattr(consultant_list, '__name__')
+
+            assert hasattr(consultant_list, "__name__")
         except Exception:
             module_name = "consultant_list"
             assert len(module_name) > 13
@@ -100,7 +106,8 @@ class TestConsultantMissionsModule:
         """Test import du module consultant_missions"""
         try:
             from app.pages_modules import consultant_missions
-            assert hasattr(consultant_missions, '__name__')
+
+            assert hasattr(consultant_missions, "__name__")
         except Exception:
             module_name = "consultant_missions"
             assert len(module_name) > 17
@@ -113,7 +120,8 @@ class TestConsultantProfileModule:
         """Test import du module consultant_profile"""
         try:
             from app.pages_modules import consultant_profile
-            assert hasattr(consultant_profile, '__name__')
+
+            assert hasattr(consultant_profile, "__name__")
         except Exception:
             module_name = "consultant_profile"
             assert len(module_name) > 16
@@ -126,7 +134,8 @@ class TestConsultantSkillsModule:
         """Test import du module consultant_skills"""
         try:
             from app.pages_modules import consultant_skills
-            assert hasattr(consultant_skills, '__name__')
+
+            assert hasattr(consultant_skills, "__name__")
         except Exception:
             module_name = "consultant_skills"
             assert len(module_name) > 15
@@ -139,7 +148,8 @@ class TestConsultantsModule:
         """Test import du module consultants"""
         try:
             from app.pages_modules import consultants
-            assert hasattr(consultants, '__name__')
+
+            assert hasattr(consultants, "__name__")
         except Exception:
             module_name = "consultants"
             assert len(module_name) > 10
@@ -152,7 +162,8 @@ class TestDocumentsFunctionsModule:
         """Test import du module documents_functions"""
         try:
             from app.pages_modules import documents_functions
-            assert hasattr(documents_functions, '__name__')
+
+            assert hasattr(documents_functions, "__name__")
         except Exception:
             module_name = "documents_functions"
             assert len(module_name) > 18
@@ -165,7 +176,8 @@ class TestDocumentsUploadModule:
         """Test import du module documents_upload"""
         try:
             from app.pages_modules import documents_upload
-            assert hasattr(documents_upload, '__name__')
+
+            assert hasattr(documents_upload, "__name__")
         except Exception:
             module_name = "documents_upload"
             assert len(module_name) > 15
@@ -178,7 +190,8 @@ class TestHomeModule:
         """Test import du module home"""
         try:
             from app.pages_modules import home
-            assert hasattr(home, '__name__')
+
+            assert hasattr(home, "__name__")
         except Exception:
             module_name = "home"
             assert len(module_name) > 3
@@ -191,7 +204,8 @@ class TestPracticesModule:
         """Test import du module practices"""
         try:
             from app.pages_modules import practices
-            assert hasattr(practices, '__name__')
+
+            assert hasattr(practices, "__name__")
         except Exception:
             module_name = "practices"
             assert len(module_name) > 8
@@ -204,7 +218,8 @@ class TestTechnologiesModule:
         """Test import du module technologies"""
         try:
             from app.pages_modules import technologies
-            assert hasattr(technologies, '__name__')
+
+            assert hasattr(technologies, "__name__")
         except Exception:
             module_name = "technologies"
             assert len(module_name) > 10
@@ -217,15 +232,15 @@ class TestUtilsModules:
         """Test des fonctions du module skill_categories"""
         try:
             from app.utils.skill_categories import get_skill_categories, categorize_skill
-            
+
             # Test get_skill_categories
             categories = get_skill_categories()
             assert isinstance(categories, dict)
-            
+
             # Test categorize_skill
             category = categorize_skill("Python")
             assert isinstance(category, str)
-            
+
         except Exception:
             skill_name = "skill_categories"
             assert len(skill_name) > 10
@@ -234,11 +249,11 @@ class TestUtilsModules:
         """Test des fonctions du module technologies_referentiel"""
         try:
             from app.utils.technologies_referentiel import get_technologies_by_category
-            
+
             # Test get_technologies_by_category
             techs = get_technologies_by_category()
             assert isinstance(techs, dict)
-            
+
         except Exception:
             tech_name = "technologies"
             assert len(tech_name) > 8
@@ -247,21 +262,22 @@ class TestUtilsModules:
         """Test des fonctions du module helpers"""
         try:
             from app.utils.helpers import format_date, validate_email, generate_random_string
-            
+
             # Test format_date
             from datetime import datetime
+
             result = format_date(datetime.now())
             assert isinstance(result, str)
-            
+
             # Test validate_email
             result = validate_email("test@example.com")
             assert isinstance(result, bool)
-            
+
             # Test generate_random_string
             result = generate_random_string(10)
             assert isinstance(result, str)
             assert len(result) == 10
-            
+
         except Exception:
             helper_name = "helpers"
             assert len(helper_name) > 5
@@ -274,11 +290,11 @@ class TestServiceModulesBasic:
         """Test des fonctions du business_manager_service"""
         try:
             from app.services.business_manager_service import BusinessManagerService
-            
+
             # Test création instance
             service = BusinessManagerService()
             assert service is not None
-            
+
         except Exception:
             bm_name = "business_manager"
             assert len(bm_name) > 12
@@ -287,11 +303,11 @@ class TestServiceModulesBasic:
         """Test des fonctions du cache_service"""
         try:
             from app.services.cache_service import CacheService
-            
+
             # Test méthodes statiques de base
             CacheService.clear_all_cache()
-            assert hasattr(CacheService, 'clear_all_cache')
-            
+            assert hasattr(CacheService, "clear_all_cache")
+
         except Exception:
             cache_name = "cache_service"
             assert len(cache_name) > 10
@@ -300,11 +316,11 @@ class TestServiceModulesBasic:
         """Test des fonctions du consultant_service"""
         try:
             from app.services.consultant_service import ConsultantService
-            
+
             # Test méthodes statiques disponibles
-            assert hasattr(ConsultantService, 'get_all_consultants')
-            assert hasattr(ConsultantService, 'create_consultant')
-            
+            assert hasattr(ConsultantService, "get_all_consultants")
+            assert hasattr(ConsultantService, "create_consultant")
+
         except Exception:
             consultant_name = "consultant_service"
             assert len(consultant_name) > 14
@@ -313,22 +329,22 @@ class TestServiceModulesBasic:
 class TestDatabaseModuleFunctions:
     """Tests pour améliorer la couverture du module database"""
 
-    @patch('app.database.database.os.path.exists')
+    @patch("app.database.database.os.path.exists")
     def test_database_functions(self, mock_exists):
         """Test des fonctions de base de données"""
         try:
             from app.database.database import get_database_session, init_database
-            
+
             mock_exists.return_value = True
-            
+
             # Test init_database
             init_database()
-            assert hasattr(init_database, '__name__')
-            
+            assert hasattr(init_database, "__name__")
+
             # Test get_database_session
             with get_database_session() as session:
                 assert session is not None
-                
+
         except Exception:
             db_name = "database"
             assert len(db_name) > 5
@@ -337,16 +353,16 @@ class TestDatabaseModuleFunctions:
         """Test création basique des modèles"""
         try:
             from app.database.models import Consultant, Mission, Competence
-            
+
             # Test création instances
             consultant = Consultant()
             mission = Mission()
             competence = Competence()
-            
+
             assert consultant is not None
             assert mission is not None
             assert competence is not None
-            
+
         except Exception:
             model_name = "models"
             assert len(model_name) > 4
@@ -359,11 +375,11 @@ class TestPageModulesInitModule:
         """Test des fonctions du module __init__.py"""
         try:
             from app.pages_modules import get_page_config, setup_sidebar
-            
+
             # Test get_page_config
             config = get_page_config()
             assert isinstance(config, dict)
-            
+
         except Exception:
             init_name = "init"
             assert len(init_name) > 2
@@ -372,8 +388,9 @@ class TestPageModulesInitModule:
         """Test des imports du module __init__.py"""
         try:
             import app.pages_modules
-            assert hasattr(app.pages_modules, '__name__')
-            
+
+            assert hasattr(app.pages_modules, "__name__")
+
         except Exception:
             pages_name = "pages_modules"
             assert len(pages_name) > 10
@@ -386,13 +403,13 @@ class TestAIServices:
         """Test basique du service Grok"""
         try:
             from app.services.ai_grok_service import GrokService
-            
+
             service = GrokService()
             assert service is not None
-            
+
             # Test méthode de base
-            assert hasattr(service, 'analyze_cv')
-            
+            assert hasattr(service, "analyze_cv")
+
         except Exception:
             ai_name = "ai_grok"
             assert len(ai_name) > 5
@@ -405,14 +422,14 @@ class TestComponentsModule:
         """Test du widget de technologies"""
         try:
             from app.components.technology_widget import create_technology_selector
-            
+
             # Test avec mock
-            with patch('streamlit.multiselect') as mock_multi:
+            with patch("streamlit.multiselect") as mock_multi:
                 mock_multi.return_value = ["Python", "Java"]
-                
+
                 result = create_technology_selector(["Python", "Java", "C++"])
                 assert isinstance(result, list)
-                
+
         except Exception:
             tech_widget_name = "technology_widget"
             assert len(tech_widget_name) > 14
@@ -426,11 +443,13 @@ class TestDirectFunctionCalls:
         try:
             # Import et test direct de fonctions utilitaires
             from app.utils.skill_categories import SKILL_CATEGORIES
+
             assert isinstance(SKILL_CATEGORIES, dict)
-            
+
             from app.utils.technologies_referentiel import TECHNOLOGIES
+
             assert isinstance(TECHNOLOGIES, dict)
-            
+
         except Exception:
             simple_func_name = "simple_functions"
             assert len(simple_func_name) > 13
@@ -439,19 +458,19 @@ class TestDirectFunctionCalls:
         """Test des propriétés des modèles"""
         try:
             from app.database.models import Consultant
-            
+
             consultant = Consultant()
             consultant.nom = "Test"
             consultant.prenom = "User"
-            
+
             assert consultant.nom == "Test"
             assert consultant.prenom == "User"
-            
+
             # Test propriétés calculées
-            if hasattr(consultant, 'nom_complet'):
+            if hasattr(consultant, "nom_complet"):
                 nom_complet = consultant.nom_complet
                 assert isinstance(nom_complet, str)
-                
+
         except Exception:
             model_prop_name = "models_properties"
             assert len(model_prop_name) > 13

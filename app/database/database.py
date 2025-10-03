@@ -21,9 +21,7 @@ from .models import Mission
 from .models import Practice
 
 # Configuration de la base de données
-DATABASE_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "..", "data", "consultator.db"
-)
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "consultator.db")
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 
 # Variable globale pour le contrôle d'initialisation

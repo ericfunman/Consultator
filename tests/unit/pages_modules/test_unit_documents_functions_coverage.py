@@ -126,17 +126,13 @@ class TestDocumentsFunctions:
             )
 
             # La fonction attend (uploaded_file, consultant, document_type, _)
-            save_consultant_document(
-                mock_uploaded_file, mock_consultant, "CV", "CV principal"
-            )
+            save_consultant_document(mock_uploaded_file, mock_consultant, "CV", "CV principal")
 
             # Vérifier que la fonction s'exécute sans erreur (elle utilise st.success)
             mock_st.success.assert_called()
         except ImportError:
             # Test simulé
-            def save_consultant_document(
-                uploaded_file, consultant, document_type, description
-            ):
+            def save_consultant_document(uploaded_file, consultant, document_type, description):
                 if uploaded_file and uploaded_file.name.endswith(".pdf"):
                     return bool("true")
                 return not bool("true")
@@ -166,9 +162,7 @@ class TestDocumentsFunctions:
             mock_st.error.assert_called()
         except ImportError:
             # Test simulé
-            def save_consultant_document(
-                uploaded_file, consultant, document_type, description
-            ):
+            def save_consultant_document(uploaded_file, consultant, document_type, description):
                 if not uploaded_file:
                     return not bool("true")
                 return bool("true")
@@ -201,9 +195,7 @@ class TestDocumentsFunctions:
             mock_st.error.assert_called()
         except ImportError:
             # Test simulé
-            def save_consultant_document(
-                uploaded_file, consultant, document_type, description
-            ):
+            def save_consultant_document(uploaded_file, consultant, document_type, description):
                 allowed_types = [".pdf", ".docx", ".doc"]
                 if not any(uploaded_file.name.endswith(ext) for ext in allowed_types):
                     return not bool("true")
@@ -292,13 +284,9 @@ class TestDocumentValidation:
             safe_chars = re.sub(r'[<>:"/\\|?*]', "_", filename)
             # Limiter la longueur en préservant l'extension
             if len(safe_chars) > 255:
-                name_part, ext_part = (
-                    safe_chars.rsplit(".", 1) if "." in safe_chars else (safe_chars, "")
-                )
+                name_part, ext_part = safe_chars.rsplit(".", 1) if "." in safe_chars else (safe_chars, "")
                 max_name_len = 255 - len(ext_part) - 1 if ext_part else 255
-                safe_chars = name_part[:max_name_len] + (
-                    "." + ext_part if ext_part else ""
-                )
+                safe_chars = name_part[:max_name_len] + ("." + ext_part if ext_part else "")
             return safe_chars
 
         # Tests
@@ -463,16 +451,10 @@ class TestDocumentUtils:
         def document_security_check(filename, file_content):
             # Vérifications de sécurité
             checks = {
-                "safe_extension": not filename.lower().endswith(
-                    (".exe", ".bat", ".sh", ".cmd")
-                ),
-                "reasonable_size": (
-                    len(file_content) < 50 * 1024 * 1024 if file_content else True
-                ),  # 50MB max
+                "safe_extension": not filename.lower().endswith((".exe", ".bat", ".sh", ".cmd")),
+                "reasonable_size": (len(file_content) < 50 * 1024 * 1024 if file_content else True),  # 50MB max
                 "not_empty": len(file_content) > 0 if file_content else False,
-                "safe_name": not any(
-                    char in filename for char in ["<", ">", ":", '"', "|", "?", "*"]
-                ),
+                "safe_name": not any(char in filename for char in ["<", ">", ":", '"', "|", "?", "*"]),
             }
 
             return all(checks.values()), checks
@@ -504,9 +486,7 @@ class TestDocumentIntegration:
 
             # Étape 3: Génération du chemin
             safe_filename = filename.replace(" ", "_")
-            file_path = (
-                f"uploads/consultant_{consultant_id}/{document_type}/{safe_filename}"
-            )
+            file_path = f"uploads/consultant_{consultant_id}/{document_type}/{safe_filename}"
 
             # Étape 4: Métadonnées
             metadata = {

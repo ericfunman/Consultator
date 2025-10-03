@@ -40,9 +40,7 @@ class TestHomePageComponents:
     @patch("streamlit.markdown")
     @patch("streamlit.columns")
     @patch("streamlit.metric")
-    def test_dashboard_metrics(
-        self, mock_metric, mock_columns, mock_markdown, mock_title
-    ):
+    def test_dashboard_metrics(self, mock_metric, mock_columns, mock_markdown, mock_title):
         """Test des métriques du tableau de bord"""
         # Configuration des mocks
         mock_columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
@@ -70,9 +68,7 @@ class TestHomePageComponents:
     @patch("streamlit.info")
     @patch("streamlit.success")
     @patch("streamlit.warning")
-    def test_status_messages(
-        self, mock_warning, mock_success, mock_info, mock_subheader
-    ):
+    def test_status_messages(self, mock_warning, mock_success, mock_info, mock_subheader):
         """Test des messages de statut"""
         # Configuration des mocks
         mock_subheader.return_value = None
@@ -125,10 +121,7 @@ class TestDashboardData:
         }
 
         # Vérifications
-        assert (
-            stats["total_consultants"]
-            == stats["available_consultants"] + stats["occupied_consultants"]
-        )
+        assert stats["total_consultants"] == stats["available_consultants"] + stats["occupied_consultants"]
         assert stats["new_this_month"] >= 0
         assert all(value >= 0 for value in stats.values())
 
@@ -178,9 +171,7 @@ class TestDashboardData:
 
         # Vérifications
         assert sum(grades.values()) == 150  # Total consultants
-        assert (
-            grades["Confirmé"] >= grades["Junior"]
-        )  # Plus de confirmés que de juniors
+        assert grades["Confirmé"] >= grades["Junior"]  # Plus de confirmés que de juniors
         assert grades["Senior"] > grades["Expert"]  # Plus de seniors que d'experts
 
 
@@ -232,9 +223,7 @@ class TestChartsAndVisualizations:
 
         # Vérifications
         assert all(revenue > 0 for revenue in performance_data["monthly_revenue"])
-        assert all(
-            0 <= util <= 100 for util in performance_data["consultant_utilization"]
-        )
+        assert all(0 <= util <= 100 for util in performance_data["consultant_utilization"])
         assert all(1 <= sat <= 5 for sat in performance_data["client_satisfaction"])
 
 
@@ -244,9 +233,7 @@ class TestNavigationAndActions:
     @patch("streamlit.button")
     @patch("streamlit.selectbox")
     @patch("streamlit.multiselect")
-    def test_interactive_components(
-        self, mock_multiselect, mock_selectbox, mock_button
-    ):
+    def test_interactive_components(self, mock_multiselect, mock_selectbox, mock_button):
         """Test des composants interactifs"""
         # Configuration des mocks
         mock_button.return_value = False
@@ -256,9 +243,7 @@ class TestNavigationAndActions:
         # Test des interactions
         button_clicked = mock_button("Action Button")
         selected_option = mock_selectbox("Choose", ["Option1", "Option2"])
-        multi_selection = mock_multiselect(
-            "Choose Multiple", ["Option1", "Option2", "Option3"]
-        )
+        multi_selection = mock_multiselect("Choose Multiple", ["Option1", "Option2", "Option3"])
 
         # Vérifications
         assert button_clicked is False
@@ -273,9 +258,7 @@ class TestNavigationAndActions:
         mock_sidebar.button = MagicMock(return_value=False)
 
         # Test de la navigation
-        page_selection = mock_sidebar.selectbox(
-            "Navigate", ["Home", "Consultants", "Missions"]
-        )
+        page_selection = mock_sidebar.selectbox("Navigate", ["Home", "Consultants", "Missions"])
         refresh_button = mock_sidebar.button("Refresh")
 
         # Vérifications
@@ -384,9 +367,7 @@ class TestPerformanceOptimization:
         processing_time = end_time - start_time
 
         # Vérifications
-        assert (
-            len(filtered_data) == 200
-        )  # 200 éléments dont la valeur est divisible par 100 (0, 100, 200, ..., 9900)
+        assert len(filtered_data) == 200  # 200 éléments dont la valeur est divisible par 100 (0, 100, 200, ..., 9900)
         assert processing_time < 1.0  # Moins d'1 seconde
 
     def test_memory_efficiency(self):

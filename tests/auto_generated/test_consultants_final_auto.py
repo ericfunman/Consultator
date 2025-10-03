@@ -18,17 +18,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import consultants_final: {e}", allow_module_level=True)
 
 
-
-
 def test_show():
     """Test automatiquement généré pour show"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = show(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -40,30 +38,29 @@ def test_show_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_show_with_mocks(mock_request):
     """Test de show avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_show_consultants_list():
     """Test automatiquement généré pour show_consultants_list"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = show_consultants_list(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -75,30 +72,29 @@ def test_show_consultants_list_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_show_consultants_list_with_mocks(mock_request):
     """Test de show_consultants_list avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_show_add_consultant_form():
     """Test automatiquement généré pour show_add_consultant_form"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = show_add_consultant_form(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -110,16 +106,15 @@ def test_show_add_consultant_form_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_show_add_consultant_form_with_mocks(mock_request):
     """Test de show_add_consultant_form avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

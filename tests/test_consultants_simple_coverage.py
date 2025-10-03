@@ -2,6 +2,7 @@
 Tests simplifiés pour améliorer la couverture de consultants.py
 Focus sur les fonctions de gestion des salaires et compétences
 """
+
 import pytest
 from unittest.mock import MagicMock, patch
 from datetime import date, datetime
@@ -58,12 +59,15 @@ class TestSalaryHistoryFunctions:
         consultant.nom = "Dupont"
 
         # Mock des fonctions internes
-        with patch('app.pages_modules.consultants._load_and_ensure_salary_history') as mock_load, \
-             patch('app.pages_modules.consultants._display_salary_history_content') as mock_display, \
-             patch('app.pages_modules.consultants._handle_salary_evolution_form') as mock_form, \
-             patch('streamlit.markdown'), \
-             patch('streamlit.subheader'), \
-             patch('streamlit.info'):
+        with patch("app.pages_modules.consultants._load_and_ensure_salary_history") as mock_load, patch(
+            "app.pages_modules.consultants._display_salary_history_content"
+        ) as mock_display, patch("app.pages_modules.consultants._handle_salary_evolution_form") as mock_form, patch(
+            "streamlit.markdown"
+        ), patch(
+            "streamlit.subheader"
+        ), patch(
+            "streamlit.info"
+        ):
 
             # Retourner des données pour déclencher _display_salary_history_content
             mock_salaires = [MagicMock()]
@@ -84,11 +88,13 @@ class TestSalaryHistoryFunctions:
 
         mock_salaires = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_session, \
-             patch('app.pages_modules.consultants._should_add_initial_salary_entry') as mock_should_add, \
-             patch('app.pages_modules.consultants._add_initial_salary_entry') as mock_add:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session, patch(
+            "app.pages_modules.consultants._should_add_initial_salary_entry"
+        ) as mock_should_add, patch("app.pages_modules.consultants._add_initial_salary_entry") as mock_add:
 
-            mock_session.return_value.__enter__.return_value.query.return_value.filter.return_value.order_by.return_value.all.return_value = mock_salaires
+            mock_session.return_value.__enter__.return_value.query.return_value.filter.return_value.order_by.return_value.all.return_value = (
+                mock_salaires
+            )
             mock_should_add.return_value = False
 
             result = _load_and_ensure_salary_history(consultant)
@@ -103,12 +109,15 @@ class TestSalaryHistoryFunctions:
 
         mock_salaires = []
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_session, \
-             patch('app.pages_modules.consultants._should_add_initial_salary_entry') as mock_should_add, \
-             patch('app.pages_modules.consultants._add_initial_salary_entry') as mock_add:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session, patch(
+            "app.pages_modules.consultants._should_add_initial_salary_entry"
+        ) as mock_should_add, patch("app.pages_modules.consultants._add_initial_salary_entry") as mock_add:
 
             # Configuration des mocks
-            mock_session.return_value.__enter__.return_value.query.return_value.filter.return_value.order_by.return_value.all.side_effect = [mock_salaires, mock_salaires]
+            mock_session.return_value.__enter__.return_value.query.return_value.filter.return_value.order_by.return_value.all.side_effect = [
+                mock_salaires,
+                mock_salaires,
+            ]
             mock_should_add.return_value = True
 
             result = _load_and_ensure_salary_history(consultant)
@@ -123,7 +132,7 @@ class TestSalaryHistoryFunctions:
 
         salaires = []  # Liste vide
 
-        with patch('datetime.date') as mock_date:
+        with patch("datetime.date") as mock_date:
             mock_date.today.return_value.year = 2024
 
             result = _should_add_initial_salary_entry(consultant, salaires)
@@ -151,7 +160,7 @@ class TestSalaryHistoryFunctions:
         mock_salaire.date_debut.year = 2024
         salaires = [mock_salaire]
 
-        with patch('datetime.date') as mock_date:
+        with patch("datetime.date") as mock_date:
             mock_date.today.return_value.year = 2024
 
             result = _should_add_initial_salary_entry(consultant, salaires)
@@ -166,7 +175,7 @@ class TestSalaryHistoryFunctions:
 
         mock_session = MagicMock()
 
-        with patch('datetime.date') as mock_date:
+        with patch("datetime.date") as mock_date:
             mock_date.return_value = date(2024, 1, 1)
 
             _add_initial_salary_entry(mock_session, consultant)
@@ -187,10 +196,11 @@ class TestSalaryHistoryFunctions:
         consultant = MagicMock()
         salaires = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants._display_salary_list') as mock_list, \
-             patch('app.pages_modules.consultants._update_current_salary_if_needed') as mock_update, \
-             patch('app.pages_modules.consultants._display_salary_evolution_chart') as mock_chart, \
-             patch('app.pages_modules.consultants.sorted') as mock_sorted:
+        with patch("app.pages_modules.consultants._display_salary_list") as mock_list, patch(
+            "app.pages_modules.consultants._update_current_salary_if_needed"
+        ) as mock_update, patch("app.pages_modules.consultants._display_salary_evolution_chart") as mock_chart, patch(
+            "app.pages_modules.consultants.sorted"
+        ) as mock_sorted:
 
             mock_sorted.return_value = salaires
 
@@ -217,7 +227,7 @@ class TestSalaryHistoryFunctions:
 
         salaires = [salaire1, salaire2]
 
-        with patch('app.pages_modules.consultants.st.write') as mock_write:
+        with patch("app.pages_modules.consultants.st.write") as mock_write:
             _display_salary_list(salaires)
 
             # Vérifier que write a été appelé 2 fois (une par salaire)
@@ -240,7 +250,7 @@ class TestSalaryHistoryFunctions:
 
         salaires = [salaire1, salaire2]
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             mock_db_session = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_db_session
 
@@ -270,7 +280,7 @@ class TestSalaryHistoryFunctions:
 
         salaires = [salaire1, salaire2]
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             _update_current_salary_if_needed(consultant, salaires)
 
             # Vérifier qu'aucune mise à jour n'a été faite
@@ -280,38 +290,38 @@ class TestSalaryHistoryFunctions:
         """Test de l'affichage du graphique d'évolution des salaires"""
         consultant = MagicMock()
         consultant.id = 1
-        
+
         # Créer des mocks de salaires avec vraies dates et valeurs
         salaire1 = MagicMock()
         salaire1.date_debut = date(2023, 1, 1)
         salaire1.salaire = 45000
-        
+
         salaire2 = MagicMock()
         salaire2.date_debut = date(2024, 1, 1)
         salaire2.salaire = 50000
-        
+
         salaires_sorted = [salaire1, salaire2]
 
         # Mock streamlit functions - simuler le clic sur le bouton
-        with patch('app.pages_modules.consultants.st.button', return_value=True) as mock_button, \
-             patch('plotly.graph_objects.Figure') as mock_fig_class, \
-             patch('plotly.graph_objects.Scatter') as mock_scatter, \
-             patch('app.pages_modules.consultants.st.plotly_chart') as mock_plotly_chart:
+        with patch("app.pages_modules.consultants.st.button", return_value=True) as mock_button, patch(
+            "plotly.graph_objects.Figure"
+        ) as mock_fig_class, patch("plotly.graph_objects.Scatter") as mock_scatter, patch(
+            "app.pages_modules.consultants.st.plotly_chart"
+        ) as mock_plotly_chart:
 
             # Mock les objets plotly
             mock_fig_instance = MagicMock()
             mock_fig_class.return_value = mock_fig_instance
             mock_fig_instance.add_trace.return_value = None
             mock_fig_instance.update_layout.return_value = None
-            
+
             mock_scatter.return_value = MagicMock()
 
             _display_salary_evolution_chart(consultant, salaires_sorted)
 
             # Vérifier que le bouton a été appelé
             mock_button.assert_called_once_with(
-                "📈 Afficher l'évolution des salaires",
-                key=f"show_salary_graph_{consultant.id}"
+                "📈 Afficher l'évolution des salaires", key=f"show_salary_graph_{consultant.id}"
             )
             # Vérifier que plotly_chart a été appelé (car le bouton retourne True)
             mock_plotly_chart.assert_called_once()
@@ -321,8 +331,9 @@ class TestSalaryHistoryFunctions:
         consultant = MagicMock()
         consultant.id = 1
 
-        with patch('app.pages_modules.consultants.st.expander') as mock_expander, \
-             patch('app.pages_modules.consultants.st.form') as mock_form:
+        with patch("app.pages_modules.consultants.st.expander") as mock_expander, patch(
+            "app.pages_modules.consultants.st.form"
+        ) as mock_form:
 
             mock_expander.return_value.__enter__.return_value = MagicMock()
             mock_form.return_value.__enter__.return_value = MagicMock()
@@ -342,10 +353,11 @@ class TestSkillsFunctions:
         consultant = MagicMock()
         consultant.id = 1
 
-        with patch('streamlit.tabs') as mock_tabs, \
-             patch('app.pages_modules.consultants._show_technical_skills') as mock_tech, \
-             patch('app.pages_modules.consultants._show_functional_skills') as mock_func, \
-             patch('app.pages_modules.consultants._add_skills_form') as mock_add:
+        with patch("streamlit.tabs") as mock_tabs, patch(
+            "app.pages_modules.consultants._show_technical_skills"
+        ) as mock_tech, patch("app.pages_modules.consultants._show_functional_skills") as mock_func, patch(
+            "app.pages_modules.consultants._add_skills_form"
+        ) as mock_add:
 
             # Mock les tabs
             mock_tab1, mock_tab2, mock_tab3 = MagicMock(), MagicMock(), MagicMock()
@@ -365,9 +377,11 @@ class TestSkillsFunctions:
         mock_competences = [MagicMock(), MagicMock()]
         mock_technologies = {"Python", "Django"}
 
-        with patch('app.pages_modules.consultants._load_technical_skills_data') as mock_load, \
-             patch('app.pages_modules.consultants._display_registered_technical_skills') as mock_display_reg, \
-             patch('app.pages_modules.consultants._display_mission_technologies') as mock_display_tech:
+        with patch("app.pages_modules.consultants._load_technical_skills_data") as mock_load, patch(
+            "app.pages_modules.consultants._display_registered_technical_skills"
+        ) as mock_display_reg, patch(
+            "app.pages_modules.consultants._display_mission_technologies"
+        ) as mock_display_tech:
 
             mock_load.return_value = (mock_competences, mock_technologies)
 
@@ -385,7 +399,7 @@ class TestSkillsFunctions:
         mock_competences = [MagicMock(), MagicMock()]
         mock_missions = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             # Configurer le mock pour retourner les bonnes valeurs
             mock_db_session = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_db_session
@@ -418,8 +432,9 @@ class TestSkillsFunctions:
 
         competences_tech = [(mock_comp1, mock_competence1), (mock_comp2, mock_competence2)]
 
-        with patch('app.pages_modules.consultants.st.write') as mock_write, \
-             patch('app.pages_modules.consultants.st.columns', side_effect=create_mock_columns):
+        with patch("app.pages_modules.consultants.st.write") as mock_write, patch(
+            "app.pages_modules.consultants.st.columns", side_effect=create_mock_columns
+        ):
 
             _display_registered_technical_skills(competences_tech)
 
@@ -430,7 +445,7 @@ class TestSkillsFunctions:
         """Test de l'affichage des compétences techniques - liste vide"""
         competences_tech = []
 
-        with patch('app.pages_modules.consultants.st.info') as mock_info:
+        with patch("app.pages_modules.consultants.st.info") as mock_info:
             _display_registered_technical_skills(competences_tech)
 
             mock_info.assert_called_once_with("📝 Aucune compétence technique enregistrée")
@@ -439,9 +454,9 @@ class TestSkillsFunctions:
         """Test de l'affichage des technologies des missions"""
         technologies = {"Python", "Django", "PostgreSQL"}
 
-        with patch('app.pages_modules.consultants.st.write') as mock_write, \
-             patch('app.pages_modules.consultants.st.columns', return_value=create_mock_columns(4)), \
-             patch('app.pages_modules.consultants.st.metric') as mock_metric:
+        with patch("app.pages_modules.consultants.st.write") as mock_write, patch(
+            "app.pages_modules.consultants.st.columns", return_value=create_mock_columns(4)
+        ), patch("app.pages_modules.consultants.st.metric") as mock_metric:
 
             _display_mission_technologies(technologies)
 
@@ -455,8 +470,9 @@ class TestSkillsFunctions:
 
         mock_competences = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants._load_functional_skills_data') as mock_load, \
-             patch('app.pages_modules.consultants._display_functional_skills_by_category') as mock_display:
+        with patch("app.pages_modules.consultants._load_functional_skills_data") as mock_load, patch(
+            "app.pages_modules.consultants._display_functional_skills_by_category"
+        ) as mock_display:
 
             mock_load.return_value = mock_competences
 
@@ -472,13 +488,15 @@ class TestSkillsFunctions:
 
         mock_competences = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_session:
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
             # Configurer le mock pour retourner les bonnes valeurs
             mock_db_session = MagicMock()
             mock_session.return_value.__enter__.return_value = mock_db_session
 
             # Mock pour les compétences fonctionnelles
-            mock_db_session.query.return_value.join.return_value.filter.return_value.order_by.return_value.all.return_value = mock_competences
+            mock_db_session.query.return_value.join.return_value.filter.return_value.order_by.return_value.all.return_value = (
+                mock_competences
+            )
 
             result = _load_functional_skills_data(consultant)
 
@@ -497,12 +515,16 @@ class TestSkillsFunctions:
 
         competences_func = [(mock_comp1, mock_competence1), (mock_comp2, mock_competence2)]
 
-        with patch('app.pages_modules.consultants.st.write') as mock_write, \
-             patch('app.pages_modules.consultants._group_functional_skills_by_category') as mock_group, \
-             patch('app.pages_modules.consultants._display_functional_skills_categories'), \
-             patch('app.pages_modules.consultants._display_functional_skills_metrics'):
+        with patch("app.pages_modules.consultants.st.write") as mock_write, patch(
+            "app.pages_modules.consultants._group_functional_skills_by_category"
+        ) as mock_group, patch("app.pages_modules.consultants._display_functional_skills_categories"), patch(
+            "app.pages_modules.consultants._display_functional_skills_metrics"
+        ):
 
-            mock_group.return_value = {"Banque": [(mock_comp1, mock_competence1)], "Assurance": [(mock_comp2, mock_competence2)]}
+            mock_group.return_value = {
+                "Banque": [(mock_comp1, mock_competence1)],
+                "Assurance": [(mock_comp2, mock_competence2)],
+            }
 
             _display_functional_skills_by_category(competences_func)
 
@@ -513,7 +535,7 @@ class TestSkillsFunctions:
         """Test de l'affichage des compétences fonctionnelles - liste vide"""
         competences_func = []
 
-        with patch('app.pages_modules.consultants._display_no_functional_skills_message') as mock_display_no:
+        with patch("app.pages_modules.consultants._display_no_functional_skills_message") as mock_display_no:
             _display_functional_skills_by_category(competences_func)
 
             # mock_display_no.assert_called_once() # Corrected: mock expectation
@@ -533,7 +555,11 @@ class TestSkillsFunctions:
         mock_competence3 = MagicMock()
         mock_competence3.categorie = "Assurance"
 
-        competences_func = [(mock_comp1, mock_competence1), (mock_comp2, mock_competence2), (mock_comp3, mock_competence3)]
+        competences_func = [
+            (mock_comp1, mock_competence1),
+            (mock_comp2, mock_competence2),
+            (mock_comp3, mock_competence3),
+        ]
 
         result = _group_functional_skills_by_category(competences_func)
 
@@ -544,13 +570,11 @@ class TestSkillsFunctions:
 
     def test_display_functional_skills_categories(self):
         """Test de l'affichage des catégories de compétences fonctionnelles"""
-        categories = {
-            "Banque": [MagicMock(), MagicMock()],
-            "Assurance": [MagicMock()]
-        }
+        categories = {"Banque": [MagicMock(), MagicMock()], "Assurance": [MagicMock()]}
 
-        with patch('app.pages_modules.consultants.st.expander') as mock_expander, \
-             patch('app.pages_modules.consultants._display_functional_skills_in_category'):
+        with patch("app.pages_modules.consultants.st.expander") as mock_expander, patch(
+            "app.pages_modules.consultants._display_functional_skills_in_category"
+        ):
 
             mock_expander.return_value.__enter__.return_value = MagicMock()
 
@@ -576,9 +600,9 @@ class TestSkillsFunctions:
 
         comps = [(mock_comp1, mock_competence1), (mock_comp2, mock_competence2)]
 
-        with patch('app.pages_modules.consultants.st.columns', side_effect=create_mock_columns), \
-             patch('app.pages_modules.consultants.st.write') as mock_write, \
-             patch('app.pages_modules.consultants.st.button'):
+        with patch("app.pages_modules.consultants.st.columns", side_effect=create_mock_columns), patch(
+            "app.pages_modules.consultants.st.write"
+        ) as mock_write, patch("app.pages_modules.consultants.st.button"):
 
             _display_functional_skills_in_category(comps)
 
@@ -589,15 +613,16 @@ class TestSkillsFunctions:
         """Test de l'affichage des métriques des compétences fonctionnelles"""
         competences_func = [MagicMock(), MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants.st.metric') as mock_metric:
+        with patch("app.pages_modules.consultants.st.metric") as mock_metric:
             _display_functional_skills_metrics(competences_func)
 
             mock_metric.assert_called_once_with("🏦 Total compétences fonctionnelles", len(competences_func))
 
     def test_display_no_functional_skills_message(self):
         """Test de l'affichage du message quand aucune compétence fonctionnelle"""
-        with patch('app.pages_modules.consultants.st.info') as mock_info, \
-             patch('app.pages_modules.consultants.st.write') as mock_write:
+        with patch("app.pages_modules.consultants.st.info") as mock_info, patch(
+            "app.pages_modules.consultants.st.write"
+        ) as mock_write:
 
             _display_no_functional_skills_message()
 
@@ -615,11 +640,13 @@ class TestMissionsFunctions:
 
         mock_missions = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants._load_consultant_missions') as mock_load, \
-             patch('app.pages_modules.consultants._display_mission_metrics') as mock_metrics, \
-             patch('app.pages_modules.consultants._display_missions_with_tabs') as mock_tabs, \
-             patch('streamlit.subheader'), \
-             patch('streamlit.info'):
+        with patch("app.pages_modules.consultants._load_consultant_missions") as mock_load, patch(
+            "app.pages_modules.consultants._display_mission_metrics"
+        ) as mock_metrics, patch("app.pages_modules.consultants._display_missions_with_tabs") as mock_tabs, patch(
+            "streamlit.subheader"
+        ), patch(
+            "streamlit.info"
+        ):
 
             mock_load.return_value = mock_missions
 
@@ -634,10 +661,9 @@ class TestMissionsFunctions:
         consultant = MagicMock()
         consultant.id = 1
 
-        with patch('app.pages_modules.consultants._load_consultant_missions') as mock_load, \
-             patch('app.pages_modules.consultants.show_add_mission_form') as mock_add_form, \
-             patch('streamlit.subheader'), \
-             patch('streamlit.info'):
+        with patch("app.pages_modules.consultants._load_consultant_missions") as mock_load, patch(
+            "app.pages_modules.consultants.show_add_mission_form"
+        ) as mock_add_form, patch("streamlit.subheader"), patch("streamlit.info"):
 
             mock_load.return_value = []
 
@@ -653,8 +679,10 @@ class TestMissionsFunctions:
 
         mock_missions = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants.get_database_session') as mock_session:
-            mock_session.return_value.__enter__.return_value.query.return_value.filter.return_value.order_by.return_value.all.return_value = mock_missions
+        with patch("app.pages_modules.consultants.get_database_session") as mock_session:
+            mock_session.return_value.__enter__.return_value.query.return_value.filter.return_value.order_by.return_value.all.return_value = (
+                mock_missions
+            )
 
             result = _load_consultant_missions(consultant)
 
@@ -677,9 +705,9 @@ class TestMissionsFunctions:
 
         missions = [mission1, mission2, mission3]
 
-        with patch('streamlit.columns', side_effect=create_mock_columns), \
-             patch('streamlit.metric') as mock_metric, \
-             patch('streamlit.markdown'):
+        with patch("streamlit.columns", side_effect=create_mock_columns), patch(
+            "streamlit.metric"
+        ) as mock_metric, patch("streamlit.markdown"):
 
             _display_mission_metrics(missions)
 
@@ -701,16 +729,16 @@ class TestMissionsFunctions:
         consultant = MagicMock()
         missions = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants.st.tabs') as mock_tabs, \
-             patch('app.pages_modules.consultants._display_missions_list') as mock_list, \
-             patch('app.pages_modules.consultants.show_add_mission_form') as mock_add:
+        with patch("app.pages_modules.consultants.st.tabs") as mock_tabs, patch(
+            "app.pages_modules.consultants._display_missions_list"
+        ) as mock_list, patch("app.pages_modules.consultants.show_add_mission_form") as mock_add:
 
             mock_tab1, mock_tab2 = MagicMock(), MagicMock()
             mock_tab1.__enter__ = MagicMock(return_value=mock_tab1)
             mock_tab1.__exit__ = MagicMock(return_value=None)
             mock_tab2.__enter__ = MagicMock(return_value=mock_tab2)
             mock_tab2.__exit__ = MagicMock(return_value=None)
-            
+
             # Retourner un tuple de 2 éléments pour le déballage
             mock_tabs.return_value = (mock_tab1, mock_tab2)
 
@@ -723,9 +751,9 @@ class TestMissionsFunctions:
         """Test de l'affichage en mode lecture seule"""
         missions = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants.st.checkbox', return_value=False) as mock_checkbox, \
-             patch('app.pages_modules.consultants.st.expander') as mock_expander, \
-             patch('app.pages_modules.consultants.show_mission_readonly') as mock_readonly:
+        with patch("app.pages_modules.consultants.st.checkbox", return_value=False) as mock_checkbox, patch(
+            "app.pages_modules.consultants.st.expander"
+        ) as mock_expander, patch("app.pages_modules.consultants.show_mission_readonly") as mock_readonly:
 
             mock_expander.return_value.__enter__.return_value = MagicMock()
 
@@ -739,10 +767,11 @@ class TestMissionsFunctions:
         """Test de l'affichage en mode édition"""
         missions = [MagicMock(), MagicMock()]
 
-        with patch('app.pages_modules.consultants.st.checkbox', return_value=True) as mock_checkbox, \
-             patch('app.pages_modules.consultants.st.expander') as mock_expander, \
-             patch('app.pages_modules.consultants.show_mission_edit_form') as mock_edit, \
-             patch('app.pages_modules.consultants.st.info'):
+        with patch("app.pages_modules.consultants.st.checkbox", return_value=True) as mock_checkbox, patch(
+            "app.pages_modules.consultants.st.expander"
+        ) as mock_expander, patch("app.pages_modules.consultants.show_mission_edit_form") as mock_edit, patch(
+            "app.pages_modules.consultants.st.info"
+        ):
 
             mock_expander.return_value.__enter__.return_value = MagicMock()
 
@@ -767,13 +796,17 @@ class TestMissionsFunctions:
         mission.technologies_utilisees = "Python, Django, PostgreSQL"
         mission.description = "Développement d'une application web"
 
-        with patch('app.pages_modules.consultants.st.columns', side_effect=create_mock_columns), \
-             patch('app.pages_modules.consultants.st.write') as mock_write, \
-             patch('app.pages_modules.consultants.st.success'), \
-             patch('app.pages_modules.consultants.st.info'), \
-             patch('app.pages_modules.consultants.st.warning'), \
-             patch('app.pages_modules.consultants.st.text_area'), \
-             patch('app.pages_modules.consultants.st.markdown'):
+        with patch("app.pages_modules.consultants.st.columns", side_effect=create_mock_columns), patch(
+            "app.pages_modules.consultants.st.write"
+        ) as mock_write, patch("app.pages_modules.consultants.st.success"), patch(
+            "app.pages_modules.consultants.st.info"
+        ), patch(
+            "app.pages_modules.consultants.st.warning"
+        ), patch(
+            "app.pages_modules.consultants.st.text_area"
+        ), patch(
+            "app.pages_modules.consultants.st.markdown"
+        ):
 
             show_mission_readonly(mission)
 
@@ -796,8 +829,9 @@ class TestCVAnalysisFunctions:
         file_path = Path("/nonexistent/file.pdf")
         consultant = MagicMock()
 
-        with patch('pathlib.Path.exists', return_value=False), \
-             patch('app.pages_modules.consultants.st.error') as mock_error:
+        with patch("pathlib.Path.exists", return_value=False), patch(
+            "app.pages_modules.consultants.st.error"
+        ) as mock_error:
 
             analyze_cv_document(file_path, consultant)
 
@@ -810,9 +844,9 @@ class TestCVAnalysisFunctions:
         file_path = Path("/fake/file.pdf")
         consultant = MagicMock()
 
-        with patch('pathlib.Path.exists', return_value=True), \
-             patch('app.pages_modules.consultants.DocumentAnalyzer.extract_text_from_file', return_value=None), \
-             patch('app.pages_modules.consultants.st.warning') as mock_warning:
+        with patch("pathlib.Path.exists", return_value=True), patch(
+            "app.pages_modules.consultants.DocumentAnalyzer.extract_text_from_file", return_value=None
+        ), patch("app.pages_modules.consultants.st.warning") as mock_warning:
 
             analyze_cv_document(file_path, consultant)
 
@@ -825,9 +859,9 @@ class TestCVAnalysisFunctions:
         file_path = Path("/fake/file.pdf")
         consultant = MagicMock()
 
-        with patch('pathlib.Path.exists', return_value=True), \
-             patch('app.pages_modules.consultants.DocumentAnalyzer.extract_text_from_file', return_value="Short"), \
-             patch('app.pages_modules.consultants.st.warning') as mock_warning:
+        with patch("pathlib.Path.exists", return_value=True), patch(
+            "app.pages_modules.consultants.DocumentAnalyzer.extract_text_from_file", return_value="Short"
+        ), patch("app.pages_modules.consultants.st.warning") as mock_warning:
 
             analyze_cv_document(file_path, consultant)
 
@@ -845,14 +879,22 @@ class TestCVAnalysisFunctions:
         mock_analysis = {"competences": ["Python", "Django"], "experience": "5 ans"}
 
         # Mock toutes les fonctions streamlit pour éviter les erreurs UI
-        with patch('pathlib.Path.exists', return_value=True), \
-             patch('app.pages_modules.consultants.DocumentAnalyzer.extract_text_from_file', return_value="Long text content for analysis"), \
-             patch('app.pages_modules.consultants.DocumentAnalyzer.analyze_cv_content', return_value=mock_analysis), \
-             patch('app.pages_modules.consultants.st.success'), \
-             patch('app.pages_modules.consultants.st.info'), \
-             patch('app.pages_modules.consultants.st.spinner'), \
-             patch('app.pages_modules.consultants.st.rerun'), \
-             patch('app.pages_modules.consultants.st.session_state', {}):
+        with patch("pathlib.Path.exists", return_value=True), patch(
+            "app.pages_modules.consultants.DocumentAnalyzer.extract_text_from_file",
+            return_value="Long text content for analysis",
+        ), patch(
+            "app.pages_modules.consultants.DocumentAnalyzer.analyze_cv_content", return_value=mock_analysis
+        ), patch(
+            "app.pages_modules.consultants.st.success"
+        ), patch(
+            "app.pages_modules.consultants.st.info"
+        ), patch(
+            "app.pages_modules.consultants.st.spinner"
+        ), patch(
+            "app.pages_modules.consultants.st.rerun"
+        ), patch(
+            "app.pages_modules.consultants.st.session_state", {}
+        ):
 
             # Test que la fonction s'exécute sans lever d'exception avec des données valides
             try:
@@ -868,11 +910,14 @@ class TestCVAnalysisFunctions:
         file_path = Path("/fake/file.pdf")
         consultant = MagicMock()
 
-        with patch('pathlib.Path.exists', return_value=True), \
-             patch('app.pages_modules.consultants.DocumentAnalyzer.extract_text_from_file', return_value="Long text content for analysis"), \
-             patch('app.pages_modules.consultants.DocumentAnalyzer.analyze_cv_content', return_value=None), \
-             patch('app.pages_modules.consultants.st.error'), \
-             patch('app.pages_modules.consultants.st.session_state', {}):
+        with patch("pathlib.Path.exists", return_value=True), patch(
+            "app.pages_modules.consultants.DocumentAnalyzer.extract_text_from_file",
+            return_value="Long text content for analysis",
+        ), patch("app.pages_modules.consultants.DocumentAnalyzer.analyze_cv_content", return_value=None), patch(
+            "app.pages_modules.consultants.st.error"
+        ), patch(
+            "app.pages_modules.consultants.st.session_state", {}
+        ):
 
             analyze_cv_document(file_path, consultant)
 

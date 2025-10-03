@@ -47,9 +47,7 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
-            mock_consultant
-        )
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = mock_consultant
 
         # Test
         result = ConsultantService.get_consultant_by_id(1)
@@ -66,9 +64,7 @@ class TestConsultantService(BaseServiceTest):
         mock_db = Mock()
         mock_session.return_value.__enter__.return_value = mock_db
 
-        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = (
-            None
-        )
+        mock_db.query.return_value.options.return_value.filter.return_value.first.return_value = None
 
         # Test
         result = ConsultantService.get_consultant_by_id(999)
@@ -118,9 +114,7 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            mock_consultant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
 
         # Données de mise à jour
         data = {"telephone": "0987654321", "salaire": 60000}
@@ -145,9 +139,7 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            mock_consultant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
 
         # Test
         result = ConsultantService.delete_consultant(1)
@@ -169,9 +161,7 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.nom = "Dupont"
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            mock_consultant
-        ]
+        mock_db.query.return_value.filter.return_value.all.return_value = [mock_consultant]
 
         # Test
         result = ConsultantService.search_consultants("Jean")
@@ -331,9 +321,7 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.id = 1
         mock_consultant.email = "jean@test.com"
 
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            mock_consultant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
 
         # Test
         result = ConsultantService.get_consultant_by_email("jean@test.com")
@@ -355,9 +343,7 @@ class TestConsultantService(BaseServiceTest):
         mock_consultant.prenom = "Jean"
         mock_consultant.disponibilite = True
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            mock_consultant
-        ]
+        mock_db.query.return_value.filter.return_value.all.return_value = [mock_consultant]
 
         # Test
         result = ConsultantService.get_consultants_by_availability(available=True)
@@ -398,9 +384,7 @@ class TestConsultantService(BaseServiceTest):
         assert result["active_missions"] == 50
         assert result["busy_consultants"] == 30  # 150 - 120
 
-    @patch(
-        "app.services.consultant_service.ConsultantService.get_all_consultants_with_stats"
-    )
+    @patch("app.services.consultant_service.ConsultantService.get_all_consultants_with_stats")
     def test_get_all_consultants_with_stats(self, mock_get_all_consultants_with_stats):
         """Test de récupération de tous les consultants avec statistiques complètes"""
         # Mock la fonction pour éviter le cache Streamlit
@@ -477,9 +461,7 @@ class TestConsultantService(BaseServiceTest):
         mock_query.all.return_value = [mock_result]
 
         # Test
-        result = ConsultantService.search_consultants_optimized(
-            "Jean", page=1, per_page=10
-        )
+        result = ConsultantService.search_consultants_optimized("Jean", page=1, per_page=10)
 
         # Vérifications
         assert len(result) == 1
@@ -497,9 +479,7 @@ class TestConsultantService(BaseServiceTest):
         # Mock consultant
         mock_consultant = Mock()
         mock_consultant.id = 1
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            mock_consultant
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = mock_consultant
 
         # Données d'analyse
         analysis_data = {
@@ -526,9 +506,7 @@ class TestConsultantService(BaseServiceTest):
         assert result == "Frontend"
 
         # Test compétences fonctionnelles
-        result = ConsultantService._determine_skill_category(
-            "Management", "fonctionnelle"
-        )
+        result = ConsultantService._determine_skill_category("Management", "fonctionnelle")
         assert result == "Management"
 
         # Test compétence inconnue
@@ -544,9 +522,7 @@ class TestConsultantService(BaseServiceTest):
 
         # Mock consultant existant avec même email
         mock_existing = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            mock_existing
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = mock_existing
 
         # Données de test
         data = {"prenom": "Jean", "nom": "Dupont", "email": "existing@test.com"}
@@ -706,9 +682,7 @@ class TestConsultantService(BaseServiceTest):
 
         # Mock mission existante
         mock_existing_mission = Mock()
-        mock_db.query.return_value.filter.return_value.first.return_value = (
-            mock_existing_mission
-        )
+        mock_db.query.return_value.filter.return_value.first.return_value = mock_existing_mission
 
         # Données de mission
         mission_data = {
@@ -758,9 +732,7 @@ class TestConsultantService(BaseServiceTest):
         mock_db.flush.return_value = None
 
         # Test
-        result = ConsultantService._save_competence_from_analysis(
-            mock_db, 1, "Python", "technique"
-        )
+        result = ConsultantService._save_competence_from_analysis(mock_db, 1, "Python", "technique")
 
         # Vérifications
         assert result is True
@@ -782,9 +754,7 @@ class TestConsultantService(BaseServiceTest):
         ]
 
         # Test
-        result = ConsultantService._save_competence_from_analysis(
-            mock_db, 1, "Python", "technique"
-        )
+        result = ConsultantService._save_competence_from_analysis(mock_db, 1, "Python", "technique")
 
         # Vérifications
         assert result is True
@@ -808,9 +778,7 @@ class TestConsultantService(BaseServiceTest):
         ]
 
         # Test
-        result = ConsultantService._save_competence_from_analysis(
-            mock_db, 1, "Python", "technique"
-        )
+        result = ConsultantService._save_competence_from_analysis(mock_db, 1, "Python", "technique")
 
         # Vérifications
         assert result is False
@@ -824,9 +792,7 @@ class TestConsultantService(BaseServiceTest):
         mock_session.return_value.__enter__.return_value = mock_db
 
         # Test
-        result = ConsultantService._save_competence_from_analysis(
-            mock_db, 1, "", "technique"
-        )
+        result = ConsultantService._save_competence_from_analysis(mock_db, 1, "", "technique")
 
         # Vérifications
         assert result is False
@@ -836,9 +802,7 @@ class TestConsultantService(BaseServiceTest):
     @patch("streamlit.error")
     @patch("streamlit.success")
     @patch("streamlit.info")
-    def test_save_cv_analysis_success(
-        self, mock_info, mock_success, mock_error, mock_session
-    ):
+    def test_save_cv_analysis_success(self, mock_info, mock_success, mock_error, mock_session):
         """Test de sauvegarde complète d'analyse CV réussie"""
         # Note: Cette méthode complexe nécessite un mock très élaboré, testé partiellement par d'autres tests
         pass
@@ -944,15 +908,11 @@ class TestConsultantService(BaseServiceTest):
     def test_determine_skill_category_functional_management(self):
         """Test de détermination de catégorie pour compétences fonctionnelles management"""
         # Test Management
-        result = ConsultantService._determine_skill_category(
-            "Management", "fonctionnelle"
-        )
+        result = ConsultantService._determine_skill_category("Management", "fonctionnelle")
         assert result == "Management"
 
         # Test Leadership
-        result = ConsultantService._determine_skill_category(
-            "Leadership", "fonctionnelle"
-        )
+        result = ConsultantService._determine_skill_category("Leadership", "fonctionnelle")
         assert result == "Management"
 
         # Test Gestion
@@ -976,15 +936,11 @@ class TestConsultantService(BaseServiceTest):
     def test_determine_skill_category_functional_unknown(self):
         """Test de détermination de catégorie pour compétences fonctionnelles inconnues"""
         # Test compétence inconnue
-        result = ConsultantService._determine_skill_category(
-            "Unknown Skill", "fonctionnelle"
-        )
+        result = ConsultantService._determine_skill_category("Unknown Skill", "fonctionnelle")
         assert result == "Fonctionnelle"
 
     def test_determine_skill_category_technical_unknown(self):
         """Test de détermination de catégorie pour compétences techniques inconnues"""
         # Test compétence inconnue
-        result = ConsultantService._determine_skill_category(
-            "Unknown Tech", "technique"
-        )
+        result = ConsultantService._determine_skill_category("Unknown Tech", "technique")
         assert result == "Technique"

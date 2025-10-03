@@ -45,9 +45,7 @@ class TestRealCodeExecution:
         assert isinstance(categories, dict)
         assert len(categories) > 0
 
-        print(
-            f"✅ Module skill_categories exécuté: {len(all_competences)} catégories, {len(categories)} types"
-        )
+        print(f"✅ Module skill_categories exécuté: {len(all_competences)} catégories, {len(categories)} types")
 
     def test_technologies_referentiel_real_execution(self):
         """Test exécution réelle du module technologies_referentiel"""
@@ -72,9 +70,7 @@ class TestRealCodeExecution:
         search_results = search_technologies("Python")
         assert search_results is not None
 
-        print(
-            f"✅ Module technologies_referentiel exécuté: {len(all_technologies)} catégories"
-        )
+        print(f"✅ Module technologies_referentiel exécuté: {len(all_technologies)} catégories")
 
     def test_database_models_real_import(self):
         """Test import réel des modèles de base de données"""

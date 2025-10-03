@@ -43,16 +43,12 @@ class Practice(Base):
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
     nom: Mapped[str] = Column(String(100), unique=True, nullable=False)
     description: Mapped[Optional[str]] = Column(Text)
-    responsable: Mapped[Optional[str]] = Column(
-        String(200)
-    )  # Nom du responsable de practice
+    responsable: Mapped[Optional[str]] = Column(String(200))  # Nom du responsable de practice
     date_creation: Mapped[datetime] = Column(DateTime, default=datetime.now)
     actif: Mapped[bool] = Column(Boolean, default=True)
 
     # Relations
-    consultants: Mapped[List["Consultant"]] = relationship(
-        "Consultant", back_populates="practice"
-    )
+    consultants: Mapped[List["Consultant"]] = relationship("Consultant", back_populates="practice")
 
     def __repr__(self) -> str:
         return f"<Practice(id={self.id}, nom='{self.nom}')>"
@@ -75,24 +71,16 @@ class Consultant(Base):
     telephone: Mapped[Optional[str]] = Column(String(20))
     salaire_actuel: Mapped[Optional[float]] = Column(Float)
     date_creation: Mapped[datetime] = Column(DateTime, default=datetime.now)
-    derniere_maj: Mapped[datetime] = Column(
-        DateTime, default=datetime.now, onupdate=datetime.now
-    )
+    derniere_maj: Mapped[datetime] = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     disponibilite: Mapped[bool] = Column(Boolean, default=True)
     notes: Mapped[Optional[str]] = Column(Text)
 
     # Nouveaux champs pour l'historique société V1.2
-    date_entree_societe: Mapped[Optional[datetime.date]] = Column(
-        Date
-    )  # Date d'entrée dans la société
+    date_entree_societe: Mapped[Optional[datetime.date]] = Column(Date)  # Date d'entrée dans la société
     date_sortie_societe: Mapped[Optional[datetime.date]] = Column(Date)
     societe: Mapped[str] = Column(String(50), default="Quanteam")  # Quanteam ou Asigma
-    entite: Mapped[Optional[str]] = Column(
-        String(100)
-    )  # Entité (ASIGMA, QUANTEAM, etc.)
-    date_premiere_mission: Mapped[Optional[datetime.date]] = Column(
-        Date
-    )  # Date de la première mission
+    entite: Mapped[Optional[str]] = Column(String(100))  # Entité (ASIGMA, QUANTEAM, etc.)
+    date_premiere_mission: Mapped[Optional[datetime.date]] = Column(Date)  # Date de la première mission
 
     # Nouveaux champs pour grade et contrat V1.2.1
     # Junior, Confirmé, Consultant Manager, Directeur de Practice
@@ -101,21 +89,13 @@ class Consultant(Base):
     type_contrat: Mapped[str] = Column(String(20), default="CDI")
 
     # Nouveaux champs période d'essai et statut actif V1.2.3
-    etat_periode_essai: Mapped[Optional[str]] = Column(
-        String(50)
-    )  # Statut période d'essai (Etat P.Test)
-    fin_periode_essai: Mapped[Optional[datetime.date]] = Column(
-        Date
-    )  # Date fin période d'essai (Fin P.Test)
-    actif: Mapped[bool] = Column(
-        Boolean, default=True
-    )  # Statut actif du consultant (UseActive)
+    etat_periode_essai: Mapped[Optional[str]] = Column(String(50))  # Statut période d'essai (Etat P.Test)
+    fin_periode_essai: Mapped[Optional[datetime.date]] = Column(Date)  # Date fin période d'essai (Fin P.Test)
+    actif: Mapped[bool] = Column(Boolean, default=True)  # Statut actif du consultant (UseActive)
 
     # Relations
     practice_id: Mapped[Optional[int]] = Column(Integer, ForeignKey("practices.id"))
-    practice: Mapped[Optional["Practice"]] = relationship(
-        "Practice", back_populates="consultants"
-    )
+    practice: Mapped[Optional["Practice"]] = relationship("Practice", back_populates="consultants")
     competences: Mapped[List["ConsultantCompetence"]] = relationship(
         "ConsultantCompetence",
         back_populates="consultant",
@@ -124,9 +104,7 @@ class Consultant(Base):
     missions: Mapped[List["Mission"]] = relationship(
         "Mission", back_populates="consultant", cascade=CASCADE_ALL_DELETE_ORPHAN
     )
-    cvs: Mapped[List["CV"]] = relationship(
-        "CV", back_populates="consultant", cascade=CASCADE_ALL_DELETE_ORPHAN
-    )
+    cvs: Mapped[List["CV"]] = relationship("CV", back_populates="consultant", cascade=CASCADE_ALL_DELETE_ORPHAN)
     salaires: Mapped[List["ConsultantSalaire"]] = relationship(
         "ConsultantSalaire",
         back_populates="consultant",
@@ -268,9 +246,7 @@ class Competence(Base):
     # technique ou fonctionnelle
     type_competence: Mapped[str] = Column(String(20), default="technique")
     description: Mapped[Optional[str]] = Column(Text)
-    niveau_requis: Mapped[str] = Column(
-        String(20), default="junior"
-    )  # junior, medior, senior
+    niveau_requis: Mapped[str] = Column(String(20), default="junior")  # junior, medior, senior
 
     # Relations
     consultant_competences: Mapped[List["ConsultantCompetence"]] = relationship(
@@ -287,12 +263,8 @@ class ConsultantCompetence(Base):
     __tablename__ = "consultant_competences"
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
-    )
-    competence_id: Mapped[int] = Column(
-        Integer, ForeignKey("competences.id"), nullable=False
-    )
+    consultant_id: Mapped[int] = Column(Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False)
+    competence_id: Mapped[int] = Column(Integer, ForeignKey("competences.id"), nullable=False)
     annees_experience: Mapped[float] = Column(Float, default=0.0)
     # debutant, intermediaire, expert
     niveau_maitrise: Mapped[str] = Column(String(20), default="debutant")
@@ -301,12 +273,8 @@ class ConsultantCompetence(Base):
     date_ajout: Mapped[datetime] = Column(DateTime, default=datetime.now)
 
     # Relations
-    consultant: Mapped["Consultant"] = relationship(
-        "Consultant", back_populates="competences"
-    )
-    competence: Mapped["Competence"] = relationship(
-        "Competence", back_populates="consultant_competences"
-    )
+    consultant: Mapped["Consultant"] = relationship("Consultant", back_populates="competences")
+    competence: Mapped["Competence"] = relationship("Competence", back_populates="consultant_competences")
 
     def __repr__(self) -> str:
         return f"<ConsultantCompetence(consultant_id={self.consultant_id}, competence_id={self.competence_id}, experience={self.annees_experience})>"
@@ -318,35 +286,21 @@ class Mission(Base):
     __tablename__ = "missions"
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
-    )
+    consultant_id: Mapped[int] = Column(Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False)
     nom_mission: Mapped[str] = Column(String(200), nullable=False)
     client: Mapped[str] = Column(String(200), nullable=False)
-    role: Mapped[Optional[str]] = Column(
-        String(300)
-    )  # Nouveau champ pour le rôle/poste
+    role: Mapped[Optional[str]] = Column(String(300))  # Nouveau champ pour le rôle/poste
     date_debut: Mapped[datetime.date] = Column(Date, nullable=False)
     date_fin: Mapped[Optional[datetime.date]] = Column(Date)
-    statut: Mapped[str] = Column(
-        String(20), default="en_cours"
-    )  # en_cours, terminee, suspendue
-    taux_journalier: Mapped[Optional[float]] = Column(
-        Float
-    )  # Ancien champ, conservé pour compatibilité
-    tjm: Mapped[Optional[float]] = Column(
-        Float
-    )  # Nouveau champ TJM spécifique mission V1.2.2
+    statut: Mapped[str] = Column(String(20), default="en_cours")  # en_cours, terminee, suspendue
+    taux_journalier: Mapped[Optional[float]] = Column(Float)  # Ancien champ, conservé pour compatibilité
+    tjm: Mapped[Optional[float]] = Column(Float)  # Nouveau champ TJM spécifique mission V1.2.2
     revenus_generes: Mapped[Optional[float]] = Column(Float)
-    technologies_utilisees: Mapped[Optional[str]] = Column(
-        Text
-    )  # JSON ou texte séparé par virgules
+    technologies_utilisees: Mapped[Optional[str]] = Column(Text)  # JSON ou texte séparé par virgules
     description: Mapped[Optional[str]] = Column(Text)
 
     # Relations
-    consultant: Mapped["Consultant"] = relationship(
-        "Consultant", back_populates="missions"
-    )
+    consultant: Mapped["Consultant"] = relationship("Consultant", back_populates="missions")
 
     # Index de performance pour requêtes fréquentes
     __table_args__ = (
@@ -358,9 +312,7 @@ class Mission(Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<Mission(id={self.id}, nom='{self.nom_mission}', client='{self.client}')>"
-        )
+        return f"<Mission(id={self.id}, nom='{self.nom_mission}', client='{self.client}')>"
 
     @property
     def duree_jours(self) -> Optional[int]:
@@ -388,9 +340,7 @@ class CV(Base):
     __tablename__ = "cvs"
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
-    )
+    consultant_id: Mapped[int] = Column(Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False)
     fichier_nom: Mapped[str] = Column(String(255), nullable=False)
     fichier_path: Mapped[str] = Column(String(500), nullable=False)
     contenu_extrait: Mapped[Optional[str]] = Column(Text)  # Contenu parsé du CV
@@ -411,9 +361,7 @@ class CustomTechnology(Base):
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
     nom: Mapped[str] = Column(String(100), nullable=False, unique=True)
-    categorie: Mapped[str] = Column(
-        String(100), nullable=False, default="Personnalisées"
-    )
+    categorie: Mapped[str] = Column(String(100), nullable=False, default="Personnalisées")
     description: Mapped[Optional[str]] = Column(Text)
     date_creation: Mapped[datetime] = Column(DateTime, default=datetime.utcnow)
 
@@ -426,18 +374,12 @@ class ConsultantSalaire(Base):
 
     __tablename__ = "consultant_salaires"
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
-    )
+    consultant_id: Mapped[int] = Column(Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False)
     salaire: Mapped[float] = Column(Float, nullable=False)
-    date_debut: Mapped[datetime.date] = Column(
-        Date, nullable=False, default=datetime.now
-    )
+    date_debut: Mapped[datetime.date] = Column(Date, nullable=False, default=datetime.now)
     date_fin: Mapped[Optional[datetime.date]] = Column(Date)
     commentaire: Mapped[Optional[str]] = Column(Text)
-    consultant: Mapped["Consultant"] = relationship(
-        "Consultant", back_populates="salaires"
-    )
+    consultant: Mapped["Consultant"] = relationship("Consultant", back_populates="salaires")
 
     def __repr__(self) -> str:
         return f"<ConsultantSalaire(id={self.id}, consultant_id={self.consultant_id}, salaire={self.salaire}, date_debut={self.date_debut})>"
@@ -454,9 +396,7 @@ class Langue(Base):
     description: Mapped[Optional[str]] = Column(Text)
 
     # Relations
-    consultant_langues: Mapped[List["ConsultantLangue"]] = relationship(
-        "ConsultantLangue", back_populates="langue"
-    )
+    consultant_langues: Mapped[List["ConsultantLangue"]] = relationship("ConsultantLangue", back_populates="langue")
 
     def __repr__(self) -> str:
         return f"<Langue(id={self.id}, nom='{self.nom}', code_iso='{self.code_iso}')>"
@@ -468,24 +408,20 @@ class ConsultantLangue(Base):
     __tablename__ = "consultant_langues"
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
-    )
+    consultant_id: Mapped[int] = Column(Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False)
     langue_id: Mapped[int] = Column(Integer, ForeignKey("langues.id"), nullable=False)
     niveau: Mapped[int] = Column(Integer, nullable=False)
     commentaire: Mapped[Optional[str]] = Column(Text)
     date_ajout: Mapped[datetime] = Column(DateTime, default=datetime.now)
 
     # Relations
-    consultant: Mapped["Consultant"] = relationship(
-        "Consultant", back_populates="langues"
-    )
-    langue: Mapped["Langue"] = relationship(
-        "Langue", back_populates="consultant_langues"
-    )
+    consultant: Mapped["Consultant"] = relationship("Consultant", back_populates="langues")
+    langue: Mapped["Langue"] = relationship("Langue", back_populates="consultant_langues")
 
     def __repr__(self) -> str:
-        return f"<ConsultantLangue(consultant_id={self.consultant_id}, langue_id={self.langue_id}, niveau={self.niveau})>"
+        return (
+            f"<ConsultantLangue(consultant_id={self.consultant_id}, langue_id={self.langue_id}, niveau={self.niveau})>"
+        )
 
     @property
     def niveau_label(self) -> str:
@@ -528,9 +464,7 @@ class BusinessManager(Base):
     email: Mapped[str] = Column(String(255), unique=True, nullable=False)
     telephone: Mapped[Optional[str]] = Column(String(20))
     date_creation: Mapped[datetime] = Column(DateTime, default=datetime.now)
-    derniere_maj: Mapped[datetime] = Column(
-        DateTime, default=datetime.now, onupdate=datetime.now
-    )
+    derniere_maj: Mapped[datetime] = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     actif: Mapped[bool] = Column(Boolean, default=True)
     notes: Mapped[Optional[str]] = Column(Text)
 
@@ -542,9 +476,7 @@ class BusinessManager(Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<BusinessManager(id={self.id}, nom='{self.nom}', prenom='{self.prenom}')>"
-        )
+        return f"<BusinessManager(id={self.id}, nom='{self.nom}', prenom='{self.prenom}')>"
 
     @property
     def nom_complet(self) -> str:
@@ -578,9 +510,7 @@ class BusinessManager(Base):
             >>> actifs = bm.consultants_actuels
             >>> print(f"BM gère actuellement {len(actifs)} consultants")
         """
-        return [
-            cbm.consultant for cbm in self.consultant_gestions if cbm.date_fin is None
-        ]
+        return [cbm.consultant for cbm in self.consultant_gestions if cbm.date_fin is None]
 
     @property
     def nombre_consultants_actuels(self) -> int:
@@ -603,9 +533,7 @@ class VsaMission(Base):
     __tablename__ = "vsa_missions"
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = Column(
-        Integer, nullable=False
-    )  # Lien avec consultant (non FK pour éviter dépendance)
+    user_id: Mapped[int] = Column(Integer, nullable=False)  # Lien avec consultant (non FK pour éviter dépendance)
     code: Mapped[str] = Column(String(100), nullable=False)  # Clé unique de la mission
     orderid: Mapped[str] = Column(String(100), nullable=False)  # Numéro de commande
     client_name: Mapped[str] = Column(String(200), nullable=False)  # Nom du client
@@ -614,9 +542,7 @@ class VsaMission(Base):
     tjm: Mapped[Optional[float]] = Column(Float)  # Taux Journalier Moyen
     cjm: Mapped[Optional[float]] = Column(Float)  # Coût Journalier Moyen
     description: Mapped[Optional[str]] = Column(Text)
-    statut: Mapped[str] = Column(
-        String(50), default="active"
-    )  # active, completed, cancelled
+    statut: Mapped[str] = Column(String(50), default="active")  # active, completed, cancelled
     date_import: Mapped[datetime] = Column(DateTime, default=datetime.now)
 
     # Index pour les recherches fréquentes
@@ -644,9 +570,7 @@ class VsaMission(Base):
         from database.database import get_database_session
 
         with get_database_session() as session:
-            return (
-                session.query(Consultant).filter(Consultant.id == self.user_id).first()
-            )
+            return session.query(Consultant).filter(Consultant.id == self.user_id).first()
 
     @property
     def est_active(self) -> bool:
@@ -667,30 +591,16 @@ class ConsultantBusinessManager(Base):
     __tablename__ = "consultant_business_managers"
 
     id: Mapped[int] = Column(Integer, primary_key=True, autoincrement=True)
-    consultant_id: Mapped[int] = Column(
-        Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False
-    )
-    business_manager_id: Mapped[int] = Column(
-        Integer, ForeignKey("business_managers.id"), nullable=False
-    )
-    date_debut: Mapped[datetime.date] = Column(
-        Date, nullable=False, default=datetime.now
-    )
-    date_fin: Mapped[Optional[datetime.date]] = Column(
-        Date
-    )  # NULL si la gestion est active
-    commentaire: Mapped[Optional[str]] = Column(
-        Text
-    )  # ex: "Changement d'équipe", "Promotion", etc.
+    consultant_id: Mapped[int] = Column(Integer, ForeignKey(CONSULTANTS_ID_FK), nullable=False)
+    business_manager_id: Mapped[int] = Column(Integer, ForeignKey("business_managers.id"), nullable=False)
+    date_debut: Mapped[datetime.date] = Column(Date, nullable=False, default=datetime.now)
+    date_fin: Mapped[Optional[datetime.date]] = Column(Date)  # NULL si la gestion est active
+    commentaire: Mapped[Optional[str]] = Column(Text)  # ex: "Changement d'équipe", "Promotion", etc.
     date_creation: Mapped[datetime] = Column(DateTime, default=datetime.now)
 
     # Relations
-    consultant: Mapped["Consultant"] = relationship(
-        "Consultant", back_populates="business_manager_gestions"
-    )
-    business_manager: Mapped["BusinessManager"] = relationship(
-        "BusinessManager", back_populates="consultant_gestions"
-    )
+    consultant: Mapped["Consultant"] = relationship("Consultant", back_populates="business_manager_gestions")
+    business_manager: Mapped["BusinessManager"] = relationship("BusinessManager", back_populates="consultant_gestions")
 
     def __repr__(self) -> str:
         return f"<ConsultantBusinessManager(consultant_id={self.consultant_id}, bm_id={self.business_manager_id}, debut={self.date_debut})>"
@@ -735,11 +645,13 @@ class ConsultantBusinessManager(Base):
 # MODÈLES DASHBOARD - Système de dashboard personnalisé
 # =============================================================================
 
+
 class DashboardConfiguration(Base):
     """
     Configuration d'un dashboard personnalisé
     """
-    __tablename__ = 'dashboard_configurations'
+
+    __tablename__ = "dashboard_configurations"
 
     id = Column(Integer, primary_key=True)
     nom = Column(String(100), nullable=False)
@@ -764,10 +676,11 @@ class DashboardWidgetInstance(Base):
     """
     Instance d'un widget dans un dashboard spécifique
     """
-    __tablename__ = 'dashboard_widget_instances'
+
+    __tablename__ = "dashboard_widget_instances"
 
     id = Column(Integer, primary_key=True)
-    dashboard_id = Column(Integer, ForeignKey('dashboard_configurations.id'), nullable=False)
+    dashboard_id = Column(Integer, ForeignKey("dashboard_configurations.id"), nullable=False)
     widget_type = Column(String(50), nullable=False)  # Type du widget (revenue_chart, intercontrat_rate, etc.)
     position_x = Column(Integer, default=0)  # Position X dans la grille
     position_y = Column(Integer, default=0)  # Position Y dans la grille
@@ -788,7 +701,8 @@ class WidgetCatalog(Base):
     """
     Catalogue des widgets disponibles
     """
-    __tablename__ = 'widget_catalog'
+
+    __tablename__ = "widget_catalog"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, unique=True)

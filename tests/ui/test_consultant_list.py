@@ -96,9 +96,7 @@ class TestConsultantList(BaseUITest):
 
         # Mock service
         mock_service_instance = Mock()
-        mock_service_instance.get_all_consultants_with_stats.return_value = (
-            mock_consultants
-        )
+        mock_service_instance.get_all_consultants_with_stats.return_value = mock_consultants
         mock_service_instance.get_consultants_count.return_value = len(mock_consultants)
         mock_service.return_value = mock_service_instance
 
@@ -159,9 +157,7 @@ class TestConsultantList(BaseUITest):
 
         # Mock service
         mock_service_instance = Mock()
-        mock_service_instance.search_consultants_optimized.return_value = (
-            mock_filtered_consultants
-        )
+        mock_service_instance.search_consultants_optimized.return_value = mock_filtered_consultants
         mock_service.return_value = mock_service_instance
 
         try:
@@ -179,9 +175,7 @@ class TestConsultantList(BaseUITest):
         """Test de la liste avec erreur de service"""
         # Mock service qui lève une exception
         mock_service_instance = Mock()
-        mock_service_instance.get_all_consultants_with_stats.side_effect = Exception(
-            "Service error"
-        )
+        mock_service_instance.get_all_consultants_with_stats.side_effect = Exception("Service error")
         mock_service.return_value = mock_service_instance
 
         try:
@@ -267,9 +261,7 @@ class TestConsultantList(BaseUITest):
         mock_df = MagicMock()
         mock_df.__len__.return_value = 5
         mock_df.__getitem__.return_value = MagicMock()  # Mock pour df["Disponibilité"]
-        mock_df.__getitem__.return_value.__eq__.return_value = (
-            MagicMock()
-        )  # Mock pour == "✅ Disponible"
+        mock_df.__getitem__.return_value.__eq__.return_value = MagicMock()  # Mock pour == "✅ Disponible"
         mock_df.__getitem__.return_value.__eq__.return_value.__len__.return_value = 3
         mock_df.__getitem__.return_value.sum.return_value = 250000
         mock_df.__getitem__.return_value.mean.return_value = 50000
@@ -324,9 +316,7 @@ class TestConsultantList(BaseUITest):
         mock_df.iloc = MagicMock()
         mock_df.iloc.__getitem__.return_value = MagicMock()
         mock_df.iloc.__getitem__.return_value.__getitem__.return_value = 1  # ID
-        mock_df.iloc.__getitem__.return_value.__getitem__.return_value = (
-            "Jean"  # Prénom
-        )
+        mock_df.iloc.__getitem__.return_value.__getitem__.return_value = "Jean"  # Prénom
         mock_df.iloc.__getitem__.return_value.__getitem__.return_value = "Dupont"  # Nom
 
         # Mock session state
@@ -351,9 +341,7 @@ class TestConsultantList(BaseUITest):
         mock_st.button.return_value = False
 
         # Mock ConsultantService
-        with patch(
-            "app.pages_modules.consultant_list.ConsultantService"
-        ) as mock_service:
+        with patch("app.pages_modules.consultant_list.ConsultantService") as mock_service:
             mock_service_instance = MagicMock()
             mock_service_instance.get_all_consultants_with_stats.return_value = [
                 {"id": 1, "prenom": "Jean", "nom": "Dupont"}
@@ -404,9 +392,7 @@ class TestConsultantList(BaseUITest):
         ]  # export button
 
         # Mock ConsultantService
-        with patch(
-            "app.pages_modules.consultant_list.ConsultantService"
-        ) as mock_service:
+        with patch("app.pages_modules.consultant_list.ConsultantService") as mock_service:
             mock_service_instance = MagicMock()
             mock_service_instance.get_all_consultants_with_stats.return_value = [
                 {"id": 1, "prenom": "Jean", "nom": "Dupont"}
@@ -414,9 +400,7 @@ class TestConsultantList(BaseUITest):
             mock_service.return_value = mock_service_instance
 
             # Mock export function
-            with patch(
-                "app.pages_modules.consultant_list.export_to_excel"
-            ) as mock_export:
+            with patch("app.pages_modules.consultant_list.export_to_excel") as mock_export:
                 show_consultants_list()
 
                 # Vérifier que la fonction s'exécute

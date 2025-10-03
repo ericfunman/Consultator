@@ -1,0 +1,16 @@
+{
+  "workflow_name": "🧪 Tests et Couverture (Simplifié)",
+  "workflow_id": 194633156,
+  "failed_runs_count": 4,
+  "latest_failure": {
+    "run_id": 18225897039,
+    "run_number": 4,
+    "head_sha": "8e090acc",
+    "created_at": "2025-10-03T15:00:31Z",
+    "html_url": "https://github.com/ericfunman/Consultator/actions/runs/18225897039",
+    "total_jobs": 1,
+    "failed_jobs": [],
+    "error_patterns": [],
+    "suggested_fixes": []
+  }
+}

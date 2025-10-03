@@ -18,17 +18,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import search_eric_lapina: {e}", allow_module_level=True)
 
 
-
-
 def test_search_eric_lapina():
     """Test automatiquement généré pour search_eric_lapina"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = search_eric_lapina(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -40,16 +38,15 @@ def test_search_eric_lapina_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_search_eric_lapina_with_mocks(mock_request):
     """Test de search_eric_lapina avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

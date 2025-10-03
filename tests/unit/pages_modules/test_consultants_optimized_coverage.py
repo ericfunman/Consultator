@@ -2,25 +2,28 @@
 Tests unitaires pour consultants.py - Version optimisée pour la couverture
 Tests simples et fonctionnels sans complexité excessive
 """
+
 import unittest
 from unittest.mock import Mock, patch, MagicMock
 from datetime import date, datetime
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 
 
 class MockSessionState:
     """Mock de st.session_state simple"""
+
     def __init__(self):
         self.data = {}
-    
+
     def get(self, key, default=None):
         return self.data.get(key, default)
-    
+
     def __getitem__(self, key):
         return self.data.get(key)
-    
+
     def __setitem__(self, key, value):
         self.data[key] = value
 
@@ -45,7 +48,7 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.mock_consultant.notes = "Notes test"
         self.mock_consultant.practice_id = 1
         self.mock_consultant.business_manager_actuel = None
-        
+
         # Mock column
         self.mock_col = MagicMock()
         self.mock_col.__enter__ = Mock(return_value=self.mock_col)
@@ -67,10 +70,11 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
             "date_sortie": None,
             "date_premiere_mission": None,
             "grade": "Senior",
-            "type_contrat": "CDI"
+            "type_contrat": "CDI",
         }
 
         from app.pages_modules.consultants import _build_update_data
+
         result = _build_update_data(form_data)
 
         # Vérifications
@@ -80,19 +84,16 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.assertEqual(result["email"], "jean.dupont@test.com")
         self.assertEqual(result["salaire_actuel"], 55000)
 
-    @patch('app.pages_modules.consultants.st.columns')
-    @patch('app.pages_modules.consultants.st.title')
-    @patch('app.pages_modules.consultants.st.markdown')
+    @patch("app.pages_modules.consultants.st.columns")
+    @patch("app.pages_modules.consultants.st.title")
+    @patch("app.pages_modules.consultants.st.markdown")
     def test_display_consultant_header(self, mock_markdown, mock_title, mock_columns):
         """Test _display_consultant_header"""
         mock_columns.return_value = (self.mock_col, self.mock_col)
-        consultant_data = {
-            "prenom": "Jean",
-            "nom": "Dupont",
-            "practice_name": "Practice Test"
-        }
+        consultant_data = {"prenom": "Jean", "nom": "Dupont", "practice_name": "Practice Test"}
 
         from app.pages_modules.consultants import _display_consultant_header
+
         _display_consultant_header(consultant_data)
 
         # Vérifications
@@ -107,6 +108,7 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.mock_consultant.business_manager_actuel = mock_bm
 
         from app.pages_modules.consultants import _extract_business_manager_info
+
         result = _extract_business_manager_info(self.mock_consultant)
 
         # Vérifications
@@ -120,6 +122,7 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.mock_consultant.business_manager_actuel = None
 
         from app.pages_modules.consultants import _extract_business_manager_info
+
         result = _extract_business_manager_info(self.mock_consultant)
 
         # Vérifications
@@ -132,6 +135,7 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.mock_consultant.practice_id = 5
 
         from app.pages_modules.consultants import _get_current_practice_id
+
         result = _get_current_practice_id(self.mock_consultant)
 
         # Vérifications
@@ -139,9 +143,10 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
 
     def test_get_current_practice_id_without_practice(self):
         """Test _get_current_practice_id sans practice"""
-        delattr(self.mock_consultant, 'practice_id')
+        delattr(self.mock_consultant, "practice_id")
 
         from app.pages_modules.consultants import _get_current_practice_id
+
         result = _get_current_practice_id(self.mock_consultant)
 
         # Vérifications
@@ -154,6 +159,7 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         salaires = []
 
         from app.pages_modules.consultants import _should_add_initial_salary_entry
+
         result = _should_add_initial_salary_entry(mock_consultant, salaires)
 
         # Vérifications
@@ -166,12 +172,13 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         salaires = []
 
         from app.pages_modules.consultants import _should_add_initial_salary_entry
+
         result = _should_add_initial_salary_entry(mock_consultant, salaires)
 
         # Vérifications
         self.assertFalse(result)
 
-    @patch('app.pages_modules.consultants.st.date_input')
+    @patch("app.pages_modules.consultants.st.date_input")
     def test_render_date_entree_field(self, mock_date):
         """Test _render_date_entree_field"""
         mock_date.return_value = date.today()
@@ -179,13 +186,14 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.mock_consultant.date_entree = date(2022, 1, 1)
 
         from app.pages_modules.consultants import _render_date_entree_field
+
         result = _render_date_entree_field(self.mock_consultant)
 
         # Vérifications
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('app.pages_modules.consultants.st.date_input')
+    @patch("app.pages_modules.consultants.st.date_input")
     def test_render_date_sortie_field(self, mock_date):
         """Test _render_date_sortie_field"""
         mock_date.return_value = date.today()
@@ -193,13 +201,14 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.mock_consultant.date_sortie = date(2023, 12, 31)
 
         from app.pages_modules.consultants import _render_date_sortie_field
+
         result = _render_date_sortie_field(self.mock_consultant)
 
         # Vérifications
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('app.pages_modules.consultants.st.date_input')
+    @patch("app.pages_modules.consultants.st.date_input")
     def test_render_date_premiere_mission_field(self, mock_date):
         """Test _render_date_premiere_mission_field"""
         mock_date.return_value = date.today()
@@ -207,18 +216,20 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
         self.mock_consultant.date_premiere_mission = date(2022, 1, 15)
 
         from app.pages_modules.consultants import _render_date_premiere_mission_field
+
         result = _render_date_premiere_mission_field(self.mock_consultant)
 
         # Vérifications
         mock_date.assert_called()
         self.assertEqual(result, date.today())
 
-    @patch('app.pages_modules.consultants.st.selectbox')
+    @patch("app.pages_modules.consultants.st.selectbox")
     def test_render_societe_field(self, mock_select):
         """Test _render_societe_field"""
         mock_select.return_value = "France"
 
         from app.pages_modules.consultants import _render_societe_field
+
         result = _render_societe_field(self.mock_consultant)
 
         # Vérifications
@@ -228,19 +239,18 @@ class TestConsultantsOptimizedCoverage(unittest.TestCase):
     def test_consultant_module_functions_exist(self):
         """Test que les principales fonctions du module existent"""
         from app.pages_modules import consultants
-        
+
         # Test l'existence des fonctions principales
         required_functions = [
-            '_build_update_data',
-            '_extract_business_manager_info',
-            '_get_current_practice_id',
-            '_should_add_initial_salary_entry'
+            "_build_update_data",
+            "_extract_business_manager_info",
+            "_get_current_practice_id",
+            "_should_add_initial_salary_entry",
         ]
-        
+
         for func_name in required_functions:
-            self.assertTrue(hasattr(consultants, func_name), 
-                          f"Fonction {func_name} manquante")
+            self.assertTrue(hasattr(consultants, func_name), f"Fonction {func_name} manquante")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

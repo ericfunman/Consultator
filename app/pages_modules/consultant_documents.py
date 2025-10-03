@@ -101,10 +101,7 @@ def show_consultant_documents(consultant):
                 show_documents_report(documents)
 
         # Formulaire d'upload (si activé)
-        if (
-            "upload_document" in st.session_state
-            and st.session_state.upload_document == consultant.id
-        ):
+        if "upload_document" in st.session_state and st.session_state.upload_document == consultant.id:
             show_upload_document_form(consultant.id)
 
     except Exception as e:
@@ -154,9 +151,7 @@ def show_documents_statistics(documents):
             doc_type = doc.type_document or "Autre"
             types[doc_type] = types.get(doc_type, 0) + 1
 
-        most_common_type = (
-            max(types.items(), key=lambda x: x[1]) if types else ("N/A", 0)
-        )
+        most_common_type = max(types.items(), key=lambda x: x[1]) if types else ("N/A", 0)
         st.metric("Type principal", most_common_type[0])
 
     with col3:
@@ -196,9 +191,7 @@ def show_upload_document_form(consultant_id: int):
             help="Sélectionnez le type de document",
         )
 
-        description = st.text_area(
-            "Description", height=80, help="Description optionnelle du document"
-        )
+        description = st.text_area("Description", height=80, help="Description optionnelle du document")
 
         st.markdown("#### 📎 Fichier à uploader")
 
@@ -253,9 +246,7 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
             st.error("❌ Fichier CV introuvable")
             return False
 
-        extracted_text = DocumentAnalyzer.extract_text_from_file(
-            cv_document.chemin_fichier
-        )
+        extracted_text = DocumentAnalyzer.extract_text_from_file(cv_document.chemin_fichier)
         if not extracted_text:
             st.error("❌ Impossible d'extraire le texte du CV")
             return False
@@ -272,9 +263,7 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
 
             # Ajouter des métadonnées
             analysis_result["_analysis_method"] = "openai_gpt4"
-            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(
-                len(extracted_text)
-            )
+            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(len(extracted_text))
 
         else:
             # Analyse classique
@@ -368,11 +357,7 @@ def _display_current_analysis_status(cv_document, consultant):
 
 def _handle_analysis_button(cv_document, consultant, selected_method):
     """Gère le bouton d'analyse et l'exécution"""
-    button_text = (
-        "🚀 Analyser avec GPT-4"
-        if "Grok" in selected_method
-        else "🔍 Analyser classiquement"
-    )
+    button_text = "🚀 Analyser avec GPT-4" if "Grok" in selected_method else "🔍 Analyser classiquement"
 
     if st.button(button_text, type="primary", key="start_analysis"):
         with st.spinner("Analyse en cours..."):
@@ -423,9 +408,7 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         original_name = uploaded_file.name
         file_extension = os.path.splitext(original_name)[1]
-        unique_filename = (
-            f"{consultant_id}_{data['type_document']}_{timestamp}{file_extension}"
-        )
+        unique_filename = f"{consultant_id}_{data['type_document']}_{timestamp}{file_extension}"
         file_path = os.path.join(upload_dir, unique_filename)
 
         # Sauvegarder le fichier
@@ -441,9 +424,7 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
 
                 # Analyser le contenu du CV
                 if extracted_text:
-                    analysis_result = DocumentAnalyzer.analyze_cv_content(
-                        extracted_text, f"{consultant_id}"
-                    )
+                    analysis_result = DocumentAnalyzer.analyze_cv_content(extracted_text, f"{consultant_id}")
             except Exception as e:
                 st.warning(f"⚠️ Analyse CV non disponible: {e}")
 
@@ -456,9 +437,7 @@ def upload_document(consultant_id: int, data: Dict[str, Any]) -> bool:
                 type_document=data["type_document"],
                 taille_fichier=len(uploaded_file.getbuffer()),
                 mimetype=uploaded_file.type,
-                description=(
-                    data["description"].strip() if data["description"] else None
-                ),
+                description=(data["description"].strip() if data["description"] else None),
                 date_upload=datetime.now(),
                 analyse_cv=str(analysis_result) if analysis_result else None,
             )
@@ -501,9 +480,7 @@ def reanalyze_document(document_id: int, consultant) -> bool:
 
     try:
         with get_database_session() as session:
-            document = (
-                session.query(Document).filter(Document.id == document_id).first()
-            )
+            document = session.query(Document).filter(Document.id == document_id).first()
 
             if not document:
                 st.error(ERROR_DOCUMENT_NOT_FOUND)
@@ -514,9 +491,7 @@ def reanalyze_document(document_id: int, consultant) -> bool:
                 return False
 
             # Réanalyser le document
-            extracted_text = DocumentAnalyzer.extract_text_from_file(
-                document.chemin_fichier
-            )
+            extracted_text = DocumentAnalyzer.extract_text_from_file(document.chemin_fichier)
             if extracted_text:
                 analysis_result = DocumentAnalyzer.analyze_cv_content(
                     extracted_text, f"{consultant.prenom} {consultant.nom}"
@@ -546,9 +521,7 @@ def _load_document_for_rename(document_id: int):
         return document
 
 
-def _handle_rename_form_submission(
-    document_id: int, new_name: str, new_description: str
-):
+def _handle_rename_form_submission(document_id: int, new_name: str, new_description: str):
     """Gère la soumission du formulaire de renommage"""
     if not new_name or not new_name.strip():
         st.error("❌ Le nom du fichier est obligatoire")
@@ -628,9 +601,7 @@ def rename_document(document_id: int, data: Dict[str, Any]) -> bool:
 
     try:
         with get_database_session() as session:
-            document = (
-                session.query(Document).filter(Document.id == document_id).first()
-            )
+            document = session.query(Document).filter(Document.id == document_id).first()
 
             if not document:
                 st.error(ERROR_DOCUMENT_NOT_FOUND)
@@ -654,9 +625,7 @@ def delete_document(document_id: int) -> bool:
 
     try:
         with get_database_session() as session:
-            document = (
-                session.query(Document).filter(Document.id == document_id).first()
-            )
+            document = session.query(Document).filter(Document.id == document_id).first()
 
             if not document:
                 st.error(ERROR_DOCUMENT_NOT_FOUND)
@@ -690,9 +659,7 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
             st.error("❌ Fichier CV introuvable")
             return False
 
-        extracted_text = DocumentAnalyzer.extract_text_from_file(
-            cv_document.chemin_fichier
-        )
+        extracted_text = DocumentAnalyzer.extract_text_from_file(cv_document.chemin_fichier)
         if not extracted_text:
             st.error("❌ Impossible d'extraire le texte du CV")
             return False
@@ -709,9 +676,7 @@ def perform_cv_analysis(cv_document, consultant, method: str) -> bool:
 
             # Ajouter des métadonnées
             analysis_result["_analysis_method"] = "openai_gpt4"
-            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(
-                len(extracted_text)
-            )
+            analysis_result["_cost_estimate"] = grok_service.get_cost_estimate(len(extracted_text))
 
         else:
             # Analyse classique
@@ -887,9 +852,7 @@ def show_documents_report(documents):
         recent_docs = sum(
             1
             for doc in documents
-            if doc.date_upload
-            and doc.date_upload.month == current_month
-            and doc.date_upload.year == current_year
+            if doc.date_upload and doc.date_upload.month == current_month and doc.date_upload.year == current_year
         )
         st.write(f"**Documents ce mois :** {recent_docs}")
 
@@ -903,9 +866,7 @@ def show_documents_report(documents):
                 "Nom": doc.nom_fichier,
                 "Type": doc.type_document or "N/A",
                 "Taille (KB)": round((doc.taille_fichier or 0) / 1024, 1),
-                "Date upload": (
-                    doc.date_upload.strftime("%d/%m/%Y") if doc.date_upload else "N/A"
-                ),
+                "Date upload": (doc.date_upload.strftime("%d/%m/%Y") if doc.date_upload else "N/A"),
                 "Analysé": "✅" if doc.analyse_cv else "❌",
             }
         )
@@ -996,8 +957,5 @@ def _display_document_actions(document, consultant):
 
 def _handle_rename_form(document):
     """Gère l'affichage du formulaire de renommage si activé."""
-    if (
-        "rename_document" in st.session_state
-        and st.session_state.rename_document == document.id
-    ):
+    if "rename_document" in st.session_state and st.session_state.rename_document == document.id:
         show_rename_document_form(document.id)

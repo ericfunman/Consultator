@@ -17,17 +17,15 @@ except ImportError as e:
     pytest.skip(f"Cannot import import_vsa_missions: {e}", allow_module_level=True)
 
 
-
-
 def test_parse_date():
     """Test automatiquement généré pour parse_date"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = parse_date(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -39,30 +37,29 @@ def test_parse_date_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_parse_date_with_mocks(mock_request):
     """Test de parse_date avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_validate_mission_data():
     """Test automatiquement généré pour validate_mission_data"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = validate_mission_data(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -74,30 +71,29 @@ def test_validate_mission_data_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_validate_mission_data_with_mocks(mock_request):
     """Test de validate_mission_data avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_import_vsa_missions():
     """Test automatiquement généré pour import_vsa_missions"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = import_vsa_missions(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -109,30 +105,29 @@ def test_import_vsa_missions_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_import_vsa_missions_with_mocks(mock_request):
     """Test de import_vsa_missions avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-
 
 
 def test_show_import_summary():
     """Test automatiquement généré pour show_import_summary"""
     # Given
     # TODO: Préparer les paramètres de test
-    
+
     # When
     # TODO: Appeler la fonction
     # result = show_import_summary(test_params)
-    
+
     # Then
     # TODO: Vérifier le résultat
     pass
@@ -144,16 +139,15 @@ def test_show_import_summary_edge_cases():
     pass
 
 
-@patch('requests.get')  # Adapter selon les dépendances
+@patch("requests.get")  # Adapter selon les dépendances
 def test_show_import_summary_with_mocks(mock_request):
     """Test de show_import_summary avec mocks"""
     # Given
     mock_request.return_value.json.return_value = {"test": "data"}
-    
+
     # When
     # TODO: Appeler avec mocks
-    
+
     # Then
     # TODO: Vérifier les appels mocks
     pass
-

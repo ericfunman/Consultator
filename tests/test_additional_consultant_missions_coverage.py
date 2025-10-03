@@ -125,30 +125,16 @@ class TestAdditionalConsultantMissionsCoverage:
         from app.pages_modules.consultant_missions import validate_mission_form
 
         # Empty title
-        assert (
-            validate_mission_form("", 1, date(2024, 1, 1), False, date(2024, 6, 30))
-            is False
-        )
+        assert validate_mission_form("", 1, date(2024, 1, 1), False, date(2024, 6, 30)) is False
 
         # No client
-        assert (
-            validate_mission_form(
-                "Test", None, date(2024, 1, 1), False, date(2024, 6, 30)
-            )
-            is False
-        )
+        assert validate_mission_form("Test", None, date(2024, 1, 1), False, date(2024, 6, 30)) is False
 
         # Valid case
-        assert (
-            validate_mission_form("Test", 1, date(2024, 1, 1), False, date(2024, 6, 30))
-            is True
-        )
+        assert validate_mission_form("Test", 1, date(2024, 1, 1), False, date(2024, 6, 30)) is True
 
         # End before start
-        assert (
-            validate_mission_form("Test", 1, date(2024, 6, 30), False, date(2024, 1, 1))
-            is False
-        )
+        assert validate_mission_form("Test", 1, date(2024, 6, 30), False, date(2024, 1, 1)) is False
 
     @patch("app.pages_modules.consultant_missions.st")
     def test_show_missions_analysis_empty_data(self, mock_st):
@@ -212,9 +198,7 @@ class TestAdditionalConsultantMissionsCoverage:
     @patch("app.pages_modules.consultant_missions.st")
     @patch("app.pages_modules.consultant_missions.ConsultantService")
     @patch("app.pages_modules.consultant_missions.get_database_session")
-    def test_delete_mission_not_found(
-        self, mock_get_session, mock_consultant_service, mock_st
-    ):
+    def test_delete_mission_not_found(self, mock_get_session, mock_consultant_service, mock_st):
         """Test suppression mission introuvable"""
         mock_session = Mock()
         mock_get_session.return_value = mock_session

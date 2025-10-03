@@ -297,16 +297,12 @@ def mock_sqlalchemy_models():
     try:
         # Patch des modèles principaux - seulement si disponibles
         try:
-            patches.append(
-                patch("app.database.models.Consultant", mock_consultant_class)
-            )
+            patches.append(patch("app.database.models.Consultant", mock_consultant_class))
             patches.append(patch("app.database.models.Practice", mock_practice_class))
             patches.append(patch("app.database.models.BusinessManager", MagicMock()))
             patches.append(patch("app.database.models.Mission", MagicMock()))
             patches.append(patch("app.database.models.Competence", MagicMock()))
-            patches.append(
-                patch("app.database.models.ConsultantCompetence", MagicMock())
-            )
+            patches.append(patch("app.database.models.ConsultantCompetence", MagicMock()))
             patches.append(patch("app.database.models.Langue", MagicMock()))
             patches.append(patch("app.database.models.ConsultantLangue", MagicMock()))
             patches.append(patch("sqlalchemy.func", mock_func))
@@ -481,28 +477,31 @@ def mock_streamlit_complete():
     for patch_obj in patches:
         started_patches.append(patch_obj.start())
         if len(started_patches) <= len(streamlit_functions):
-            mock_patches[streamlit_functions[len(started_patches) - 1]] = (
-                started_patches[-1]
-            )
+            mock_patches[streamlit_functions[len(started_patches) - 1]] = started_patches[-1]
 
     try:
         # Configuration des mocks
         mock_patches["columns"].return_value = [MagicMock(), MagicMock()]
-        
+
         # Mock tabs pour retourner des context managers appropriés
         class MockTabContextManager(MagicMock):
             def __enter__(self):
                 return self
+
             def __exit__(self, *exc):
                 pass
-        
+
         mock_patches["tabs"].return_value = [MockTabContextManager(), MockTabContextManager(), MockTabContextManager()]
-        
+
         # Configurer aussi le patch spécifique si disponible
         if len(started_patches) > len(streamlit_functions):
             specific_tabs_patch = started_patches[-1]
-            specific_tabs_patch.return_value = [MockTabContextManager(), MockTabContextManager(), MockTabContextManager()]
-        
+            specific_tabs_patch.return_value = [
+                MockTabContextManager(),
+                MockTabContextManager(),
+                MockTabContextManager(),
+            ]
+
         mock_patches["form"].return_value.__enter__ = MagicMock(return_value=None)
         mock_patches["form"].return_value.__exit__ = MagicMock(return_value=None)
         mock_patches["form_submit_button"].return_value = False
@@ -661,9 +660,7 @@ def mock_sqlalchemy_models_global():
                     return_value=mock_session,
                 )
             )
-            patches.append(
-                patch("app.database.database.session_local", return_value=mock_session)
-            )
+            patches.append(patch("app.database.database.session_local", return_value=mock_session))
         except ImportError:
             # Si les modules de l'app ne sont pas disponibles, ne pas patcher
             pass
@@ -741,13 +738,9 @@ def mock_services():
 
     # Essayer de patcher seulement si les modules sont disponibles
     try:
-        with patch(
-            "services.consultant_service.ConsultantService", mock_consultant_service
-        ), patch(
+        with patch("services.consultant_service.ConsultantService", mock_consultant_service), patch(
             "services.business_manager_service.BusinessManagerService", mock_bm_service
-        ), patch(
-            "services.practice_service.PracticeService", mock_practice_service
-        ):
+        ), patch("services.practice_service.PracticeService", mock_practice_service):
             yield {
                 "consultant_service": mock_consultant_service,
                 "business_manager_service": mock_bm_service,
@@ -879,9 +872,7 @@ def auto_mocks(request):
                     return value
                 return date.today()
 
-            patches.append(
-                patch("streamlit.date_input", side_effect=mock_date_input_func)
-            )
+            patches.append(patch("streamlit.date_input", side_effect=mock_date_input_func))
 
         # Démarrer tous les patches
         for p in patches:

@@ -9,7 +9,7 @@ import sys
 import os
 
 # Ajouter le répertoire parent au path pour les imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
 class TestMainModuleCoverage(unittest.TestCase):
@@ -29,12 +29,12 @@ class TestMainModuleCoverage(unittest.TestCase):
     #         # Mock du module home
     #         mock_module = Mock()
     #         mock_module.__name__ = 'pages_modules.home'
-            
+
     #         # Modifier temporairement sys.modules pour que l'import retourne le mock
     #         import sys
     #         original_module = sys.modules.get('pages_modules.home')
     #         sys.modules['pages_modules.home'] = mock_module
-            
+
     #         try:
     #             with patch('app.main.importlib.reload', return_value=mock_module):
     #                 from app.main import load_module_safe
@@ -51,11 +51,12 @@ class TestMainModuleCoverage(unittest.TestCase):
         """Test du chargement d'un module déjà en cache"""
         # Simuler que le module est en cache
         mock_cached_module = Mock()
-        
-        with patch('app.main.st') as mock_st:
+
+        with patch("app.main.st") as mock_st:
             mock_st.session_state.modules_cache = {"home": mock_cached_module}
 
             from app.main import load_module_safe
+
             result = load_module_safe("home")
             self.assertEqual(result, mock_cached_module)
 
@@ -71,7 +72,7 @@ class TestMainModuleCoverage(unittest.TestCase):
     #         original_module = sys.modules.get('pages_modules.home')
     #         if 'pages_modules.home' in sys.modules:
     #             del sys.modules['pages_modules.home']
-            
+
     #         try:
     #             # Patcher __import__ pour qu'il lève une ImportError
     #             with patch('builtins.__import__', side_effect=ImportError("Module not found")):
@@ -86,56 +87,61 @@ class TestMainModuleCoverage(unittest.TestCase):
 
     def test_load_module_safe_invalid_module_name(self):
         """Test avec un nom de module invalide"""
-        with patch('app.main.st') as mock_st:
+        with patch("app.main.st") as mock_st:
             mock_st.session_state.modules_cache = {}
 
             from app.main import load_module_safe
+
             result = load_module_safe("invalid_module")
             self.assertIsNone(result)
 
-    @patch('app.main.st')
-    @patch('app.main.option_menu')
+    @patch("app.main.st")
+    @patch("app.main.option_menu")
     def test_show_navigation_default_selection(self, mock_option_menu, mock_st):
         """Test de la navigation avec sélection par défaut"""
         mock_option_menu.return_value = "🏠 Accueil"
 
         from app.main import show_navigation
+
         result = show_navigation()
         self.assertEqual(result, "home")
 
-    @patch('app.main.st')
-    @patch('app.main.option_menu')
+    @patch("app.main.st")
+    @patch("app.main.option_menu")
     def test_show_navigation_consultants_selection(self, mock_option_menu, mock_st):
         """Test de la navigation avec sélection Consultants"""
         mock_option_menu.return_value = "👥 Consultants"
 
         from app.main import show_navigation
+
         result = show_navigation()
         self.assertEqual(result, "consultants")
 
-    @patch('app.main.st')
-    @patch('app.main.option_menu')
+    @patch("app.main.st")
+    @patch("app.main.option_menu")
     def test_show_navigation_business_managers_selection(self, mock_option_menu, mock_st):
         """Test de la navigation avec sélection Business Managers"""
         mock_option_menu.return_value = "🤵‍♂ Business Managers"
 
         from app.main import show_navigation
+
         result = show_navigation()
         self.assertEqual(result, "business_managers")
 
-    @patch('app.main.st')
-    @patch('app.main.option_menu')
+    @patch("app.main.st")
+    @patch("app.main.option_menu")
     def test_show_navigation_chatbot_selection(self, mock_option_menu, mock_st):
         """Test de la navigation avec sélection Assistant IA"""
         mock_option_menu.return_value = "🤖 Assistant IA"
 
         from app.main import show_navigation
+
         result = show_navigation()
         self.assertEqual(result, "chatbot")
 
-    @patch('streamlit.markdown')
-    @patch('app.main.show_navigation')
-    @patch('app.main.load_module_safe')
+    @patch("streamlit.markdown")
+    @patch("app.main.show_navigation")
+    @patch("app.main.load_module_safe")
     def test_main_successful_page_load(self, mock_load_module, mock_show_nav, mock_markdown):
         """Test du flux principal avec chargement réussi d'une page"""
         mock_show_nav.return_value = "home"
@@ -144,20 +150,23 @@ class TestMainModuleCoverage(unittest.TestCase):
         mock_load_module.return_value = mock_module
 
         from app.main import main
+
         main()
 
         mock_load_module.assert_called_with("home")
         mock_module.show.assert_called_once()
 
-    @patch('app.main.st.markdown')
-    @patch('app.main.show_navigation')
-    @patch('app.main.load_module_safe')
-    @patch('app.main.st.error')
-    @patch('app.main.st.title')
-    @patch('app.main.st.info')
-    def test_main_module_load_failure(self, mock_info, mock_title, mock_error, mock_load_module, mock_show_nav, mock_markdown):
+    @patch("app.main.st.markdown")
+    @patch("app.main.show_navigation")
+    @patch("app.main.load_module_safe")
+    @patch("app.main.st.error")
+    @patch("app.main.st.title")
+    @patch("app.main.st.info")
+    def test_main_module_load_failure(
+        self, mock_info, mock_title, mock_error, mock_load_module, mock_show_nav, mock_markdown
+    ):
         """Test du flux principal avec échec de chargement du module"""
-        with patch('app.main.st.columns') as mock_columns:
+        with patch("app.main.st.columns") as mock_columns:
             # Mock pour st.columns(3) qui retourne un tuple de 3 context managers
             mock_col1 = Mock()
             mock_col1.__enter__ = Mock(return_value=mock_col1)
@@ -169,23 +178,26 @@ class TestMainModuleCoverage(unittest.TestCase):
             mock_col3.__enter__ = Mock(return_value=mock_col3)
             mock_col3.__exit__ = Mock(return_value=None)
             mock_columns.return_value = (mock_col1, mock_col2, mock_col3)
-            
+
             mock_show_nav.return_value = "home"
             mock_load_module.return_value = None
 
             from app.main import main
+
             main()
 
             mock_title.assert_called_with("🏠 Tableau de bord")
             mock_info.assert_called_with("ℹ️ Page d'accueil en mode simplifié - Module home non disponible")
 
-    @patch('app.main.st.markdown')
-    @patch('app.main.show_navigation')
-    @patch('app.main.load_module_safe')
-    @patch('app.main.st.error')
-    @patch('app.main.st.info')
-    @patch('app.main.st.expander')
-    def test_main_page_show_exception(self, mock_expander, mock_info, mock_error, mock_load_module, mock_show_nav, mock_markdown):
+    @patch("app.main.st.markdown")
+    @patch("app.main.show_navigation")
+    @patch("app.main.load_module_safe")
+    @patch("app.main.st.error")
+    @patch("app.main.st.info")
+    @patch("app.main.st.expander")
+    def test_main_page_show_exception(
+        self, mock_expander, mock_info, mock_error, mock_load_module, mock_show_nav, mock_markdown
+    ):
         """Test du flux principal avec exception lors de l'affichage de la page"""
         mock_show_nav.return_value = "home"
         mock_module = Mock()
@@ -199,21 +211,24 @@ class TestMainModuleCoverage(unittest.TestCase):
         mock_expander.return_value = mock_expander_cm
 
         from app.main import main
+
         main()
 
         # Vérifier que st.error est appelé avec le message d'erreur
         mock_error.assert_called_once()
         mock_info.assert_called_with("🔄 Essayez de recharger la page")
 
-    @patch('app.main.st.markdown')
-    @patch('app.main.show_navigation')
-    @patch('app.main.load_module_safe')
-    @patch('app.main.st.error')
-    @patch('app.main.st.title')
-    @patch('app.main.st.info')
-    def test_main_fallback_home_display(self, mock_info, mock_title, mock_error, mock_load_module, mock_show_nav, mock_markdown):
+    @patch("app.main.st.markdown")
+    @patch("app.main.show_navigation")
+    @patch("app.main.load_module_safe")
+    @patch("app.main.st.error")
+    @patch("app.main.st.title")
+    @patch("app.main.st.info")
+    def test_main_fallback_home_display(
+        self, mock_info, mock_title, mock_error, mock_load_module, mock_show_nav, mock_markdown
+    ):
         """Test du flux principal avec affichage de la page fallback home"""
-        with patch('app.main.st.columns') as mock_columns:
+        with patch("app.main.st.columns") as mock_columns:
             # Mock pour st.columns(3) qui retourne un tuple de 3 context managers
             mock_col1 = Mock()
             mock_col1.__enter__ = Mock(return_value=mock_col1)
@@ -225,21 +240,22 @@ class TestMainModuleCoverage(unittest.TestCase):
             mock_col3.__enter__ = Mock(return_value=mock_col3)
             mock_col3.__exit__ = Mock(return_value=None)
             mock_columns.return_value = (mock_col1, mock_col2, mock_col3)
-            
+
             mock_show_nav.return_value = "home"
             mock_load_module.return_value = None
 
             from app.main import main
+
             main()
 
             mock_title.assert_called_with("🏠 Tableau de bord")
             mock_info.assert_called_with("ℹ️ Page d'accueil en mode simplifié - Module home non disponible")
 
-    @patch('app.main.st.title')
-    @patch('app.main.st.markdown')
-    @patch('app.main.st.columns')
-    @patch('app.main.st.metric')
-    @patch('app.main.st.info')
+    @patch("app.main.st.title")
+    @patch("app.main.st.markdown")
+    @patch("app.main.st.columns")
+    @patch("app.main.st.metric")
+    @patch("app.main.st.info")
     def test_show_fallback_home_complete_display(self, mock_info, mock_metric, mock_columns, mock_markdown, mock_title):
         """Test complet de la fonction show_fallback_home"""
         # Mock pour st.columns qui retourne un tuple de context managers
@@ -255,18 +271,20 @@ class TestMainModuleCoverage(unittest.TestCase):
         mock_columns.return_value = (mock_col1, mock_col2, mock_col3)
 
         from app.main import show_fallback_home
+
         show_fallback_home()
 
         # Vérifier que st.metric est appelé 3 fois
         self.assertEqual(mock_metric.call_count, 3)
         mock_info.assert_called_with("ℹ️ Page d'accueil en mode simplifié - Module home non disponible")
 
-    @patch('app.main.st.error')
-    @patch('app.main.st.info')
+    @patch("app.main.st.error")
+    @patch("app.main.st.info")
     def test_main_critical_exception_handling(self, mock_info, mock_error):
         """Test de la gestion d'exceptions critiques dans main()"""
-        with patch('app.main.show_navigation', side_effect=RuntimeError("Critical error")):
+        with patch("app.main.show_navigation", side_effect=RuntimeError("Critical error")):
             from app.main import main
+
             main()
 
             mock_error.assert_called_with("❌ Erreur critique: Critical error")
@@ -275,16 +293,18 @@ class TestMainModuleCoverage(unittest.TestCase):
     def test_constants_definition(self):
         """Test que les constantes sont correctement définies"""
         from app.main import CONSULTANTS_MENU_LABEL
+
         self.assertEqual(CONSULTANTS_MENU_LABEL, "👥 Consultants")
 
-    @patch('streamlit.set_page_config')
+    @patch("streamlit.set_page_config")
     def test_page_config_setup(self, mock_set_page_config):
         """Test que la configuration de page est appelée (exécuté à l'import)"""
         # Cette fonction est appelée lors de l'import du module
         # On vérifie juste qu'elle peut être appelée sans erreur
         from app.main import st
+
         self.assertIsNotNone(st)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
