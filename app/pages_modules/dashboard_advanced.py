@@ -398,7 +398,7 @@ class AdvancedDashboardFeatures:
                         if insight.get("recommendation"):
                             st.info(f"💡 **Recommandation:** {insight['recommendation']}")
 
-    def _generate_ai_insights(self, dashboard_config: Dict, filters: Dict[str, Any]) -> List[Dict]:
+    def _generate_ai_insights(self, _dashboard_config: Dict, filters: Dict[str, Any]) -> List[Dict]:
         """
         Génère des insights IA (simulation)
         """
@@ -558,7 +558,7 @@ class AdvancedDashboardFeatures:
             with get_database_session() as _session:
                 entities = _session.query(Consultant.entite).distinct().all()
                 return [e[0] for e in entities if e[0]]
-        except Exception as e:
+        except Exception:
             return ["Quanteam", "Autre"]
 
     def _get_available_practices(self) -> List[str]:
@@ -568,7 +568,7 @@ class AdvancedDashboardFeatures:
                 # Adapter selon votre modèle
                 practices = ["Data & Analytics", "Cloud & DevOps", "Cybersécurité", "Digital"]
                 return practices
-        except Exception as e:
+        except Exception:
             return []
 
     def _get_available_business_managers(self) -> List[str]:
@@ -577,7 +577,7 @@ class AdvancedDashboardFeatures:
             with get_database_session() as _session:
                 bms = _session.query(Consultant.business_manager).distinct().all()
                 return [bm[0] for bm in bms if bm[0]]
-        except Exception as e:
+        except Exception:
             return []
 
     def _get_widget_export_data(self, _widget: Dict) -> Dict:
