@@ -1253,6 +1253,8 @@ def show_statistics():
     st.subheader("📊 Statistiques des Business Managers")
 
     try:
+        from sqlalchemy import func
+        
         with get_database_session() as session:
             # Statistiques générales
             total_bms = session.query(BusinessManager).count()
@@ -1288,17 +1290,16 @@ def show_statistics():
             bm_stats_query = session.query(
                 BusinessManager.prenom,
                 BusinessManager.nom,
-                session.query(ConsultantBusinessManager)
-                .filter(
-                    and_(
-                        ConsultantBusinessManager.business_manager_id
-                        == BusinessManager.id,
-                        ConsultantBusinessManager.date_fin.is_(None),
-                    )
+                func.count(ConsultantBusinessManager.id).label("consultants_count")
+            ).outerjoin(
+                ConsultantBusinessManager,
+                and_(
+                    BusinessManager.id == ConsultantBusinessManager.business_manager_id,
+                    ConsultantBusinessManager.date_fin.is_(None)
                 )
-                .count()
-                .label("consultants_count"),
-            ).filter(BusinessManager.actif)
+            ).filter(BusinessManager.actif).group_by(
+                BusinessManager.id, BusinessManager.prenom, BusinessManager.nom
+            )
 
             bm_stats = bm_stats_query.all()
 
@@ -1324,9 +1325,7 @@ def show_statistics():
 
             # Assignations par mois (derniers 12 mois)
             import calendar
-
             from sqlalchemy import extract
-            from sqlalchemy import func
 
             monthly_stats = (
                 session.query(
