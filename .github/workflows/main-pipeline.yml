@@ -129,11 +129,11 @@ jobs:
 
     - name: Run Black (code formatting)
       run: |
-        black --check --diff app/
+        black --check --diff --line-length 120 app/ tests/
 
     - name: Run isort (import sorting)
       run: |
-        isort --check-only --diff app/
+        isort --check-only --diff app/ tests/
 
     - name: Run Flake8 (linting)
       run: |
