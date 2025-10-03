@@ -18,6 +18,7 @@ from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Integer
+from sqlalchemy import JSON
 from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy.orm import Mapped
@@ -728,3 +729,79 @@ class ConsultantBusinessManager(Base):
         """
         date_fin_effective = self.date_fin or datetime.now().date()
         return (date_fin_effective - self.date_debut).days
+
+
+# =============================================================================
+# MODÈLES DASHBOARD - Système de dashboard personnalisé
+# =============================================================================
+
+class DashboardConfiguration(Base):
+    """
+    Configuration d'un dashboard personnalisé
+    """
+    __tablename__ = 'dashboard_configurations'
+
+    id = Column(Integer, primary_key=True)
+    nom = Column(String(100), nullable=False)
+    description = Column(Text)
+    layout_config = Column(JSON)  # Configuration de disposition des widgets
+    filters_config = Column(JSON)  # Filtres par défaut
+    role_access = Column(String(50))  # 'bm', 'direction', 'responsable_bm', 'all'
+    is_template = Column(Boolean, default=False)  # Template réutilisable
+    created_by = Column(String(100))  # Nom de l'utilisateur créateur
+    is_public = Column(Boolean, default=False)  # Partageable avec autres utilisateurs
+    date_creation = Column(DateTime, default=datetime.now)
+    derniere_maj = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    # Relation avec les instances de widgets
+    widget_instances = relationship("DashboardWidgetInstance", back_populates="dashboard", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<DashboardConfiguration(id={self.id}, nom='{self.nom}', role_access='{self.role_access}')>"
+
+
+class DashboardWidgetInstance(Base):
+    """
+    Instance d'un widget dans un dashboard spécifique
+    """
+    __tablename__ = 'dashboard_widget_instances'
+
+    id = Column(Integer, primary_key=True)
+    dashboard_id = Column(Integer, ForeignKey('dashboard_configurations.id'), nullable=False)
+    widget_type = Column(String(50), nullable=False)  # Type du widget (revenue_chart, intercontrat_rate, etc.)
+    position_x = Column(Integer, default=0)  # Position X dans la grille
+    position_y = Column(Integer, default=0)  # Position Y dans la grille
+    width = Column(Integer, default=1)  # Largeur en colonnes
+    height = Column(Integer, default=1)  # Hauteur en lignes
+    config = Column(JSON)  # Configuration spécifique du widget
+    date_creation = Column(DateTime, default=datetime.now)
+    derniere_maj = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    # Relations
+    dashboard = relationship("DashboardConfiguration", back_populates="widget_instances")
+
+    def __repr__(self):
+        return f"<DashboardWidgetInstance(id={self.id}, widget_type='{self.widget_type}', dashboard_id={self.dashboard_id})>"
+
+
+class WidgetCatalog(Base):
+    """
+    Catalogue des widgets disponibles
+    """
+    __tablename__ = 'widget_catalog'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False, unique=True)
+    category = Column(String(30), nullable=False)  # 'financial', 'intercontrat', 'management'
+    display_name = Column(String(100), nullable=False)  # Nom affiché à l'utilisateur
+    description = Column(Text)
+    icon = Column(String(20))  # Icône emoji ou nom d'icône
+    sql_query_template = Column(Text)  # Template de requête SQL
+    config_schema = Column(JSON)  # Schema de configuration possible
+    render_function = Column(String(50), nullable=False)  # Nom de la fonction de rendu
+    required_permissions = Column(JSON)  # Permissions nécessaires
+    is_active = Column(Boolean, default=True)
+    date_creation = Column(DateTime, default=datetime.now)
+
+    def __repr__(self):
+        return f"<WidgetCatalog(id={self.id}, name='{self.name}', category='{self.category}')>"

@@ -11,6 +11,7 @@ from app.database.models import Consultant
 from app.database.models import ConsultantBusinessManager
 from app.database.models import Mission
 from app.services.business_manager_service import BusinessManagerService
+from app.pages_modules.dashboard_page import show_dashboard_page
 
 # Constantes pour éviter la duplication
 TELEPHONE_LABEL = "Téléphone"
@@ -156,7 +157,7 @@ def show():
         return
 
     # Navigation par onglets
-    tab1, tab2, tab3 = st.tabs(["📋 Liste des BMs", "➕ Nouveau BM", "📊 Statistiques"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 Liste des BMs", "➕ Nouveau BM", "📊 Statistiques", "📊 Dashboard"])
 
     with tab1:
         show_business_managers_list()
@@ -166,6 +167,9 @@ def show():
 
     with tab3:
         show_statistics()
+
+    with tab4:
+        show_dashboard_page()
 
 
 def show_bm_profile():
