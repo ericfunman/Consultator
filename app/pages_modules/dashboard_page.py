@@ -13,6 +13,12 @@ from app.services.widget_factory import WidgetFactory, WidgetCatalogManager
 from app.pages_modules.dashboard_builder import dashboard_builder
 from app.pages_modules.dashboard_advanced import advanced_features
 
+# Constantes pour messages d'erreur et labels réutilisés
+ERROR_DASHBOARD_NOT_FOUND = "❌ Dashboard introuvable"
+ERROR_DASHBOARD_NAME_REQUIRED = "❌ Le nom du dashboard est obligatoire"
+LABEL_DASHBOARD_NAME = "Nom du dashboard *"
+BUTTON_CANCEL = "❌ Annuler"
+
 
 def show_dashboard_page():
     """
@@ -106,7 +112,7 @@ def show_dashboard_viewer():
     dashboard_config = DashboardService.get_dashboard_by_id(selected_dashboard_id)
 
     if not dashboard_config:
-        st.error("❌ Dashboard introuvable")
+        st.error(ERROR_DASHBOARD_NOT_FOUND)
         return
 
     # Conversion de la période en nombre de mois
@@ -162,7 +168,7 @@ def show_advanced_analytics():
     dashboard_config = DashboardService.get_dashboard_by_id(selected_dashboard_id)
 
     if not dashboard_config:
-        st.error("❌ Dashboard introuvable")
+        st.error(ERROR_DASHBOARD_NOT_FOUND)
         return
 
     # Tabs analytiques
@@ -363,7 +369,7 @@ def show_dashboard_creator():
         col1, col2 = st.columns(2)
 
         with col1:
-            dashboard_name = st.text_input("Nom du dashboard *", placeholder="Mon Dashboard Personnel")
+            dashboard_name = st.text_input(LABEL_DASHBOARD_NAME, placeholder="Mon Dashboard Personnel")
             role_access = st.selectbox(
                 "Accès",
                 options=["all", "direction", "bm", "responsable_bm"],
@@ -413,13 +419,13 @@ def show_dashboard_creator():
             submitted = st.form_submit_button("🚀 Créer le Dashboard", type="primary")
 
         with col2:
-            if st.form_submit_button("❌ Annuler"):
+            if st.form_submit_button(BUTTON_CANCEL):
                 st.session_state.dashboard_mode = "view"
                 st.rerun()
 
         if submitted:
             if not dashboard_name.strip():
-                st.error("❌ Le nom du dashboard est obligatoire")
+                st.error(ERROR_DASHBOARD_NAME_REQUIRED)
                 return
 
             if not selected_widgets:
@@ -477,7 +483,7 @@ def show_dashboard_editor():
     dashboard_config = DashboardService.get_dashboard_by_id(dashboard_id)
 
     if not dashboard_config:
-        st.error("❌ Dashboard introuvable")
+        st.error(ERROR_DASHBOARD_NOT_FOUND)
         st.session_state.dashboard_mode = "view"
         st.rerun()
         return
@@ -679,7 +685,7 @@ def show_dashboard_management(dashboard_config: Dict):
                     st.error("❌ Erreur lors de la suppression")
 
         with col2:
-            if st.button("❌ Annuler", key="cancel_delete_dashboard"):
+            if st.button(BUTTON_CANCEL, key="cancel_delete_dashboard"):
                 st.session_state.confirm_delete_dashboard = False
                 st.rerun()
 
@@ -807,7 +813,7 @@ def show_dashboard_creation_form():
     )
 
     # Bouton pour rediriger vers le Builder Avancé
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, _ = st.columns([1, 2, 1])
     with col2:
         if st.button(
             "🎨 Aller directement au Builder Avancé",
@@ -825,7 +831,7 @@ def show_dashboard_creation_form():
     with st.form("create_simple_dashboard"):
         st.subheader("📝 Créer un dashboard simple")
 
-        nom = st.text_input("Nom du dashboard *", placeholder="Mon Dashboard Perso")
+        nom = st.text_input(LABEL_DASHBOARD_NAME, placeholder="Mon Dashboard Perso")
         description = st.text_area("Description", placeholder="Description de votre dashboard...")
 
         role_access = st.selectbox(
@@ -849,11 +855,11 @@ def show_dashboard_creation_form():
             submitted = st.form_submit_button("✅ Créer Dashboard", type="primary", use_container_width=True)
 
         with col2:
-            cancelled = st.form_submit_button("❌ Annuler", use_container_width=True)
+            cancelled = st.form_submit_button(BUTTON_CANCEL, use_container_width=True)
 
         if submitted:
             if not nom:
-                st.error("❌ Le nom du dashboard est requis !")
+                st.error(ERROR_DASHBOARD_NAME_REQUIRED)
             else:
                 try:
                     # Créer le dashboard
@@ -897,7 +903,7 @@ def show_dashboard_edit_form():
     dashboard_config = DashboardService.get_dashboard_by_id(dashboard_id)
 
     if not dashboard_config:
-        st.error("❌ Dashboard introuvable")
+        st.error(ERROR_DASHBOARD_NOT_FOUND)
         if st.button("🔙 Retour"):
             st.session_state.dashboard_mode = "view"
             st.rerun()
@@ -906,7 +912,7 @@ def show_dashboard_edit_form():
     st.info("💡 Utilisez le Builder Avancé pour modifier les widgets et la disposition")
 
     # Bouton pour rediriger vers le Builder Avancé
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, _ = st.columns([1, 2, 1])
     with col2:
         if st.button(
             "🎨 Éditer avec le Builder Avancé", key="edit_in_builder_advanced", type="primary", use_container_width=True
@@ -921,7 +927,7 @@ def show_dashboard_edit_form():
     with st.form("edit_dashboard_form"):
         st.subheader(f"✏️ Éditer: {dashboard_config['nom']}")
 
-        nom = st.text_input("Nom du dashboard *", value=dashboard_config["nom"])
+        nom = st.text_input(LABEL_DASHBOARD_NAME, value=dashboard_config["nom"])
         description = st.text_area("Description", value=dashboard_config.get("description", ""))
 
         role_access = st.selectbox(
@@ -944,11 +950,11 @@ def show_dashboard_edit_form():
             submitted = st.form_submit_button("✅ Sauvegarder", type="primary", use_container_width=True)
 
         with col2:
-            cancelled = st.form_submit_button("❌ Annuler", use_container_width=True)
+            cancelled = st.form_submit_button(BUTTON_CANCEL, use_container_width=True)
 
         if submitted:
             if not nom:
-                st.error("❌ Le nom du dashboard est requis !")
+                st.error(ERROR_DASHBOARD_NAME_REQUIRED)
             else:
                 try:
                     # Mettre à jour le dashboard

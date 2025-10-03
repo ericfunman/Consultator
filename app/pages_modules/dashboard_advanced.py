@@ -294,7 +294,7 @@ class AdvancedDashboardFeatures:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
 
-    def _export_to_image(self, dashboard_config: Dict):
+    def _export_to_image(self, _dashboard_config: Dict):
         """
         Export PNG du dashboard
         """
@@ -302,7 +302,7 @@ class AdvancedDashboardFeatures:
         # Cette fonctionnalité nécessiterait une capture d'écran
         # ou la génération d'images des graphiques Plotly
 
-    def _export_to_powerpoint(self, dashboard_config: Dict):
+    def _export_to_powerpoint(self, _dashboard_config: Dict):
         """
         Export PowerPoint
         """
@@ -419,7 +419,7 @@ class AdvancedDashboardFeatures:
         # Analyse des revenus
         revenue_data = self.data_service.get_revenue_by_bm_data()
         bm_revenues = revenue_data.get("bm_revenues", [])
-        avg_revenue = sum(bm["ca_estime"] for bm in bm_revenues) / len(bm_revenues) if bm_revenues else 0
+        _avg_revenue = sum(bm["ca_estime"] for bm in bm_revenues) / len(bm_revenues) if bm_revenues else 0
 
         top_performer = max(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
         bottom_performer = min(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
@@ -471,7 +471,7 @@ class AdvancedDashboardFeatures:
             )
 
         with col2:
-            comparison_type = st.selectbox(
+            _comparison_type = st.selectbox(
                 "Type de comparaison",
                 ["Évolution %", "Différence absolue", "Les deux"],
                 key="dashboard_comparison_type_selectbox",
@@ -525,7 +525,7 @@ class AdvancedDashboardFeatures:
                     y=forecast_data["forecast"]["values"],
                     mode="lines+markers",
                     name="Prévision",
-                    line=dict(color="red", dash="dash"),
+                    line={"color": "red", "dash": "dash"},
                 )
             )
 
@@ -536,7 +536,7 @@ class AdvancedDashboardFeatures:
                     y=forecast_data["forecast"]["upper"] + forecast_data["forecast"]["lower"][::-1],
                     fill="tonexty",
                     fillcolor="rgba(255,0,0,0.2)",
-                    line=dict(color="rgba(255,255,255,0)"),
+                    line={"color": "rgba(255,255,255,0)"},
                     name="Zone de confiance 95%",
                 )
             )
@@ -555,51 +555,51 @@ class AdvancedDashboardFeatures:
     def _get_available_entities(self) -> List[str]:
         """Récupère les entités disponibles"""
         try:
-            with get_database_session() as session:
-                entities = session.query(Consultant.entite).distinct().all()
+            with get_database_session() as _session:
+                entities = _session.query(Consultant.entite).distinct().all()
                 return [e[0] for e in entities if e[0]]
-        except:
+        except Exception as e:
             return ["Quanteam", "Autre"]
 
     def _get_available_practices(self) -> List[str]:
         """Récupère les practices disponibles"""
         try:
-            with get_database_session() as session:
+            with get_database_session() as _session:
                 # Adapter selon votre modèle
                 practices = ["Data & Analytics", "Cloud & DevOps", "Cybersécurité", "Digital"]
                 return practices
-        except:
+        except Exception as e:
             return []
 
     def _get_available_business_managers(self) -> List[str]:
         """Récupère les BM disponibles"""
         try:
-            with get_database_session() as session:
-                bms = session.query(Consultant.business_manager).distinct().all()
+            with get_database_session() as _session:
+                bms = _session.query(Consultant.business_manager).distinct().all()
                 return [bm[0] for bm in bms if bm[0]]
-        except:
+        except Exception as e:
             return []
 
-    def _get_widget_export_data(self, widget: Dict) -> Dict:
+    def _get_widget_export_data(self, _widget: Dict) -> Dict:
         """Récupère les données d'export pour un widget"""
-        return {"title": widget["widget_type"], "summary": ["Données du widget...", "Ligne 2", "Ligne 3"]}
+        return {"title": _widget["widget_type"], "summary": ["Données du widget...", "Ligne 2", "Ligne 3"]}
 
-    def _get_widget_detailed_data(self, widget: Dict) -> Optional[pd.DataFrame]:
+    def _get_widget_detailed_data(self, _widget: Dict) -> Optional[pd.DataFrame]:
         """Récupère les données détaillées pour export Excel"""
         return pd.DataFrame({"colonne1": [1, 2, 3], "colonne2": ["A", "B", "C"]})
 
-    def _get_dashboard_summary_data(self, dashboard_config: Dict) -> List[Dict]:
+    def _get_dashboard_summary_data(self, _dashboard_config: Dict) -> List[Dict]:
         """Récupère les données de sommaire du dashboard"""
         return [
-            {"Métrique": "Nombre de widgets", "Valeur": len(dashboard_config.get("widgets", []))},
-            {"Métrique": "Date de création", "Valeur": dashboard_config.get("date_creation", "N/A")},
+            {"Métrique": "Nombre de widgets", "Valeur": len(_dashboard_config.get("widgets", []))},
+            {"Métrique": "Date de création", "Valeur": _dashboard_config.get("date_creation", "N/A")},
         ]
 
     def _check_recent_mission_activity(self) -> Dict:
         """Vérifie l'activité récente des missions"""
         return {"low_activity": False, "count": 5}
 
-    def _get_trend_analysis(self, filters: Dict) -> Dict:
+    def _get_trend_analysis(self, _filters: Dict) -> Dict:
         """Analyse les tendances"""
         return {"declining": False}
 
@@ -609,16 +609,18 @@ class AdvancedDashboardFeatures:
 
     def _get_comparison_data(self) -> Optional[pd.DataFrame]:
         """Récupère les données de comparaison"""
+        # Constante pour éviter duplication
+        METRIC_LABEL = "Métrique"
         return pd.DataFrame(
             {
-                "Métrique": ["Revenus", "Taux intercontrat", "Nb missions"],
+                METRIC_LABEL: ["Revenus", "Taux intercontrat", "Nb missions"],
                 "Actuel": [1000, 15.5, 45],
                 "Précédent": [950, 12.3, 42],
                 "evolution": [5.3, 26.0, 7.1],
             }
         )
 
-    def _generate_forecast(self, forecast_type: str, period_months: int) -> Dict:
+    def _generate_forecast(self, _forecast_type: str, period_months: int) -> Dict:
         """Génère des prévisions (simulation)"""
         from datetime import datetime, timedelta
         import random

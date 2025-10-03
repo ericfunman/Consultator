@@ -3236,7 +3236,7 @@ class ChatbotService:
                 tjm_global = (
                     (tjm_nouveau_moyen * missions_nouveau_tjm) + (tjm_ancien_moyen * missions_ancien_tjm)
                 ) / total_missions
-                response += f"🎯 **TJM global moyen :** {tjm_global:.0f}€ " f"(sur {total_missions} missions)"
+                response += f"🎯 **TJM global moyen :** {tjm_global:.0f}€ (sur {total_missions} missions)"
             else:
                 response = "💰 **Aucun TJM renseigné** dans les missions"
 

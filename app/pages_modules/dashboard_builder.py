@@ -136,7 +136,7 @@ class DashboardBuilder:
 
                 # Bouton d'ajout
                 if st.button(
-                    f"➕ Ajouter", key=f"add_{widget['name']}", help=f"Ajouter {widget['display_name']} au canvas"
+                    "➕ Ajouter", key=f"add_{widget['name']}", help=f"Ajouter {widget['display_name']} au canvas"
                 ):
                     self._add_widget_to_canvas(widget["name"])
 
@@ -491,7 +491,7 @@ class DashboardBuilder:
                     except Exception as e:
                         st.error(f"❌ Erreur preview {widget['widget_type']}: {e}")
 
-    def _show_builder_actions(self, mode: str, dashboard_id: Optional[int], dashboard_config: Optional[Dict]):
+    def _show_builder_actions(self, mode: str, dashboard_id: Optional[int], _dashboard_config: Optional[Dict]):
         """
         Actions de sauvegarde et navigation du builder
         """
