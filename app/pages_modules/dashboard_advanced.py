@@ -514,7 +514,7 @@ class AdvancedDashboardFeatures:
                     y=forecast_data["historical"]["values"],
                     mode="lines+markers",
                     name="Données historiques",
-                    line=dict(color="blue"),
+                    line={"color": "blue"},
                 )
             )
 
