@@ -175,20 +175,32 @@ class DashboardBuilder:
             self._place_widget_on_grid(canvas_grid, widget)
 
         # Rendu de la grille
+        self._render_grid_rows(canvas_grid)
+
+    def _render_grid_rows(self, canvas_grid: List[List]):
+        """Rendu des lignes de la grille"""
         for row_idx in range(self.grid_height):
             if any(canvas_grid[row_idx]):  # Seulement les lignes avec contenu
-                cols = st.columns(self.grid_width)
+                self._render_single_row(canvas_grid, row_idx)
 
-                for col_idx in range(self.grid_width):
-                    with cols[col_idx]:
-                        cell_content = canvas_grid[row_idx][col_idx]
+    def _render_single_row(self, canvas_grid: List[List], row_idx: int):
+        """Rendu d'une seule ligne de la grille"""
+        cols = st.columns(self.grid_width)
 
-                        if cell_content:
-                            self._render_canvas_cell(cell_content, row_idx, col_idx)
-                        else:
-                            # Zone de drop vide
-                            if st.button("➕", key=f"empty_{row_idx}_{col_idx}", help="Ajouter un widget ici"):
-                                st.session_state.drop_zone = (row_idx, col_idx)
+        for col_idx in range(self.grid_width):
+            with cols[col_idx]:
+                self._render_grid_column(canvas_grid, row_idx, col_idx)
+
+    def _render_grid_column(self, canvas_grid: List[List], row_idx: int, col_idx: int):
+        """Rendu d'une colonne de la grille"""
+        cell_content = canvas_grid[row_idx][col_idx]
+
+        if cell_content:
+            self._render_canvas_cell(cell_content, row_idx, col_idx)
+        else:
+            # Zone de drop vide
+            if st.button("➕", key=f"empty_{row_idx}_{col_idx}", help="Ajouter un widget ici"):
+                st.session_state.drop_zone = (row_idx, col_idx)
 
     def _create_empty_grid(self) -> List[List[Optional[Dict]]]:
         """
@@ -370,27 +382,6 @@ class DashboardBuilder:
             del config["period_months"]
         return config
 
-    def _add_common_config(self, config: Dict) -> Dict:
-        """Ajoute les configurations communes à tous les widgets"""
-        config["title"] = st.text_input(
-            "Titre personnalisé",
-            value=config.get("title", ""),
-            placeholder="Laissez vide pour le titre par défaut",
-            key="builder_widget_title_input",
-        )
-        return config
-
-    def _add_widget_specific_config(self, widget_type: str, config: Dict) -> Dict:
-        """Ajoute les configurations spécifiques selon le type de widget"""
-        if widget_type in ["intercontrat_rate", "intercontrat_trend"]:
-            config = self._add_intercontrat_config(config)
-        elif widget_type == "revenue_by_bm":
-            config = self._add_revenue_config(config)
-        elif widget_type == "global_kpis":
-            config = self._add_kpis_config(config)
-
-        return config
-
     def _add_intercontrat_config(self, config: Dict) -> Dict:
         """Configuration pour les widgets d'intercontrat"""
         config["seuil_alerte"] = st.number_input(
@@ -423,22 +414,6 @@ class DashboardBuilder:
             default=config.get("kpis_to_show", ["total_consultants", "total_missions", "revenue_total"]),
             key="builder_widget_kpis_multiselect",
         )
-        return config
-
-    def _add_period_config(self, config: Dict) -> Dict:
-        """Ajoute la configuration de période si cochée"""
-        if st.checkbox(
-            "Configuration de période", value="period_months" in config, key="builder_widget_period_checkbox"
-        ):
-            config["period_months"] = st.selectbox(
-                "Période par défaut",
-                options=[1, 3, 6, 12],
-                index=[1, 3, 6, 12].index(config.get("period_months", 3)),
-                key="builder_widget_period_selectbox",
-            )
-        elif "period_months" in config:
-            del config["period_months"]
-
         return config
 
     def _add_widget_to_canvas(self, widget_type: str):

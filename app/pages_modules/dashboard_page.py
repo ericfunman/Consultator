@@ -715,6 +715,16 @@ def show_dashboard_management(dashboard_config: Dict):
     st.subheader("🗑️ Gestion du Dashboard")
 
     # Informations du dashboard
+    _display_dashboard_info(dashboard_config)
+
+    st.markdown("---")
+
+    # Actions dangereuses
+    _display_dashboard_actions(dashboard_config)
+
+
+def _display_dashboard_info(dashboard_config: Dict):
+    """Affiche les informations du dashboard"""
     col1, col2 = st.columns(2)
 
     with col1:
@@ -727,9 +737,9 @@ def show_dashboard_management(dashboard_config: Dict):
         st.write(f"**Accès:** {dashboard_config['role_access']}")
         st.write(f"**Public:** {'✅ Oui' if dashboard_config['is_public'] else '❌ Non'}")
 
-    st.markdown("---")
 
-    # Actions dangereuses
+def _display_dashboard_actions(dashboard_config: Dict):
+    """Affiche les actions de gestion du dashboard"""
     st.subheader("⚠️ Actions Avancées")
 
     col1, col2 = st.columns(2)
@@ -743,28 +753,45 @@ def show_dashboard_management(dashboard_config: Dict):
             st.session_state.confirm_delete_dashboard = True
 
     # Confirmation de suppression
-    if st.session_state.get("confirm_delete_dashboard", False):
-        st.error("🚨 **Attention !** Cette action est irréversible.")
+    _handle_delete_confirmation(dashboard_config)
 
-        col1, col2, _ = st.columns(3)
 
-        with col1:
-            if st.button("✅ Confirmer la suppression", type="primary", key="confirm_delete_dashboard"):
-                if DashboardService.delete_dashboard(dashboard_config["id"]):
-                    st.success("✅ Dashboard supprimé avec succès")
-                    st.session_state.dashboard_mode = "view"
-                    if "edit_dashboard_id" in st.session_state:
-                        del st.session_state.edit_dashboard_id
-                    if "confirm_delete_dashboard" in st.session_state:
-                        del st.session_state.confirm_delete_dashboard
-                    st.rerun()
-                else:
-                    st.error("❌ Erreur lors de la suppression")
+def _handle_delete_confirmation(dashboard_config: Dict):
+    """Gère la confirmation de suppression du dashboard"""
+    if not st.session_state.get("confirm_delete_dashboard", False):
+        return
 
-        with col2:
-            if st.button(BUTTON_CANCEL, key="cancel_delete_dashboard"):
-                st.session_state.confirm_delete_dashboard = False
-                st.rerun()
+    st.error("🚨 **Attention !** Cette action est irréversible.")
+
+    col1, col2, _ = st.columns(3)
+
+    with col1:
+        if st.button("✅ Confirmer la suppression", type="primary", key="confirm_delete_dashboard"):
+            _execute_dashboard_deletion(dashboard_config)
+
+    with col2:
+        if st.button(BUTTON_CANCEL, key="cancel_delete_dashboard"):
+            st.session_state.confirm_delete_dashboard = False
+            st.rerun()
+
+
+def _execute_dashboard_deletion(dashboard_config: Dict):
+    """Exécute la suppression du dashboard"""
+    if DashboardService.delete_dashboard(dashboard_config["id"]):
+        st.success("✅ Dashboard supprimé avec succès")
+        _cleanup_dashboard_state()
+        st.rerun()
+    else:
+        st.error("❌ Erreur lors de la suppression")
+
+
+def _cleanup_dashboard_state():
+    """Nettoie l'état de session après suppression"""
+    st.session_state.dashboard_mode = "view"
+    if "edit_dashboard_id" in st.session_state:
+        del st.session_state.edit_dashboard_id
+    if "confirm_delete_dashboard" in st.session_state:
+        del st.session_state.confirm_delete_dashboard
 
 
 def render_dashboard_widgets(dashboard_config: Dict, period_months: int = 3):
