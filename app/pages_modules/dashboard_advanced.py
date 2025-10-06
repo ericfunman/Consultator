@@ -55,14 +55,28 @@ class AdvancedDashboardFeatures:
             if date_mode == "Prédéfini":
                 period = st.selectbox(
                     "Période",
-                    options=["7 jours", "1 mois", "3 mois", "6 mois", "12 mois", "2 ans"],
+                    options=[
+                        "7 jours",
+                        "1 mois",
+                        "3 mois",
+                        "6 mois",
+                        "12 mois",
+                        "2 ans",
+                    ],
                     index=2,
                     key=f"dashboard_period_selectbox_{context}",
                 )
                 filters["period_predefined"] = period
 
                 # Conversion en dates
-                period_map = {"7 jours": 7, "1 mois": 30, "3 mois": 90, "6 mois": 180, "12 mois": 365, "2 ans": 730}
+                period_map = {
+                    "7 jours": 7,
+                    "1 mois": 30,
+                    "3 mois": 90,
+                    "6 mois": 180,
+                    "12 mois": 365,
+                    "2 ans": 730,
+                }
 
                 end_date = datetime.now()
                 start_date = end_date - timedelta(days=period_map[period])
@@ -79,7 +93,10 @@ class AdvancedDashboardFeatures:
 
                 with col2:
                     end_date = st.date_input(
-                        "Au", value=datetime.now(), max_value=datetime.now(), key=f"dashboard_end_date_input_{context}"
+                        "Au",
+                        value=datetime.now(),
+                        max_value=datetime.now(),
+                        key=f"dashboard_end_date_input_{context}",
                     )
 
                 start_date = datetime.combine(start_date, datetime.min.time())
@@ -157,7 +174,9 @@ class AdvancedDashboardFeatures:
 
         return filters
 
-    def apply_filters_to_data(self, data: pd.DataFrame, filters: Dict[str, Any]) -> pd.DataFrame:
+    def apply_filters_to_data(
+        self, data: pd.DataFrame, filters: Dict[str, Any]
+    ) -> pd.DataFrame:
         """
         Applique les filtres aux données
         """
@@ -167,23 +186,30 @@ class AdvancedDashboardFeatures:
         if "start_date" in filters and "end_date" in filters:
             if "date" in filtered_data.columns:
                 filtered_data = filtered_data[
-                    (filtered_data["date"] >= filters["start_date"]) & (filtered_data["date"] <= filters["end_date"])
+                    (filtered_data["date"] >= filters["start_date"])
+                    & (filtered_data["date"] <= filters["end_date"])
                 ]
 
         # Filtres entités
         if "entities" in filters and filters["entities"]:
             if "entite" in filtered_data.columns:
-                filtered_data = filtered_data[filtered_data["entite"].isin(filters["entities"])]
+                filtered_data = filtered_data[
+                    filtered_data["entite"].isin(filters["entities"])
+                ]
 
         # Filtres practices
         if "practices" in filters and filters["practices"]:
             if "practice" in filtered_data.columns:
-                filtered_data = filtered_data[filtered_data["practice"].isin(filters["practices"])]
+                filtered_data = filtered_data[
+                    filtered_data["practice"].isin(filters["practices"])
+                ]
 
         # Filtres BM
         if "business_managers" in filters and filters["business_managers"]:
             if "business_manager" in filtered_data.columns:
-                filtered_data = filtered_data[filtered_data["business_manager"].isin(filters["business_managers"])]
+                filtered_data = filtered_data[
+                    filtered_data["business_manager"].isin(filters["business_managers"])
+                ]
 
         return filtered_data
 
@@ -193,7 +219,9 @@ class AdvancedDashboardFeatures:
         """
         st.sidebar.subheader("📤 Export")
 
-        export_format = st.sidebar.selectbox("Format d'export", options=["PDF", "Excel", "PNG", "PowerPoint"])
+        export_format = st.sidebar.selectbox(
+            "Format d'export", options=["PDF", "Excel", "PNG", "PowerPoint"]
+        )
 
         if st.sidebar.button("📥 Exporter le dashboard"):
             self._export_dashboard(dashboard_config, export_format)
@@ -232,7 +260,9 @@ class AdvancedDashboardFeatures:
         pdf_canvas.drawString(50, 800, f"Dashboard: {dashboard_config['nom']}")
 
         pdf_canvas.setFont("Helvetica", 12)
-        pdf_canvas.drawString(50, 780, f"Généré le: {datetime.now().strftime('%d/%m/%Y à %H:%M')}")
+        pdf_canvas.drawString(
+            50, 780, f"Généré le: {datetime.now().strftime('%d/%m/%Y à %H:%M')}"
+        )
 
         # Récupérer les données pour chaque widget
         y_position = 750
@@ -322,7 +352,11 @@ class AdvancedDashboardFeatures:
             return
 
         for alert in alerts:
-            alert_color = {"critical": "error", "warning": "warning", "info": "info"}.get(alert["severity"], "info")
+            alert_color = {
+                "critical": "error",
+                "warning": "warning",
+                "info": "info",
+            }.get(alert["severity"], "info")
 
             with st.sidebar.container():
                 if alert_color == "error":
@@ -357,7 +391,11 @@ class AdvancedDashboardFeatures:
         revenue_data = self.data_service.get_revenue_by_bm_data()
         revenue_threshold = filters.get("revenue_threshold", 500) * 1000
 
-        low_revenue_bms = [bm for bm in revenue_data.get("bm_revenues", []) if bm["ca_estime"] < revenue_threshold]
+        low_revenue_bms = [
+            bm
+            for bm in revenue_data.get("bm_revenues", [])
+            if bm["ca_estime"] < revenue_threshold
+        ]
 
         if low_revenue_bms:
             alerts.append(
@@ -396,9 +434,13 @@ class AdvancedDashboardFeatures:
                         st.write(insight["description"])
 
                         if insight.get("recommendation"):
-                            st.info(f"💡 **Recommandation:** {insight['recommendation']}")
+                            st.info(
+                                f"💡 **Recommandation:** {insight['recommendation']}"
+                            )
 
-    def _generate_ai_insights(self, _dashboard_config: Dict, filters: Dict[str, Any]) -> List[Dict]:
+    def _generate_ai_insights(
+        self, _dashboard_config: Dict, filters: Dict[str, Any]
+    ) -> List[Dict]:
         """
         Génère des insights IA (simulation)
         """
@@ -419,14 +461,24 @@ class AdvancedDashboardFeatures:
         # Analyse des revenus
         revenue_data = self.data_service.get_revenue_by_bm_data()
         bm_revenues = revenue_data.get("bm_revenues", [])
-        _avg_revenue = sum(bm["ca_estime"] for bm in bm_revenues) / len(bm_revenues) if bm_revenues else 0
+        _avg_revenue = (
+            sum(bm["ca_estime"] for bm in bm_revenues) / len(bm_revenues)
+            if bm_revenues
+            else 0
+        )
 
-        top_performer = max(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
-        bottom_performer = min(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
+        top_performer = (
+            max(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
+        )
+        bottom_performer = (
+            min(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
+        )
 
         if top_performer and bottom_performer:
             ratio = (
-                top_performer["ca_estime"] / bottom_performer["ca_estime"] if bottom_performer["ca_estime"] > 0 else 0
+                top_performer["ca_estime"] / bottom_performer["ca_estime"]
+                if bottom_performer["ca_estime"] > 0
+                else 0
             )
 
             if ratio > 3:
@@ -484,7 +536,11 @@ class AdvancedDashboardFeatures:
             st.dataframe(
                 comparison_data,
                 use_container_width=True,
-                column_config={"evolution": st.column_config.NumberColumn("Évolution", format="%.1f%%")},
+                column_config={
+                    "evolution": st.column_config.NumberColumn(
+                        "Évolution", format="%.1f%%"
+                    )
+                },
             )
 
     def show_forecasting(self):
@@ -499,7 +555,13 @@ class AdvancedDashboardFeatures:
             key="dashboard_forecast_type_selectbox",
         )
 
-        forecast_period = st.slider("Horizon de prévision (mois)", 1, 12, 3, key="dashboard_forecast_period_slider")
+        forecast_period = st.slider(
+            "Horizon de prévision (mois)",
+            1,
+            12,
+            3,
+            key="dashboard_forecast_period_slider",
+        )
 
         if st.button("📊 Générer la prévision"):
             forecast_data = self._generate_forecast(forecast_type, forecast_period)
@@ -532,8 +594,10 @@ class AdvancedDashboardFeatures:
             # Zone de confiance
             fig.add_trace(
                 go.Scatter(
-                    x=forecast_data["forecast"]["dates"] + forecast_data["forecast"]["dates"][::-1],
-                    y=forecast_data["forecast"]["upper"] + forecast_data["forecast"]["lower"][::-1],
+                    x=forecast_data["forecast"]["dates"]
+                    + forecast_data["forecast"]["dates"][::-1],
+                    y=forecast_data["forecast"]["upper"]
+                    + forecast_data["forecast"]["lower"][::-1],
                     fill="tonexty",
                     fillcolor="rgba(255,0,0,0.2)",
                     line={"color": "rgba(255,255,255,0)"},
@@ -542,13 +606,18 @@ class AdvancedDashboardFeatures:
             )
 
             fig.update_layout(
-                title=f"Prévision: {forecast_type}", xaxis_title="Date", yaxis_title=forecast_type, height=400
+                title=f"Prévision: {forecast_type}",
+                xaxis_title="Date",
+                yaxis_title=forecast_type,
+                height=400,
             )
 
             st.plotly_chart(fig, use_container_width=True)
 
             # Résumé de la prévision
-            st.info(f"📊 **Prévision à {forecast_period} mois:** {forecast_data['summary']}")
+            st.info(
+                f"📊 **Prévision à {forecast_period} mois:** {forecast_data['summary']}"
+            )
 
     # Méthodes utilitaires pour récupérer les données
 
@@ -566,7 +635,12 @@ class AdvancedDashboardFeatures:
         try:
             with get_database_session() as _session:
                 # Adapter selon votre modèle
-                practices = ["Data & Analytics", "Cloud & DevOps", "Cybersécurité", "Digital"]
+                practices = [
+                    "Data & Analytics",
+                    "Cloud & DevOps",
+                    "Cybersécurité",
+                    "Digital",
+                ]
                 return practices
         except Exception:
             return []
@@ -582,7 +656,10 @@ class AdvancedDashboardFeatures:
 
     def _get_widget_export_data(self, _widget: Dict) -> Dict:
         """Récupère les données d'export pour un widget"""
-        return {"title": _widget["widget_type"], "summary": ["Données du widget...", "Ligne 2", "Ligne 3"]}
+        return {
+            "title": _widget["widget_type"],
+            "summary": ["Données du widget...", "Ligne 2", "Ligne 3"],
+        }
 
     def _get_widget_detailed_data(self, _widget: Dict) -> Optional[pd.DataFrame]:
         """Récupère les données détaillées pour export Excel"""
@@ -591,8 +668,14 @@ class AdvancedDashboardFeatures:
     def _get_dashboard_summary_data(self, _dashboard_config: Dict) -> List[Dict]:
         """Récupère les données de sommaire du dashboard"""
         return [
-            {"Métrique": "Nombre de widgets", "Valeur": len(_dashboard_config.get("widgets", []))},
-            {"Métrique": "Date de création", "Valeur": _dashboard_config.get("date_creation", "N/A")},
+            {
+                "Métrique": "Nombre de widgets",
+                "Valeur": len(_dashboard_config.get("widgets", [])),
+            },
+            {
+                "Métrique": "Date de création",
+                "Valeur": _dashboard_config.get("date_creation", "N/A"),
+            },
         ]
 
     def _check_recent_mission_activity(self) -> Dict:
@@ -626,11 +709,21 @@ class AdvancedDashboardFeatures:
         import random
 
         # Données historiques simulées
-        historical_dates = [datetime.now() - timedelta(days=30 * i) for i in range(12, 0, -1)]
+        historical_dates = [
+            datetime.now() - timedelta(days=30 * i) for i in range(12, 0, -1)
+        ]
+        # nosemgrep: python.lang.security.audit.non-cryptographic-random-used
+        # Safe: random is only used here for generating demo/mock data for visualization purposes
+        # No security decisions, authentication, or cryptographic operations depend on these values
         historical_values = [random.randint(50, 100) for _ in range(12)]
 
         # Prévisions simulées
-        forecast_dates = [datetime.now() + timedelta(days=30 * i) for i in range(1, period_months + 1)]
+        forecast_dates = [
+            datetime.now() + timedelta(days=30 * i) for i in range(1, period_months + 1)
+        ]
+        # nosemgrep: python.lang.security.audit.non-cryptographic-random-used
+        # Safe: random is only used here for generating demo/mock data for visualization purposes
+        # No security decisions, authentication, or cryptographic operations depend on these values
         forecast_values = [random.randint(45, 95) for _ in range(period_months)]
 
         return {
