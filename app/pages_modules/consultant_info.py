@@ -33,6 +33,9 @@ COEFF_CJM = 1.8
 COEFF_TJM = 1.5
 JOURS_TRAVAIL_ANNUEL = 216
 
+# Constantes pour l'affichage des dates
+DATE_FORMAT = "%d/%m/%Y"
+
 # Ajouter les chemins nécessaires
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.dirname(current_dir)
@@ -190,7 +193,6 @@ def _display_notes_section(consultant) -> None:
 
 
 # Constantes pour l'affichage des missions VSA
-DATE_FORMAT = "%d/%m/%Y"
 COL_CODE = "Code"
 COL_ORDERID = "N° Commande"
 COL_CLIENT = "Client"

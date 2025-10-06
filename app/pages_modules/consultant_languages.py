@@ -46,6 +46,12 @@ LANGUE_INTROUVABLE_ERROR = "❌ Langue introuvable"
 ECART_LABEL = "Écart"
 
 
+def get_niveau_label(niveau: int) -> str:
+    """Retourne le label du niveau de langue"""
+    niveaux = {1: "Débutant", 2: "Intermédiaire", 3: "Avancé", 4: "Courant", 5: "Langue maternelle"}
+    return niveaux.get(niveau, f"Niveau {niveau}")
+
+
 def _get_consultant_languages_data(consultant_id: int):
     """Récupère les données des langues du consultant depuis la base de données."""
     with get_database_session() as session:

@@ -252,6 +252,7 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_show_main_page(self):
         """Test de show (page principale)"""
+
         def mock_columns_func(spec):
             """Mock pour st.columns qui retourne le bon nombre de colonnes"""
             if isinstance(spec, int):
@@ -287,13 +288,11 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
             return tuple(mock_tabs)
 
         with patch("app.pages_modules.business_managers.st.title"), patch(
-            "app.pages_modules.business_managers.st.tabs",
-            side_effect=mock_tabs_func
+            "app.pages_modules.business_managers.st.tabs", side_effect=mock_tabs_func
         ), patch("app.pages_modules.business_managers.st.selectbox") as mock_select, patch(
             "app.pages_modules.business_managers.st.form"
         ) as mock_form, patch(
-            "app.pages_modules.business_managers.st.columns",
-            side_effect=mock_columns_func
+            "app.pages_modules.business_managers.st.columns", side_effect=mock_columns_func
         ), patch(
             "app.pages_modules.business_managers.st.text_input"
         ) as mock_text_input, patch(

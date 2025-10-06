@@ -53,6 +53,12 @@ EMOJI_CERTIFIE = "✅"
 EMOJI_NON_CERTIFIE = "❌"
 
 
+def get_niveau_label(niveau: int) -> str:
+    """Retourne le label du niveau de compétence"""
+    niveaux = {1: "Débutant", 2: "Intermédiaire", 3: "Avancé", 4: "Expert", 5: "Maître"}
+    return niveaux.get(niveau, f"Niveau {niveau}")
+
+
 def _load_consultant_competences(consultant_id):
     """Charge les compétences d'un consultant."""
     with get_database_session() as session:
@@ -205,13 +211,6 @@ def show_consultant_skills(consultant):
     except Exception as e:
         st.error(f"{MSG_ERREUR_AFFICHAGE_COMPETENCES} {e}")
         st.code(str(e))
-
-
-def get_niveau_label(niveau: int) -> str:
-    """Retourne le label du niveau de compétence"""
-
-    niveaux = {1: "Débutant", 2: "Intermédiaire", 3: "Avancé", 4: "Expert", 5: "Maître"}
-    return niveaux.get(niveau, f"Niveau {niveau}")
 
 
 def show_skills_statistics(consultant_competences):

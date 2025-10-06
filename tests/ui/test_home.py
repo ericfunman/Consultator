@@ -117,7 +117,7 @@ class TestHomeModule(unittest.TestCase):
             "missions": 120,
             "practices": 8,
             "competences": 25,
-            "exists": True
+            "exists": True,
         }
 
         from database.database import get_database_info

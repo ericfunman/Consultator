@@ -1324,7 +1324,7 @@ class ChatbotService:
         articles = ["le ", "la ", "les ", "du ", "de ", "des ", "en ", "un ", "une "]
         for article in articles:
             if competence.startswith(article):
-                return competence[len(article):]
+                return competence[len(article) :]
         return competence
 
     def _remove_suffixes(self, competence: str) -> str:
@@ -1332,7 +1332,7 @@ class ChatbotService:
         suffixes = [" compétence", " compétences", " skill", " skills"]
         for suffix in suffixes:
             if competence.endswith(suffix):
-                return competence[:-len(suffix)]
+                return competence[: -len(suffix)]
         return competence
 
     def _handle_specific_skill_search(self, competence: str, type_competence: Optional[str]) -> Dict[str, Any]:
