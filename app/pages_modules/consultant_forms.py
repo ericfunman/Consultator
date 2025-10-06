@@ -515,3 +515,41 @@ def _handle_cancel_action(cancel):
     """Gère l'action d'annulation."""
     if cancel:
         st.info("ℹ️ Modification annulée")
+
+
+# Alias pour compatibilité avec les tests
+def create_consultant_form():
+    """Alias de show_add_consultant_form pour les tests"""
+    return show_add_consultant_form()
+
+
+def update_consultant_form(consultant_id: int):
+    """Alias de show_edit_consultant_form pour les tests"""
+    return show_edit_consultant_form(consultant_id)
+
+
+def validate_form_data(data: Dict[str, Any]) -> bool:
+    """
+    Valide les données d'un formulaire consultant
+    
+    Args:
+        data: Dictionnaire contenant les données du formulaire
+        
+    Returns:
+        bool: True si les données sont valides
+    """
+    required_fields = ["prenom", "nom", "email", "practice_id"]
+    
+    # Vérifier les champs requis
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return False
+    
+    # Valider l'email
+    import re
+    email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    if not re.match(email_pattern, str(data["email"])):
+        return False
+    
+    return True
+

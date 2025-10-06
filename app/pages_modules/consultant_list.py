@@ -492,3 +492,17 @@ def generate_consultants_report(df: pd.DataFrame):
 
     except Exception as e:
         st.error(f"{MSG_ERREUR_RAPPORT}: {e}")
+
+
+def show_consultants_list_table(consultants=None, filters=None):
+    """
+    Affiche la liste des consultants sous forme de tableau
+    Alias de show_consultants_list pour compatibilité avec les tests
+    
+    Args:
+        consultants: Liste de consultants (optionnel, rechargé si None)
+        filters: Filtres à appliquer (optionnel)
+    """
+    # Appeler la fonction principale
+    show_consultants_list()
+

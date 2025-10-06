@@ -39,6 +39,7 @@ try:
     from services.ai_openai_service import is_grok_available
     from services.consultant_service import ConsultantService
     from services.document_analyzer import DocumentAnalyzer
+    from services.document_service import DocumentService
 
     imports_ok = True
 except ImportError:

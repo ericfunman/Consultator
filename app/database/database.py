@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import pool
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session  # Export pour les tests
 
 from .models import CV
 from .models import Base

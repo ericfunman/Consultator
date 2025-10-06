@@ -372,6 +372,7 @@ class DocumentService:
                         stat = file_path.stat()
                         documents.append(
                             {
+                                "id": hash(str(file_path)),  # ID basé sur le chemin
                                 "filename": file_path.name,
                                 "path": str(file_path),
                                 "size": stat.st_size,
@@ -387,6 +388,40 @@ class DocumentService:
         except (OSError, IOError) as e:
             st.error(f"Erreur lors de la récupération des documents: {e}")
             return []
+
+    @classmethod
+    def get_document_by_id(cls, document_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Récupère un document par son ID (hash du chemin)
+
+        Args:
+            document_id: ID du document (hash)
+
+        Returns:
+            Dict avec les informations du document ou None
+        """
+        try:
+            # Parcourir tous les répertoires de consultants
+            for consultant_dir in cls.UPLOAD_DIR.iterdir():
+                if consultant_dir.is_dir() and consultant_dir.name.startswith("consultant_"):
+                    for file_path in consultant_dir.iterdir():
+                        if file_path.is_file() and hash(str(file_path)) == document_id:
+                            stat = file_path.stat()
+                            return {
+                                "id": document_id,
+                                "filename": file_path.name,
+                                "path": str(file_path),
+                                "size": stat.st_size,
+                                "size_mb": round(stat.st_size / (1024 * 1024), 2),
+                                "modified": datetime.fromtimestamp(stat.st_mtime),
+                                "extension": cls.get_file_extension(file_path.name),
+                                "type": cls.get_file_type_name(file_path.name),
+                            }
+            return None
+
+        except (OSError, IOError) as e:
+            st.error(f"Erreur lors de la récupération du document: {e}")
+            return None
 
     @classmethod
     def get_file_type_name(cls, filename: str) -> str:

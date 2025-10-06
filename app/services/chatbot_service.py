@@ -17,6 +17,12 @@ from sqlalchemy.orm import joinedload
 from database.database import get_database_session
 from database.models import Competence, Consultant, ConsultantCompetence, ConsultantLangue, Langue, Mission, Practice
 
+# Import du service OpenAI pour les tests
+try:
+    from services.ai_openai_service import OpenAIChatGPTService
+except ImportError:
+    OpenAIChatGPTService = None
+
 # Import de la fonction de calcul de disponibilité
 try:
     from pages_modules.consultant_info import _calculate_availability_status

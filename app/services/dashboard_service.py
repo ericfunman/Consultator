@@ -248,6 +248,51 @@ class DashboardService:
             return []
 
     @staticmethod
+    def update_dashboard(
+        dashboard_id: int,
+        nom: Optional[str] = None,
+        description: Optional[str] = None,
+        role_access: Optional[str] = None,
+        is_public: Optional[bool] = None
+    ) -> bool:
+        """
+        Met à jour les informations d'un dashboard
+
+        Args:
+            dashboard_id: ID du dashboard
+            nom: Nouveau nom (optionnel)
+            description: Nouvelle description (optionnel)
+            role_access: Nouveau rôle d'accès (optionnel)
+            is_public: Nouvelle valeur public (optionnel)
+
+        Returns:
+            bool: True si mis à jour avec succès
+        """
+        try:
+            with get_database_session() as session:
+                dashboard = (
+                    session.query(DashboardConfiguration).filter(DashboardConfiguration.id == dashboard_id).first()
+                )
+
+                if dashboard:
+                    if nom is not None:
+                        dashboard.nom = nom
+                    if description is not None:
+                        dashboard.description = description
+                    if role_access is not None:
+                        dashboard.role_access = role_access
+                    if is_public is not None:
+                        dashboard.is_public = is_public
+                    dashboard.derniere_maj = datetime.now()
+                    session.commit()
+                    return True
+                return False
+
+        except Exception as e:
+            print(f"Erreur lors de la mise à jour du dashboard: {e}")
+            return False
+
+    @staticmethod
     def delete_dashboard(dashboard_id: int) -> bool:
         """
         Supprime un dashboard et tous ses widgets

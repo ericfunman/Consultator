@@ -606,3 +606,15 @@ def show_skills_evolution(consultant_id: int):
 
     except Exception as e:
         st.error(f"❌ Erreur lors de l'analyse de l'évolution: {e}")
+
+
+def show_skills_management(consultant):
+    """
+    Affiche l'interface de gestion des compétences d'un consultant
+    Alias de show_consultant_skills pour compatibilité avec les tests
+    
+    Args:
+        consultant: Objet Consultant
+    """
+    show_consultant_skills(consultant)
+

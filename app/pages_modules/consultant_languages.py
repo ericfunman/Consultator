@@ -862,3 +862,40 @@ def show_languages_comparison(consultant_id: int):
 
     except Exception as e:
         st.error(f"❌ Erreur lors de la comparaison: {e}")
+
+
+def get_consultant_languages(consultant_id: int):
+    """
+    Récupère toutes les langues d'un consultant
+    
+    Args:
+        consultant_id: ID du consultant
+        
+    Returns:
+        List: Liste des langues avec leurs niveaux
+    """
+    try:
+        with get_database_session() as session:
+            consultant_langues = (
+                session.query(ConsultantLangue)
+                .join(Langue)
+                .filter(ConsultantLangue.consultant_id == consultant_id)
+                .all()
+            )
+            
+            return [
+                {
+                    "id": cl.id,
+                    "langue": cl.langue.nom if cl.langue else "N/A",
+                    "niveau": cl.niveau,
+                    "niveau_ecrit": cl.niveau_ecrit,
+                    "niveau_parle": cl.niveau_parle,
+                    "certification": cl.certification,
+                    "langue_maternelle": cl.langue_maternelle
+                }
+                for cl in consultant_langues
+            ]
+    except Exception as e:
+        print(f"Erreur récupération langues: {e}")
+        return []
+

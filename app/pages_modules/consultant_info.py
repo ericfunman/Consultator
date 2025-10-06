@@ -363,6 +363,26 @@ def _handle_conditional_displays(consultant) -> None:
         show_detailed_salary_history(consultant.id)
 
 
+def show_personal_info(consultant):
+    """
+    Affiche les informations personnelles du consultant (alias de show_consultant_info)
+    
+    Args:
+        consultant: Objet Consultant à afficher
+    """
+    show_consultant_info(consultant)
+
+
+def edit_personal_info(consultant):
+    """
+    Affiche le formulaire d'édition des informations personnelles
+    
+    Args:
+        consultant: Objet Consultant à éditer
+    """
+    show_edit_info_form(consultant)
+
+
 def show_consultant_info(consultant):
     """Affiche les informations personnelles du consultant"""
 

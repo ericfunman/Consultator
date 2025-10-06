@@ -1284,3 +1284,94 @@ def show_missions_revenues(missions):
 
     else:
         st.info("ℹ️ Aucune donnée de revenus disponible")
+
+
+def calculate_mission_revenue(mission) -> float:
+    """
+    Calcule le revenu généré par une mission
+    
+    Args:
+        mission: Objet Mission
+        
+    Returns:
+        float: Revenu total estimé de la mission
+    """
+    if not mission or not mission.tjm:
+        return 0.0
+    
+    try:
+        # Calculer la durée en jours ouvrés
+        if mission.date_debut and mission.date_fin:
+            from datetime import timedelta
+            delta = mission.date_fin - mission.date_debut
+            total_days = delta.days
+            
+            # Approximation: 5 jours travaillés par semaine (environ 71% des jours)
+            working_days = total_days * 5 / 7
+            
+            return float(mission.tjm) * working_days
+        
+        # Si pas de date de fin, estimer sur 30 jours
+        return float(mission.tjm) * 30.0
+        
+    except Exception as e:
+        print(f"Erreur calcul revenu mission: {e}")
+        return 0.0
+
+
+def show_missions_list(missions):
+    """
+    Affiche la liste des missions sous forme de tableau
+    
+    Args:
+        missions: Liste d'objets Mission
+    """
+    if not missions:
+        st.info("ℹ️ Aucune mission à afficher")
+        return
+    
+    try:
+        import pandas as pd
+        from datetime import datetime
+        
+        # Préparer les données pour le dataframe
+        missions_data = []
+        for mission in missions:
+            date_debut_str = mission.date_debut.strftime("%d/%m/%Y") if mission.date_debut else "N/A"
+            date_fin_str = mission.date_fin.strftime("%d/%m/%Y") if mission.date_fin else "En cours"
+            
+            # Statut avec emoji
+            status_icons = {
+                "en_cours": "🔴",
+                "termine": "✅",
+                "planifie": "📅"
+            }
+            statut_display = f"{status_icons.get(mission.statut, '⚪')} {mission.statut.replace('_', ' ').title()}"
+            
+            missions_data.append({
+                "Client": mission.client or "N/A",
+                "Poste": mission.poste or "N/A",
+                "Début": date_debut_str,
+                "Fin": date_fin_str,
+                "TJM": f"{mission.tjm:,}€" if mission.tjm else "N/A",
+                "Statut": statut_display,
+                "Revenu estimé": f"{calculate_mission_revenue(mission):,.0f}€"
+            })
+        
+        df = pd.DataFrame(missions_data)
+        st.dataframe(df, use_container_width=True, hide_index=True)
+        
+        # Statistiques globales
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total missions", len(missions))
+        with col2:
+            missions_actives = sum(1 for m in missions if m.statut == "en_cours")
+            st.metric("En cours", missions_actives)
+        with col3:
+            revenu_total = sum(calculate_mission_revenue(m) for m in missions)
+            st.metric("Revenu total", f"{revenu_total:,.0f}€")
+            
+    except Exception as e:
+        st.error(f"❌ Erreur lors de l'affichage des missions: {e}")
+

@@ -11,6 +11,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime, date
 
 from app.services.dashboard_service import DashboardDataService
+from app.services.consultant_service import ConsultantService
 
 
 class WidgetFactory:
