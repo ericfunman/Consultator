@@ -3,6 +3,8 @@ from datetime import datetime
 import streamlit as st
 
 from services.document_service import DocumentService
+# Export pour les tests
+from database.database import get_database_session
 
 
 def show_consultant_documents(consultant):

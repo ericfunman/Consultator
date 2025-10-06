@@ -39,6 +39,11 @@ class TechnologyService:
             return ref_technologies
 
     @staticmethod
+    def get_all_technologies() -> List[str]:
+        """Alias de get_all_available_technologies pour compatibilité avec les tests"""
+        return TechnologyService.get_all_available_technologies()
+
+    @staticmethod
     def add_custom_technology(name: str, category: str = "Personnalisées") -> bool:
         """Ajoute une technologie personnalisée en base de données"""
         try:

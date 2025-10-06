@@ -4092,3 +4092,80 @@ def show_consultant_missions_tab(consultant):
 def show_consultant_documents_tab(consultant):
     """Fonction wrapper pour show_consultant_documents - Compatible avec consultant_profile.py"""
     show_consultant_documents(consultant)
+
+
+# Fonctions privées pour compatibilité avec les tests
+def _render_availability_field():
+    """Affiche le champ de disponibilité"""
+    return st.checkbox("Disponible", value=True, help="Cochez si le consultant est disponible")
+
+
+def _render_practice_field(practices):
+    """Affiche le champ de sélection de practice"""
+    if not practices:
+        st.warning("⚠️ Aucune practice disponible")
+        return None
+    
+    practice_options = {p.id: p.nom for p in practices}
+    return st.selectbox(
+        "Practice *",
+        options=list(practice_options.keys()),
+        format_func=lambda x: practice_options[x],
+        help="Sélectionnez la practice du consultant"
+    )
+
+
+def _render_manager_field(managers):
+    """Affiche le champ de sélection de manager"""
+    if not managers:
+        return None
+    
+    manager_options = {m.id: f"{m.prenom} {m.nom}" for m in managers}
+    return st.selectbox(
+        "Business Manager",
+        options=[None] + list(manager_options.keys()),
+        format_func=lambda x: "Non assigné" if x is None else manager_options[x],
+        help="Sélectionnez le Business Manager"
+    )
+
+
+def _validate_consultant_data(data):
+    """Valide les données d'un consultant"""
+    required_fields = ["prenom", "nom", "email", "practice_id"]
+    
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return False
+    
+    # Validation email
+    import re
+    email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    if not re.match(email_pattern, str(data["email"])):
+        return False
+    
+    return True
+
+
+def _calculate_experience_years(date_debut):
+    """Calcule le nombre d'années d'expérience depuis une date"""
+    if not date_debut:
+        return 0
+    
+    from datetime import datetime
+    today = datetime.now().date()
+    
+    if isinstance(date_debut, str):
+        from dateutil import parser
+        date_debut = parser.parse(date_debut).date()
+    
+    years = (today - date_debut).days / 365.25
+    return round(years, 1)
+
+
+def _format_consultant_display_name(consultant):
+    """Formate le nom d'affichage d'un consultant"""
+    if not consultant:
+        return "N/A"
+    
+    return f"{consultant.prenom} {consultant.nom}"
+

@@ -556,4 +556,38 @@ __all__ = [
     "LoadingSpinner",
     "NotificationManager",
     "create_enhanced_consultants_view",
+    "create_metric_card",
+    "create_info_card",
+    "display_consultant_card",
 ]
+
+
+# Fonctions pour compatibilité avec les tests
+def create_metric_card(label: str, value, delta=None, delta_color="normal"):
+    """Crée une carte de métrique"""
+    st.metric(label=label, value=value, delta=delta, delta_color=delta_color)
+
+
+def create_info_card(title: str, content: str, icon="ℹ️"):
+    """Crée une carte d'information"""
+    st.markdown(f"### {icon} {title}")
+    st.info(content)
+
+
+def display_consultant_card(consultant):
+    """Affiche une carte consultant"""
+    if not consultant:
+        st.warning("⚠️ Aucun consultant fourni")
+        return
+    
+    st.markdown(f"### 👤 {consultant.prenom} {consultant.nom}")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write(f"**Email:** {consultant.email}")
+        st.write(f"**Téléphone:** {consultant.telephone or 'N/A'}")
+    
+    with col2:
+        st.write(f"**Practice:** {consultant.practice.nom if consultant.practice else 'N/A'}")
+        st.write(f"**Statut:** {'✅ Actif' if consultant.actif else '❌ Inactif'}")
+

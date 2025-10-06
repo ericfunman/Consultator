@@ -960,3 +960,25 @@ def _handle_rename_form(document):
     """Gère l'affichage du formulaire de renommage si activé."""
     if "rename_document" in st.session_state and st.session_state.rename_document == document.id:
         show_rename_document_form(document.id)
+
+
+# Fonctions pour compatibilité avec les tests
+def show():
+    """Point d'entrée principal pour la page documents (alias)"""
+    # Cette fonction nécessiterait un consultant_id en session
+    if "selected_consultant" in st.session_state:
+        consultant = st.session_state.selected_consultant
+        return show_consultant_documents(consultant)
+    else:
+        st.warning("⚠️ Aucun consultant sélectionné")
+
+
+def _create_cv_upload_form(consultant_id: int):
+    """Crée le formulaire d'upload de CV"""
+    return show_upload_document_form(consultant_id)
+
+
+def _display_document_not_found():
+    """Affiche un message quand le document n'est pas trouvé"""
+    st.error(ERROR_DOCUMENT_NOT_FOUND)
+
