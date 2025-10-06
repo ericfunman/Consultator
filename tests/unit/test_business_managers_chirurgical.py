@@ -23,6 +23,26 @@ class MockSessionState(dict):
 class TestBusinessManagersChirurgical(unittest.TestCase):
     """Tests chirurgicaux pour le module business_managers - Partie 1 SIMPLIFIÉE"""
 
+    def create_mock_columns(self, spec):
+        """Crée un mock pour st.columns qui retourne le bon nombre de colonnes"""
+        if isinstance(spec, int):
+            # st.columns(n) retourne n colonnes
+            num_cols = spec
+        elif isinstance(spec, list):
+            # st.columns([x, y, z]) retourne len(list) colonnes
+            num_cols = len(spec)
+        else:
+            num_cols = 2  # Default
+
+        mock_cols = []
+        for _ in range(num_cols):
+            mock_col = Mock()
+            mock_col.__enter__ = Mock(return_value=mock_col)
+            mock_col.__exit__ = Mock(return_value=None)
+            mock_cols.append(mock_col)
+
+        return tuple(mock_cols)
+
     def test_validate_and_convert_bm_id_string(self):
         """Test de _validate_and_convert_bm_id avec string valide"""
         with patch("streamlit.error"):
@@ -232,13 +252,49 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
 
     def test_show_main_page(self):
         """Test de show (page principale)"""
+        def mock_columns_func(spec):
+            """Mock pour st.columns qui retourne le bon nombre de colonnes"""
+            if isinstance(spec, int):
+                num_cols = spec
+            elif isinstance(spec, list):
+                num_cols = len(spec)
+            else:
+                num_cols = 2
+
+            mock_cols = []
+            for _ in range(num_cols):
+                mock_col = Mock()
+                mock_col.__enter__ = Mock(return_value=mock_col)
+                mock_col.__exit__ = Mock(return_value=None)
+                mock_cols.append(mock_col)
+
+            return tuple(mock_cols)
+
+        def mock_tabs_func(tab_list):
+            """Mock pour st.tabs qui retourne le bon nombre de tabs"""
+            if isinstance(tab_list, list):
+                num_tabs = len(tab_list)
+            else:
+                num_tabs = 4
+
+            mock_tabs = []
+            for _ in range(num_tabs):
+                mock_tab = Mock()
+                mock_tab.__enter__ = Mock(return_value=mock_tab)
+                mock_tab.__exit__ = Mock(return_value=None)
+                mock_tabs.append(mock_tab)
+
+            return tuple(mock_tabs)
+
         with patch("app.pages_modules.business_managers.st.title"), patch(
-            "app.pages_modules.business_managers.st.tabs"
-        ) as mock_tabs, patch("app.pages_modules.business_managers.st.selectbox") as mock_select, patch(
+            "app.pages_modules.business_managers.st.tabs",
+            side_effect=mock_tabs_func
+        ), patch("app.pages_modules.business_managers.st.selectbox") as mock_select, patch(
             "app.pages_modules.business_managers.st.form"
         ) as mock_form, patch(
-            "app.pages_modules.business_managers.st.columns"
-        ) as mock_columns, patch(
+            "app.pages_modules.business_managers.st.columns",
+            side_effect=mock_columns_func
+        ), patch(
             "app.pages_modules.business_managers.st.text_input"
         ) as mock_text_input, patch(
             "app.pages_modules.business_managers.st.checkbox"
@@ -252,17 +308,7 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
             "app.pages_modules.business_managers.st.session_state", MockSessionState()
         ):
 
-            # Mock pour st.tabs() qui retourne des objets context manager
-            mock_tab1 = Mock()
-            mock_tab1.__enter__ = Mock(return_value=mock_tab1)
-            mock_tab1.__exit__ = Mock(return_value=None)
-            mock_tab2 = Mock()
-            mock_tab2.__enter__ = Mock(return_value=mock_tab2)
-            mock_tab2.__exit__ = Mock(return_value=None)
-            mock_tab3 = Mock()
-            mock_tab3.__enter__ = Mock(return_value=mock_tab3)
-            mock_tab3.__exit__ = Mock(return_value=None)
-            mock_tabs.return_value = (mock_tab1, mock_tab2, mock_tab3)
+            # Mock pour st.tabs() géré dynamiquement par mock_tabs_func
 
             # Mock pour st.form() qui retourne un context manager
             mock_form_cm = Mock()
@@ -270,17 +316,10 @@ class TestBusinessManagersChirurgical(unittest.TestCase):
             mock_form_cm.__exit__ = Mock(return_value=None)
             mock_form.return_value = mock_form_cm
 
-            # Mock pour st.columns() qui retourne un tuple d'objets context manager
-            mock_col1 = Mock()
-            mock_col1.__enter__ = Mock(return_value=mock_col1)
-            mock_col1.__exit__ = Mock(return_value=None)
-            mock_col2 = Mock()
-            mock_col2.__enter__ = Mock(return_value=mock_col2)
-            mock_col2.__exit__ = Mock(return_value=None)
-            mock_columns.return_value = (mock_col1, mock_col2)
+            # Mock pour st.columns() géré dynamiquement par mock_columns_func
 
             # Mock pour les inputs qui retournent des valeurs
-            mock_text_input.side_effect = ["Dupont", "john.dupont@company.com", "Jean", "0123456789", "Notes"]
+            mock_text_input.return_value = "Test Input"
             mock_checkbox.return_value = True
             mock_text_area.return_value = "Notes"
             mock_submit_button.return_value = False  # Ne pas soumettre le formulaire
