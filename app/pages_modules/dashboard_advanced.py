@@ -667,21 +667,25 @@ class AdvancedDashboardFeatures:
     def _generate_forecast(self, _forecast_type: str, period_months: int) -> Dict:
         """Génère des prévisions (simulation)"""
         from datetime import datetime, timedelta
-        import random  # noqa: S404
+        import random  # noqa: S2245  # Non-cryptographic use for demo data only
 
         # Données historiques simulées
         historical_dates = [datetime.now() - timedelta(days=30 * i) for i in range(12, 0, -1)]
         # nosemgrep: python.lang.security.audit.non-cryptographic-random-used
         # Safe: random is only used here for generating demo/mock data for visualization purposes
         # No security decisions, authentication, or cryptographic operations depend on these values
-        historical_values = [random.randint(50, 100) for _ in range(12)]  # noqa: S311
+        historical_values = [
+            random.randint(50, 100) for _ in range(12)
+        ]  # noqa: S2245  # Non-cryptographic use for demo data only
 
         # Prévisions simulées
         forecast_dates = [datetime.now() + timedelta(days=30 * i) for i in range(1, period_months + 1)]
         # nosemgrep: python.lang.security.audit.non-cryptographic-random-used
         # Safe: random is only used here for generating demo/mock data for visualization purposes
         # No security decisions, authentication, or cryptographic operations depend on these values
-        forecast_values = [random.randint(45, 95) for _ in range(period_months)]  # noqa: S311
+        forecast_values = [
+            random.randint(45, 95) for _ in range(period_months)
+        ]  # noqa: S2245  # Non-cryptographic use for demo data only
 
         return {
             "historical": {"dates": historical_dates, "values": historical_values},
