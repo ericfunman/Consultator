@@ -246,19 +246,22 @@ class TestBusinessManagersCoverage(unittest.TestCase):
     @patch("app.pages_modules.business_managers.show_business_managers_list")
     @patch("app.pages_modules.business_managers.show_add_business_manager")
     @patch("app.pages_modules.business_managers.show_statistics")
+    @patch("app.pages_modules.business_managers.show_dashboard_page")
     def test_show_main_function_no_profile_view(
-        self, mock_show_stats, mock_show_add, mock_show_list, mock_tabs, mock_title
+        self, mock_show_dashboard, mock_show_stats, mock_show_add, mock_show_list, mock_tabs, mock_title
     ):
         """Test de la fonction show sans vue profil"""
-        # Setup
-        mock_tab1, mock_tab2, mock_tab3 = MagicMock(), MagicMock(), MagicMock()
+        # Setup - 4 onglets au lieu de 3
+        mock_tab1, mock_tab2, mock_tab3, mock_tab4 = MagicMock(), MagicMock(), MagicMock(), MagicMock()
         mock_tab1.__enter__ = MagicMock(return_value=mock_tab1)
         mock_tab1.__exit__ = MagicMock(return_value=None)
         mock_tab2.__enter__ = MagicMock(return_value=mock_tab2)
         mock_tab2.__exit__ = MagicMock(return_value=None)
         mock_tab3.__enter__ = MagicMock(return_value=mock_tab3)
         mock_tab3.__exit__ = MagicMock(return_value=None)
-        mock_tabs.return_value = [mock_tab1, mock_tab2, mock_tab3]
+        mock_tab4.__enter__ = MagicMock(return_value=mock_tab4)
+        mock_tab4.__exit__ = MagicMock(return_value=None)
+        mock_tabs.return_value = [mock_tab1, mock_tab2, mock_tab3, mock_tab4]
 
         # Mock session state sans view_bm_profile
         mock_session_state = MockSessionState({})
@@ -273,6 +276,7 @@ class TestBusinessManagersCoverage(unittest.TestCase):
             mock_show_list.assert_called_once()
             mock_show_add.assert_called_once()
             mock_show_stats.assert_called_once()
+            mock_show_dashboard.assert_called_once()
 
     @patch("app.pages_modules.business_managers._validate_and_convert_bm_id")
     @patch("app.pages_modules.business_managers._display_bm_header_and_info")
