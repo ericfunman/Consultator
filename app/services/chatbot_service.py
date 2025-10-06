@@ -148,9 +148,9 @@ class ChatbotService:
         with get_database_session() as session:
             all_consultants = session.query(Consultant).all()
             for consultant in all_consultants:
-                if re.search(
-                    rf"\b{re.escape(consultant.prenom.lower())}\b", question
-                ) or re.search(rf"\b{re.escape(consultant.nom.lower())}\b", question):
+                if re.search(rf"\b{re.escape(consultant.prenom.lower())}\b", question) or re.search(
+                    rf"\b{re.escape(consultant.nom.lower())}\b", question
+                ):
                     return True
             return False
 
@@ -359,9 +359,7 @@ class ChatbotService:
             ],
         }
 
-    def _calculate_intent_scores(
-        self, question: str, intent_patterns: Dict[str, List[str]]
-    ) -> Dict[str, int]:
+    def _calculate_intent_scores(self, question: str, intent_patterns: Dict[str, List[str]]) -> Dict[str, int]:
         """Calcule les scores pour chaque intention"""
         intent_scores: Dict[str, int] = {}
         for intent, patterns in intent_patterns.items():
@@ -378,9 +376,7 @@ class ChatbotService:
         """Applique les règles spéciales pour déterminer l'intention"""
 
         # Vérifier les règles pour consultants nommés
-        consultant_specific = self._check_consultant_specific_rules(
-            question, intent_scores, has_consultant_name
-        )
+        consultant_specific = self._check_consultant_specific_rules(question, intent_scores, has_consultant_name)
         if consultant_specific:
             return consultant_specific
 
@@ -416,15 +412,11 @@ class ChatbotService:
 
         return None
 
-    def _check_pattern_based_rules(
-        self, question: str, intent_scores: Dict[str, int]
-    ) -> Optional[str]:
+    def _check_pattern_based_rules(self, question: str, intent_scores: Dict[str, int]) -> Optional[str]:
         """Vérifie les règles basées sur les patterns de texte"""
 
         # NOUVELLE RÈGLE V1.2.2 : Prioriser tjm_mission sur missions si TJM est mentionné
-        if intent_scores.get("tjm_mission", 0) > 0 and re.search(
-            r"tjm|taux|prix|coût|tarif", question
-        ):
+        if intent_scores.get("tjm_mission", 0) > 0 and re.search(r"tjm|taux|prix|coût|tarif", question):
             return "tjm_mission"
 
         # Questions de type "combien de consultants en CDI/CDD"
@@ -470,9 +462,7 @@ class ChatbotService:
         intent_scores = self._calculate_intent_scores(question, intent_patterns)
 
         # Appliquer les règles spéciales
-        special_intent = self._apply_special_intent_rules(
-            question, intent_scores, has_consultant_name
-        )
+        special_intent = self._apply_special_intent_rules(question, intent_scores, has_consultant_name)
         if special_intent:
             return special_intent
 
@@ -493,9 +483,7 @@ class ChatbotService:
 
         for consultant in all_consultants:
             # Chercher le prénom dans la question (insensible à la casse)
-            if re.search(
-                rf"\b{re.escape(consultant.prenom.lower())}\b", question_lower
-            ):
+            if re.search(rf"\b{re.escape(consultant.prenom.lower())}\b", question_lower):
                 noms.append(consultant.prenom)
             # Chercher le nom de famille dans la question
             if re.search(rf"\b{re.escape(consultant.nom.lower())}\b", question_lower):
@@ -661,9 +649,7 @@ class ChatbotService:
                 )
 
             if not consultant.disponibilite:
-                response += (
-                    "\n⚠️ Attention : ce consultant est actuellement indisponible."
-                )
+                response += "\n⚠️ Attention : ce consultant est actuellement indisponible."
         else:
             if is_cjm_question:
                 response = f"❓ Désolé, le CJM de **{consultant.prenom} {consultant.nom}** ne peut pas être calculé car le salaire n'est pas renseigné."
@@ -672,9 +658,7 @@ class ChatbotService:
 
         return response
 
-    def _handle_consultant_salary_inquiry(
-        self, consultant, is_cjm_question: bool
-    ) -> Dict[str, Any]:
+    def _handle_consultant_salary_inquiry(self, consultant, is_cjm_question: bool) -> Dict[str, Any]:
         """Gère la réponse pour un consultant spécifique"""
         response = self._format_salary_response(consultant, is_cjm_question)
 
@@ -685,11 +669,7 @@ class ChatbotService:
                     "nom": consultant.nom,
                     "prenom": consultant.prenom,
                     "salaire": consultant.salaire_actuel,
-                    "cjm": (
-                        self._calculate_cjm(consultant.salaire_actuel)
-                        if consultant.salaire_actuel
-                        else None
-                    ),
+                    "cjm": (self._calculate_cjm(consultant.salaire_actuel) if consultant.salaire_actuel else None),
                     "disponibilite": consultant.disponibilite,
                 }
             },
@@ -719,10 +699,7 @@ class ChatbotService:
         """Gère les questions sur les salaires et le CJM"""
 
         # Détecter si c'est une question sur le CJM
-        is_cjm_question = (
-            "cjm" in self.last_question.lower()
-            or "coût journalier" in self.last_question.lower()
-        )
+        is_cjm_question = "cjm" in self.last_question.lower() or "coût journalier" in self.last_question.lower()
 
         # Si un nom est mentionné, chercher ce consultant spécifique
         if entities["noms"]:
@@ -730,9 +707,7 @@ class ChatbotService:
             consultant = self._find_consultant_by_name(nom_recherche)
 
             if consultant:
-                return self._handle_consultant_salary_inquiry(
-                    consultant, is_cjm_question
-                )
+                return self._handle_consultant_salary_inquiry(consultant, is_cjm_question)
             else:
                 return {
                     "response": f"❌ Je n'ai pas trouvé de consultant nommé **{nom_recherche}** dans la base de données.",
@@ -764,13 +739,7 @@ class ChatbotService:
         """Formate les détails d'expérience d'un consultant"""
         experience_annees = consultant_db.experience_annees
 
-        response = (
-            "📊 **Expérience de "
-            + consultant.prenom
-            + " "
-            + consultant.nom
-            + self.SECTION_HEADER_SUFFIX
-        )
+        response = "📊 **Expérience de " + consultant.prenom + " " + consultant.nom + self.SECTION_HEADER_SUFFIX
         response += f"🚀 **Première mission :** {consultant_db.date_premiere_mission.strftime(self.DATE_FORMAT)}\n"
         response += f"⏱️ **Expérience totale :** **{experience_annees} années**\n"
 
@@ -782,7 +751,9 @@ class ChatbotService:
             response += f"🏢 **Société :** {consultant_db.societe}\n"
 
         if consultant_db.date_entree_societe:
-            response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime(self.DATE_FORMAT)}\n"
+            response += (
+                f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime(self.DATE_FORMAT)}\n"
+            )
             # Calculer l'ancienneté dans la société
             anciennete_societe = self._calculate_company_seniority(consultant_db)
             response += f"🏢 **Ancienneté société :** {anciennete_societe} années\n"
@@ -803,20 +774,14 @@ class ChatbotService:
         return {
             "nom": consultant.nom,
             "prenom": consultant.prenom,
-            "experience_annees": (
-                getattr(consultant_db, "experience_annees", None)
-                if consultant_db
-                else None
-            ),
+            "experience_annees": (getattr(consultant_db, "experience_annees", None) if consultant_db else None),
             "date_premiere_mission": (
                 consultant_db.date_premiere_mission.isoformat()
                 if consultant_db and consultant_db.date_premiere_mission
                 else None
             ),
             "grade": (getattr(consultant_db, "grade", None) if consultant_db else None),
-            "societe": (
-                getattr(consultant_db, "societe", None) if consultant_db else None
-            ),
+            "societe": (getattr(consultant_db, "societe", None) if consultant_db else None),
         }
 
     def _handle_consultant_experience_inquiry(self, consultant) -> Dict[str, Any]:
@@ -825,38 +790,26 @@ class ChatbotService:
             with get_database_session() as session:
                 consultant_db = (
                     session.query(Consultant)
-                    .options(
-                        joinedload(Consultant.langues).joinedload(
-                            ConsultantLangue.langue
-                        )
-                    )
+                    .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
                     .filter(Consultant.id == consultant.id)
                     .first()
                 )
 
                 if consultant_db:
                     if consultant_db.date_premiere_mission:
-                        response = self._format_experience_details(
-                            consultant, consultant_db
-                        )
+                        response = self._format_experience_details(consultant, consultant_db)
                     else:
                         response = f"❓ L'expérience de **{consultant.prenom} {consultant.nom}** ne peut pas être calculée car la date de première mission n'est pas renseignée."
                 else:
                     response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {consultant.nom}**."
 
         except (ValueError, TypeError, AttributeError, KeyError) as e:
-            response = (
-                f"❌ Erreur lors de la récupération des données d'expérience : {str(e)}"
-            )
+            response = f"❌ Erreur lors de la récupération des données d'expérience : {str(e)}"
             consultant_db = None
 
         return {
             "response": response,
-            "data": {
-                "consultant": self._build_consultant_experience_data(
-                    consultant, consultant_db
-                )
-            },
+            "data": {"consultant": self._build_consultant_experience_data(consultant, consultant_db)},
             "intent": "experience",
             "confidence": 0.9,
         }
@@ -867,17 +820,9 @@ class ChatbotService:
 
         response = "📊 **Statistiques d'expérience :**\n\n"
         response += f"• **Consultants avec expérience renseignée :** {len(consultants_avec_experience)}\n"
-        response += (
-            "• **Expérience moyenne :** "
-            + str(sum(experiences) / len(experiences))
-            + self.YEARS_SUFFIX
-        )
-        response += (
-            "• **Expérience minimum :** " + str(min(experiences)) + self.YEARS_SUFFIX
-        )
-        response += (
-            "• **Expérience maximum :** " + str(max(experiences)) + self.YEARS_SUFFIX
-        )
+        response += "• **Expérience moyenne :** " + str(sum(experiences) / len(experiences)) + self.YEARS_SUFFIX
+        response += "• **Expérience minimum :** " + str(min(experiences)) + self.YEARS_SUFFIX
+        response += "• **Expérience maximum :** " + str(max(experiences)) + self.YEARS_SUFFIX
 
         # Top 3 des plus expérimentés
         top_experienced = sorted(
@@ -905,19 +850,13 @@ class ChatbotService:
         try:
             with get_database_session() as session:
                 consultants_avec_experience = (
-                    session.query(Consultant)
-                    .filter(Consultant.date_premiere_mission.isnot(None))
-                    .all()
+                    session.query(Consultant).filter(Consultant.date_premiere_mission.isnot(None)).all()
                 )
 
                 if consultants_avec_experience:
-                    response = self._calculate_experience_statistics(
-                        consultants_avec_experience
-                    )
+                    response = self._calculate_experience_statistics(consultants_avec_experience)
                 else:
-                    response = (
-                        "❓ Aucun consultant n'a d'expérience renseignée dans la base."
-                    )
+                    response = "❓ Aucun consultant n'a d'expérience renseignée dans la base."
 
         except (
             SQLAlchemyError,
@@ -969,7 +908,9 @@ class ChatbotService:
 
     def _get_profile_response_for_company(self, consultant, consultant_db):
         """Retourne la réponse pour une question sur la société"""
-        response = f"🏢 **Société de {consultant.prenom} {consultant.nom}** : **{consultant_db.societe or 'Non renseigné'}**"
+        response = (
+            f"🏢 **Société de {consultant.prenom} {consultant.nom}** : **{consultant_db.societe or 'Non renseigné'}**"
+        )
         if consultant_db.date_entree_societe:
             response += f"\n📅 **Date d'entrée :** {consultant_db.date_entree_societe.strftime(self.DATE_FORMAT)}"
         if consultant_db.date_sortie_societe:
@@ -986,10 +927,14 @@ class ChatbotService:
         response += f"🏢 **Société :** {consultant_db.societe or 'Non renseigné'}\n"
 
         if consultant_db.date_entree_societe:
-            response += f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime(self.DATE_FORMAT)}\n"
+            response += (
+                f"📅 **Date d'entrée société :** {consultant_db.date_entree_societe.strftime(self.DATE_FORMAT)}\n"
+            )
 
         if consultant_db.date_sortie_societe:
-            response += f"📅 **Date de sortie société :** {consultant_db.date_sortie_societe.strftime(self.DATE_FORMAT)}\n"
+            response += (
+                f"📅 **Date de sortie société :** {consultant_db.date_sortie_societe.strftime(self.DATE_FORMAT)}\n"
+            )
         else:
             response += "✅ **Statut :** Toujours en poste\n"
 
@@ -1004,9 +949,7 @@ class ChatbotService:
 
         return response
 
-    def _handle_individual_profile_question(
-        self, entities: Dict, question_lower: str
-    ) -> Dict[str, Any]:
+    def _handle_individual_profile_question(self, entities: Dict, question_lower: str) -> Dict[str, Any]:
         """Gère les questions de profil pour un consultant spécifique"""
         nom_recherche: str = entities["noms"][0]
         consultant = self._find_consultant_by_name(nom_recherche)
@@ -1021,30 +964,16 @@ class ChatbotService:
 
         try:
             with get_database_session() as session:
-                consultant_db = (
-                    session.query(Consultant)
-                    .filter(Consultant.id == consultant.id)
-                    .first()
-                )
+                consultant_db = session.query(Consultant).filter(Consultant.id == consultant.id).first()
 
                 if not consultant_db:
                     response = f"❌ Impossible de récupérer les données de **{consultant.prenom} {consultant.nom}**."
                 else:
                     # Déterminer le type d'information demandée
-                    if any(
-                        word in question_lower
-                        for word in ["grade", "niveau", "poste", "fonction"]
-                    ):
-                        response = self._get_profile_response_for_grade(
-                            consultant, consultant_db
-                        )
-                    elif any(
-                        word in question_lower
-                        for word in ["contrat", "type contrat", "cdi", "cdd"]
-                    ):
-                        response = self._get_profile_response_for_contract(
-                            consultant, consultant_db
-                        )
+                    if any(word in question_lower for word in ["grade", "niveau", "poste", "fonction"]):
+                        response = self._get_profile_response_for_grade(consultant, consultant_db)
+                    elif any(word in question_lower for word in ["contrat", "type contrat", "cdi", "cdd"]):
+                        response = self._get_profile_response_for_contract(consultant, consultant_db)
                     elif any(
                         word in question_lower
                         for word in [
@@ -1055,13 +984,9 @@ class ChatbotService:
                             "asigma",
                         ]
                     ):
-                        response = self._get_profile_response_for_company(
-                            consultant, consultant_db
-                        )
+                        response = self._get_profile_response_for_company(consultant, consultant_db)
                     else:
-                        response = self._get_complete_profile_response(
-                            consultant, consultant_db
-                        )
+                        response = self._get_complete_profile_response(consultant, consultant_db)
 
         except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
             response = f"❌ Erreur lors de la récupération du profil : {str(e)}"
@@ -1073,19 +998,9 @@ class ChatbotService:
                 "consultant": {
                     "nom": consultant.nom,
                     "prenom": consultant.prenom,
-                    "grade": (
-                        getattr(consultant_db, "grade", None) if consultant_db else None
-                    ),
-                    "type_contrat": (
-                        getattr(consultant_db, "type_contrat", None)
-                        if consultant_db
-                        else None
-                    ),
-                    "societe": (
-                        getattr(consultant_db, "societe", None)
-                        if consultant_db
-                        else None
-                    ),
+                    "grade": (getattr(consultant_db, "grade", None) if consultant_db else None),
+                    "type_contrat": (getattr(consultant_db, "type_contrat", None) if consultant_db else None),
+                    "societe": (getattr(consultant_db, "societe", None) if consultant_db else None),
                 }
             },
             "intent": "profil_professionnel",
@@ -1104,9 +1019,7 @@ class ChatbotService:
 
     def _handle_grade_statistics(self, session) -> str:
         """Gère les statistiques par grade"""
-        consultants = (
-            session.query(Consultant).filter(Consultant.grade.isnot(None)).all()
-        )
+        consultants = session.query(Consultant).filter(Consultant.grade.isnot(None)).all()
 
         if consultants:
             grades_count = self._group_consultants_by_grade(consultants)
@@ -1122,34 +1035,14 @@ class ChatbotService:
 
         return response
 
-    def _count_consultants_by_contract_type(
-        self, consultants, contract_type: str
-    ) -> int:
+    def _count_consultants_by_contract_type(self, consultants, contract_type: str) -> int:
         """Compte les consultants d'un type de contrat spécifique"""
         if contract_type.upper() == "CDI":
-            return len(
-                [
-                    c
-                    for c in consultants
-                    if c.type_contrat and c.type_contrat.upper() == "CDI"
-                ]
-            )
+            return len([c for c in consultants if c.type_contrat and c.type_contrat.upper() == "CDI"])
         elif contract_type.upper() == "CDD":
-            return len(
-                [
-                    c
-                    for c in consultants
-                    if c.type_contrat and c.type_contrat.upper() == "CDD"
-                ]
-            )
+            return len([c for c in consultants if c.type_contrat and c.type_contrat.upper() == "CDD"])
         elif contract_type.lower() == "stagiaire":
-            return len(
-                [
-                    c
-                    for c in consultants
-                    if c.type_contrat and c.type_contrat.lower() == "stagiaire"
-                ]
-            )
+            return len([c for c in consultants if c.type_contrat and c.type_contrat.lower() == "stagiaire"])
         return 0
 
     def _handle_contract_count_query(self, consultants, question_lower: str) -> str:
@@ -1199,9 +1092,7 @@ class ChatbotService:
 
     def _handle_contract_statistics(self, session, question_lower: str) -> str:
         """Gère les statistiques par type de contrat"""
-        consultants = (
-            session.query(Consultant).filter(Consultant.type_contrat.isnot(None)).all()
-        )
+        consultants = session.query(Consultant).filter(Consultant.type_contrat.isnot(None)).all()
 
         # Si c'est une question "combien de consultants en CDI/CDD"
         if any(word in question_lower for word in ["combien"]):
@@ -1230,19 +1121,13 @@ class ChatbotService:
         """Vérifie si la question concerne une société spécifique"""
         return any(word in question_lower for word in ["quanteam", "asigma"])
 
-    def _handle_specific_company_search(
-        self, consultants: List, question_lower: str
-    ) -> str:
+    def _handle_specific_company_search(self, consultants: List, question_lower: str) -> str:
         """Gère la recherche pour une société spécifique"""
         societe_recherchee = self._extract_target_company(question_lower)
-        consultants_societe = self._filter_consultants_by_company(
-            consultants, societe_recherchee
-        )
+        consultants_societe = self._filter_consultants_by_company(consultants, societe_recherchee)
 
         if consultants_societe:
-            return self._format_specific_company_response(
-                consultants_societe, societe_recherchee
-            )
+            return self._format_specific_company_response(consultants_societe, societe_recherchee)
         else:
             return f"❓ Aucun consultant trouvé chez {societe_recherchee}."
 
@@ -1250,30 +1135,18 @@ class ChatbotService:
         """Extrait le nom de la société recherchée"""
         return "Quanteam" if "quanteam" in question_lower else "Asigma"
 
-    def _filter_consultants_by_company(
-        self, consultants: List, target_company: str
-    ) -> List:
+    def _filter_consultants_by_company(self, consultants: List, target_company: str) -> List:
         """Filtre les consultants par société"""
-        return [
-            c
-            for c in consultants
-            if c.societe and c.societe.lower() == target_company.lower()
-        ]
+        return [c for c in consultants if c.societe and c.societe.lower() == target_company.lower()]
 
-    def _format_specific_company_response(
-        self, consultants_societe: List, societe_recherchee: str
-    ) -> str:
+    def _format_specific_company_response(self, consultants_societe: List, societe_recherchee: str) -> str:
         """Formate la réponse pour une société spécifique"""
         response = f"🏢 **Consultants chez {societe_recherchee}** :\n\n"
 
         for i, consultant in enumerate(consultants_societe, 1):
             response += self._format_consultant_company_line(consultant, i)
 
-        response += (
-            self.TOTAL_PREFIX
-            + str(len(consultants_societe))
-            + self.CONSULTANT_FOUND_SUFFIX
-        )
+        response += self.TOTAL_PREFIX + str(len(consultants_societe)) + self.CONSULTANT_FOUND_SUFFIX
         return response
 
     def _format_consultant_company_line(self, consultant, index: int) -> str:
@@ -1307,9 +1180,7 @@ class ChatbotService:
             societes_count[societe].append(consultant)
         return societes_count
 
-    def _format_general_company_statistics(
-        self, societes_count: Dict[str, List]
-    ) -> str:
+    def _format_general_company_statistics(self, societes_count: Dict[str, List]) -> str:
         """Formate les statistiques générales par société"""
         response = "🏢 **Répartition par société :**\n\n"
 
@@ -1351,13 +1222,8 @@ class ChatbotService:
                         ]
                     ):
                         response = self._handle_grade_statistics(session)
-                    elif any(
-                        word in question_lower
-                        for word in ["contrat", "cdi", "cdd", "stagiaire"]
-                    ):
-                        response = self._handle_contract_statistics(
-                            session, question_lower
-                        )
+                    elif any(word in question_lower for word in ["contrat", "cdi", "cdd", "stagiaire"]):
+                        response = self._handle_contract_statistics(session, question_lower)
                     elif any(
                         word in question_lower
                         for word in [
@@ -1369,9 +1235,7 @@ class ChatbotService:
                             "qui est",
                         ]
                     ):
-                        response = self._handle_company_statistics(
-                            session, question_lower
-                        )
+                        response = self._handle_company_statistics(session, question_lower)
                     else:
                         response = "🤔 Précisez quel aspect du profil professionnel vous intéresse : grade, type de contrat, ou société ?"
 
@@ -1465,9 +1329,7 @@ class ChatbotService:
                 return competence_found.strip()
         return None
 
-    def _handle_specific_skill_search(
-        self, competence: str, type_competence: Optional[str]
-    ) -> Dict[str, Any]:
+    def _handle_specific_skill_search(self, competence: str, type_competence: Optional[str]) -> Dict[str, Any]:
         """Gère la recherche de consultants ayant une compétence spécifique"""
         consultants = self._find_consultants_by_skill(competence, type_competence)
 
@@ -1475,26 +1337,18 @@ class ChatbotService:
             noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
             response = f"🎯 Consultants maîtrisant **{competence.title()}** :\n\n"
             response += "\n".join([f"• {nom}" for nom in noms])
-            response += (
-                self.STATS_PREFIX + str(len(consultants)) + self.CONSULTANT_FOUND_SUFFIX
-            )
+            response += self.STATS_PREFIX + str(len(consultants)) + self.CONSULTANT_FOUND_SUFFIX
         else:
-            response = (
-                f"❌ Aucun consultant ne maîtrise **{competence}** dans notre base."
-            )
+            response = f"❌ Aucun consultant ne maîtrise **{competence}** dans notre base."
 
         return {
             "response": response,
-            "data": {
-                "consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]
-            },
+            "data": {"consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]},
             "intent": "competences",
             "confidence": 0.9,
         }
 
-    def _handle_consultant_skills_inquiry(
-        self, nom: str, type_competence: Optional[str]
-    ) -> Dict[str, Any]:
+    def _handle_consultant_skills_inquiry(self, nom: str, type_competence: Optional[str]) -> Dict[str, Any]:
         """Gère les questions sur les compétences d'un consultant spécifique"""
         consultant = self._find_consultant_by_name(nom)
 
@@ -1552,9 +1406,7 @@ class ChatbotService:
 
         return response
 
-    def _group_skills_by_category(
-        self, skills: List
-    ) -> Dict[str, List[Dict[str, Any]]]:
+    def _group_skills_by_category(self, skills: List) -> Dict[str, List[Dict[str, Any]]]:
         """Groupe les compétences par catégorie"""
         categories: Dict[str, List[Dict[str, Any]]] = {}
         for skill in skills:
@@ -1564,9 +1416,7 @@ class ChatbotService:
             categories[categorie].append(skill)
         return categories
 
-    def _format_skills_by_category(
-        self, categories: Dict[str, List[Dict[str, Any]]]
-    ) -> str:
+    def _format_skills_by_category(self, categories: Dict[str, List[Dict[str, Any]]]) -> str:
         """Formate l'affichage des compétences par catégorie"""
         response = ""
         for categorie, competences in categories.items():
@@ -1611,27 +1461,18 @@ class ChatbotService:
 
         # Si une compétence spécifique est mentionnée
         if entities["competences"]:
-            return self._handle_specific_skill_search(
-                entities["competences"][0], type_competence
-            )
+            return self._handle_specific_skill_search(entities["competences"][0], type_competence)
 
         # Recherche dynamique de compétence dans la question
-        elif any(
-            word in question_lower
-            for word in ["qui maîtrise", "qui sait", "qui connaît", "qui connait"]
-        ):
+        elif any(word in question_lower for word in ["qui maîtrise", "qui sait", "qui connaît", "qui connait"]):
             competence_found = self._extract_skill_from_question(question_lower)
 
             if competence_found:
-                return self._handle_specific_skill_search(
-                    competence_found, type_competence
-                )
+                return self._handle_specific_skill_search(competence_found, type_competence)
 
         # Question générale sur les compétences d'un consultant
         elif entities["noms"]:
-            return self._handle_consultant_skills_inquiry(
-                entities["noms"][0], type_competence
-            )
+            return self._handle_consultant_skills_inquiry(entities["noms"][0], type_competence)
 
         return {
             "response": "🤔 Pouvez-vous préciser quelle compétence ou quel consultant vous intéresse ?",
@@ -1640,9 +1481,7 @@ class ChatbotService:
             "confidence": 0.5,
         }
 
-    def _extract_consultant_name_from_language_question(
-        self, question_lower: str
-    ) -> Optional[str]:
+    def _extract_consultant_name_from_language_question(self, question_lower: str) -> Optional[str]:
         """Extrait le nom du consultant d'une question sur les langues"""
         patterns = [
             r"quelles?\s+langues?\s+parle\s+(\w+)",
@@ -1671,9 +1510,7 @@ class ChatbotService:
             if match:
                 langue_found = match.group(1).strip()
                 # Nettoyer les articles
-                langue_found = re.sub(
-                    r"^(le|la|les|du|de|des|en|une?)\s+", "", langue_found
-                )
+                langue_found = re.sub(r"^(le|la|les|du|de|des|en|une?)\s+", "", langue_found)
                 return langue_found
         return None
 
@@ -1682,13 +1519,7 @@ class ChatbotService:
         if not consultant.langues:
             return f"❌ Aucune langue enregistrée pour **{consultant.prenom} {consultant.nom}**."
 
-        response = (
-            "🌍 **Langues parlées par "
-            + consultant.prenom
-            + " "
-            + consultant.nom
-            + " :**\n\n"
-        )
+        response = "🌍 **Langues parlées par " + consultant.prenom + " " + consultant.nom + " :**\n\n"
 
         flag_emoji = {
             "FR": "🇫🇷",
@@ -1715,31 +1546,23 @@ class ChatbotService:
         response += f"\n📊 **Total : {len(consultant.langues)} langue(s)**"
         return response
 
-    def _handle_specific_language_search(
-        self, langue_recherchee: str
-    ) -> Dict[str, Any]:
+    def _handle_specific_language_search(self, langue_recherchee: str) -> Dict[str, Any]:
         """Gère la recherche de consultants parlant une langue spécifique"""
         consultants = self._find_consultants_by_language(langue_recherchee)
 
         if not consultants:
             return self._format_no_language_speakers_response(langue_recherchee)
 
-        response = self._format_language_speakers_response(
-            consultants, langue_recherchee
-        )
+        response = self._format_language_speakers_response(consultants, langue_recherchee)
 
         return {
             "response": response,
-            "data": {
-                "consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]
-            },
+            "data": {"consultants": [{"nom": c.nom, "prenom": c.prenom} for c in consultants]},
             "intent": "langues",
             "confidence": 0.9,
         }
 
-    def _format_no_language_speakers_response(
-        self, langue_recherchee: str
-    ) -> Dict[str, Any]:
+    def _format_no_language_speakers_response(self, langue_recherchee: str) -> Dict[str, Any]:
         """Formate la réponse quand aucun consultant ne parle la langue"""
         return {
             "response": f"❌ Aucun consultant ne parle **{langue_recherchee}** dans notre base.",
@@ -1748,22 +1571,16 @@ class ChatbotService:
             "confidence": 0.8,
         }
 
-    def _format_language_speakers_response(
-        self, consultants: List, langue_recherchee: str
-    ) -> str:
+    def _format_language_speakers_response(self, consultants: List, langue_recherchee: str) -> str:
         """Formate la réponse complète des consultants parlant une langue"""
         response = self._format_language_speakers_list(consultants, langue_recherchee)
 
         if len(consultants) <= 5:
-            response += self._format_language_levels_details(
-                consultants, langue_recherchee
-            )
+            response += self._format_language_levels_details(consultants, langue_recherchee)
 
         return response
 
-    def _format_language_speakers_list(
-        self, consultants: List, langue_recherchee: str
-    ) -> str:
+    def _format_language_speakers_list(self, consultants: List, langue_recherchee: str) -> str:
         """Formate la liste de base des consultants parlant une langue"""
         noms = [f"**{c.prenom} {c.nom}**" for c in consultants]
         response = f"🌍 Consultants parlant **{langue_recherchee.title()}** :\n\n"
@@ -1771,16 +1588,12 @@ class ChatbotService:
         response += f"\n\n📊 **{len(consultants)} consultant(s) trouvé(s)**"
         return response
 
-    def _format_language_levels_details(
-        self, consultants: List, langue_recherchee: str
-    ) -> str:
+    def _format_language_levels_details(self, consultants: List, langue_recherchee: str) -> str:
         """Formate les détails de niveaux pour une langue spécifique"""
         details = "\n\n🎯 **Niveaux détaillés :**"
 
         for consultant in consultants:
-            level_info = self._get_consultant_language_level(
-                consultant, langue_recherchee
-            )
+            level_info = self._get_consultant_language_level(consultant, langue_recherchee)
             if level_info:
                 details += f"\n  • **{consultant.prenom} {consultant.nom}** : {level_info['niveau']}"
                 if level_info["commentaire"]:
@@ -1788,9 +1601,7 @@ class ChatbotService:
 
         return details
 
-    def _get_consultant_language_level(
-        self, consultant, langue_recherchee: str
-    ) -> Optional[Dict[str, str]]:
+    def _get_consultant_language_level(self, consultant, langue_recherchee: str) -> Optional[Dict[str, str]]:
         """Récupère le niveau et commentaire d'un consultant pour une langue"""
         for cl in consultant.langues:
             if cl.langue.nom.lower() == langue_recherchee.lower():
@@ -1817,9 +1628,7 @@ class ChatbotService:
                     "response": response,
                     "data": {
                         "consultant": consultant.nom,
-                        "languages_count": (
-                            len(consultant.langues) if consultant.langues else 0
-                        ),
+                        "languages_count": (len(consultant.langues) if consultant.langues else 0),
                     },
                     "intent": "langues",
                     "confidence": 0.8,
@@ -1849,16 +1658,12 @@ class ChatbotService:
 
         # Question générale sur les langues d'un consultant
         elif entities["noms"] or any(
-            word in self.last_question.lower()
-            for word in ["quelles langues", "langues de", "langues parlées"]
+            word in self.last_question.lower() for word in ["quelles langues", "langues de", "langues parlées"]
         ):
             return self._handle_consultant_languages_inquiry(entities)
 
         # Recherche dynamique de langue dans la question
-        elif any(
-            word in self.last_question.lower()
-            for word in ["qui parle", "parle", "parlent", "bilingue"]
-        ):
+        elif any(word in self.last_question.lower() for word in ["qui parle", "parle", "parlent", "bilingue"]):
             question_lower = self.last_question.lower()
             langue_found = self._extract_language_from_question(question_lower)
 
@@ -1879,13 +1684,9 @@ class ChatbotService:
         is_count_question = self._is_count_question(question_lower)
 
         if entities["entreprises"]:
-            return self._handle_company_missions_inquiry(
-                entities["entreprises"][0], is_count_question
-            )
+            return self._handle_company_missions_inquiry(entities["entreprises"][0], is_count_question)
         elif entities["noms"]:
-            return self._handle_consultant_missions_inquiry(
-                entities["noms"][0], is_count_question
-            )
+            return self._handle_consultant_missions_inquiry(entities["noms"][0], is_count_question)
         else:
             return self._handle_generic_missions_question()
 
@@ -1893,9 +1694,7 @@ class ChatbotService:
         """Détermine si c'est une question de comptage"""
         return any(word in question_lower for word in ["combien", "nombre"])
 
-    def _handle_company_missions_inquiry(
-        self, entreprise: str, is_count_question: bool
-    ) -> Dict[str, Any]:
+    def _handle_company_missions_inquiry(self, entreprise: str, is_count_question: bool) -> Dict[str, Any]:
         """Gère les questions sur les missions d'une entreprise"""
         missions = self._get_missions_by_company(entreprise)
 
@@ -1915,13 +1714,7 @@ class ChatbotService:
 
     def _format_company_missions_count(self, missions: List, entreprise: str) -> str:
         """Formate le comptage des missions pour une entreprise"""
-        return (
-            "📊 **"
-            + str(len(missions))
-            + " mission(s)** trouvée(s) chez **"
-            + entreprise.title()
-            + "**"
-        )
+        return "📊 **" + str(len(missions)) + " mission(s)** trouvée(s) chez **" + entreprise.title() + "**"
 
     def _format_company_missions_list(self, missions: List, entreprise: str) -> str:
         """Formate la liste des missions pour une entreprise"""
@@ -1937,9 +1730,7 @@ class ChatbotService:
         response += "\n\n📊 **Total : " + str(len(missions)) + " mission(s)**"
         return response
 
-    def _handle_consultant_missions_inquiry(
-        self, nom: str, is_count_question: bool
-    ) -> Dict[str, Any]:
+    def _handle_consultant_missions_inquiry(self, nom: str, is_count_question: bool) -> Dict[str, Any]:
         """Gère les questions sur les missions d'un consultant"""
         consultant = self._find_consultant_by_name(nom)
 
@@ -1965,9 +1756,7 @@ class ChatbotService:
             "confidence": 0.9,
         }
 
-    def _format_consultant_not_found_missions_response(
-        self, nom: str
-    ) -> Dict[str, Any]:
+    def _format_consultant_not_found_missions_response(self, nom: str) -> Dict[str, Any]:
         """Formate la réponse quand le consultant n'est pas trouvé"""
         return {
             "response": f"❌ Consultant **{nom}** introuvable.",
@@ -2041,10 +1830,7 @@ class ChatbotService:
 
         # Si c'est une question spécifique sur le nombre de consultants
         if any(pattern in self.last_question for pattern in ["combien", "nombre"]):
-            if (
-                "consultant" in self.last_question
-                and "mission" not in self.last_question
-            ):
+            if "consultant" in self.last_question and "mission" not in self.last_question:
                 response = f"👥 **Vous avez {stats['consultants_total']} consultants** dans votre base de données.\n\n"
                 response += (
                     "📊 Détail : "
@@ -2145,7 +1931,9 @@ class ChatbotService:
         if consultant.email:
             response = f"� L'email de **{consultant.prenom} {consultant.nom}** est : **{consultant.email}**"
         else:
-            response = f"❓ Désolé, l'email de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+            response = (
+                f"❓ Désolé, l'email de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+            )
 
         return {
             "response": response,
@@ -2163,7 +1951,9 @@ class ChatbotService:
         if consultant.telephone:
             response = f"📞 Le téléphone de **{consultant.prenom} {consultant.nom}** est : **{consultant.telephone}**"
         else:
-            response = f"❓ Désolé, le téléphone de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+            response = (
+                f"❓ Désolé, le téléphone de **{consultant.prenom} {consultant.nom}** n'est pas renseigné dans la base."
+            )
 
         return {
             "response": response,
@@ -2216,21 +2006,13 @@ class ChatbotService:
         """Récupère les consultants selon les critères de la question"""
         with get_database_session() as session:
             if "disponibles" in question_lower or "disponible" in question_lower:
-                consultants = (
-                    session.query(Consultant).filter(Consultant.disponibilite).all()
-                )
+                consultants = session.query(Consultant).filter(Consultant.disponibilite).all()
                 titre = "👥 **Consultants disponibles :**"
             elif "indisponibles" in question_lower or "indisponible" in question_lower:
-                consultants = (
-                    session.query(Consultant)
-                    .filter(Consultant.disponibilite is False)
-                    .all()
-                )
+                consultants = session.query(Consultant).filter(Consultant.disponibilite is False).all()
                 titre = "👥 **Consultants indisponibles :**"
             elif "actifs" in question_lower or "actif" in question_lower:
-                consultants = (
-                    session.query(Consultant).filter(Consultant.disponibilite).all()
-                )
+                consultants = session.query(Consultant).filter(Consultant.disponibilite).all()
                 titre = "👥 **Consultants actifs :**"
             else:
                 consultants = session.query(Consultant).all()
@@ -2286,11 +2068,7 @@ class ChatbotService:
                     "email": c.email,
                     "disponibilite": c.disponibilite,
                     "salaire": c.salaire_actuel,
-                    "cjm": (
-                        self._calculate_cjm(c.salaire_actuel)
-                        if c.salaire_actuel
-                        else None
-                    ),
+                    "cjm": (self._calculate_cjm(c.salaire_actuel) if c.salaire_actuel else None),
                 }
                 for c in consultants
             ],
@@ -2346,9 +2124,7 @@ class ChatbotService:
     def _format_basic_consultant_info(self, consultant) -> str:
         """Formate les informations de base du consultant"""
         date_creation = (
-            consultant.date_creation.strftime(self.DATE_FORMAT)
-            if consultant.date_creation
-            else "Non renseignée"
+            consultant.date_creation.strftime(self.DATE_FORMAT) if consultant.date_creation else "Non renseignée"
         )
 
         return f"""👤 **{consultant.prenom} {consultant.nom}**
@@ -2364,10 +2140,7 @@ class ChatbotService:
             return ""
 
         cjm = self._calculate_cjm(consultant.salaire_actuel)
-        return (
-            f"\n💰 Salaire : **{consultant.salaire_actuel:,.0f} €**"
-            + f"\n📈 CJM : **{cjm:,.0f} €**"
-        )
+        return f"\n💰 Salaire : **{consultant.salaire_actuel:,.0f} €**" + f"\n📈 CJM : **{cjm:,.0f} €**"
 
     def _format_consultant_missions_info(self, consultant) -> str:
         """Formate les informations sur les missions du consultant"""
@@ -2502,11 +2275,7 @@ class ChatbotService:
                     "nom": c.nom,
                     "prenom": c.prenom,
                     "disponibilite": c.disponibilite,
-                    "cjm": (
-                        self._calculate_cjm(c.salaire_actuel)
-                        if c.salaire_actuel
-                        else None
-                    ),
+                    "cjm": (self._calculate_cjm(c.salaire_actuel) if c.salaire_actuel else None),
                 }
                 for c in consultants
             ],
@@ -2569,9 +2338,7 @@ class ChatbotService:
                 {
                     "nom": p.nom,
                     "consultants_total": len(list(p.consultants)),
-                    "consultants_disponibles": len(
-                        [c for c in p.consultants if c.disponibilite]
-                    ),
+                    "consultants_disponibles": len([c for c in p.consultants if c.disponibilite]),
                     "responsable": p.responsable,
                 }
                 for p in practices
@@ -2644,9 +2411,7 @@ class ChatbotService:
     def _format_cv_details(self, cv, index: int) -> str:
         """Formate les détails d'un CV"""
         taille_mb = (cv.taille_fichier / 1024 / 1024) if cv.taille_fichier else 0
-        date_upload = (
-            cv.date_upload.strftime(self.DATE_FORMAT) if cv.date_upload else "N/A"
-        )
+        date_upload = cv.date_upload.strftime(self.DATE_FORMAT) if cv.date_upload else "N/A"
 
         details = f"{index}. **{cv.fichier_nom}**\n"
         details += f"   📅 Uploadé le : {date_upload}\n"
@@ -2665,9 +2430,7 @@ class ChatbotService:
             "cvs": [
                 {
                     "nom": cv.fichier_nom,
-                    "date_upload": (
-                        cv.date_upload.isoformat() if cv.date_upload else None
-                    ),
+                    "date_upload": (cv.date_upload.isoformat() if cv.date_upload else None),
                     "taille": cv.taille_fichier,
                     "contenu_analyse": bool(cv.contenu_extrait),
                 }
@@ -2727,9 +2490,7 @@ class ChatbotService:
         if top_consultants:
             response += "\n🏆 **Top consultants (nombre de CVs)** :\n"
             for consultant, nb_cvs in top_consultants:
-                response += (
-                    f"• **{consultant.prenom} {consultant.nom}** : {nb_cvs} CV(s)\n"
-                )
+                response += f"• **{consultant.prenom} {consultant.nom}** : {nb_cvs} CV(s)\n"
 
         return response
 
@@ -2738,10 +2499,7 @@ class ChatbotService:
         return {
             "cvs_total": stats["cvs_total"],
             "consultants_avec_cv": stats["consultants_avec_cv"],
-            "top_consultants": [
-                {"nom": c.nom, "prenom": c.prenom, "nb_cvs": nb}
-                for c, nb in top_consultants
-            ],
+            "top_consultants": [{"nom": c.nom, "prenom": c.prenom, "nb_cvs": nb} for c, nb in top_consultants],
         }
 
     # Méthodes utilitaires pour les requêtes DB
@@ -2777,17 +2535,13 @@ class ChatbotService:
 
             consultant = (
                 session.query(Consultant)
-                .options(
-                    joinedload(Consultant.langues).joinedload(ConsultantLangue.langue)
-                )
+                .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
                 .filter(
                     or_(
                         func.lower(Consultant.nom) == nom_recherche.lower(),
                         func.lower(Consultant.prenom) == nom_recherche.lower(),
-                        func.lower(func.concat(Consultant.prenom, " ", Consultant.nom))
-                        == nom_recherche.lower(),
-                        func.lower(func.concat(Consultant.nom, " ", Consultant.prenom))
-                        == nom_recherche.lower(),
+                        func.lower(func.concat(Consultant.prenom, " ", Consultant.nom)) == nom_recherche.lower(),
+                        func.lower(func.concat(Consultant.nom, " ", Consultant.prenom)) == nom_recherche.lower(),
                     )
                 )
                 .first()
@@ -2801,15 +2555,11 @@ class ChatbotService:
 
             consultant = (
                 session.query(Consultant)
-                .options(
-                    joinedload(Consultant.langues).joinedload(ConsultantLangue.langue)
-                )
+                .options(joinedload(Consultant.langues).joinedload(ConsultantLangue.langue))
                 .filter(
                     or_(
                         func.lower(Consultant.nom).like(f"%{nom_recherche.lower()}%"),
-                        func.lower(Consultant.prenom).like(
-                            f"%{nom_recherche.lower()}%"
-                        ),
+                        func.lower(Consultant.prenom).like(f"%{nom_recherche.lower()}%"),
                     )
                 )
                 .first()
@@ -2817,9 +2567,7 @@ class ChatbotService:
 
         return consultant
 
-    def _find_consultants_by_skill(
-        self, competence: str, type_competence: Optional[str] = None
-    ) -> List[Any]:
+    def _find_consultants_by_skill(self, competence: str, type_competence: Optional[str] = None) -> List[Any]:
         """
         Recherche les consultants maîtrisant une compétence spécifique.
 
@@ -2949,9 +2697,7 @@ class ChatbotService:
                 .all()
             )
 
-    def _get_consultant_skills(
-        self, consultant_id: int, type_competence: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+    def _get_consultant_skills(self, consultant_id: int, type_competence: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Récupère les compétences détaillées d'un consultant.
 
@@ -3075,9 +2821,7 @@ class ChatbotService:
     def _get_consultant_statistics(self, session) -> Dict[str, int]:
         """Récupère les statistiques des consultants"""
         consultants_total = session.query(Consultant).count()
-        consultants_actifs = (
-            session.query(Consultant).filter(Consultant.disponibilite).count()
-        )
+        consultants_actifs = session.query(Consultant).filter(Consultant.disponibilite).count()
         consultants_inactifs = consultants_total - consultants_actifs
 
         return {
@@ -3089,9 +2833,7 @@ class ChatbotService:
     def _get_mission_statistics(self, session) -> Dict[str, int]:
         """Récupère les statistiques des missions"""
         missions_total = session.query(Mission).count()
-        missions_en_cours = (
-            session.query(Mission).filter(Mission.statut == "en_cours").count()
-        )
+        missions_en_cours = session.query(Mission).filter(Mission.statut == "en_cours").count()
         missions_terminees = missions_total - missions_en_cours
 
         return {
@@ -3137,18 +2879,13 @@ class ChatbotService:
     def _calculate_average_tjm(self, session) -> float:
         """Calcule le TJM moyen"""
         return (
-            session.query(func.avg(Mission.taux_journalier))
-            .filter(Mission.taux_journalier.isnot(None))
-            .scalar()
-            or 0
+            session.query(func.avg(Mission.taux_journalier)).filter(Mission.taux_journalier.isnot(None)).scalar() or 0
         )
 
     def _calculate_average_salary(self, session) -> float:
         """Calcule le salaire moyen"""
         return (
-            session.query(func.avg(Consultant.salaire_actuel))
-            .filter(Consultant.salaire_actuel.isnot(None))
-            .scalar()
+            session.query(func.avg(Consultant.salaire_actuel)).filter(Consultant.salaire_actuel.isnot(None)).scalar()
             or 0
         )
 
@@ -3198,9 +2935,7 @@ class ChatbotService:
     def _get_consultant_db_data(self, consultant):
         """Récupère les données DB du consultant"""
         with get_database_session() as session:
-            return (
-                session.query(Consultant).filter(Consultant.id == consultant.id).first()
-            )
+            return session.query(Consultant).filter(Consultant.id == consultant.id).first()
 
     def _build_availability_response(self, consultant, consultant_db) -> str:
         """Construit la réponse de disponibilité"""
@@ -3211,13 +2946,7 @@ class ChatbotService:
 
     def _format_availability_header(self, consultant) -> str:
         """Formate l'en-tête de disponibilité"""
-        return (
-            "📅 **Disponibilité de "
-            + consultant.prenom
-            + " "
-            + consultant.nom
-            + self.SECTION_HEADER_SUFFIX
-        )
+        return "📅 **Disponibilité de " + consultant.prenom + " " + consultant.nom + self.SECTION_HEADER_SUFFIX
 
     def _format_availability_status(self, consultant_db) -> str:
         """Formate le statut de disponibilité basé sur les missions"""
@@ -3264,23 +2993,13 @@ class ChatbotService:
         """Récupère les missions futures"""
         from datetime import date
 
-        return [
-            m
-            for m in consultant_db.missions
-            if m.date_fin and m.date_fin > date.today()
-        ]
+        return [m for m in consultant_db.missions if m.date_fin and m.date_fin > date.today()]
 
     def _format_missions_list(self, missions):
         """Formate la liste des missions"""
         result = ""
         for mission in missions:
-            result += (
-                self.BULLET_POINT_INDENT
-                + mission.nom_mission
-                + " chez "
-                + mission.client
-                + "\n"
-            )
+            result += self.BULLET_POINT_INDENT + mission.nom_mission + " chez " + mission.client + "\n"
         return result
 
     def _format_missions_futures_list(self, missions):
@@ -3288,13 +3007,7 @@ class ChatbotService:
         result = ""
         for mission in missions:
             fin_mission = mission.date_fin.strftime(self.DATE_FORMAT)
-            result += (
-                self.BULLET_POINT_INDENT
-                + mission.nom_mission
-                + " (fin: "
-                + fin_mission
-                + ")\n"
-            )
+            result += self.BULLET_POINT_INDENT + mission.nom_mission + " (fin: " + fin_mission + ")\n"
         return result
 
     def _format_consultant_details(self, consultant_db) -> str:
@@ -3323,9 +3036,7 @@ class ChatbotService:
             + "**."
         )
 
-    def _build_availability_result(
-        self, consultant, consultant_db, response
-    ) -> Dict[str, Any]:
+    def _build_availability_result(self, consultant, consultant_db, response) -> Dict[str, Any]:
         """Construit le résultat de disponibilité"""
         return {
             "response": response,
@@ -3334,14 +3045,10 @@ class ChatbotService:
                     "nom": consultant.nom,
                     "prenom": consultant.prenom,
                     "date_disponibilite": (
-                        getattr(consultant_db, "date_disponibilite", None)
-                        if consultant_db
-                        else None
+                        getattr(consultant_db, "date_disponibilite", None) if consultant_db else None
                     ),
                     "disponibilite_immediate": (
-                        getattr(consultant_db, "disponibilite", None)
-                        if consultant_db
-                        else None
+                        getattr(consultant_db, "disponibilite", None) if consultant_db else None
                     ),
                 }
             },
@@ -3352,10 +3059,7 @@ class ChatbotService:
     def _build_availability_error_result(self, error) -> Dict[str, Any]:
         """Construit le résultat d'erreur"""
         return {
-            "response": (
-                "❌ Erreur lors de la récupération des données de disponibilité : "
-                + str(error)
-            ),
+            "response": ("❌ Erreur lors de la récupération des données de disponibilité : " + str(error)),
             "data": {},
             "intent": "disponibilite",
             "confidence": 0.3,
@@ -3365,9 +3069,7 @@ class ChatbotService:
         """Gère les questions générales sur les disponibilités"""
         try:
             consultants_dispos, consultants_occupes = self._get_availability_data()
-            response = self._build_general_availability_response(
-                consultants_dispos, consultants_occupes
-            )
+            response = self._build_general_availability_response(consultants_dispos, consultants_occupes)
 
             return {
                 "response": response,
@@ -3382,8 +3084,7 @@ class ChatbotService:
 
         except (SQLAlchemyError, AttributeError, ValueError, TypeError) as e:
             return {
-                "response": "❌ Erreur lors de la récupération des disponibilités : "
-                + str(e),
+                "response": "❌ Erreur lors de la récupération des disponibilités : " + str(e),
                 "data": {},
                 "intent": "disponibilite",
                 "confidence": 0.3,
@@ -3392,29 +3093,17 @@ class ChatbotService:
     def _get_availability_data(self):
         """Récupère les données de disponibilité générale"""
         with get_database_session() as session:
-            consultants_dispos = (
-                session.query(Consultant).filter(Consultant.disponibilite).all()
-            )
+            consultants_dispos = session.query(Consultant).filter(Consultant.disponibilite).all()
 
         with get_database_session() as session:
-            consultants_occupes = (
-                session.query(Consultant)
-                .filter(Consultant.disponibilite is False)
-                .all()
-            )
+            consultants_occupes = session.query(Consultant).filter(Consultant.disponibilite is False).all()
 
         return consultants_dispos, consultants_occupes
 
-    def _build_general_availability_response(
-        self, consultants_dispos, consultants_occupes
-    ) -> str:
+    def _build_general_availability_response(self, consultants_dispos, consultants_occupes) -> str:
         """Construit la réponse générale de disponibilité"""
         response = "📅 **État des disponibilités** :\n\n"
-        response += (
-            "✅ **Disponibles immédiatement :** "
-            + str(len(consultants_dispos))
-            + " consultant(s)\n"
-        )
+        response += "✅ **Disponibles immédiatement :** " + str(len(consultants_dispos)) + " consultant(s)\n"
 
         response += self._format_available_consultants_list(consultants_dispos)
         response += self._format_busy_consultants_section(consultants_occupes)
@@ -3427,28 +3116,15 @@ class ChatbotService:
 
         if consultants_dispos:
             for consultant in consultants_dispos[:5]:  # Limiter à 5
-                response += (
-                    self.BULLET_POINT_INDENT
-                    + consultant.prenom
-                    + " "
-                    + consultant.nom
-                    + "\n"
-                )
+                response += self.BULLET_POINT_INDENT + consultant.prenom + " " + consultant.nom + "\n"
             if len(consultants_dispos) > 5:
-                response += (
-                    self.BULLET_POINT_INDENT
-                    + "... et "
-                    + str(len(consultants_dispos) - 5)
-                    + " autre(s)\n"
-                )
+                response += self.BULLET_POINT_INDENT + "... et " + str(len(consultants_dispos) - 5) + " autre(s)\n"
 
         return response
 
     def _format_busy_consultants_section(self, consultants_occupes) -> str:
         """Formate la section des consultants occupés"""
-        response = (
-            "\n🔴 **Occupés :** " + str(len(consultants_occupes)) + " consultant(s)\n"
-        )
+        response = "\n🔴 **Occupés :** " + str(len(consultants_occupes)) + " consultant(s)\n"
 
         if consultants_occupes:
             for consultant in consultants_occupes[:5]:  # Limiter à 5
@@ -3463,12 +3139,7 @@ class ChatbotService:
                     + ")\n"
                 )
             if len(consultants_occupes) > 5:
-                response += (
-                    self.BULLET_POINT_INDENT
-                    + "... et "
-                    + str(len(consultants_occupes) - 5)
-                    + " autre(s)\n"
-                )
+                response += self.BULLET_POINT_INDENT + "... et " + str(len(consultants_occupes) - 5) + " autre(s)\n"
 
         return response
 
@@ -3502,9 +3173,7 @@ class ChatbotService:
         if not missions_avec_tjm:
             return 0, 0
 
-        total_tjm = sum(
-            mission.tjm or mission.taux_journalier for mission in missions_avec_tjm
-        )
+        total_tjm = sum(mission.tjm or mission.taux_journalier for mission in missions_avec_tjm)
         count_tjm = len(missions_avec_tjm)
         return total_tjm / count_tjm if count_tjm > 0 else 0, count_tjm
 
@@ -3512,11 +3181,7 @@ class ChatbotService:
         """Gère les questions TJM pour un consultant spécifique"""
         try:
             with get_database_session() as session:
-                consultant_db = (
-                    session.query(Consultant)
-                    .filter(Consultant.id == consultant.id)
-                    .first()
-                )
+                consultant_db = session.query(Consultant).filter(Consultant.id == consultant.id).first()
 
             missions_avec_tjm = self._get_consultant_missions_with_tjm(consultant_db)
 
@@ -3531,10 +3196,7 @@ class ChatbotService:
                     response += f"📊 **TJM moyen :** {tjm_moyen:.0f}€ (sur {count_tjm} missions)"
 
             else:
-                response = (
-                    f"💰 **{consultant.prenom} {consultant.nom}** : "
-                    "Aucun TJM renseigné dans les missions"
-                )
+                response = f"💰 **{consultant.prenom} {consultant.nom}** : " "Aucun TJM renseigné dans les missions"
 
         except (
             SQLAlchemyError,
@@ -3547,9 +3209,7 @@ class ChatbotService:
 
         return {
             "response": response,
-            "data": {
-                "consultant": {"nom": consultant.nom, "prenom": consultant.prenom}
-            },
+            "data": {"consultant": {"nom": consultant.nom, "prenom": consultant.prenom}},
             "intent": "tjm_mission",
             "confidence": 0.9,
         }
@@ -3559,12 +3219,7 @@ class ChatbotService:
         try:
             with get_database_session() as session:
                 # TJM moyen avec nouveau champ
-                tjm_nouveau_moyen = (
-                    session.query(func.avg(Mission.tjm))
-                    .filter(Mission.tjm.isnot(None))
-                    .scalar()
-                    or 0
-                )
+                tjm_nouveau_moyen = session.query(func.avg(Mission.tjm)).filter(Mission.tjm.isnot(None)).scalar() or 0
 
                 # TJM moyen avec ancien champ
                 tjm_ancien_moyen = (
@@ -3575,38 +3230,27 @@ class ChatbotService:
                 )
 
                 # Compter les missions avec TJM
-                missions_nouveau_tjm = (
-                    session.query(Mission).filter(Mission.tjm.isnot(None)).count()
-                )
+                missions_nouveau_tjm = session.query(Mission).filter(Mission.tjm.isnot(None)).count()
 
-                missions_ancien_tjm = (
-                    session.query(Mission)
-                    .filter(Mission.taux_journalier.isnot(None))
-                    .count()
-                )
+                missions_ancien_tjm = session.query(Mission).filter(Mission.taux_journalier.isnot(None)).count()
 
             response = "💰 **Statistiques TJM des missions** :\n\n"
 
             if missions_nouveau_tjm > 0:
                 response += "🆕 **Nouveau format TJM :**\n"
                 response += f"{self.BULLET_POINT_INDENT}Missions avec TJM: {missions_nouveau_tjm}\n"
-                response += (
-                    f"{self.BULLET_POINT_INDENT}TJM moyen: {tjm_nouveau_moyen:.0f}€\n\n"
-                )
+                response += f"{self.BULLET_POINT_INDENT}TJM moyen: {tjm_nouveau_moyen:.0f}€\n\n"
 
             if missions_ancien_tjm > 0:
                 response += "📊 **Ancien format TJM :**\n"
                 response += f"{self.BULLET_POINT_INDENT}Missions avec TJM: {missions_ancien_tjm}\n"
-                response += (
-                    f"{self.BULLET_POINT_INDENT}TJM moyen: {tjm_ancien_moyen:.0f}€\n\n"
-                )
+                response += f"{self.BULLET_POINT_INDENT}TJM moyen: {tjm_ancien_moyen:.0f}€\n\n"
 
             # Calcul global
             if missions_nouveau_tjm > 0 or missions_ancien_tjm > 0:
                 total_missions = missions_nouveau_tjm + missions_ancien_tjm
                 tjm_global = (
-                    (tjm_nouveau_moyen * missions_nouveau_tjm)
-                    + (tjm_ancien_moyen * missions_ancien_tjm)
+                    (tjm_nouveau_moyen * missions_nouveau_tjm) + (tjm_ancien_moyen * missions_ancien_tjm)
                 ) / total_missions
                 response += f"🎯 **TJM global moyen :** {tjm_global:.0f}€ (sur {total_missions} missions)"
             else:
@@ -3691,11 +3335,7 @@ class ChatbotService:
         try:
             result = self.process_question(question)
             response = result.get("response", "❓ Je n'ai pas compris votre question.")
-            return (
-                str(response)
-                if response is not None
-                else "❓ Je n'ai pas compris votre question."
-            )
+            return str(response) if response is not None else "❓ Je n'ai pas compris votre question."
         except (AttributeError, KeyError, TypeError, ValueError) as e:
             return "❌ Erreur: " + str(e)
 

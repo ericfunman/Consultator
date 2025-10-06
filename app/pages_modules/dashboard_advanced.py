@@ -174,9 +174,7 @@ class AdvancedDashboardFeatures:
 
         return filters
 
-    def apply_filters_to_data(
-        self, data: pd.DataFrame, filters: Dict[str, Any]
-    ) -> pd.DataFrame:
+    def apply_filters_to_data(self, data: pd.DataFrame, filters: Dict[str, Any]) -> pd.DataFrame:
         """
         Applique les filtres aux données
         """
@@ -186,30 +184,23 @@ class AdvancedDashboardFeatures:
         if "start_date" in filters and "end_date" in filters:
             if "date" in filtered_data.columns:
                 filtered_data = filtered_data[
-                    (filtered_data["date"] >= filters["start_date"])
-                    & (filtered_data["date"] <= filters["end_date"])
+                    (filtered_data["date"] >= filters["start_date"]) & (filtered_data["date"] <= filters["end_date"])
                 ]
 
         # Filtres entités
         if "entities" in filters and filters["entities"]:
             if "entite" in filtered_data.columns:
-                filtered_data = filtered_data[
-                    filtered_data["entite"].isin(filters["entities"])
-                ]
+                filtered_data = filtered_data[filtered_data["entite"].isin(filters["entities"])]
 
         # Filtres practices
         if "practices" in filters and filters["practices"]:
             if "practice" in filtered_data.columns:
-                filtered_data = filtered_data[
-                    filtered_data["practice"].isin(filters["practices"])
-                ]
+                filtered_data = filtered_data[filtered_data["practice"].isin(filters["practices"])]
 
         # Filtres BM
         if "business_managers" in filters and filters["business_managers"]:
             if "business_manager" in filtered_data.columns:
-                filtered_data = filtered_data[
-                    filtered_data["business_manager"].isin(filters["business_managers"])
-                ]
+                filtered_data = filtered_data[filtered_data["business_manager"].isin(filters["business_managers"])]
 
         return filtered_data
 
@@ -219,9 +210,7 @@ class AdvancedDashboardFeatures:
         """
         st.sidebar.subheader("📤 Export")
 
-        export_format = st.sidebar.selectbox(
-            "Format d'export", options=["PDF", "Excel", "PNG", "PowerPoint"]
-        )
+        export_format = st.sidebar.selectbox("Format d'export", options=["PDF", "Excel", "PNG", "PowerPoint"])
 
         if st.sidebar.button("📥 Exporter le dashboard"):
             self._export_dashboard(dashboard_config, export_format)
@@ -260,9 +249,7 @@ class AdvancedDashboardFeatures:
         pdf_canvas.drawString(50, 800, f"Dashboard: {dashboard_config['nom']}")
 
         pdf_canvas.setFont("Helvetica", 12)
-        pdf_canvas.drawString(
-            50, 780, f"Généré le: {datetime.now().strftime('%d/%m/%Y à %H:%M')}"
-        )
+        pdf_canvas.drawString(50, 780, f"Généré le: {datetime.now().strftime('%d/%m/%Y à %H:%M')}")
 
         # Récupérer les données pour chaque widget
         y_position = 750
@@ -391,11 +378,7 @@ class AdvancedDashboardFeatures:
         revenue_data = self.data_service.get_revenue_by_bm_data()
         revenue_threshold = filters.get("revenue_threshold", 500) * 1000
 
-        low_revenue_bms = [
-            bm
-            for bm in revenue_data.get("bm_revenues", [])
-            if bm["ca_estime"] < revenue_threshold
-        ]
+        low_revenue_bms = [bm for bm in revenue_data.get("bm_revenues", []) if bm["ca_estime"] < revenue_threshold]
 
         if low_revenue_bms:
             alerts.append(
@@ -434,13 +417,9 @@ class AdvancedDashboardFeatures:
                         st.write(insight["description"])
 
                         if insight.get("recommendation"):
-                            st.info(
-                                f"💡 **Recommandation:** {insight['recommendation']}"
-                            )
+                            st.info(f"💡 **Recommandation:** {insight['recommendation']}")
 
-    def _generate_ai_insights(
-        self, _dashboard_config: Dict, filters: Dict[str, Any]
-    ) -> List[Dict]:
+    def _generate_ai_insights(self, _dashboard_config: Dict, filters: Dict[str, Any]) -> List[Dict]:
         """
         Génère des insights IA (simulation)
         """
@@ -461,24 +440,14 @@ class AdvancedDashboardFeatures:
         # Analyse des revenus
         revenue_data = self.data_service.get_revenue_by_bm_data()
         bm_revenues = revenue_data.get("bm_revenues", [])
-        _avg_revenue = (
-            sum(bm["ca_estime"] for bm in bm_revenues) / len(bm_revenues)
-            if bm_revenues
-            else 0
-        )
+        _avg_revenue = sum(bm["ca_estime"] for bm in bm_revenues) / len(bm_revenues) if bm_revenues else 0
 
-        top_performer = (
-            max(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
-        )
-        bottom_performer = (
-            min(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
-        )
+        top_performer = max(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
+        bottom_performer = min(bm_revenues, key=lambda x: x["ca_estime"]) if bm_revenues else None
 
         if top_performer and bottom_performer:
             ratio = (
-                top_performer["ca_estime"] / bottom_performer["ca_estime"]
-                if bottom_performer["ca_estime"] > 0
-                else 0
+                top_performer["ca_estime"] / bottom_performer["ca_estime"] if bottom_performer["ca_estime"] > 0 else 0
             )
 
             if ratio > 3:
@@ -536,11 +505,7 @@ class AdvancedDashboardFeatures:
             st.dataframe(
                 comparison_data,
                 use_container_width=True,
-                column_config={
-                    "evolution": st.column_config.NumberColumn(
-                        "Évolution", format="%.1f%%"
-                    )
-                },
+                column_config={"evolution": st.column_config.NumberColumn("Évolution", format="%.1f%%")},
             )
 
     def show_forecasting(self):
@@ -594,10 +559,8 @@ class AdvancedDashboardFeatures:
             # Zone de confiance
             fig.add_trace(
                 go.Scatter(
-                    x=forecast_data["forecast"]["dates"]
-                    + forecast_data["forecast"]["dates"][::-1],
-                    y=forecast_data["forecast"]["upper"]
-                    + forecast_data["forecast"]["lower"][::-1],
+                    x=forecast_data["forecast"]["dates"] + forecast_data["forecast"]["dates"][::-1],
+                    y=forecast_data["forecast"]["upper"] + forecast_data["forecast"]["lower"][::-1],
                     fill="tonexty",
                     fillcolor="rgba(255,0,0,0.2)",
                     line={"color": "rgba(255,255,255,0)"},
@@ -615,9 +578,7 @@ class AdvancedDashboardFeatures:
             st.plotly_chart(fig, use_container_width=True)
 
             # Résumé de la prévision
-            st.info(
-                f"📊 **Prévision à {forecast_period} mois:** {forecast_data['summary']}"
-            )
+            st.info(f"📊 **Prévision à {forecast_period} mois:** {forecast_data['summary']}")
 
     # Méthodes utilitaires pour récupérer les données
 
@@ -709,18 +670,14 @@ class AdvancedDashboardFeatures:
         import random
 
         # Données historiques simulées
-        historical_dates = [
-            datetime.now() - timedelta(days=30 * i) for i in range(12, 0, -1)
-        ]
+        historical_dates = [datetime.now() - timedelta(days=30 * i) for i in range(12, 0, -1)]
         # nosemgrep: python.lang.security.audit.non-cryptographic-random-used
         # Safe: random is only used here for generating demo/mock data for visualization purposes
         # No security decisions, authentication, or cryptographic operations depend on these values
         historical_values = [random.randint(50, 100) for _ in range(12)]
 
         # Prévisions simulées
-        forecast_dates = [
-            datetime.now() + timedelta(days=30 * i) for i in range(1, period_months + 1)
-        ]
+        forecast_dates = [datetime.now() + timedelta(days=30 * i) for i in range(1, period_months + 1)]
         # nosemgrep: python.lang.security.audit.non-cryptographic-random-used
         # Safe: random is only used here for generating demo/mock data for visualization purposes
         # No security decisions, authentication, or cryptographic operations depend on these values
