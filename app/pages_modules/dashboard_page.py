@@ -781,10 +781,8 @@ def render_dashboard_widgets(dashboard_config: Dict, period_months: int = 3):
         st.info("📊 Ce dashboard ne contient aucun widget")
         return
 
-    # Organisation des widgets par position
+    # Organiser et rendre les widgets
     widgets_by_row = _organize_widgets_by_position(widgets)
-
-    # Rendu ligne par ligne
     _render_widgets_by_rows(widgets_by_row, period_months)
 
 
@@ -844,8 +842,7 @@ def _render_single_widget(widget: Dict, period_months: int):
 
 def _should_apply_global_period(widget: Dict, widget_config: Dict) -> bool:
     """Détermine si la période globale doit être appliquée au widget"""
-    return ("period_months" in widget_config or
-            "period_months" in str(widget.get("widget_type", "")))
+    return "period_months" in widget_config or "period_months" in str(widget.get("widget_type", ""))
 
 
 def create_default_dashboards():
@@ -1050,7 +1047,7 @@ def _show_edit_instructions():
     st.info("💡 Utilisez le Builder Avancé pour modifier les widgets et la disposition")
 
     # Bouton pour rediriger vers le Builder Avancé
-    col1, col2, _ = st.columns([1, 2, 1])
+    _, col2, _ = st.columns([1, 2, 1])
     with col2:
         if st.button(
             "🎨 Éditer avec le Builder Avancé", key="edit_in_builder_advanced", type="primary", use_container_width=True

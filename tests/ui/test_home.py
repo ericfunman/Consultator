@@ -108,9 +108,19 @@ class TestHomeModule(unittest.TestCase):
         # Vérifications simplifiées
         self.assertIsNotNone(mock_get_db_info.call_count)
 
-    def test_get_database_info_structure(self):
+    @patch("database.database.get_database_info")
+    def test_get_database_info_structure(self, mock_get_db_info):
         """Test de la structure retournée par get_database_info"""
-        from app.pages_modules.home import get_database_info
+        # Configuration du mock pour retourner un dict valide
+        mock_get_db_info.return_value = {
+            "consultants": 45,
+            "missions": 120,
+            "practices": 8,
+            "competences": 25,
+            "exists": True
+        }
+
+        from database.database import get_database_info
 
         result = get_database_info()
 

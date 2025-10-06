@@ -328,15 +328,46 @@ class DashboardBuilder:
         """
         config = current_config.copy()
 
-        # Configurations communes
-        config = self._add_common_config(config)
+        # Appliquer toutes les configurations
+        config = self._apply_common_config(config)
+        config = self._apply_specific_config(widget_type, config)
+        config = self._apply_period_config(config)
 
-        # Configurations spécifiques par type de widget
-        config = self._add_widget_specific_config(widget_type, config)
+        return config
 
-        # Configuration de période
-        config = self._add_period_config(config)
+    def _apply_common_config(self, config: Dict) -> Dict:
+        """Ajoute les configurations communes à tous les widgets"""
+        config["title"] = st.text_input(
+            "Titre personnalisé",
+            value=config.get("title", ""),
+            placeholder="Laissez vide pour le titre par défaut",
+            key="builder_widget_title_input",
+        )
+        return config
 
+    def _apply_specific_config(self, widget_type: str, config: Dict) -> Dict:
+        """Ajoute les configurations spécifiques selon le type de widget"""
+        if widget_type in ["intercontrat_rate", "intercontrat_trend"]:
+            config = self._add_intercontrat_config(config)
+        elif widget_type == "revenue_by_bm":
+            config = self._add_revenue_config(config)
+        elif widget_type == "global_kpis":
+            config = self._add_kpis_config(config)
+        return config
+
+    def _apply_period_config(self, config: Dict) -> Dict:
+        """Ajoute la configuration de période si cochée"""
+        if st.checkbox(
+            "Configuration de période", value="period_months" in config, key="builder_widget_period_checkbox"
+        ):
+            config["period_months"] = st.selectbox(
+                "Période par défaut",
+                options=[1, 3, 6, 12],
+                index=[1, 3, 6, 12].index(config.get("period_months", 3)),
+                key="builder_widget_period_selectbox",
+            )
+        elif "period_months" in config:
+            del config["period_months"]
         return config
 
     def _add_common_config(self, config: Dict) -> Dict:

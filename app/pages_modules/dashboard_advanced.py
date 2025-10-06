@@ -195,29 +195,41 @@ class AdvancedDashboardFeatures:
         """
         filtered_data = data.copy()
 
-        # Filtre temporel
-        if "start_date" in filters and "end_date" in filters:
-            if "date" in filtered_data.columns:
-                filtered_data = filtered_data[
-                    (filtered_data["date"] >= filters["start_date"]) & (filtered_data["date"] <= filters["end_date"])
-                ]
-
-        # Filtres entités
-        if "entities" in filters and filters["entities"]:
-            if "entite" in filtered_data.columns:
-                filtered_data = filtered_data[filtered_data["entite"].isin(filters["entities"])]
-
-        # Filtres practices
-        if "practices" in filters and filters["practices"]:
-            if "practice" in filtered_data.columns:
-                filtered_data = filtered_data[filtered_data["practice"].isin(filters["practices"])]
-
-        # Filtres BM
-        if "business_managers" in filters and filters["business_managers"]:
-            if "business_manager" in filtered_data.columns:
-                filtered_data = filtered_data[filtered_data["business_manager"].isin(filters["business_managers"])]
+        # Appliquer tous les filtres
+        filtered_data = self._apply_temporal_filter(filtered_data, filters)
+        filtered_data = self._apply_entity_filter(filtered_data, filters)
+        filtered_data = self._apply_practice_filter(filtered_data, filters)
+        filtered_data = self._apply_bm_filter(filtered_data, filters)
 
         return filtered_data
+
+    def _apply_temporal_filter(self, data: pd.DataFrame, filters: Dict[str, Any]) -> pd.DataFrame:
+        """Applique le filtre temporel"""
+        if "start_date" in filters and "end_date" in filters:
+            if "date" in data.columns:
+                data = data[(data["date"] >= filters["start_date"]) & (data["date"] <= filters["end_date"])]
+        return data
+
+    def _apply_entity_filter(self, data: pd.DataFrame, filters: Dict[str, Any]) -> pd.DataFrame:
+        """Applique le filtre entités"""
+        if "entities" in filters and filters["entities"]:
+            if "entite" in data.columns:
+                data = data[data["entite"].isin(filters["entities"])]
+        return data
+
+    def _apply_practice_filter(self, data: pd.DataFrame, filters: Dict[str, Any]) -> pd.DataFrame:
+        """Applique le filtre practices"""
+        if "practices" in filters and filters["practices"]:
+            if "practice" in data.columns:
+                data = data[data["practice"].isin(filters["practices"])]
+        return data
+
+    def _apply_bm_filter(self, data: pd.DataFrame, filters: Dict[str, Any]) -> pd.DataFrame:
+        """Applique le filtre BM"""
+        if "business_managers" in filters and filters["business_managers"]:
+            if "business_manager" in data.columns:
+                data = data[data["business_manager"].isin(filters["business_managers"])]
+        return data
 
     def show_export_options(self, dashboard_config: Dict):
         """
