@@ -667,25 +667,28 @@ class AdvancedDashboardFeatures:
     def _generate_forecast(self, _forecast_type: str, period_months: int) -> Dict:
         """Génère des prévisions (simulation)"""
         from datetime import datetime, timedelta
-        import random  # noqa: S2245  # Non-cryptographic use for demo data only
+        import secrets
+
+        def _demo_random_int(min_val: int, max_val: int) -> int:
+            """
+            Génère un nombre entier aléatoire pour les données de démonstration.
+            Utilise secrets pour satisfaire les analyseurs de sécurité, mais clairement
+            documenté comme n'étant PAS pour un usage cryptographique sécurisé.
+
+            WARNING: Cette fonction est UNIQUEMENT pour les données de démo/visualisation.
+            NE PAS utiliser pour la sécurité, l'authentification, ou toute décision critique.
+            """
+            return secrets.randbelow(max_val - min_val + 1) + min_val
 
         # Données historiques simulées
         historical_dates = [datetime.now() - timedelta(days=30 * i) for i in range(12, 0, -1)]
-        # nosemgrep: python.lang.security.audit.non-cryptographic-random-used
-        # Safe: random is only used here for generating demo/mock data for visualization purposes
-        # No security decisions, authentication, or cryptographic operations depend on these values
-        historical_values = [
-            random.randint(50, 100) for _ in range(12)
-        ]  # noqa: S2245  # Non-cryptographic use for demo data only
+        # Utilisation sécurisée de secrets pour les données de démo uniquement
+        historical_values = [_demo_random_int(50, 100) for _ in range(12)]
 
         # Prévisions simulées
         forecast_dates = [datetime.now() + timedelta(days=30 * i) for i in range(1, period_months + 1)]
-        # nosemgrep: python.lang.security.audit.non-cryptographic-random-used
-        # Safe: random is only used here for generating demo/mock data for visualization purposes
-        # No security decisions, authentication, or cryptographic operations depend on these values
-        forecast_values = [
-            random.randint(45, 95) for _ in range(period_months)
-        ]  # noqa: S2245  # Non-cryptographic use for demo data only
+        # Utilisation sécurisée de secrets pour les données de démo uniquement
+        forecast_values = [_demo_random_int(45, 95) for _ in range(period_months)]
 
         return {
             "historical": {"dates": historical_dates, "values": historical_values},
