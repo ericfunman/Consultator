@@ -609,3 +609,168 @@ def calculate_tjm(salary: float, working_days: int = 218) -> float:
         return round(tjm, 2)
     except (ValueError, TypeError, ZeroDivisionError):
         return 0.0
+
+
+# ============================================================================
+# Fonctions Streamlit UI Helpers
+# ============================================================================
+
+
+def show_success_message(message: str):
+    """
+    Affiche un message de succès Streamlit
+
+    Args:
+        message: Message à afficher
+    """
+    import streamlit as st
+
+    st.success(message)
+
+
+def show_error_message(message: str):
+    """
+    Affiche un message d'erreur Streamlit
+
+    Args:
+        message: Message d'erreur à afficher
+    """
+    import streamlit as st
+
+    st.error(message)
+
+
+def create_download_button(data, filename: str, label: str = "📥 Télécharger"):
+    """
+    Crée un bouton de téléchargement Streamlit
+
+    Args:
+        data: Données à télécharger (bytes, str ou DataFrame)
+        filename: Nom du fichier
+        label: Label du bouton
+
+    Returns:
+        True si le bouton est cliqué
+    """
+    import streamlit as st
+
+    # Convertir les données en bytes si nécessaire
+    if isinstance(data, str):
+        data_bytes = data.encode("utf-8")
+    elif isinstance(data, pd.DataFrame):
+        data_bytes = data.to_csv(index=False).encode("utf-8")
+    else:
+        data_bytes = data
+
+    return st.download_button(label=label, data=data_bytes, file_name=filename)
+
+
+def create_metric_card(title: str, value: Union[int, float, str], delta: str = None):
+    """
+    Crée une carte métrique Streamlit
+
+    Args:
+        title: Titre de la métrique
+        value: Valeur de la métrique
+        delta: Variation (optionnel)
+    """
+    import streamlit as st
+
+    st.metric(label=title, value=value, delta=delta)
+
+
+# ============================================================================
+# Fonctions Data Processing
+# ============================================================================
+
+
+def convert_to_dataframe(data: List[Dict]) -> pd.DataFrame:
+    """
+    Convertit une liste de dictionnaires en DataFrame pandas
+
+    Args:
+        data: Liste de dictionnaires
+
+    Returns:
+        DataFrame pandas
+    """
+    if not data or not isinstance(data, list):
+        return pd.DataFrame()
+
+    try:
+        return pd.DataFrame(data)
+    except (ValueError, TypeError):
+        return pd.DataFrame()
+
+
+def export_to_csv(df: pd.DataFrame, filename: str = None) -> str:
+    """
+    Exporte un DataFrame en CSV
+
+    Args:
+        df: DataFrame à exporter
+        filename: Nom du fichier (optionnel, non utilisé dans export string)
+
+    Returns:
+        CSV en string
+    """
+    if df is None or df.empty:
+        return ""
+
+    try:
+        return df.to_csv(index=False)
+    except Exception:
+        return ""
+
+
+def export_to_excel(df: pd.DataFrame, filename: str = None) -> bytes:
+    """
+    Exporte un DataFrame en Excel
+
+    Args:
+        df: DataFrame à exporter
+        filename: Nom du fichier (optionnel, non utilisé dans export bytes)
+
+    Returns:
+        Données Excel en bytes
+    """
+    if df is None or df.empty:
+        return b""
+
+    try:
+        import io
+
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="Data")
+        output.seek(0)
+        return output.getvalue()
+    except Exception:
+        return b""
+
+
+def group_by_category(data: List[Dict], category_key: str) -> Dict[str, List]:
+    """
+    Groupe une liste de dictionnaires par catégorie
+
+    Args:
+        data: Liste de dictionnaires
+        category_key: Clé de catégorie
+
+    Returns:
+        Dictionnaire groupé par catégorie
+    """
+    if not data or not isinstance(data, list):
+        return {}
+
+    grouped = {}
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+
+        category = item.get(category_key, "Autre")
+        if category not in grouped:
+            grouped[category] = []
+        grouped[category].append(item)
+
+    return grouped
