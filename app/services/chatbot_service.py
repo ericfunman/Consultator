@@ -1286,6 +1286,13 @@ class ChatbotService:
         if len(question_lower) > 500:
             return None
 
+        competence_found = self._find_skill_with_patterns(question_lower)
+        if competence_found:
+            return self._clean_extracted_skill(competence_found)
+        return None
+
+    def _find_skill_with_patterns(self, question_lower: str) -> Optional[str]:
+        """Cherche une compétence dans la question avec différents patterns"""
         patterns = [
             r"qui\s+maîtrise\s+(.+?)(?:\?|$)",
             r"qui\s+sait\s+(.+?)(?:\?|$)",
@@ -1302,32 +1309,31 @@ class ChatbotService:
                 # Limite la longueur de la chaîne pour éviter le backtracking excessif
                 if len(competence_found) > 100:  # Protection ReDoS
                     competence_found = competence_found[:100]
-
-                # Nettoyer les articles et prépositions de manière sécurisée
-                # Utiliser des patterns simples sans backtracking
-                for article in [
-                    "le ",
-                    "la ",
-                    "les ",
-                    "du ",
-                    "de ",
-                    "des ",
-                    "en ",
-                    "un ",
-                    "une ",
-                ]:
-                    if competence_found.startswith(article):
-                        competence_found = competence_found[len(article) :]
-                        break
-
-                # Supprimer les mots de fin de manière sécurisée
-                for suffix in [" compétence", " compétences", " skill", " skills"]:
-                    if competence_found.endswith(suffix):
-                        competence_found = competence_found[: -len(suffix)]
-                        break
-
-                return competence_found.strip()
+                return competence_found
         return None
+
+    def _clean_extracted_skill(self, competence_found: str) -> str:
+        """Nettoie la compétence extraite en supprimant articles et suffixes"""
+        # Nettoyer les articles et prépositions de manière sécurisée
+        competence_found = self._remove_articles(competence_found)
+        competence_found = self._remove_suffixes(competence_found)
+        return competence_found.strip()
+
+    def _remove_articles(self, competence: str) -> str:
+        """Supprime les articles du début de la compétence"""
+        articles = ["le ", "la ", "les ", "du ", "de ", "des ", "en ", "un ", "une "]
+        for article in articles:
+            if competence.startswith(article):
+                return competence[len(article):]
+        return competence
+
+    def _remove_suffixes(self, competence: str) -> str:
+        """Supprime les suffixes de fin de compétence"""
+        suffixes = [" compétence", " compétences", " skill", " skills"]
+        for suffix in suffixes:
+            if competence.endswith(suffix):
+                return competence[:-len(suffix)]
+        return competence
 
     def _handle_specific_skill_search(self, competence: str, type_competence: Optional[str]) -> Dict[str, Any]:
         """Gère la recherche de consultants ayant une compétence spécifique"""

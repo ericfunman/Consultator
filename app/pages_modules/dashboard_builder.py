@@ -329,43 +329,73 @@ class DashboardBuilder:
         config = current_config.copy()
 
         # Configurations communes
+        config = self._add_common_config(config)
+
+        # Configurations spécifiques par type de widget
+        config = self._add_widget_specific_config(widget_type, config)
+
+        # Configuration de période
+        config = self._add_period_config(config)
+
+        return config
+
+    def _add_common_config(self, config: Dict) -> Dict:
+        """Ajoute les configurations communes à tous les widgets"""
         config["title"] = st.text_input(
             "Titre personnalisé",
             value=config.get("title", ""),
             placeholder="Laissez vide pour le titre par défaut",
             key="builder_widget_title_input",
         )
+        return config
 
-        # Configurations spécifiques
+    def _add_widget_specific_config(self, widget_type: str, config: Dict) -> Dict:
+        """Ajoute les configurations spécifiques selon le type de widget"""
         if widget_type in ["intercontrat_rate", "intercontrat_trend"]:
-            config["seuil_alerte"] = st.number_input(
-                "Seuil d'alerte (%)",
-                value=config.get("seuil_alerte", 15),
-                min_value=0,
-                max_value=100,
-                key="builder_widget_seuil_alerte",
-            )
-
+            config = self._add_intercontrat_config(config)
         elif widget_type == "revenue_by_bm":
-            config["show_target"] = st.checkbox(
-                "Afficher les objectifs", value=config.get("show_target", True), key="builder_widget_show_target"
-            )
-            config["chart_type"] = st.selectbox(
-                "Type de graphique",
-                options=["bar", "pie", "line"],
-                index=["bar", "pie", "line"].index(config.get("chart_type", "bar")),
-                key="builder_widget_chart_type",
-            )
-
+            config = self._add_revenue_config(config)
         elif widget_type == "global_kpis":
-            config["kpis_to_show"] = st.multiselect(
-                "KPIs à afficher",
-                options=["total_consultants", "total_missions", "revenue_total", "intercontrat_rate"],
-                default=config.get("kpis_to_show", ["total_consultants", "total_missions", "revenue_total"]),
-                key="builder_widget_kpis_multiselect",
-            )
+            config = self._add_kpis_config(config)
 
-        # Période par défaut
+        return config
+
+    def _add_intercontrat_config(self, config: Dict) -> Dict:
+        """Configuration pour les widgets d'intercontrat"""
+        config["seuil_alerte"] = st.number_input(
+            "Seuil d'alerte (%)",
+            value=config.get("seuil_alerte", 15),
+            min_value=0,
+            max_value=100,
+            key="builder_widget_seuil_alerte",
+        )
+        return config
+
+    def _add_revenue_config(self, config: Dict) -> Dict:
+        """Configuration pour les widgets de revenus"""
+        config["show_target"] = st.checkbox(
+            "Afficher les objectifs", value=config.get("show_target", True), key="builder_widget_show_target"
+        )
+        config["chart_type"] = st.selectbox(
+            "Type de graphique",
+            options=["bar", "pie", "line"],
+            index=["bar", "pie", "line"].index(config.get("chart_type", "bar")),
+            key="builder_widget_chart_type",
+        )
+        return config
+
+    def _add_kpis_config(self, config: Dict) -> Dict:
+        """Configuration pour les widgets de KPIs globaux"""
+        config["kpis_to_show"] = st.multiselect(
+            "KPIs à afficher",
+            options=["total_consultants", "total_missions", "revenue_total", "intercontrat_rate"],
+            default=config.get("kpis_to_show", ["total_consultants", "total_missions", "revenue_total"]),
+            key="builder_widget_kpis_multiselect",
+        )
+        return config
+
+    def _add_period_config(self, config: Dict) -> Dict:
+        """Ajoute la configuration de période si cochée"""
         if st.checkbox(
             "Configuration de période", value="period_months" in config, key="builder_widget_period_checkbox"
         ):

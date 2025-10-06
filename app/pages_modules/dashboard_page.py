@@ -5,7 +5,7 @@ Phases 1-4 complètes : fondations, widgets, builder avancé, fonctionnalités p
 """
 
 import streamlit as st
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 
 from app.services.dashboard_service import DashboardService
@@ -366,106 +366,149 @@ def show_dashboard_creator():
 
     # Formulaire de création
     with st.form("create_dashboard_form"):
-        col1, col2 = st.columns(2)
-
-        with col1:
-            dashboard_name = st.text_input(LABEL_DASHBOARD_NAME, placeholder="Mon Dashboard Personnel")
-            role_access = st.selectbox(
-                "Accès",
-                options=["all", "direction", "bm", "responsable_bm"],
-                format_func=lambda x: {
-                    "all": "🌐 Tous",
-                    "direction": "👑 Direction",
-                    "bm": "👔 Business Managers",
-                    "responsable_bm": "📋 Responsables BM",
-                }.get(x, x),
-                key="dashboard_creator_role_access_selectbox",
-            )
-
-        with col2:
-            description = st.text_area("Description", placeholder="Description de ce dashboard...", height=100)
-            is_template = st.checkbox("📋 Utiliser comme template")
-
-        st.subheader("🧩 Widgets à inclure")
-
-        # Récupération des widgets par catégorie
-        widgets_by_category = WidgetCatalogManager.get_widgets_by_category()
-
-        selected_widgets = []
-
-        for category, widgets in widgets_by_category.items():
-            category_names = {
-                "financial": "💰 Financier",
-                "intercontrat": "⏰ Intercontrat",
-                "management": "🏆 Management",
-            }
-
-            st.write(f"**{category_names.get(category, category)}**")
-
-            cols = st.columns(2)
-            for i, widget in enumerate(widgets):
-                with cols[i % 2]:
-                    if st.checkbox(
-                        f"{widget['icon']} {widget['display_name']}",
-                        key=f"widget_{widget['name']}",
-                        help=widget["description"],
-                    ):
-                        selected_widgets.append(widget["name"])
+        dashboard_data = _collect_dashboard_form_data()
+        selected_widgets = _collect_widget_selections()
 
         # Boutons d'action
-        col1, col2 = st.columns(2)
+        submitted, cancelled = _render_creation_buttons()
 
-        with col1:
-            submitted = st.form_submit_button("🚀 Créer le Dashboard", type="primary")
-
-        with col2:
-            if st.form_submit_button(BUTTON_CANCEL):
-                st.session_state.dashboard_mode = "view"
-                st.rerun()
+        if cancelled:
+            st.session_state.dashboard_mode = "view"
+            st.rerun()
+            return
 
         if submitted:
-            if not dashboard_name.strip():
-                st.error(ERROR_DASHBOARD_NAME_REQUIRED)
-                return
+            _process_dashboard_creation(dashboard_data, selected_widgets)
 
-            if not selected_widgets:
-                st.error("❌ Veuillez sélectionner au moins un widget")
-                return
 
-            # Création du dashboard
-            dashboard_id = DashboardService.create_dashboard(
-                nom=dashboard_name.strip(),
-                description=description.strip(),
-                role_access=role_access,
-                created_by="system",  # À adapter selon l'authentification
-                is_template=is_template,
-            )
+def _collect_dashboard_form_data() -> Dict:
+    """Collecte les données du formulaire de dashboard"""
+    col1, col2 = st.columns(2)
 
-            if dashboard_id:
-                # Ajout des widgets sélectionnés
-                for i, widget_type in enumerate(selected_widgets):
-                    # Disposition automatique en grille 2 colonnes
-                    position_x = i % 2
-                    position_y = i // 2
+    with col1:
+        dashboard_name = st.text_input(LABEL_DASHBOARD_NAME, placeholder="Mon Dashboard Personnel")
+        role_access = st.selectbox(
+            "Accès",
+            options=["all", "direction", "bm", "responsable_bm"],
+            format_func=lambda x: {
+                "all": "🌐 Tous",
+                "direction": "👑 Direction",
+                "bm": "👔 Business Managers",
+                "responsable_bm": "📋 Responsables BM",
+            }.get(x, x),
+            key="dashboard_creator_role_access_selectbox",
+        )
 
-                    DashboardService.add_widget_to_dashboard(
-                        dashboard_id=dashboard_id,
-                        widget_type=widget_type,
-                        position_x=position_x,
-                        position_y=position_y,
-                        width=1,
-                        height=1,
-                    )
+    with col2:
+        description = st.text_area("Description", placeholder="Description de ce dashboard...", height=100)
+        is_template = st.checkbox("📋 Utiliser comme template")
 
-                st.success(f"✅ Dashboard '{dashboard_name}' créé avec succès !")
-                st.balloons()
+    return {
+        "name": dashboard_name,
+        "description": description,
+        "role_access": role_access,
+        "is_template": is_template,
+    }
 
-                # Retour au mode visualisation
-                st.session_state.dashboard_mode = "view"
-                st.rerun()
 
-            else:
-                st.error("❌ Erreur lors de la création du dashboard")
+def _collect_widget_selections() -> List[str]:
+    """Collecte les sélections de widgets par catégorie"""
+    st.subheader("🧩 Widgets à inclure")
+
+    # Récupération des widgets par catégorie
+    widgets_by_category = WidgetCatalogManager.get_widgets_by_category()
+    selected_widgets = []
+
+    for category, widgets in widgets_by_category.items():
+        selected_widgets.extend(_collect_category_widgets(category, widgets))
+
+    return selected_widgets
+
+
+def _collect_category_widgets(category: str, widgets: List[Dict]) -> List[str]:
+    """Collecte les widgets sélectionnés pour une catégorie"""
+    category_names = {
+        "financial": "💰 Financier",
+        "intercontrat": "⏰ Intercontrat",
+        "management": "🏆 Management",
+    }
+
+    st.write(f"**{category_names.get(category, category)}**")
+
+    cols = st.columns(2)
+    selected = []
+
+    for i, widget in enumerate(widgets):
+        with cols[i % 2]:
+            if st.checkbox(
+                f"{widget['icon']} {widget['display_name']}",
+                key=f"widget_{widget['name']}",
+                help=widget["description"],
+            ):
+                selected.append(widget["name"])
+
+    return selected
+
+
+def _render_creation_buttons() -> Tuple[bool, bool]:
+    """Affiche les boutons de création et retourne leur état"""
+    col1, col2 = st.columns(2)
+
+    with col1:
+        submitted = st.form_submit_button("🚀 Créer le Dashboard", type="primary")
+
+    with col2:
+        cancelled = st.form_submit_button(BUTTON_CANCEL)
+
+    return submitted, cancelled
+
+
+def _process_dashboard_creation(dashboard_data: Dict, selected_widgets: List[str]):
+    """Traite la création du dashboard et des widgets"""
+    if not dashboard_data["name"].strip():
+        st.error(ERROR_DASHBOARD_NAME_REQUIRED)
+        return
+
+    if not selected_widgets:
+        st.error("❌ Veuillez sélectionner au moins un widget")
+        return
+
+    # Création du dashboard
+    dashboard_id = DashboardService.create_dashboard(
+        nom=dashboard_data["name"].strip(),
+        description=dashboard_data["description"].strip(),
+        role_access=dashboard_data["role_access"],
+        created_by="system",  # À adapter selon l'authentification
+        is_template=dashboard_data["is_template"],
+    )
+
+    if dashboard_id:
+        _add_selected_widgets_to_dashboard(dashboard_id, selected_widgets)
+        st.success(f"✅ Dashboard '{dashboard_data['name']}' créé avec succès !")
+        st.balloons()
+
+        # Retour au mode visualisation
+        st.session_state.dashboard_mode = "view"
+        st.rerun()
+    else:
+        st.error("❌ Erreur lors de la création du dashboard")
+
+
+def _add_selected_widgets_to_dashboard(dashboard_id: int, selected_widgets: List[str]):
+    """Ajoute les widgets sélectionnés au dashboard"""
+    for i, widget_type in enumerate(selected_widgets):
+        # Disposition automatique en grille 2 colonnes
+        position_x = i % 2
+        position_y = i // 2
+
+        DashboardService.add_widget_to_dashboard(
+            dashboard_id=dashboard_id,
+            widget_type=widget_type,
+            position_x=position_x,
+            position_y=position_y,
+            width=1,
+            height=1,
+        )
 
 
 def show_dashboard_editor():
@@ -519,93 +562,127 @@ def show_widgets_editor(dashboard_config: Dict):
     current_widgets = dashboard_config.get("widgets", [])
 
     # Widgets actuels
+    _display_current_widgets(current_widgets)
+
+    # Ajouter nouveaux widgets
+    _handle_widget_addition(dashboard_config, current_widgets)
+
+
+def _display_current_widgets(current_widgets: List[Dict]):
+    """Affiche la liste des widgets actuels avec options de suppression"""
     if current_widgets:
         st.write("**Widgets actuels:**")
 
         for widget in current_widgets:
-            with st.container():
-                col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
+            _display_single_widget(widget)
 
-                with col1:
-                    widget_info = next(
-                        (w for w in DashboardService.get_available_widgets() if w["name"] == widget["widget_type"]),
-                        {"display_name": widget["widget_type"], "icon": "📊"},
-                    )
-                    st.write(f"{widget_info['icon']} {widget_info['display_name']}")
+        st.divider()
 
-                with col2:
-                    st.write(f"Position: ({widget['position_x']}, {widget['position_y']})")
 
-                with col3:
-                    st.write(f"Taille: {widget['width']}x{widget['height']}")
+def _display_single_widget(widget: Dict):
+    """Affiche un widget individuel avec ses informations et bouton de suppression"""
+    with st.container():
+        col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
 
-                with col4:
-                    if st.button("🗑️", key=f"delete_widget_{widget['id']}", help="Supprimer"):
-                        if DashboardService.remove_widget_from_dashboard(widget["id"]):
-                            st.success("✅ Widget supprimé")
-                            st.rerun()
-                        else:
-                            st.error("❌ Erreur lors de la suppression")
+        with col1:
+            widget_info = next(
+                (w for w in DashboardService.get_available_widgets() if w["name"] == widget["widget_type"]),
+                {"display_name": widget["widget_type"], "icon": "📊"},
+            )
+            st.write(f"{widget_info['icon']} {widget_info['display_name']}")
 
-                st.divider()
+        with col2:
+            st.write(f"Position: ({widget['position_x']}, {widget['position_y']})")
 
-    # Ajouter nouveaux widgets
+        with col3:
+            st.write(f"Taille: {widget['width']}x{widget['height']}")
+
+        with col4:
+            _render_delete_button(widget)
+
+
+def _render_delete_button(widget: Dict):
+    """Affiche le bouton de suppression pour un widget"""
+    if st.button("🗑️", key=f"delete_widget_{widget['id']}", help="Supprimer"):
+        if DashboardService.remove_widget_from_dashboard(widget["id"]):
+            st.success("✅ Widget supprimé")
+            st.rerun()
+        else:
+            st.error("❌ Erreur lors de la suppression")
+
+
+def _handle_widget_addition(dashboard_config: Dict, current_widgets: List[Dict]):
+    """Gère l'ajout de nouveaux widgets"""
     st.write("**Ajouter des widgets:**")
 
     widgets_by_category = WidgetCatalogManager.get_widgets_by_category()
 
     with st.form("add_widgets_form"):
-        new_widgets = []
-
-        for category, widgets in widgets_by_category.items():
-            category_names = {
-                "financial": "💰 Financier",
-                "intercontrat": "⏰ Intercontrat",
-                "management": "🏆 Management",
-            }
-
-            st.write(f"**{category_names.get(category, category)}**")
-
-            cols = st.columns(2)
-            for i, widget in enumerate(widgets):
-                # Vérifier si le widget n'est pas déjà présent
-                is_already_present = any(w["widget_type"] == widget["name"] for w in current_widgets)
-
-                with cols[i % 2]:
-                    if not is_already_present:
-                        if st.checkbox(
-                            f"{widget['icon']} {widget['display_name']}",
-                            key=f"add_widget_{widget['name']}",
-                            help=widget["description"],
-                        ):
-                            new_widgets.append(widget["name"])
-                    else:
-                        st.write(f"✅ {widget['icon']} {widget['display_name']} (déjà présent)")
+        new_widgets = _collect_new_widgets(widgets_by_category, current_widgets)
 
         if st.form_submit_button("➕ Ajouter les widgets sélectionnés"):
-            if new_widgets:
-                # Calcul de la prochaine position
-                max_y = max([w["position_y"] for w in current_widgets] + [-1])
+            _process_widget_addition(dashboard_config, new_widgets)
 
-                for i, widget_type in enumerate(new_widgets):
-                    position_x = i % 2
-                    position_y = max_y + 1 + (i // 2)
 
-                    success = DashboardService.add_widget_to_dashboard(
-                        dashboard_id=dashboard_config["id"],
-                        widget_type=widget_type,
-                        position_x=position_x,
-                        position_y=position_y,
-                    )
+def _collect_new_widgets(widgets_by_category: Dict, current_widgets: List[Dict]) -> List[str]:
+    """Collecte les nouveaux widgets sélectionnés par l'utilisateur"""
+    new_widgets = []
 
-                    if success:
-                        st.success(f"✅ Widget {widget_type} ajouté")
-                    else:
-                        st.error(f"❌ Erreur lors de l'ajout de {widget_type}")
+    for category, widgets in widgets_by_category.items():
+        category_names = {
+            "financial": "💰 Financier",
+            "intercontrat": "⏰ Intercontrat",
+            "management": "🏆 Management",
+        }
 
-                st.rerun()
+        st.write(f"**{category_names.get(category, category)}**")
+
+        cols = st.columns(2)
+        for i, widget in enumerate(widgets):
+            with cols[i % 2]:
+                if _is_widget_available(widget, current_widgets):
+                    if st.checkbox(
+                        f"{widget['icon']} {widget['display_name']}",
+                        key=f"add_widget_{widget['name']}",
+                        help=widget["description"],
+                    ):
+                        new_widgets.append(widget["name"])
+                else:
+                    st.write(f"✅ {widget['icon']} {widget['display_name']} (déjà présent)")
+
+    return new_widgets
+
+
+def _is_widget_available(widget: Dict, current_widgets: List[Dict]) -> bool:
+    """Vérifie si un widget peut être ajouté (n'est pas déjà présent)"""
+    return not any(w["widget_type"] == widget["name"] for w in current_widgets)
+
+
+def _process_widget_addition(dashboard_config: Dict, new_widgets: List[str]):
+    """Traite l'ajout des nouveaux widgets sélectionnés"""
+    if new_widgets:
+        # Calcul de la prochaine position
+        max_y = max([w["position_y"] for w in dashboard_config.get("widgets", [])] + [-1])
+
+        for i, widget_type in enumerate(new_widgets):
+            position_x = i % 2
+            position_y = max_y + 1 + (i // 2)
+
+            success = DashboardService.add_widget_to_dashboard(
+                dashboard_id=dashboard_config["id"],
+                widget_type=widget_type,
+                position_x=position_x,
+                position_y=position_y,
+            )
+
+            if success:
+                st.success(f"✅ Widget {widget_type} ajouté")
             else:
-                st.warning("⚠️ Aucun widget sélectionné")
+                st.error(f"❌ Erreur lors de l'ajout de {widget_type}")
+
+        st.rerun()
+    else:
+        st.warning("⚠️ Aucun widget sélectionné")
 
 
 def show_dashboard_settings_editor(dashboard_config: Dict):
@@ -705,39 +782,70 @@ def render_dashboard_widgets(dashboard_config: Dict, period_months: int = 3):
         return
 
     # Organisation des widgets par position
+    widgets_by_row = _organize_widgets_by_position(widgets)
+
+    # Rendu ligne par ligne
+    _render_widgets_by_rows(widgets_by_row, period_months)
+
+
+def _organize_widgets_by_position(widgets: List[Dict]) -> Dict[int, List[Dict]]:
+    """Organise les widgets par ligne selon leur position Y"""
     widgets_by_row = {}
     for widget in widgets:
         row = widget["position_y"]
         if row not in widgets_by_row:
             widgets_by_row[row] = []
         widgets_by_row[row].append(widget)
+    return widgets_by_row
 
-    # Rendu ligne par ligne
+
+def _render_widgets_by_rows(widgets_by_row: Dict[int, List[Dict]], period_months: int):
+    """Rend les widgets ligne par ligne"""
     for row in sorted(widgets_by_row.keys()):
         row_widgets = sorted(widgets_by_row[row], key=lambda w: w["position_x"])
+        _render_single_row(row_widgets, period_months, row, max(widgets_by_row.keys()))
 
-        # Créer les colonnes selon le nombre de widgets dans la ligne
-        if len(row_widgets) == 1:
-            cols = [st.container()]
-        else:
-            cols = st.columns(len(row_widgets))
 
-        for i, widget in enumerate(row_widgets):
-            with cols[i] if len(row_widgets) > 1 else cols[0]:
-                # Configuration du widget avec période globale
-                widget_config = widget.get("config", {}).copy()
-                if "period_months" in widget_config or "period_months" in str(widget.get("widget_type", "")):
-                    widget_config["period_months"] = period_months
+def _render_single_row(row_widgets: List[Dict], period_months: int, row: int, max_row: int):
+    """Rend une ligne de widgets"""
+    # Créer les colonnes selon le nombre de widgets dans la ligne
+    cols = _create_columns_for_row(row_widgets)
 
-                # Rendu du widget
-                try:
-                    WidgetFactory.render_widget(widget["widget_type"], widget_config)
-                except Exception as e:
-                    st.error(f"❌ Erreur dans le widget {widget['widget_type']}: {e}")
+    for i, widget in enumerate(row_widgets):
+        with cols[i] if len(row_widgets) > 1 else cols[0]:
+            _render_single_widget(widget, period_months)
 
-        # Séparateur entre les lignes (sauf pour la dernière)
-        if row < max(widgets_by_row.keys()):
-            st.markdown("---")
+    # Séparateur entre les lignes (sauf pour la dernière)
+    if row < max_row:
+        st.markdown("---")
+
+
+def _create_columns_for_row(row_widgets: List[Dict]) -> List:
+    """Crée les colonnes appropriées pour une ligne de widgets"""
+    if len(row_widgets) == 1:
+        return [st.container()]
+    else:
+        return st.columns(len(row_widgets))
+
+
+def _render_single_widget(widget: Dict, period_months: int):
+    """Rend un widget individuel avec sa configuration"""
+    # Configuration du widget avec période globale
+    widget_config = widget.get("config", {}).copy()
+    if _should_apply_global_period(widget, widget_config):
+        widget_config["period_months"] = period_months
+
+    # Rendu du widget
+    try:
+        WidgetFactory.render_widget(widget["widget_type"], widget_config)
+    except Exception as e:
+        st.error(f"❌ Erreur dans le widget {widget['widget_type']}: {e}")
+
+
+def _should_apply_global_period(widget: Dict, widget_config: Dict) -> bool:
+    """Détermine si la période globale doit être appliquée au widget"""
+    return ("period_months" in widget_config or
+            "period_months" in str(widget.get("widget_type", "")))
 
 
 def create_default_dashboards():
@@ -747,46 +855,56 @@ def create_default_dashboards():
     dashboards = DashboardService.get_all_dashboards()
 
     if not dashboards:
-        # Dashboard Direction
-        direction_id = DashboardService.create_dashboard(
-            nom="Vue Direction",
-            description="Dashboard pour la direction avec KPIs globaux et analyse financière",
-            role_access="direction",
-            created_by="system",
-            is_template=True,
-        )
-
-        if direction_id:
-            direction_widgets = [
-                ("global_kpis", 0, 0, 2, 1),
-                ("intercontrat_rate", 0, 1, 1, 1),
-                ("revenue_by_bm", 1, 1, 1, 1),
-                ("top_bm_performance", 0, 2, 2, 1),
-            ]
-
-            for widget_type, x, y, w, h in direction_widgets:
-                DashboardService.add_widget_to_dashboard(direction_id, widget_type, x, y, w, h)
-
-        # Dashboard BM
-        bm_id = DashboardService.create_dashboard(
-            nom="Focus Business Manager",
-            description="Dashboard pour Business Managers avec focus sur l'intercontrat",
-            role_access="bm",
-            created_by="system",
-            is_template=True,
-        )
-
-        if bm_id:
-            bm_widgets = [
-                ("intercontrat_rate", 0, 0, 1, 1),
-                ("consultants_sans_mission", 1, 0, 1, 1),
-                ("intercontrat_trend", 0, 1, 2, 1),
-            ]
-
-            for widget_type, x, y, w, h in bm_widgets:
-                DashboardService.add_widget_to_dashboard(bm_id, widget_type, x, y, w, h)
-
+        _create_direction_dashboard()
+        _create_bm_dashboard()
         print("✅ Dashboards par défaut créés")
+
+
+def _create_direction_dashboard():
+    """Crée le dashboard par défaut pour la direction"""
+    direction_id = DashboardService.create_dashboard(
+        nom="Vue Direction",
+        description="Dashboard pour la direction avec KPIs globaux et analyse financière",
+        role_access="direction",
+        created_by="system",
+        is_template=True,
+    )
+
+    if direction_id:
+        direction_widgets = [
+            ("global_kpis", 0, 0, 2, 1),
+            ("intercontrat_rate", 0, 1, 1, 1),
+            ("revenue_by_bm", 1, 1, 1, 1),
+            ("top_bm_performance", 0, 2, 2, 1),
+        ]
+
+        _add_widgets_to_dashboard(direction_id, direction_widgets)
+
+
+def _create_bm_dashboard():
+    """Crée le dashboard par défaut pour les Business Managers"""
+    bm_id = DashboardService.create_dashboard(
+        nom="Focus Business Manager",
+        description="Dashboard pour Business Managers avec focus sur l'intercontrat",
+        role_access="bm",
+        created_by="system",
+        is_template=True,
+    )
+
+    if bm_id:
+        bm_widgets = [
+            ("intercontrat_rate", 0, 0, 1, 1),
+            ("consultants_sans_mission", 1, 0, 1, 1),
+            ("intercontrat_trend", 0, 1, 2, 1),
+        ]
+
+        _add_widgets_to_dashboard(bm_id, bm_widgets)
+
+
+def _add_widgets_to_dashboard(dashboard_id: int, widgets: List[Tuple[str, int, int, int, int]]):
+    """Ajoute une liste de widgets à un dashboard"""
+    for widget_type, x, y, w, h in widgets:
+        DashboardService.add_widget_to_dashboard(dashboard_id, widget_type, x, y, w, h)
 
 
 def show_dashboard_creation_form():
@@ -892,23 +1010,43 @@ def show_dashboard_edit_form():
     """
     Formulaire d'édition de dashboard
     """
-    if "edit_dashboard_id" not in st.session_state:
-        st.error("❌ Aucun dashboard sélectionné pour l'édition")
-        if st.button("🔙 Retour"):
-            st.session_state.dashboard_mode = "view"
-            st.rerun()
+    if not _validate_edit_session():
         return
 
     dashboard_id = st.session_state.edit_dashboard_id
     dashboard_config = DashboardService.get_dashboard_by_id(dashboard_id)
 
+    if not _validate_dashboard_config(dashboard_config):
+        return
+
+    _show_edit_instructions()
+    _show_edit_form(dashboard_config)
+
+
+def _validate_edit_session() -> bool:
+    """Valide que la session d'édition est correctement initialisée"""
+    if "edit_dashboard_id" not in st.session_state:
+        st.error("❌ Aucun dashboard sélectionné pour l'édition")
+        if st.button("🔙 Retour"):
+            st.session_state.dashboard_mode = "view"
+            st.rerun()
+        return False
+    return True
+
+
+def _validate_dashboard_config(dashboard_config: Optional[Dict]) -> bool:
+    """Valide que la configuration du dashboard est disponible"""
     if not dashboard_config:
         st.error(ERROR_DASHBOARD_NOT_FOUND)
         if st.button("🔙 Retour"):
             st.session_state.dashboard_mode = "view"
             st.rerun()
-        return
+        return False
+    return True
 
+
+def _show_edit_instructions():
+    """Affiche les instructions pour l'édition"""
     st.info("💡 Utilisez le Builder Avancé pour modifier les widgets et la disposition")
 
     # Bouton pour rediriger vers le Builder Avancé
@@ -923,59 +1061,92 @@ def show_dashboard_edit_form():
 
     st.markdown("---")
 
-    # Formulaire d'édition
+
+def _show_edit_form(dashboard_config: Dict):
+    """Affiche le formulaire d'édition du dashboard"""
     with st.form("edit_dashboard_form"):
-        st.subheader(f"✏️ Éditer: {dashboard_config['nom']}")
-
-        nom = st.text_input(LABEL_DASHBOARD_NAME, value=dashboard_config["nom"])
-        description = st.text_area("Description", value=dashboard_config.get("description", ""))
-
-        role_access = st.selectbox(
-            "Rôle d'accès",
-            options=["all", "admin", "bm", "consultant"],
-            index=["all", "admin", "bm", "consultant"].index(dashboard_config.get("role_access", "all")),
-            format_func=lambda x: {
-                "all": "🌍 Tous",
-                "admin": "👑 Admin",
-                "bm": "💼 Business Manager",
-                "consultant": "👤 Consultant",
-            }.get(x, x),
-        )
-
-        is_template = st.checkbox("📋 Template", value=dashboard_config.get("is_template", False))
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            submitted = st.form_submit_button("✅ Sauvegarder", type="primary", use_container_width=True)
-
-        with col2:
-            cancelled = st.form_submit_button(BUTTON_CANCEL, use_container_width=True)
-
-        if submitted:
-            if not nom:
-                st.error(ERROR_DASHBOARD_NAME_REQUIRED)
-            else:
-                try:
-                    # Mettre à jour le dashboard
-                    success = DashboardService.update_dashboard(
-                        dashboard_id=dashboard_id,
-                        nom=nom,
-                        description=description,
-                        role_access=role_access,
-                        is_template=is_template,
-                    )
-
-                    if success:
-                        st.success(f"✅ Dashboard '{nom}' mis à jour avec succès !")
-                        st.session_state.dashboard_mode = "view"
-                        st.rerun()
-                    else:
-                        st.error("❌ Erreur lors de la mise à jour du dashboard")
-
-                except Exception as e:
-                    st.error(f"❌ Erreur : {str(e)}")
+        _render_edit_form_fields(dashboard_config)
+        submitted, cancelled = _render_edit_form_buttons()
 
         if cancelled:
             st.session_state.dashboard_mode = "view"
             st.rerun()
+            return
+
+        if submitted:
+            _process_edit_form_submission(dashboard_config)
+
+
+def _render_edit_form_fields(dashboard_config: Dict):
+    """Affiche les champs du formulaire d'édition"""
+    st.subheader(f"✏️ Éditer: {dashboard_config['nom']}")
+
+    # Utilisation de variables globales pour éviter la répétition
+    global LABEL_DASHBOARD_NAME, ERROR_DASHBOARD_NAME_REQUIRED, BUTTON_CANCEL
+
+    nom = st.text_input(LABEL_DASHBOARD_NAME, value=dashboard_config["nom"])
+    description = st.text_area("Description", value=dashboard_config.get("description", ""))
+
+    role_access = st.selectbox(
+        "Rôle d'accès",
+        options=["all", "admin", "bm", "consultant"],
+        index=["all", "admin", "bm", "consultant"].index(dashboard_config.get("role_access", "all")),
+        format_func=lambda x: {
+            "all": "🌍 Tous",
+            "admin": "👑 Admin",
+            "bm": "💼 Business Manager",
+            "consultant": "👤 Consultant",
+        }.get(x, x),
+    )
+
+    is_template = st.checkbox("📋 Template", value=dashboard_config.get("is_template", False))
+
+    # Stocker les valeurs pour utilisation dans la soumission
+    st.session_state.edit_form_data = {
+        "nom": nom,
+        "description": description,
+        "role_access": role_access,
+        "is_template": is_template,
+    }
+
+
+def _render_edit_form_buttons() -> Tuple[bool, bool]:
+    """Affiche les boutons du formulaire d'édition et retourne leur état"""
+    col1, col2 = st.columns(2)
+
+    with col1:
+        submitted = st.form_submit_button("✅ Sauvegarder", type="primary", use_container_width=True)
+
+    with col2:
+        cancelled = st.form_submit_button(BUTTON_CANCEL, use_container_width=True)
+
+    return submitted, cancelled
+
+
+def _process_edit_form_submission(dashboard_config: Dict):
+    """Traite la soumission du formulaire d'édition"""
+    form_data = st.session_state.get("edit_form_data", {})
+
+    if not form_data.get("nom"):
+        st.error(ERROR_DASHBOARD_NAME_REQUIRED)
+        return
+
+    try:
+        # Mettre à jour le dashboard
+        success = DashboardService.update_dashboard(
+            dashboard_id=dashboard_config["id"],
+            nom=form_data["nom"],
+            description=form_data["description"],
+            role_access=form_data["role_access"],
+            is_template=form_data["is_template"],
+        )
+
+        if success:
+            st.success(f"✅ Dashboard '{form_data['nom']}' mis à jour avec succès !")
+            st.session_state.dashboard_mode = "view"
+            st.rerun()
+        else:
+            st.error("❌ Erreur lors de la mise à jour du dashboard")
+
+    except Exception as e:
+        st.error(f"❌ Erreur : {str(e)}")

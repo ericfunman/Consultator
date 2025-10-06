@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import json
 import io
+import secrets
 
 # Imports optionnels pour exports
 try:
@@ -32,8 +33,22 @@ class AdvancedDashboardFeatures:
     Fonctionnalités avancées pour les dashboards
     """
 
+    # Constantes pour éviter la duplication de chaînes
+    METRIC_LABEL = "Métrique"
+
     def __init__(self):
         self.data_service = DashboardDataService()
+
+    def _demo_random_int(self, min_val: int, max_val: int) -> int:
+        """
+        Génère un nombre entier aléatoire pour les données de démonstration.
+        Utilise secrets pour satisfaire les analyseurs de sécurité, mais clairement
+        documenté comme n'étant PAS pour un usage cryptographique sécurisé.
+
+        WARNING: Cette fonction est UNIQUEMENT pour les données de démo/visualisation.
+        NE PAS utiliser pour la sécurité, l'authentification, ou toute décision critique.
+        """
+        return secrets.randbelow(max_val - min_val + 1) + min_val
 
     def show_advanced_filters(self, context: str = "default") -> Dict[str, Any]:
         """
@@ -630,11 +645,11 @@ class AdvancedDashboardFeatures:
         """Récupère les données de sommaire du dashboard"""
         return [
             {
-                "Métrique": "Nombre de widgets",
+                self.METRIC_LABEL: "Nombre de widgets",
                 "Valeur": len(_dashboard_config.get("widgets", [])),
             },
             {
-                "Métrique": "Date de création",
+                self.METRIC_LABEL: "Date de création",
                 "Valeur": _dashboard_config.get("date_creation", "N/A"),
             },
         ]
@@ -666,29 +681,15 @@ class AdvancedDashboardFeatures:
 
     def _generate_forecast(self, _forecast_type: str, period_months: int) -> Dict:
         """Génère des prévisions (simulation)"""
-        from datetime import datetime, timedelta
-        import secrets
-
-        def _demo_random_int(min_val: int, max_val: int) -> int:
-            """
-            Génère un nombre entier aléatoire pour les données de démonstration.
-            Utilise secrets pour satisfaire les analyseurs de sécurité, mais clairement
-            documenté comme n'étant PAS pour un usage cryptographique sécurisé.
-
-            WARNING: Cette fonction est UNIQUEMENT pour les données de démo/visualisation.
-            NE PAS utiliser pour la sécurité, l'authentification, ou toute décision critique.
-            """
-            return secrets.randbelow(max_val - min_val + 1) + min_val
-
         # Données historiques simulées
-        historical_dates = [datetime.now() - timedelta(days=30 * i) for i in range(12, 0, -1)]
-        # Utilisation sécurisée de secrets pour les données de démo uniquement
-        historical_values = [_demo_random_int(50, 100) for _ in range(12)]
+        historical_dates, historical_values = self._generate_historical_data()
 
         # Prévisions simulées
-        forecast_dates = [datetime.now() + timedelta(days=30 * i) for i in range(1, period_months + 1)]
-        # Utilisation sécurisée de secrets pour les données de démo uniquement
-        forecast_values = [_demo_random_int(45, 95) for _ in range(period_months)]
+        forecast_dates, forecast_values = self._generate_forecast_data(period_months)
+
+        # Calcul du résumé
+        avg_forecast = sum(forecast_values) / len(forecast_values) if forecast_values else 0
+        summary = f"Tendance stable avec une moyenne de {avg_forecast:.1f}"
 
         return {
             "historical": {"dates": historical_dates, "values": historical_values},
@@ -698,8 +699,20 @@ class AdvancedDashboardFeatures:
                 "upper": [v + 10 for v in forecast_values],
                 "lower": [v - 10 for v in forecast_values],
             },
-            "summary": f"Tendance stable avec une moyenne de {sum(forecast_values)/len(forecast_values):.1f}",
+            "summary": summary,
         }
+
+    def _generate_historical_data(self) -> tuple:
+        """Génère les données historiques simulées"""
+        historical_dates = [datetime.now() - timedelta(days=30 * i) for i in range(12, 0, -1)]
+        historical_values = [self._demo_random_int(50, 100) for _ in range(12)]
+        return historical_dates, historical_values
+
+    def _generate_forecast_data(self, period_months: int) -> tuple:
+        """Génère les données de prévision simulées"""
+        forecast_dates = [datetime.now() + timedelta(days=30 * i) for i in range(1, period_months + 1)]
+        forecast_values = [self._demo_random_int(45, 95) for _ in range(period_months)]
+        return forecast_dates, forecast_values
 
 
 # Instance globale des fonctionnalités avancées
