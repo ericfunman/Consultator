@@ -132,6 +132,21 @@ class CacheService:
 
         return deleted
 
+    def clear(self) -> bool:
+        """Vide complètement le cache (Redis + mémoire)"""
+        try:
+            # Vider Redis
+            if self.redis_client:
+                self.redis_client.flushdb()
+
+            # Vider le cache mémoire
+            self.memory_cache.clear()
+
+            return True
+        except Exception as e:
+            print(f"⚠️ Erreur lors du vidage du cache: {e}")
+            return False
+
     def clear_pattern(self, pattern: str) -> int:
         """Supprime toutes les clés correspondant à un pattern"""
         deleted_count = 0
