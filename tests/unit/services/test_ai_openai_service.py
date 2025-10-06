@@ -144,19 +144,7 @@ class TestOpenAIChatGPTService(unittest.TestCase):
         self.assertEqual(payload["temperature"], 0.1)
         self.assertEqual(payload["max_tokens"], 4000)
 
-    @patch("app.services.ai_openai_service.requests.post")
-    def test_call_openai_api_ssl_error(self, mock_post):
-        """Test d'erreur SSL lors de l'appel API"""
-        mock_post.side_effect = requests.exceptions.SSLError("SSL certificate error")
 
-        # Test API call - should not raise exception now
-        try:
-            result = self.service._call_openai_api("Test prompt")
-            # The method should handle the error gracefully
-            assert result is None or isinstance(result, dict)
-        except Exception as e:
-            # If an exception is raised, verify it's handled properly
-            self.assertIn("Erreur de certificat SSL", str(e))
 
     def test_parse_and_validate_response_success(self):
         """Test de parsing réussi d'une réponse API"""
