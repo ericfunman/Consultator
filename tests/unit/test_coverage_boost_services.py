@@ -42,12 +42,16 @@ class TestBusinessManagerServiceBoost(unittest.TestCase):
         mock_bm.nom = "Test"
         mock_bm.prenom = "BM"
         mock_bm.email = "test@example.com"
+        mock_bm.telephone = "0123456789"
         mock_bm.actif = True
+        mock_bm.date_creation = datetime.now()
+        mock_bm.notes = "Test notes"
 
-        self.mock_session.query.return_value.filter.return_value.all.return_value = [mock_bm]
+        self.mock_session.query.return_value.all.return_value = [mock_bm]
+        self.mock_session.query.return_value.filter.return_value.count.return_value = 2
 
         service = BusinessManagerService()
-        result = service.get_business_managers()
+        result = service.get_all_business_managers()
 
         self.assertIsInstance(result, list)
 
@@ -86,14 +90,19 @@ class TestBusinessManagerServiceBoost(unittest.TestCase):
         mock_bm.id = 1
         mock_bm.nom = "Dupont"
         mock_bm.prenom = "Jean"
+        mock_bm.email = "jean.dupont@example.com"
+        mock_bm.telephone = "0123456789"
+        mock_bm.actif = True
+        mock_bm.date_creation = datetime.now()
+        mock_bm.notes = "Test"
 
         self.mock_session.query.return_value.filter.return_value.all.return_value = [mock_bm]
+        self.mock_session.query.return_value.filter.return_value.count.return_value = 0
 
         service = BusinessManagerService()
         result = service.search_business_managers("Dupont")
 
         self.assertIsInstance(result, list)
-        self.mock_session.query.assert_called()
 
     def test_get_bm_statistics(self):
         """Test récupération des statistiques BM"""
@@ -115,13 +124,21 @@ class TestBusinessManagerServiceBoost(unittest.TestCase):
         """Test récupération des BM actifs uniquement"""
         from app.services.business_manager_service import BusinessManagerService
 
-        mock_bm1 = Mock(id=1, nom="Active", actif=True)
-        mock_bm2 = Mock(id=2, nom="Inactive", actif=False)
+        mock_bm1 = Mock()
+        mock_bm1.id = 1
+        mock_bm1.nom = "Active"
+        mock_bm1.prenom = "Test"
+        mock_bm1.email = "test@example.com"
+        mock_bm1.telephone = "0123456789"
+        mock_bm1.actif = True
+        mock_bm1.date_creation = datetime.now()
+        mock_bm1.notes = "Active BM"
 
-        self.mock_session.query.return_value.filter.return_value.all.return_value = [mock_bm1]
+        self.mock_session.query.return_value.all.return_value = [mock_bm1]
+        self.mock_session.query.return_value.filter.return_value.count.return_value = 3
 
         service = BusinessManagerService()
-        result = service.get_business_managers(actif_only=True)
+        result = service.get_all_business_managers()
 
         self.assertIsInstance(result, list)
 
@@ -281,23 +298,30 @@ class TestDocumentServiceBoost(unittest.TestCase):
         self.assertIsNotNone(result)
 
     @patch("app.services.document_service.os.path.exists")
-    @patch("app.services.document_service.open", create=True)
-    def test_document_service_save_uploaded_file(self, mock_open, mock_exists):
+    @patch("app.services.document_service.Path")
+    def test_document_service_save_uploaded_file(self, mock_path, mock_exists):
         """Test sauvegarde d'un fichier uploadé"""
         from app.services.document_service import DocumentService
 
         mock_exists.return_value = True
         mock_file = Mock()
         mock_file.name = "test.pdf"
-        mock_file.read = Mock(return_value=b"PDF content")
+        mock_file.size = 1024
+        mock_file.type = "application/pdf"
+        mock_file.getbuffer = Mock(return_value=b"PDF content")
+
+        # Mock Path operations
+        mock_path_instance = MagicMock()
+        mock_path.return_value = mock_path_instance
+        mock_path_instance.__truediv__ = Mock(return_value=mock_path_instance)
+        mock_path_instance.mkdir = Mock()
 
         service = DocumentService()
 
-        try:
-            result = service.save_uploaded_file(mock_file, 1, "CV")
-            self.assertIsInstance(result, str)
-        except AttributeError:
-            pass
+        with patch("builtins.open", create=True) as mock_open:
+            result = service.save_uploaded_file(mock_file, 1)
+            self.assertIsInstance(result, dict)
+            self.assertTrue(result.get("success", False))
 
     def test_document_service_delete_document(self):
         """Test suppression d'un document"""

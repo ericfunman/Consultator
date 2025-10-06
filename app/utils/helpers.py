@@ -473,3 +473,139 @@ def get_file_extension(filename: str) -> str:
         return ext.lower()
     except (AttributeError, TypeError):
         return ""
+
+
+def format_phone_number(phone: str) -> str:
+    """
+    Formate un numéro de téléphone français
+
+    Args:
+        phone: Numéro de téléphone brut
+
+    Returns:
+        Numéro formaté (ex: "06 12 34 56 78")
+    """
+    if not phone:
+        return ""
+
+    # Retirer tous les caractères non numériques
+    digits = re.sub(r"\D", "", str(phone))
+
+    # Formater si c'est un numéro français (10 chiffres)
+    if len(digits) == 10:
+        return f"{digits[0:2]} {digits[2:4]} {digits[4:6]} {digits[6:8]} {digits[8:10]}"
+
+    return digits
+
+
+def format_date_french(date_obj) -> str:
+    """
+    Formate une date en format français complet
+
+    Args:
+        date_obj: Objet date ou datetime
+
+    Returns:
+        Chaîne formatée (ex: "15 janvier 2024")
+    """
+    if date_obj is None:
+        return ""
+
+    try:
+        months = {
+            1: "janvier",
+            2: "février",
+            3: "mars",
+            4: "avril",
+            5: "mai",
+            6: "juin",
+            7: "juillet",
+            8: "août",
+            9: "septembre",
+            10: "octobre",
+            11: "novembre",
+            12: "décembre",
+        }
+
+        if isinstance(date_obj, (datetime, date)):
+            day = date_obj.day
+            month = months.get(date_obj.month, "")
+            year = date_obj.year
+            return f"{day} {month} {year}"
+
+        return str(date_obj)
+    except (ValueError, AttributeError):
+        return ""
+
+
+def sanitize_input(text: str) -> str:
+    """
+    Nettoie une entrée utilisateur (suppression HTML, scripts, etc.)
+
+    Args:
+        text: Texte à nettoyer
+
+    Returns:
+        Texte nettoyé
+    """
+    if not text:
+        return ""
+
+    # Supprimer les balises HTML
+    text = re.sub(r"<[^>]+>", "", str(text))
+
+    # Supprimer les scripts
+    text = re.sub(r"<script[^>]*>.*?</script>", "", text, flags=re.DOTALL | re.IGNORECASE)
+
+    # Nettoyer les caractères spéciaux dangereux
+    text = text.replace("<", "&lt;").replace(">", "&gt;")
+
+    return text.strip()
+
+
+def calculate_mission_duration(start_date, end_date) -> int:
+    """
+    Calcule la durée d'une mission en mois
+
+    Args:
+        start_date: Date de début
+        end_date: Date de fin
+
+    Returns:
+        Nombre de mois
+    """
+    if not start_date or not end_date:
+        return 0
+
+    try:
+        if isinstance(start_date, str):
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        if isinstance(end_date, str):
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+        delta = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)
+        return max(1, delta)
+    except (ValueError, AttributeError):
+        return 0
+
+
+def calculate_tjm(salary: float, working_days: int = 218) -> float:
+    """
+    Calcule le TJM à partir d'un salaire annuel
+
+    Args:
+        salary: Salaire annuel brut
+        working_days: Nombre de jours travaillés par an (défaut: 218)
+
+    Returns:
+        TJM calculé
+    """
+    if not salary or salary <= 0:
+        return 0.0
+
+    try:
+        # Formule simple: Salaire annuel / jours travaillés * multiplicateur
+        tjm = (salary / working_days) * 2.3  # Coefficient standard
+        return round(tjm, 2)
+    except (ValueError, TypeError, ZeroDivisionError):
+        return 0.0
