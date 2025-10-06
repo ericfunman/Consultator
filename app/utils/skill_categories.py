@@ -422,3 +422,55 @@ def _determine_competence_type(category, category_type):
     if category_type:
         return category_type
     return "techniques" if category in COMPETENCES_TECHNIQUES else "fonctionnelles"
+
+
+# Alias pour compatibilité avec les tests
+SKILL_CATEGORIES = {**COMPETENCES_TECHNIQUES, **COMPETENCES_FONCTIONNELLES}
+
+
+def get_category_for_skill(skill_name: str) -> str:
+    """
+    Retourne la catégorie d'une compétence donnée
+
+    Args:
+        skill_name: Nom de la compétence
+
+    Returns:
+        Nom de la catégorie ou "Autre" si non trouvée
+    """
+    if not skill_name:
+        return "Autre"
+
+    skill_lower = skill_name.lower()
+
+    # Chercher dans les compétences techniques
+    for category, skills in COMPETENCES_TECHNIQUES.items():
+        if any(skill_lower == skill.lower() for skill in skills):
+            return category
+
+    # Chercher dans les compétences fonctionnelles
+    for category, skills in COMPETENCES_FONCTIONNELLES.items():
+        if any(skill_lower == skill.lower() for skill in skills):
+            return category
+
+    return "Autre"
+
+
+def get_all_skills() -> list:
+    """
+    Retourne une liste plate de toutes les compétences disponibles
+
+    Returns:
+        Liste de toutes les compétences (techniques + fonctionnelles)
+    """
+    all_skills = []
+
+    # Ajouter les compétences techniques
+    for skills in COMPETENCES_TECHNIQUES.values():
+        all_skills.extend(skills)
+
+    # Ajouter les compétences fonctionnelles
+    for skills in COMPETENCES_FONCTIONNELLES.values():
+        all_skills.extend(skills)
+
+    return sorted(list(set(all_skills)))  # Éliminer les doublons et trier
