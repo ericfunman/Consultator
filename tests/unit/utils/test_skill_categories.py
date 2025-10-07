@@ -10,6 +10,8 @@ from app.utils.skill_categories import NIVEAUX_MAITRISE
 from app.utils.skill_categories import NIVEAUX_REQUIS
 from app.utils.skill_categories import get_all_categories
 from app.utils.skill_categories import get_all_competences
+from app.utils.skill_categories import get_all_skills
+from app.utils.skill_categories import get_category_for_skill
 from app.utils.skill_categories import get_competences_by_category
 from app.utils.skill_categories import search_competences
 
@@ -193,3 +195,171 @@ class TestSkillCategories:
         for category in COMPETENCES_FONCTIONNELLES.keys():
             assert isinstance(category, str)
             assert len(category.strip()) > 0
+
+
+class TestGetCategoryForSkill:
+    """Tests pour la fonction get_category_for_skill"""
+
+    def test_get_category_for_skill_backend(self):
+        """Test catégorie pour compétence Backend"""
+        assert get_category_for_skill("Python") == "Backend"
+        assert get_category_for_skill("Java") == "Backend"
+        assert get_category_for_skill("Spring Boot") == "Backend"
+
+    def test_get_category_for_skill_frontend(self):
+        """Test catégorie pour compétence Frontend"""
+        assert get_category_for_skill("React") == "Frontend"
+        assert get_category_for_skill("Angular") == "Frontend"
+        assert get_category_for_skill("Vue.js") == "Frontend"
+
+    def test_get_category_for_skill_mobile(self):
+        """Test catégorie pour compétence Mobile"""
+        assert get_category_for_skill("React Native") == "Mobile"
+        assert get_category_for_skill("Flutter") == "Mobile"
+
+    def test_get_category_for_skill_data(self):
+        """Test catégorie pour compétence Data"""
+        assert get_category_for_skill("SQL") == "Data & Analytics"
+        assert get_category_for_skill("Pandas") == "Data & Analytics"
+
+    def test_get_category_for_skill_cloud(self):
+        """Test catégorie pour compétence Cloud"""
+        assert get_category_for_skill("AWS") == "Cloud & DevOps"
+        assert get_category_for_skill("Docker") == "Cloud & DevOps"
+
+    def test_get_category_for_skill_database(self):
+        """Test catégorie pour compétence Base de données"""
+        assert get_category_for_skill("PostgreSQL") == "Base de données"
+        assert get_category_for_skill("MongoDB") == "Base de données"
+
+    def test_get_category_for_skill_fonctionnelle(self):
+        """Test catégorie pour compétence fonctionnelle"""
+        result = get_category_for_skill("Crédit immobilier")
+        assert result == "Banque de Détail"
+
+    def test_get_category_for_skill_case_insensitive(self):
+        """Test insensibilité à la casse"""
+        assert get_category_for_skill("python") == "Backend"
+        assert get_category_for_skill("PYTHON") == "Backend"
+        assert get_category_for_skill("PyThOn") == "Backend"
+
+    def test_get_category_for_skill_not_found(self):
+        """Test compétence non trouvée"""
+        assert get_category_for_skill("CompétenceInexistante") == "Autre"
+        assert get_category_for_skill("XYZ123") == "Autre"
+
+    def test_get_category_for_skill_empty(self):
+        """Test avec chaîne vide"""
+        assert get_category_for_skill("") == "Autre"
+
+    def test_get_category_for_skill_none(self):
+        """Test avec None"""
+        assert get_category_for_skill(None) == "Autre"
+
+    def test_get_category_for_skill_whitespace(self):
+        """Test avec espaces"""
+        result = get_category_for_skill("React Native")
+        assert result == "Mobile"
+
+
+class TestGetAllSkills:
+    """Tests pour la fonction get_all_skills"""
+
+    def test_get_all_skills_returns_list(self):
+        """Test que la fonction retourne une liste"""
+        result = get_all_skills()
+        assert isinstance(result, list)
+
+    def test_get_all_skills_not_empty(self):
+        """Test que la liste n'est pas vide"""
+        result = get_all_skills()
+        assert len(result) > 0
+
+    def test_get_all_skills_contains_techniques(self):
+        """Test que la liste contient des compétences techniques"""
+        result = get_all_skills()
+        
+        assert "Python" in result
+        assert "Java" in result
+        assert "React" in result
+        assert "Docker" in result
+
+    def test_get_all_skills_contains_fonctionnelles(self):
+        """Test que la liste contient des compétences fonctionnelles"""
+        result = get_all_skills()
+        
+        # Vérifier au moins une compétence fonctionnelle
+        has_functional = any(
+            skill in result 
+            for category_skills in COMPETENCES_FONCTIONNELLES.values() 
+            for skill in category_skills
+        )
+        assert has_functional
+
+    def test_get_all_skills_sorted(self):
+        """Test que la liste est triée"""
+        result = get_all_skills()
+        assert result == sorted(result)
+
+    def test_get_all_skills_no_duplicates(self):
+        """Test absence de doublons"""
+        result = get_all_skills()
+        assert len(result) == len(set(result))
+
+    def test_get_all_skills_all_strings(self):
+        """Test que tous les éléments sont des strings"""
+        result = get_all_skills()
+        
+        for skill in result:
+            assert isinstance(skill, str)
+            assert len(skill) > 0
+
+    def test_get_all_skills_count(self):
+        """Test nombre total approximatif de compétences"""
+        result = get_all_skills()
+        
+        # Compter manuellement (approximatif)
+        manual_count = sum(len(skills) for skills in COMPETENCES_TECHNIQUES.values())
+        manual_count += sum(len(skills) for skills in COMPETENCES_FONCTIONNELLES.values())
+        
+        # Le résultat peut être <= au compte manuel (doublons éliminés)
+        assert len(result) <= manual_count
+        assert len(result) > 0
+
+
+class TestIntegration:
+    """Tests d'intégration entre les fonctions"""
+
+    def test_all_skills_have_categories(self):
+        """Test que toutes les compétences ont une catégorie"""
+        all_skills = get_all_skills()
+        
+        # Tester un échantillon
+        for skill in all_skills[:20]:
+            category = get_category_for_skill(skill)
+            # Ne devrait pas être "Autre" pour les compétences du référentiel
+            assert category != "Autre"
+
+    def test_search_and_get_category_consistency(self):
+        """Test cohérence entre search et get_category"""
+        search_results = search_competences("Python")
+        
+        for result in search_results:
+            if result["nom"] == "Python":
+                category_from_search = result["categorie"]
+                category_from_get = get_category_for_skill("Python")
+                assert category_from_search == category_from_get
+                break
+
+    def test_get_all_and_get_category(self):
+        """Test cohérence entre get_all_skills et get_category"""
+        all_skills = get_all_skills()
+        
+        # Prendre quelques compétences et vérifier leur catégorie
+        sample_skills = all_skills[:10]
+        
+        for skill in sample_skills:
+            category = get_category_for_skill(skill)
+            # Doit être une catégorie valide
+            assert isinstance(category, str)
+            assert len(category) > 0
