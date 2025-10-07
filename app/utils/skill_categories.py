@@ -473,4 +473,5 @@ def get_all_skills() -> list:
     for skills in COMPETENCES_FONCTIONNELLES.values():
         all_skills.extend(skills)
 
-    return sorted(list(set(all_skills)))  # Éliminer les doublons et trier
+    return sorted(set(all_skills))  # Éliminer les doublons et trier
+

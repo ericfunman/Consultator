@@ -100,7 +100,7 @@ class TestConvertConsultantRowToDict(unittest.TestCase):
         self.assertEqual(result["id"], 1)
         self.assertEqual(result["nom"], "Dupont")
         self.assertEqual(result["salaire_actuel"], 50000)
-        self.assertEqual(result["disponibilite"], True)
+        self.assertTrue(result["disponibilite"])
         self.assertEqual(result["experience_annees"], 5.2)
         self.assertIn("€", result["salaire_formatted"])
         self.assertEqual(result["statut"], ConsultantService.STATUS_AVAILABLE)

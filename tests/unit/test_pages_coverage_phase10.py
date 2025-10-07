@@ -515,7 +515,7 @@ class TestEdgeCases(unittest.TestCase):
             except ImportError:
                 pass
         
-        assert True
+        pass  # Test structure OK
 
     def test_database_models_import(self):
         """Test import modèles base de données"""

@@ -14,7 +14,7 @@ class TestGetAllCompetences(unittest.TestCase):
         from app.utils.skill_categories import get_all_competences
         competences = get_all_competences()
         # Test structure selon le type
-        self.assertTrue(len(competences) > 0)
+        self.assertGreater(len(competences), 0)
 
 class TestGetCompetencesByCategory(unittest.TestCase):
     def test_get_competences_by_category_techniques(self):

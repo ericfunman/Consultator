@@ -247,7 +247,7 @@ class TestPrepareCsvExportData(unittest.TestCase):
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["Grade"], "")
-        self.assertEqual(result[0]["Disponible"], False)
+        self.assertFalse(result[0]["Disponible"])
 
 
 class TestHandlePracticeCreation(unittest.TestCase):

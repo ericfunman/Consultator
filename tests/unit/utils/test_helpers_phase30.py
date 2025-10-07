@@ -255,7 +255,7 @@ class TestTruncateText(unittest.TestCase):
         from app.utils.helpers import truncate_text
 
         result = truncate_text("Hello World", 5)
-        self.assertTrue(len(result) <= 8)  # 5 + "..."
+        self.assertLessEqual(len(result), 8)  # 5 + "..."
         self.assertTrue(result.endswith("..."))
 
     def test_truncate_text_exact(self):

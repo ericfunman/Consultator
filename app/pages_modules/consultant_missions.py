@@ -1210,7 +1210,7 @@ def _build_revenue_data(missions):
                     "Client": mission.client.nom if mission.client else "Inconnu",
                     "Revenus": revenue,
                     "TJM": mission.taux_journalier or 0,
-                    "Statut": "En cours" if mission.en_cours else "Terminée",
+                    "Statut": STATUS_EN_COURS if mission.en_cours else STATUS_TERMINEE,
                 }
             )
             total_revenue += revenue

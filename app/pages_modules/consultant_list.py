@@ -494,7 +494,7 @@ def generate_consultants_report(df: pd.DataFrame):
         st.error(f"{MSG_ERREUR_RAPPORT}: {e}")
 
 
-def show_consultants_list_table(consultants=None, filters=None):
+def show_consultants_list_table(consultants=None, filters=None):  # noqa: ARG001
     """
     Affiche la liste des consultants sous forme de tableau
     Alias de show_consultants_list pour compatibilité avec les tests

@@ -484,7 +484,7 @@ class TestChatbotHandlersCoverage(unittest.TestCase):
         result = self.chatbot._handle_missions_question(entities)
         
         # Assert
-        self.assertTrue("bnp paribas" in result["response"].lower())
+        self.assertIn("bnp paribas", result["response"].lower())
 
     # ==================== TESTS: _handle_contact_question ====================
     @patch("app.services.chatbot_service.get_database_session")

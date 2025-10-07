@@ -703,7 +703,7 @@ def convert_to_dataframe(data: List[Dict]) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def export_to_csv(df: pd.DataFrame, filename: str = None) -> str:
+def export_to_csv(df: pd.DataFrame, filename: str = None) -> str:  # noqa: ARG001
     """
     Exporte un DataFrame en CSV
 
@@ -723,7 +723,7 @@ def export_to_csv(df: pd.DataFrame, filename: str = None) -> str:
         return ""
 
 
-def export_to_excel(df: pd.DataFrame, filename: str = None) -> bytes:
+def export_to_excel(df: pd.DataFrame, filename: str = None) -> bytes:  # noqa: ARG001
     """
     Exporte un DataFrame en Excel
 
