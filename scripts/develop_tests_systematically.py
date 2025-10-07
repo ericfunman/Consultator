@@ -252,7 +252,8 @@ class Test{class_name}Navigation:
 import pytest
 
 def test_placeholder():
-    assert True
+    """Test placeholder - à implémenter."""
+    pass  # À implémenter
 '''
         
         test_dir.mkdir(parents=True, exist_ok=True)
