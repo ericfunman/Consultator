@@ -160,7 +160,7 @@ def _display_mission_period(mission):
     if mission.date_fin:
         st.write(f"**Fin :** {mission.date_fin.strftime('%d/%m/%Y')}")
     elif mission.en_cours:
-        st.write("**Statut :** 🔄 En cours")
+        st.write(f"**Statut :** 🔄 {STATUS_EN_COURS}")
 
 
 def _display_mission_client(mission):
@@ -967,7 +967,7 @@ def _display_mission_chronology(mission):
         duration_days = (today - mission.date_debut).days
         duration_months = duration_days // 30
         st.write(f"**Durée actuelle :** {duration_months} mois ({duration_days} jours)")
-        st.write("**Statut :** 🔄 En cours")
+        st.write(f"**Statut :** 🔄 {STATUS_EN_COURS}")
 
 
 def _display_mission_financial_aspects(mission):
@@ -1338,7 +1338,7 @@ def show_missions_list(missions):
         missions_data = []
         for mission in missions:
             date_debut_str = mission.date_debut.strftime("%d/%m/%Y") if mission.date_debut else "N/A"
-            date_fin_str = mission.date_fin.strftime("%d/%m/%Y") if mission.date_fin else "En cours"
+            date_fin_str = mission.date_fin.strftime("%d/%m/%Y") if mission.date_fin else STATUS_EN_COURS
             
             # Statut avec emoji
             status_icons = {
