@@ -190,7 +190,7 @@ class TestNavigationButtons(unittest.TestCase):
         mock_button.return_value = False
         
         # Test structure
-        assert True
+        pass  # Test structure OK
 
 
 class TestProfileHeader(unittest.TestCase):
@@ -204,7 +204,7 @@ class TestProfileHeader(unittest.TestCase):
         mock_cols.return_value = [mock_col, mock_col]
         
         # Test structure
-        assert True
+        pass  # Test structure OK
 
 
 class TestProfileTabs(unittest.TestCase):
@@ -216,7 +216,7 @@ class TestProfileTabs(unittest.TestCase):
         mock_tabs.return_value = [Mock(), Mock(), Mock(), Mock()]
         
         # Test structure
-        assert True
+        pass  # Test structure OK
 
 
 class TestEditMode(unittest.TestCase):
@@ -252,7 +252,7 @@ class TestProfileDataDisplay(unittest.TestCase):
         mock_cols.return_value = [mock_col, mock_col, mock_col]
         
         # Test structure
-        assert True
+        pass  # Test structure OK
 
 
 class TestConsultantInfo(unittest.TestCase):

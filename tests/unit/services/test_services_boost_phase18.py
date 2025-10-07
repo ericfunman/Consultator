@@ -181,7 +181,7 @@ class TestWidgetFactoryComplete(unittest.TestCase):
             if hasattr(WidgetFactory, 'create_metric'):
                 WidgetFactory.create_metric(config)
             
-            assert True
+            pass  # Test structure OK
         except ImportError:
             assert True
 
@@ -200,7 +200,7 @@ class TestWidgetFactoryComplete(unittest.TestCase):
             if hasattr(WidgetFactory, 'create_chart'):
                 WidgetFactory.create_chart(config)
             
-            assert True
+            pass  # Test structure OK
         except:
             assert True
 
@@ -219,7 +219,7 @@ class TestWidgetFactoryComplete(unittest.TestCase):
             if hasattr(WidgetFactory, 'create_chart'):
                 WidgetFactory.create_chart(config)
             
-            assert True
+            pass  # Test structure OK
         except:
             assert True
 
@@ -238,7 +238,7 @@ class TestWidgetFactoryComplete(unittest.TestCase):
             if hasattr(WidgetFactory, 'create_table'):
                 WidgetFactory.create_table(config)
             
-            assert True
+            pass  # Test structure OK
         except:
             assert True
 
@@ -250,7 +250,7 @@ class TestWidgetFactoryComplete(unittest.TestCase):
             if hasattr(WidgetCatalogManager, 'initialize_widget_catalog'):
                 WidgetCatalogManager.initialize_widget_catalog()
             
-            assert True
+            pass  # Test structure OK
         except:
             assert True
 
@@ -263,7 +263,7 @@ class TestWidgetFactoryComplete(unittest.TestCase):
                 result = WidgetCatalogManager.get_all_widgets()
                 assert isinstance(result, (list, dict, type(None)))
             else:
-                assert True
+                pass  # Test structure OK
         except:
             assert True
 
@@ -406,7 +406,7 @@ class TestCacheServiceComplete(unittest.TestCase):
             if hasattr(CacheService, 'clear_all_caches'):
                 CacheService.clear_all_caches()
             
-            assert True
+            pass  # Test structure OK
         except:
             assert True
 
@@ -419,7 +419,7 @@ class TestCacheServiceComplete(unittest.TestCase):
                 result = CacheService.get_cache_stats()
                 assert isinstance(result, (dict, type(None)))
             else:
-                assert True
+                pass  # Test structure OK
         except:
             assert True
 
@@ -457,7 +457,7 @@ class TestPracticeServiceComplete(unittest.TestCase):
             result = PracticeService.get_by_name("Data Science")
             assert result is not None or result is None
         else:
-            assert True
+            pass  # Test structure OK
 
 
 if __name__ == "__main__":

@@ -356,7 +356,7 @@ class TestSkillStatistics(unittest.TestCase):
         mock_cols.return_value = [mock_col, mock_col, mock_col]
         
         # Test stats display structure
-        assert True
+        pass  # Test structure OK
 
 
 if __name__ == "__main__":

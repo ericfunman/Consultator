@@ -266,7 +266,7 @@ class TestCacheService(unittest.TestCase):
             if hasattr(cache, 'invalidate_pattern'):
                 cache.invalidate_pattern("consultant_*")
             
-            assert True
+            pass  # Test structure OK
         except Exception:
             pass
 
@@ -449,7 +449,7 @@ class TestUIEnhancements(unittest.TestCase):
             with patch('streamlit.success'):
                 show_success_message("Test")
             
-            assert True
+            pass  # Test structure OK
         except Exception:
             pass
 
@@ -461,7 +461,7 @@ class TestUIEnhancements(unittest.TestCase):
             with patch('streamlit.error'):
                 show_error_message("Test")
             
-            assert True
+            pass  # Test structure OK
         except Exception:
             pass
 
@@ -473,7 +473,7 @@ class TestUIEnhancements(unittest.TestCase):
             with patch('streamlit.warning'):
                 show_warning_message("Test")
             
-            assert True
+            pass  # Test structure OK
         except Exception:
             pass
 
@@ -485,7 +485,7 @@ class TestUIEnhancements(unittest.TestCase):
             with patch('streamlit.info'):
                 show_info_message("Test")
             
-            assert True
+            pass  # Test structure OK
         except Exception:
             pass
 
