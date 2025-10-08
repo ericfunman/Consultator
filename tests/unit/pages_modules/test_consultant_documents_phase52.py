@@ -577,11 +577,11 @@ class TestShowDocumentsStatistics:
 
     def test_show_documents_statistics_empty(self):
         """Test affichage avec liste vide"""
-        # Ne devrait rien faire
+        # Ne devrait rien faire - test que l'appel ne lève pas d'exception
         consultant_documents.show_documents_statistics([])
 
-        # Pas d'exception levée
-        assert True
+        # Test réussi si aucune exception n'est levée
+        # (pas besoin d'assertion explicite, pytest détecte les exceptions)
 
 
 # ============================================================================
