@@ -63,11 +63,11 @@ jobs:
         find . -name "*.pyc" -delete 2>/dev/null || true
         echo "✅ Cache pytest nettoyé"
 
-    - name: Run tests with coverage
+    - name: Run tests with coverage (parallel)
       run: |
         mkdir -p reports
-        echo "🚀 Running tests for Python ${{ matrix.python-version }}..."
-        python -m pytest tests/ --cov=app --cov-report=xml:reports/coverage.xml --cov-report=term-missing --tb=short -q || (
+        echo "🚀 Running tests for Python ${{ matrix.python-version }} with parallelization..."
+        python -m pytest tests/ -n auto --cov=app --cov-report=xml:reports/coverage.xml --cov-report=term-missing --tb=short -q || (
           echo "⚠️ Some tests failed, but continuing with coverage report..."
           if [ -f reports/coverage.xml ]; then
             echo "✅ Coverage file exists"
