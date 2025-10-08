@@ -11,6 +11,15 @@ import os
 from pathlib import Path
 
 
+def get_venv_python():
+    """Retourne le chemin vers le Python du venv .venv_clean"""
+    venv_python = Path(__file__).parent.parent / ".venv_clean" / "Scripts" / "python.exe"
+    if venv_python.exists():
+        return str(venv_python)
+    # Fallback sur sys.executable si venv non trouvé
+    return sys.executable
+
+
 def run_regression_tests_on_changed_files():
     """
     Exécute les tests de non-régression sur les fichiers modifiés
@@ -35,8 +44,9 @@ def run_regression_tests_on_changed_files():
         
         # Génère les tests de régression
         print("\n🔧 Génération des tests de régression...")
+        python_exe = get_venv_python()
         subprocess.run([
-            sys.executable, 'scripts/generate_regression_tests.py',
+            python_exe, 'scripts/generate_regression_tests.py',
             '--files'] + python_files,
             check=True
         )
@@ -44,7 +54,7 @@ def run_regression_tests_on_changed_files():
         # Exécute les tests de régression
         print("\n🧪 Exécution des tests de régression...")
         test_result = subprocess.run([
-            sys.executable, '-m', 'pytest',
+            python_exe, '-m', 'pytest',
             'tests/regression/',
             '-v', '--tb=short',
             '--cov=app',
@@ -84,8 +94,9 @@ def post_merge_hook():
     print("🔄 Exécution du hook post-merge...")
     
     # Exécute tous les tests de régression
+    python_exe = get_venv_python()
     test_result = subprocess.run([
-        sys.executable, '-m', 'pytest',
+        python_exe, '-m', 'pytest',
         'tests/regression/',
         '-v',
         '--cov=app',
@@ -106,7 +117,7 @@ def setup_git_hooks():
     
     # Hook pré-commit
     pre_commit_path = hooks_dir / 'pre-commit'
-    pre_commit_content = f'''#!/usr/bin/env python3
+    pre_commit_content = '''#!/usr/bin/env python3
 import sys
 sys.path.insert(0, '.')
 from scripts.test_hooks import pre_commit_hook
@@ -119,7 +130,7 @@ pre_commit_hook()
     
     # Hook post-merge  
     post_merge_path = hooks_dir / 'post-merge'
-    post_merge_content = f'''#!/usr/bin/env python3
+    post_merge_content = '''#!/usr/bin/env python3
 import sys
 sys.path.insert(0, '.')
 from scripts.test_hooks import post_merge_hook
