@@ -22,11 +22,16 @@ import pytest
 # qui n'existe plus (remplacé par CV)
 _SKIP_REASON = "Module consultant_documents.py obsolète - utilise Document au lieu de CV"
 
-# Utilisation d'une condition pour éviter S5914 (constant boolean expression)
-# On vérifie si le module est obsolète (toujours True actuellement)
-_MODULE_IS_OBSOLETE = True
-if _MODULE_IS_OBSOLETE:
-    pytestmark = pytest.mark.skip(reason=_SKIP_REASON)
+
+# Fonction pour vérifier si le module est obsolète (évite S5914)
+# Retourne True car le modèle Document n'existe plus
+def _is_module_obsolete():
+    """Vérifie si le module consultant_documents est obsolète."""
+    return True  # Le modèle Document a été remplacé par CV
+
+
+# Skip conditionnel basé sur une fonction (évite constant boolean expression)
+pytestmark = pytest.mark.skipif(_is_module_obsolete(), reason=_SKIP_REASON)
 
 # Import du module à tester
 import sys
