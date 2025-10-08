@@ -1,0 +1,23 @@
+FICHIERS AVEC TESTS EN ÉCHEC
+================================================================================
+
+tests/unit/services/test_business_manager_service_phase49.py: 25 échecs
+tests/unit/ui/test_enhanced_ui.py: 25 échecs
+tests/unit/ui/test_enhanced_ui_phase51.py: 25 échecs
+tests/unit/pages_modules/test_consultant_documents_phase52.py: 23 échecs
+tests/unit/services/test_business_manager_service_phase20.py: 16 échecs
+tests/unit/services/test_widget_factory.py: 12 échecs
+tests/unit/services/test_widget_factory_phase50.py: 12 échecs
+tests/unit/services/test_chatbot_extraction_phase11.py: 9 échecs
+tests/unit/services/test_consultant_service_phase5.py: 9 échecs
+tests/unit/services/test_document_analyzer_phase9.py: 8 échecs
+tests/unit/pages_modules/test_consultant_list_phase23.py: 6 échecs
+tests/unit/utils/test_helpers_coverage.py: 4 échecs
+tests/unit/pages_modules/test_consultant_missions_phase53.py: 3 échecs
+tests/unit/pages_modules/test_consultant_skills_phase24.py: 3 échecs
+tests/unit/services/test_business_manager_service_phase39.py: 3 échecs
+tests/unit/pages_modules/test_consultant_profile_phase25.py: 2 échecs
+tests/unit/services/test_chatbot_handlers_phase7.py: 2 échecs
+tests/unit/services/test_consultant_service_phase8.py: 2 échecs
+tests/unit/test_real_functions_phase17.py: 1 échecs
+tests/unit/utils/test_helpers.py: 1 échecs
