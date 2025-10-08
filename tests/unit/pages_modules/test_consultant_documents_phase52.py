@@ -17,11 +17,15 @@ from unittest.mock import MagicMock, Mock, patch, mock_open
 
 import pytest
 
-# Skip tous les tests de ce fichier car le module est obsolète
-pytestmark = pytest.mark.skip(reason="Module consultant_documents.py obsolète - utilise Document au lieu de CV")
+# Configuration du skip pour tous les tests de ce fichier
+# Le module consultant_documents.py est obsolète et utilise un modèle Document
+# qui n'existe plus (remplacé par CV)
+_SKIP_REASON = "Module consultant_documents.py obsolète - utilise Document au lieu de CV"
+pytestmark = pytest.mark.skip(reason=_SKIP_REASON)
 
 # Import du module à tester
 import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 from app.pages_modules import consultant_documents
 
@@ -29,6 +33,7 @@ from app.pages_modules import consultant_documents
 # ============================================================================
 # FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def mock_consultant():
@@ -86,6 +91,7 @@ def mock_session():
 # TESTS: upload_document()
 # ============================================================================
 
+
 class TestUploadDocument:
     """Tests pour la fonction upload_document()"""
 
@@ -93,7 +99,9 @@ class TestUploadDocument:
     @patch("app.pages_modules.consultant_documents.os.makedirs")
     @patch("builtins.open", new_callable=mock_open)
     @patch("app.database.models.Document")
-    def test_upload_document_success(self, mock_doc_model, mock_file, mock_makedirs, mock_get_session, mock_session, mock_uploaded_file):
+    def test_upload_document_success(
+        self, mock_doc_model, mock_file, mock_makedirs, mock_get_session, mock_session, mock_uploaded_file
+    ):
         """Test upload réussi d'un document"""
         mock_get_session.return_value = mock_session
         mock_uploaded_file.getbuffer.return_value = b"PDF content"
@@ -128,7 +136,9 @@ class TestUploadDocument:
     @patch("app.pages_modules.consultant_documents.get_database_session")
     @patch("app.pages_modules.consultant_documents.os.makedirs")
     @patch("builtins.open", new_callable=mock_open)
-    def test_upload_document_service_error(self, mock_file, mock_makedirs, mock_get_session, mock_session, mock_uploaded_file):
+    def test_upload_document_service_error(
+        self, mock_file, mock_makedirs, mock_get_session, mock_session, mock_uploaded_file
+    ):
         """Test erreur lors de l'upload"""
         mock_get_session.return_value = mock_session
         mock_session.commit.side_effect = Exception("DB Error")
@@ -148,7 +158,9 @@ class TestUploadDocument:
     @patch("app.pages_modules.consultant_documents.get_database_session")
     @patch("app.pages_modules.consultant_documents.os.makedirs")
     @patch("builtins.open", new_callable=mock_open)
-    def test_upload_document_invalid_type(self, mock_file, mock_makedirs, mock_get_session, mock_session, mock_uploaded_file):
+    def test_upload_document_invalid_type(
+        self, mock_file, mock_makedirs, mock_get_session, mock_session, mock_uploaded_file
+    ):
         """Test upload avec type de document invalide"""
         mock_get_session.return_value = mock_session
         mock_uploaded_file.getbuffer.return_value = b"PDF content"
@@ -168,6 +180,7 @@ class TestUploadDocument:
 # ============================================================================
 # TESTS: download_document()
 # ============================================================================
+
 
 class TestDownloadDocument:
     """Tests pour la fonction download_document()"""
@@ -211,6 +224,7 @@ class TestDownloadDocument:
 # ============================================================================
 # TESTS: rename_document()
 # ============================================================================
+
 
 class TestRenameDocument:
     """Tests pour la fonction rename_document()"""
@@ -287,6 +301,7 @@ class TestRenameDocument:
 # TESTS: delete_document()
 # ============================================================================
 
+
 class TestDeleteDocument:
     """Tests pour la fonction delete_document()"""
 
@@ -320,7 +335,9 @@ class TestDeleteDocument:
     @patch("app.pages_modules.consultant_documents.get_database_session")
     @patch("app.pages_modules.consultant_documents.os.path.exists")
     @patch("app.pages_modules.consultant_documents.os.remove")
-    def test_delete_document_file_not_found(self, mock_remove, mock_exists, mock_get_session, mock_session, mock_document):
+    def test_delete_document_file_not_found(
+        self, mock_remove, mock_exists, mock_get_session, mock_session, mock_document
+    ):
         """Test suppression avec fichier physique introuvable"""
         mock_get_session.return_value = mock_session
         mock_session.query().filter().first.return_value = mock_document
@@ -352,6 +369,7 @@ class TestDeleteDocument:
 # ============================================================================
 # TESTS: _find_latest_cv()
 # ============================================================================
+
 
 class TestFindLatestCv:
     """Tests pour la fonction _find_latest_cv()"""
@@ -387,6 +405,7 @@ class TestFindLatestCv:
 # ============================================================================
 # TESTS: _load_document_for_rename()
 # ============================================================================
+
 
 class TestLoadDocumentForRename:
     """Tests pour la fonction _load_document_for_rename()"""
@@ -431,6 +450,7 @@ class TestLoadDocumentForRename:
 # TESTS: perform_cv_analysis()
 # ============================================================================
 
+
 class TestPerformCvAnalysis:
     """Tests pour la fonction perform_cv_analysis()"""
 
@@ -440,8 +460,15 @@ class TestPerformCvAnalysis:
     @patch("app.pages_modules.consultant_documents.get_database_session")
     @patch("streamlit.success")
     def test_perform_cv_analysis_openai_success(
-        self, mock_st_success, mock_get_session, mock_openai, mock_analyzer, mock_exists,
-        mock_document, mock_consultant, mock_session
+        self,
+        mock_st_success,
+        mock_get_session,
+        mock_openai,
+        mock_analyzer,
+        mock_exists,
+        mock_document,
+        mock_consultant,
+        mock_session,
     ):
         """Test analyse CV réussie avec OpenAI"""
         mock_exists.return_value = True
@@ -490,8 +517,15 @@ class TestPerformCvAnalysis:
     @patch("app.pages_modules.consultant_documents.get_database_session")
     @patch("streamlit.success")
     def test_perform_cv_analysis_grok_success(
-        self, mock_st_success, mock_get_session, mock_grok, mock_analyzer, mock_exists,
-        mock_document, mock_consultant, mock_session
+        self,
+        mock_st_success,
+        mock_get_session,
+        mock_grok,
+        mock_analyzer,
+        mock_exists,
+        mock_document,
+        mock_consultant,
+        mock_session,
     ):
         """Test analyse CV réussie avec Grok"""
         mock_exists.return_value = True
@@ -511,6 +545,7 @@ class TestPerformCvAnalysis:
 # ============================================================================
 # TESTS: show_documents_statistics() - UI Tests (légers)
 # ============================================================================
+
 
 class TestShowDocumentsStatistics:
     """Tests pour la fonction show_documents_statistics() (UI)"""
@@ -548,6 +583,7 @@ class TestShowDocumentsStatistics:
 # TESTS: Fonctions de helpers (intégration légère)
 # ============================================================================
 
+
 class TestHelperFunctions:
     """Tests pour les fonctions helpers"""
 
@@ -562,7 +598,9 @@ class TestHelperFunctions:
 
     @patch("app.pages_modules.consultant_documents.get_database_session")
     @patch("streamlit.success")
-    def test_handle_rename_form_submission_success(self, mock_st_success, mock_get_session, mock_session, mock_document):
+    def test_handle_rename_form_submission_success(
+        self, mock_st_success, mock_get_session, mock_session, mock_document
+    ):
         """Test soumission réussie du formulaire de renommage"""
         mock_get_session.return_value = mock_session
         mock_session.query().filter().first.return_value = mock_document
