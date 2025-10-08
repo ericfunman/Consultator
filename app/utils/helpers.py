@@ -8,13 +8,8 @@ import os
 import re
 import unicodedata
 import uuid
-from datetime import date
-from datetime import datetime
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Union
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 import streamlit as st
@@ -203,9 +198,7 @@ def round_to_nearest(value: float, nearest: float) -> float:
 
     try:
         # Utiliser decimal pour éviter les problèmes de précision flottante
-        from decimal import ROUND_HALF_UP
-        from decimal import Decimal
-        from decimal import InvalidOperation
+        from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
         result = Decimal(str(value)) / Decimal(str(nearest))
         result = result.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
@@ -703,17 +696,18 @@ def convert_to_dataframe(data: List[Dict]) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def export_to_csv(df: pd.DataFrame, filename: str = None) -> str:  # noqa: ARG001
+def export_to_csv(df: pd.DataFrame, filename: str = None) -> str:
     """
     Exporte un DataFrame en CSV
 
     Args:
         df: DataFrame à exporter
-        filename: Nom du fichier (optionnel, non utilisé dans export string)
+        filename: Nom du fichier (optionnel, conservé pour compatibilité API)
 
     Returns:
         CSV en string
     """
+    _ = filename  # Paramètre conservé pour compatibilité API
     if df is None or df.empty:
         return ""
 
@@ -723,17 +717,18 @@ def export_to_csv(df: pd.DataFrame, filename: str = None) -> str:  # noqa: ARG00
         return ""
 
 
-def export_to_excel(df: pd.DataFrame, filename: str = None) -> bytes:  # noqa: ARG001
+def export_to_excel(df: pd.DataFrame, filename: str = None) -> bytes:
     """
     Exporte un DataFrame en Excel
 
     Args:
         df: DataFrame à exporter
-        filename: Nom du fichier (optionnel, non utilisé dans export bytes)
+        filename: Nom du fichier (optionnel, conservé pour compatibilité API)
 
     Returns:
         Données Excel en bytes
     """
+    _ = filename  # Paramètre conservé pour compatibilité API
     if df is None or df.empty:
         return b""
 
