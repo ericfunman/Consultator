@@ -37,12 +37,12 @@ jobs:
         run: |
           mkdir -p reports
           echo "🚀 Running Phase 54-58 tests for 80% coverage target..."
-          python -m pytest tests/unit/services/test_*_phase5*.py \
-            tests/unit/services/test_cache_service.py \
-            tests/unit/services/test_dashboard_service.py \
-            tests/unit/services/test_document_service.py \
-            tests/unit/services/test_document_analyzer*.py \
-            tests/unit/services/test_technology_service.py \
+          python -m pytest \
+            tests/unit/services/test_cache_service_phase55.py \
+            tests/unit/services/test_dashboard_service_phase58.py \
+            tests/unit/services/test_document_analyzer_phase54.py \
+            tests/unit/services/test_document_service_phase57.py \
+            tests/unit/services/test_technology_service_phase56.py \
             --cov=app.services.cache_service \
             --cov=app.services.dashboard_service \
             --cov=app.services.document_service \
